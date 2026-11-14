@@ -1,0 +1,1066 @@
+{
+ "meta": {
+  "generated_utc": "2026-11-14T19:59:43Z",
+  "pipeline_version": "walkval-0.1",
+  "seed": 2026,
+  "earth_library": {
+   "generated_utc": "2026-11-14T19:54:57Z",
+   "pipeline_version": "earth-0.2",
+   "n": 22000,
+   "points": 100
+  },
+  "moon_regions": [
+   "cabeus_b_peak",
+   "haworth",
+   "malapert_massif",
+   "mons_mouton_plateau",
+   "mons_mouton",
+   "nobile_rim_1",
+   "nobile_rim_2",
+   "de_gerlache_rim_2",
+   "slater_plain"
+  ],
+  "method": "Each Moon route's distorted copy is appended to the Earth slope library; rank 1 means the matcher put the hidden copy above all real Earth transects. Ties count against the copy. Both walking directions are scored for every row, as the browser does.",
+  "timing_note": "Single-threaded numba on the build machine, whole library unless stated; no early abandoning (the browser abandons rows that cannot enter its top 5, so its DTW is faster than the full-scan figure).",
+  "sources": [
+   {
+    "name": "Moon tiles and Earth transects from this project's pipeline",
+    "url": "web/public/data/regions.json; web/public/data/walk/transects.json",
+    "licence": "see those files",
+    "citation": "see those files"
+   },
+   {
+    "name": "Sakoe & Chiba band",
+    "url": "https://doi.org/10.1109/TASSP.1978.1163055",
+    "licence": "n/a (method)",
+    "citation": "Sakoe, H., Chiba, S. (1978). Dynamic programming algorithm optimization for spoken word recognition. IEEE TASSP 26(1):43-49."
+   }
+  ]
+ },
+ "n_routes": 300,
+ "routes": {
+  "length_m": [
+   1000,
+   4000
+  ],
+  "shapes": {
+   "straight": 150,
+   "two_leg": 150
+  },
+  "per_region": {
+   "cabeus_b_peak": 34,
+   "haworth": 34,
+   "malapert_massif": 34,
+   "mons_mouton_plateau": 33,
+   "mons_mouton": 33,
+   "nobile_rim_1": 33,
+   "nobile_rim_2": 33,
+   "de_gerlache_rim_2": 33,
+   "slater_plain": 33
+  },
+  "points": 100
+ },
+ "needle_distortion": {
+  "height_noise_sigma_m": 2.0,
+  "height_noise_model": "i.i.d. Gaussian per 30 m DEM pixel, then bilinear sampling",
+  "length_stretch": 0.05,
+  "stretch_model": "one random contiguous half of the route stretched by 1+2s (local time warp)",
+  "reversal_probability": 0.5,
+  "n_reversed": 150,
+  "slope_rederived": true,
+  "stored_as_float32": true
+ },
+ "matchers": [
+  {
+   "name": "dtw_slope",
+   "description": "Banded DTW (Sakoe-Chiba 10%) on signed slope - the browser's default search",
+   "top1": 0.39,
+   "top5": 0.6033,
+   "median_rank": 3.0,
+   "ms_per_query": 1096.34,
+   "rows_searched": 22000
+  },
+  {
+   "name": "dtw_slope_znorm",
+   "description": "Banded DTW 10% on z-normalised slope - the browser's 'Compare shape only' option",
+   "top1": 0.1333,
+   "top5": 0.21,
+   "median_rank": 113.5,
+   "ms_per_query": 980.7,
+   "rows_searched": 22000
+  },
+  {
+   "name": "euclid_slope",
+   "description": "Euclidean (RMS) on signed slope, no warping",
+   "top1": 0.57,
+   "top5": 0.7367,
+   "median_rank": 1.0,
+   "ms_per_query": 3.83,
+   "rows_searched": 22000
+  },
+  {
+   "name": "euclid_height_slope",
+   "description": "Euclidean on relative height + slope, each channel standardised by the library spread",
+   "top1": 0.7733,
+   "top5": 0.8633,
+   "median_rank": 1.0,
+   "ms_per_query": 8.1,
+   "rows_searched": 22000
+  },
+  {
+   "name": "dtw_app",
+   "description": "The browser pipeline: Walk.tsx prefilter (nearest length class + climb/steepest-slope window), then banded DTW 10% on slope",
+   "top1": 0.3867,
+   "top5": 0.47,
+   "median_rank": 10.0,
+   "ms_per_query": 149.21,
+   "rows_searched": 2979,
+   "needle_filtered_out": 0.3367,
+   "median_candidates": 2842
+  }
+ ],
+ "winner": "euclid_height_slope",
+ "by_length": [
+  {
+   "bin": "1-2 km",
+   "n": 103,
+   "matchers": {
+    "dtw_slope": {
+     "n": 103,
+     "top1": 0.1748,
+     "top5": 0.3398,
+     "median_rank": 26.0
+    },
+    "dtw_slope_znorm": {
+     "n": 103,
+     "top1": 0.0583,
+     "top5": 0.1165,
+     "median_rank": 737.0
+    },
+    "euclid_slope": {
+     "n": 103,
+     "top1": 0.2524,
+     "top5": 0.466,
+     "median_rank": 6.0
+    },
+    "euclid_height_slope": {
+     "n": 103,
+     "top1": 0.466,
+     "top5": 0.6408,
+     "median_rank": 2.0
+    },
+    "dtw_app": {
+     "n": 103,
+     "top1": 0.2136,
+     "top5": 0.2718,
+     "median_rank": 116.0,
+     "filtered_out": 0.3204
+    }
+   }
+  },
+  {
+   "bin": "2-3 km",
+   "n": 103,
+   "matchers": {
+    "dtw_slope": {
+     "n": 103,
+     "top1": 0.3495,
+     "top5": 0.6117,
+     "median_rank": 3.0
+    },
+    "dtw_slope_znorm": {
+     "n": 103,
+     "top1": 0.0971,
+     "top5": 0.165,
+     "median_rank": 133.0
+    },
+    "euclid_slope": {
+     "n": 103,
+     "top1": 0.5922,
+     "top5": 0.7961,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 103,
+     "top1": 0.8835,
+     "top5": 0.9709,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 103,
+     "top1": 0.3495,
+     "top5": 0.5049,
+     "median_rank": 5.0,
+     "filtered_out": 0.3495
+    }
+   }
+  },
+  {
+   "bin": "3-4 km",
+   "n": 94,
+   "matchers": {
+    "dtw_slope": {
+     "n": 94,
+     "top1": 0.6702,
+     "top5": 0.883,
+     "median_rank": 1.0
+    },
+    "dtw_slope_znorm": {
+     "n": 94,
+     "top1": 0.2553,
+     "top5": 0.3617,
+     "median_rank": 15.5
+    },
+    "euclid_slope": {
+     "n": 94,
+     "top1": 0.8936,
+     "top5": 0.9681,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 94,
+     "top1": 0.9894,
+     "top5": 0.9894,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 94,
+     "top1": 0.617,
+     "top5": 0.6489,
+     "median_rank": 1.0,
+     "filtered_out": 0.3404
+    }
+   }
+  }
+ ],
+ "by_region": [
+  {
+   "bin": "cabeus_b_peak",
+   "n": 34,
+   "matchers": {
+    "dtw_slope": {
+     "n": 34,
+     "top1": 0.6176,
+     "top5": 0.8529,
+     "median_rank": 1.0
+    },
+    "dtw_slope_znorm": {
+     "n": 34,
+     "top1": 0.2059,
+     "top5": 0.3529,
+     "median_rank": 26.5
+    },
+    "euclid_slope": {
+     "n": 34,
+     "top1": 0.7059,
+     "top5": 0.9118,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 34,
+     "top1": 0.9412,
+     "top5": 1.0,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 34,
+     "top1": 0.4412,
+     "top5": 0.5,
+     "median_rank": null,
+     "filtered_out": 0.5
+    }
+   }
+  },
+  {
+   "bin": "haworth",
+   "n": 34,
+   "matchers": {
+    "dtw_slope": {
+     "n": 34,
+     "top1": 0.2647,
+     "top5": 0.5,
+     "median_rank": 5.5
+    },
+    "dtw_slope_znorm": {
+     "n": 34,
+     "top1": 0.1176,
+     "top5": 0.1471,
+     "median_rank": 73.0
+    },
+    "euclid_slope": {
+     "n": 34,
+     "top1": 0.5,
+     "top5": 0.6471,
+     "median_rank": 1.5
+    },
+    "euclid_height_slope": {
+     "n": 34,
+     "top1": 0.6471,
+     "top5": 0.7353,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 34,
+     "top1": 0.4118,
+     "top5": 0.5294,
+     "median_rank": 4.0,
+     "filtered_out": 0.2353
+    }
+   }
+  },
+  {
+   "bin": "malapert_massif",
+   "n": 34,
+   "matchers": {
+    "dtw_slope": {
+     "n": 34,
+     "top1": 0.6765,
+     "top5": 0.8824,
+     "median_rank": 1.0
+    },
+    "dtw_slope_znorm": {
+     "n": 34,
+     "top1": 0.2353,
+     "top5": 0.3235,
+     "median_rank": 42.5
+    },
+    "euclid_slope": {
+     "n": 34,
+     "top1": 0.7059,
+     "top5": 0.8529,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 34,
+     "top1": 0.8824,
+     "top5": 0.9118,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 34,
+     "top1": 0.4706,
+     "top5": 0.5,
+     "median_rank": 4.5,
+     "filtered_out": 0.3824
+    }
+   }
+  },
+  {
+   "bin": "mons_mouton_plateau",
+   "n": 33,
+   "matchers": {
+    "dtw_slope": {
+     "n": 33,
+     "top1": 0.2424,
+     "top5": 0.5152,
+     "median_rank": 5.0
+    },
+    "dtw_slope_znorm": {
+     "n": 33,
+     "top1": 0.0606,
+     "top5": 0.1515,
+     "median_rank": 124.0
+    },
+    "euclid_slope": {
+     "n": 33,
+     "top1": 0.6061,
+     "top5": 0.7273,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 33,
+     "top1": 0.7576,
+     "top5": 0.8485,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 33,
+     "top1": 0.3939,
+     "top5": 0.4848,
+     "median_rank": 7.0,
+     "filtered_out": 0.2424
+    }
+   }
+  },
+  {
+   "bin": "mons_mouton",
+   "n": 33,
+   "matchers": {
+    "dtw_slope": {
+     "n": 33,
+     "top1": 0.3636,
+     "top5": 0.5758,
+     "median_rank": 3.0
+    },
+    "dtw_slope_znorm": {
+     "n": 33,
+     "top1": 0.1515,
+     "top5": 0.2121,
+     "median_rank": 107.0
+    },
+    "euclid_slope": {
+     "n": 33,
+     "top1": 0.6061,
+     "top5": 0.7273,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 33,
+     "top1": 0.6667,
+     "top5": 0.8788,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 33,
+     "top1": 0.303,
+     "top5": 0.3939,
+     "median_rank": 16.0,
+     "filtered_out": 0.3333
+    }
+   }
+  },
+  {
+   "bin": "nobile_rim_1",
+   "n": 33,
+   "matchers": {
+    "dtw_slope": {
+     "n": 33,
+     "top1": 0.4545,
+     "top5": 0.6667,
+     "median_rank": 2.0
+    },
+    "dtw_slope_znorm": {
+     "n": 33,
+     "top1": 0.1818,
+     "top5": 0.2121,
+     "median_rank": 60.0
+    },
+    "euclid_slope": {
+     "n": 33,
+     "top1": 0.6364,
+     "top5": 0.7273,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 33,
+     "top1": 0.8182,
+     "top5": 0.9394,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 33,
+     "top1": 0.4242,
+     "top5": 0.4848,
+     "median_rank": 6.0,
+     "filtered_out": 0.3939
+    }
+   }
+  },
+  {
+   "bin": "nobile_rim_2",
+   "n": 33,
+   "matchers": {
+    "dtw_slope": {
+     "n": 33,
+     "top1": 0.303,
+     "top5": 0.4545,
+     "median_rank": 8.0
+    },
+    "dtw_slope_znorm": {
+     "n": 33,
+     "top1": 0.0606,
+     "top5": 0.1818,
+     "median_rank": 243.0
+    },
+    "euclid_slope": {
+     "n": 33,
+     "top1": 0.5455,
+     "top5": 0.7273,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 33,
+     "top1": 0.8182,
+     "top5": 0.8788,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 33,
+     "top1": 0.3939,
+     "top5": 0.5455,
+     "median_rank": 4.0,
+     "filtered_out": 0.2727
+    }
+   }
+  },
+  {
+   "bin": "de_gerlache_rim_2",
+   "n": 33,
+   "matchers": {
+    "dtw_slope": {
+     "n": 33,
+     "top1": 0.3333,
+     "top5": 0.6061,
+     "median_rank": 3.0
+    },
+    "dtw_slope_znorm": {
+     "n": 33,
+     "top1": 0.1515,
+     "top5": 0.1818,
+     "median_rank": 212.0
+    },
+    "euclid_slope": {
+     "n": 33,
+     "top1": 0.5455,
+     "top5": 0.7879,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 33,
+     "top1": 0.8182,
+     "top5": 0.9091,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 33,
+     "top1": 0.2727,
+     "top5": 0.3636,
+     "median_rank": 93.0,
+     "filtered_out": 0.4242
+    }
+   }
+  },
+  {
+   "bin": "slater_plain",
+   "n": 33,
+   "matchers": {
+    "dtw_slope": {
+     "n": 33,
+     "top1": 0.2424,
+     "top5": 0.3636,
+     "median_rank": 21.0
+    },
+    "dtw_slope_znorm": {
+     "n": 33,
+     "top1": 0.0303,
+     "top5": 0.1212,
+     "median_rank": 731.0
+    },
+    "euclid_slope": {
+     "n": 33,
+     "top1": 0.2727,
+     "top5": 0.5152,
+     "median_rank": 4.0
+    },
+    "euclid_height_slope": {
+     "n": 33,
+     "top1": 0.6061,
+     "top5": 0.6667,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 33,
+     "top1": 0.3636,
+     "top5": 0.4242,
+     "median_rank": 33.0,
+     "filtered_out": 0.2424
+    }
+   }
+  }
+ ],
+ "by_shape": [
+  {
+   "bin": "straight",
+   "n": 150,
+   "matchers": {
+    "dtw_slope": {
+     "n": 150,
+     "top1": 0.34,
+     "top5": 0.5867,
+     "median_rank": 3.0
+    },
+    "dtw_slope_znorm": {
+     "n": 150,
+     "top1": 0.08,
+     "top5": 0.1533,
+     "median_rank": 224.0
+    },
+    "euclid_slope": {
+     "n": 150,
+     "top1": 0.54,
+     "top5": 0.7333,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 150,
+     "top1": 0.7933,
+     "top5": 0.88,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 150,
+     "top1": 0.3333,
+     "top5": 0.42,
+     "median_rank": 65.5,
+     "filtered_out": 0.4067
+    }
+   }
+  },
+  {
+   "bin": "two_leg",
+   "n": 150,
+   "matchers": {
+    "dtw_slope": {
+     "n": 150,
+     "top1": 0.44,
+     "top5": 0.62,
+     "median_rank": 2.0
+    },
+    "dtw_slope_znorm": {
+     "n": 150,
+     "top1": 0.1867,
+     "top5": 0.2667,
+     "median_rank": 65.5
+    },
+    "euclid_slope": {
+     "n": 150,
+     "top1": 0.6,
+     "top5": 0.74,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 150,
+     "top1": 0.7533,
+     "top5": 0.8467,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 150,
+     "top1": 0.44,
+     "top5": 0.52,
+     "median_rank": 3.5,
+     "filtered_out": 0.2667
+    }
+   }
+  }
+ ],
+ "by_direction": [
+  {
+   "bin": "as_walked",
+   "n": 150,
+   "matchers": {
+    "dtw_slope": {
+     "n": 150,
+     "top1": 0.36,
+     "top5": 0.58,
+     "median_rank": 3.5
+    },
+    "dtw_slope_znorm": {
+     "n": 150,
+     "top1": 0.1067,
+     "top5": 0.1733,
+     "median_rank": 123.5
+    },
+    "euclid_slope": {
+     "n": 150,
+     "top1": 0.5467,
+     "top5": 0.7267,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 150,
+     "top1": 0.78,
+     "top5": 0.86,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 150,
+     "top1": 0.5533,
+     "top5": 0.6867,
+     "median_rank": 1.0,
+     "filtered_out": 0.06
+    }
+   }
+  },
+  {
+   "bin": "reversed",
+   "n": 150,
+   "matchers": {
+    "dtw_slope": {
+     "n": 150,
+     "top1": 0.42,
+     "top5": 0.6267,
+     "median_rank": 2.0
+    },
+    "dtw_slope_znorm": {
+     "n": 150,
+     "top1": 0.16,
+     "top5": 0.2467,
+     "median_rank": 101.5
+    },
+    "euclid_slope": {
+     "n": 150,
+     "top1": 0.5933,
+     "top5": 0.7467,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "n": 150,
+     "top1": 0.7667,
+     "top5": 0.8667,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "n": 150,
+     "top1": 0.22,
+     "top5": 0.2533,
+     "median_rank": null,
+     "filtered_out": 0.6133
+    }
+   }
+  }
+ ],
+ "sweep": [
+  {
+   "sigma_m": 1.0,
+   "stretch": 0.0,
+   "matchers": {
+    "dtw_slope": {
+     "top1": 0.8533,
+     "top5": 0.9367,
+     "median_rank": 1.0
+    },
+    "dtw_slope_znorm": {
+     "top1": 0.6933,
+     "top5": 0.7867,
+     "median_rank": 1.0
+    },
+    "euclid_slope": {
+     "top1": 0.94,
+     "top5": 0.9733,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "top1": 0.97,
+     "top5": 0.9833,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "top1": 0.6267,
+     "top5": 0.6533,
+     "median_rank": 1.0,
+     "filtered_out": 0.3033
+    }
+   }
+  },
+  {
+   "sigma_m": 1.0,
+   "stretch": 0.05,
+   "matchers": {
+    "dtw_slope": {
+     "top1": 0.8667,
+     "top5": 0.94,
+     "median_rank": 1.0
+    },
+    "dtw_slope_znorm": {
+     "top1": 0.5833,
+     "top5": 0.7367,
+     "median_rank": 1.0
+    },
+    "euclid_slope": {
+     "top1": 0.92,
+     "top5": 0.9633,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "top1": 0.9633,
+     "top5": 0.9767,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "top1": 0.5933,
+     "top5": 0.63,
+     "median_rank": 1.0,
+     "filtered_out": 0.3367
+    }
+   }
+  },
+  {
+   "sigma_m": 1.0,
+   "stretch": 0.1,
+   "matchers": {
+    "dtw_slope": {
+     "top1": 0.82,
+     "top5": 0.9533,
+     "median_rank": 1.0
+    },
+    "dtw_slope_znorm": {
+     "top1": 0.4867,
+     "top5": 0.6267,
+     "median_rank": 2.0
+    },
+    "euclid_slope": {
+     "top1": 0.7,
+     "top5": 0.9167,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "top1": 0.88,
+     "top5": 0.9633,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "top1": 0.5567,
+     "top5": 0.6,
+     "median_rank": 1.0,
+     "filtered_out": 0.38
+    }
+   }
+  },
+  {
+   "sigma_m": 2.0,
+   "stretch": 0.0,
+   "matchers": {
+    "dtw_slope": {
+     "top1": 0.3733,
+     "top5": 0.5867,
+     "median_rank": 3.0
+    },
+    "dtw_slope_znorm": {
+     "top1": 0.1433,
+     "top5": 0.2433,
+     "median_rank": 117.0
+    },
+    "euclid_slope": {
+     "top1": 0.6467,
+     "top5": 0.7567,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "top1": 0.7933,
+     "top5": 0.8633,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "top1": 0.3967,
+     "top5": 0.49,
+     "median_rank": 7.5,
+     "filtered_out": 0.3033
+    }
+   }
+  },
+  {
+   "sigma_m": 2.0,
+   "stretch": 0.05,
+   "matchers": {
+    "dtw_slope": {
+     "top1": 0.39,
+     "top5": 0.6033,
+     "median_rank": 3.0
+    },
+    "dtw_slope_znorm": {
+     "top1": 0.1333,
+     "top5": 0.21,
+     "median_rank": 113.5
+    },
+    "euclid_slope": {
+     "top1": 0.57,
+     "top5": 0.7367,
+     "median_rank": 1.0
+    },
+    "euclid_height_slope": {
+     "top1": 0.7733,
+     "top5": 0.8633,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "top1": 0.3867,
+     "top5": 0.47,
+     "median_rank": 10.0,
+     "filtered_out": 0.3367
+    }
+   }
+  },
+  {
+   "sigma_m": 2.0,
+   "stretch": 0.1,
+   "matchers": {
+    "dtw_slope": {
+     "top1": 0.3567,
+     "top5": 0.5967,
+     "median_rank": 3.0
+    },
+    "dtw_slope_znorm": {
+     "top1": 0.0933,
+     "top5": 0.1767,
+     "median_rank": 145.5
+    },
+    "euclid_slope": {
+     "top1": 0.3633,
+     "top5": 0.5967,
+     "median_rank": 3.0
+    },
+    "euclid_height_slope": {
+     "top1": 0.7067,
+     "top5": 0.8367,
+     "median_rank": 1.0
+    },
+    "dtw_app": {
+     "top1": 0.3633,
+     "top5": 0.4367,
+     "median_rank": 21.5,
+     "filtered_out": 0.3833
+    }
+   }
+  },
+  {
+   "sigma_m": 5.0,
+   "stretch": 0.0,
+   "matchers": {
+    "dtw_slope": {
+     "top1": 0.0133,
+     "top5": 0.0433,
+     "median_rank": 587.0
+    },
+    "dtw_slope_znorm": {
+     "top1": 0.0,
+     "top5": 0.0,
+     "median_rank": 2959.5
+    },
+    "euclid_slope": {
+     "top1": 0.09,
+     "top5": 0.1633,
+     "median_rank": 261.0
+    },
+    "euclid_height_slope": {
+     "top1": 0.3433,
+     "top5": 0.4533,
+     "median_rank": 12.0
+    },
+    "dtw_app": {
+     "top1": 0.04,
+     "top5": 0.0967,
+     "median_rank": 2016.0,
+     "filtered_out": 0.4567
+    }
+   }
+  },
+  {
+   "sigma_m": 5.0,
+   "stretch": 0.05,
+   "matchers": {
+    "dtw_slope": {
+     "top1": 0.02,
+     "top5": 0.05,
+     "median_rank": 450.5
+    },
+    "dtw_slope_znorm": {
+     "top1": 0.0,
+     "top5": 0.0067,
+     "median_rank": 3075.5
+    },
+    "euclid_slope": {
+     "top1": 0.08,
+     "top5": 0.1467,
+     "median_rank": 224.5
+    },
+    "euclid_height_slope": {
+     "top1": 0.3367,
+     "top5": 0.4533,
+     "median_rank": 12.0
+    },
+    "dtw_app": {
+     "top1": 0.05,
+     "top5": 0.1167,
+     "median_rank": 2703.5,
+     "filtered_out": 0.4633
+    }
+   }
+  },
+  {
+   "sigma_m": 5.0,
+   "stretch": 0.1,
+   "matchers": {
+    "dtw_slope": {
+     "top1": 0.01,
+     "top5": 0.0533,
+     "median_rank": 351.5
+    },
+    "dtw_slope_znorm": {
+     "top1": 0.0,
+     "top5": 0.0,
+     "median_rank": 2891.0
+    },
+    "euclid_slope": {
+     "top1": 0.0367,
+     "top5": 0.1233,
+     "median_rank": 229.5
+    },
+    "euclid_height_slope": {
+     "top1": 0.29,
+     "top5": 0.43,
+     "median_rank": 16.0
+    },
+    "dtw_app": {
+     "top1": 0.05,
+     "top5": 0.1133,
+     "median_rank": 4047.0,
+     "filtered_out": 0.4867
+    }
+   }
+  }
+ ],
+ "quality": {
+  "note": "Best real Earth transect for each clean Moon route (needle excluded). Earth heights are rebuilt by integrating the stored slopes (transects.bin has no heights), so height RMSE includes a small reconstruction error, shown below for the Moon routes themselves.",
+  "app_pipeline": {
+   "height_rmse_m": {
+    "median": 22.08,
+    "p10": 6.67,
+    "p90": 59.56
+   },
+   "max_slope_diff_deg": {
+    "median": 1.78,
+    "p10": 0.33,
+    "p90": 5.84
+   },
+   "share_max_slope_within_5deg": 0.8667,
+   "match_distance": {
+    "median": 1.51,
+    "p10": 0.9,
+    "p90": 2.77
+   },
+   "share_earth_length_within_50pct": 0.9433
+  },
+  "winner_full_library": {
+   "matcher": "euclid_height_slope",
+   "height_rmse_m": {
+    "median": 12.63,
+    "p10": 4.84,
+    "p90": 26.95
+   },
+   "max_slope_diff_deg": {
+    "median": 2.27,
+    "p10": 0.44,
+    "p90": 6.66
+   },
+   "share_max_slope_within_5deg": 0.8067,
+   "match_distance": {
+    "median": 0.25,
+    "p10": 0.13,
+    "p90": 0.43
+   },
+   "share_earth_length_within_50pct": 0.9233
+  },
+  "height_reconstruction_rmse_m": {
+   "median": 0.2,
+   "p10": 0.07,
+   "p90": 0.37
+  }
+ },
+ "skipped": [
+  {
+   "name": "matrix_profile_aamp",
+   "why": "Not run: with fixed 100-point profiles a non-normalised matrix profile at full window equals Euclidean, and shorter windows match sub-sections rather than whole walks; stumpy was not added as a dependency."
+  }
+ ]
+}

@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_utc": "2026-11-14T19:54:31Z",
+  "generated_utc": "2026-11-14T20:01:18Z",
   "pipeline_version": "match-0.1.0",
   "sources": [
    {
@@ -58,6 +58,12 @@
     "citation": "Imagery courtesy of NASA Global Imagery Browse Services (GIBS), HLS Sentinel-2 surface reflectance."
    },
    {
+    "name": "GeoNames cities1000",
+    "url": "https://download.geonames.org/export/dump/",
+    "licence": "CC-BY 4.0",
+    "citation": "GeoNames geographical database (geonames.org), CC-BY 4.0"
+   },
+   {
     "name": "Astropy (get_sun, AltAz refraction)",
     "url": "https://www.astropy.org/",
     "licence": "BSD-3-Clause",
@@ -71,21 +77,21 @@
    }
   ],
   "earth_sites_snapshot": {
-   "generated_utc": "2026-11-14T19:06:48Z",
+   "generated_utc": "2026-11-14T19:54:50Z",
    "pipeline_version": "earth-0.2",
-   "partial": true,
-   "sig": "2f279d5cf8fd266c"
+   "partial": false,
+   "sig": "9d99bc590ba72fe6"
   },
   "ranking_method": "rehearsability = 1 / (1 + mean best distance + 0.5 × Σ max(0, best distance − 1.0)) over the 3 hazards; distance 1 ≈ one Moon-region IQR off",
   "runtimes": {
-   "moon_ref_s": 8.8,
-   "earth_feats_s": 7.5,
-   "matching_s": 0.0,
-   "windows_s": 32.9,
-   "weight_stability_s": 0.2,
-   "classifier_s": 25.9,
-   "synthetic_tests_s": 0.8,
-   "total_s": 76.3
+   "moon_ref_s": 0.0,
+   "earth_feats_s": 0.0,
+   "matching_s": 1.3,
+   "windows_s": 0.0,
+   "weight_stability_s": 2.1,
+   "classifier_s": 0.0,
+   "synthetic_tests_s": 0.0,
+   "total_s": 3.5
   }
  },
  "ranking": [
@@ -93,163 +99,163 @@
    "region_id": "slater_plain",
    "rank": 1,
    "region_name": "Slater Plain",
-   "rehearsability": 0.7862,
+   "rehearsability": 0.8156,
    "per_hazard_best_distance": {
     "shadow": 0.1859,
     "rim": 0.372,
-    "texture": 0.2578
+    "texture": 0.1204
    },
    "per_hazard_best_site": {
     "shadow": "S00241",
     "rim": "S01056",
-    "texture": "S00241"
+    "texture": "S01222"
    },
    "weakest_hazard": "rim",
-   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: Screen window S01056, 0.37 Moon-IQRs off)."
+   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: 84 km SE of Pica, 0.37 Moon-IQRs off)."
+  },
+  {
+   "region_id": "nobile_rim_2",
+   "rank": 2,
+   "region_name": "Nobile Rim 2",
+   "rehearsability": 0.7882,
+   "per_hazard_best_distance": {
+    "shadow": 0.192,
+    "rim": 0.5276,
+    "texture": 0.0864
+   },
+   "per_hazard_best_site": {
+    "shadow": "S04053",
+    "rim": "S04078",
+    "texture": "S04676"
+   },
+   "weakest_hazard": "rim",
+   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: 289 km E of Kamenskoye, 0.53 Moon-IQRs off)."
   },
   {
    "region_id": "mons_mouton_plateau",
-   "rank": 2,
+   "rank": 3,
    "region_name": "Mons Mouton Plateau",
-   "rehearsability": 0.7717,
+   "rehearsability": 0.7806,
    "per_hazard_best_distance": {
-    "shadow": 0.2333,
+    "shadow": 0.1887,
     "rim": 0.5147,
     "texture": 0.1396
    },
    "per_hazard_best_site": {
-    "shadow": "S00255",
+    "shadow": "S03644",
     "rim": "S01056",
     "texture": "S01100"
    },
    "weakest_hazard": "rim",
-   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: Screen window S01056, 0.51 Moon-IQRs off)."
-  },
-  {
-   "region_id": "nobile_rim_2",
-   "rank": 3,
-   "region_name": "Nobile Rim 2",
-   "rehearsability": 0.7468,
-   "per_hazard_best_distance": {
-    "shadow": 0.2333,
-    "rim": 0.541,
-    "texture": 0.2428
-   },
-   "per_hazard_best_site": {
-    "shadow": "S00356",
-    "rim": "S00241",
-    "texture": "S01095"
-   },
-   "weakest_hazard": "rim",
-   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: Screen window S00241, 0.54 Moon-IQRs off)."
+   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: 84 km SE of Pica, 0.51 Moon-IQRs off)."
   },
   {
    "region_id": "haworth",
    "rank": 4,
    "region_name": "Haworth",
-   "rehearsability": 0.7016,
+   "rehearsability": 0.7508,
    "per_hazard_best_distance": {
     "shadow": 0.4481,
-    "rim": 0.4275,
-    "texture": 0.4004
+    "rim": 0.4222,
+    "texture": 0.1253
    },
    "per_hazard_best_site": {
     "shadow": "S00241",
-    "rim": "S00356",
-    "texture": "S01100"
+    "rim": "S04010",
+    "texture": "S03631"
    },
    "weakest_hazard": "shadow",
-   "reason": "All three hazards have a close Earth match; the weakest is low-sun shadows (best: Screen window S00241, 0.45 Moon-IQRs off)."
+   "reason": "All three hazards have a close Earth match; the weakest is low-sun shadows (best: 48 km NW of Mosgiel, 0.45 Moon-IQRs off)."
   },
   {
    "region_id": "mons_mouton",
    "rank": 5,
    "region_name": "Mons Mouton",
-   "rehearsability": 0.6969,
+   "rehearsability": 0.7446,
    "per_hazard_best_distance": {
     "shadow": 0.3311,
-    "rim": 0.6954,
-    "texture": 0.2783
+    "rim": 0.6343,
+    "texture": 0.0638
    },
    "per_hazard_best_site": {
     "shadow": "S00356",
-    "rim": "S01026",
-    "texture": "S01158"
+    "rim": "S02302",
+    "texture": "S02247"
    },
    "weakest_hazard": "rim",
-   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: Screen window S01026, 0.70 Moon-IQRs off)."
+   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: 18 km SE of Deder, 0.63 Moon-IQRs off)."
   },
   {
    "region_id": "nobile_rim_1",
    "rank": 6,
    "region_name": "Nobile Rim 1",
-   "rehearsability": 0.6897,
+   "rehearsability": 0.7301,
    "per_hazard_best_distance": {
-    "shadow": 0.5795,
-    "rim": 0.6402,
-    "texture": 0.1298
+    "shadow": 0.5371,
+    "rim": 0.4932,
+    "texture": 0.0789
    },
    "per_hazard_best_site": {
-    "shadow": "S00356",
-    "rim": "S01191",
-    "texture": "S01095"
+    "shadow": "S03018",
+    "rim": "S01417",
+    "texture": "S01331"
    },
-   "weakest_hazard": "rim",
-   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: Screen window S01191, 0.64 Moon-IQRs off)."
+   "weakest_hazard": "shadow",
+   "reason": "All three hazards have a close Earth match; the weakest is low-sun shadows (best: 18 km SW of Bustamante, 0.54 Moon-IQRs off)."
   },
   {
    "region_id": "de_gerlache_rim_2",
    "rank": 7,
    "region_name": "de Gerlache Rim 2",
-   "rehearsability": 0.6351,
+   "rehearsability": 0.6791,
    "per_hazard_best_distance": {
-    "shadow": 0.9581,
-    "rim": 0.368,
-    "texture": 0.3977
+    "shadow": 0.8748,
+    "rim": 0.3252,
+    "texture": 0.2175
    },
    "per_hazard_best_site": {
-    "shadow": "S00241",
-    "rim": "S00239",
-    "texture": "S01158"
+    "shadow": "S01264",
+    "rim": "S02247",
+    "texture": "S02247"
    },
    "weakest_hazard": "shadow",
-   "reason": "All three hazards have a close Earth match; the weakest is low-sun shadows (best: Screen window S00241, 0.96 Moon-IQRs off)."
+   "reason": "All three hazards have a close Earth match; the weakest is low-sun shadows (best: 30 km W of Calama, 0.87 Moon-IQRs off)."
   },
   {
    "region_id": "malapert_massif",
    "rank": 8,
    "region_name": "Malapert Massif",
-   "rehearsability": 0.5404,
+   "rehearsability": 0.6021,
    "per_hazard_best_distance": {
-    "shadow": 1.2778,
-    "rim": 0.6662,
-    "texture": 0.191
+    "shadow": 1.1212,
+    "rim": 0.5341,
+    "texture": 0.1455
    },
    "per_hazard_best_site": {
-    "shadow": "S00241",
-    "rim": "S01152",
-    "texture": "S00239"
+    "shadow": "S03582",
+    "rim": "S02310",
+    "texture": "S02247"
    },
    "weakest_hazard": "shadow",
-   "reason": "No close Earth match for low-sun shadows; weakest is low-sun shadows (best: Screen window S00241, 1.28 Moon-IQRs off)."
+   "reason": "No close Earth match for low-sun shadows; weakest is low-sun shadows (best: 109 km SE of Bor-Udzuur, 1.12 Moon-IQRs off)."
   },
   {
    "region_id": "cabeus_b_peak",
    "rank": 9,
    "region_name": "Peak near Cabeus B",
-   "rehearsability": 0.339,
+   "rehearsability": 0.3768,
    "per_hazard_best_distance": {
-    "shadow": 2.5641,
-    "rim": 0.6875,
-    "texture": 0.2521
+    "shadow": 2.3014,
+    "rim": 0.5436,
+    "texture": 0.1651
    },
    "per_hazard_best_site": {
-    "shadow": "S00241",
-    "rim": "S01026",
-    "texture": "S00366"
+    "shadow": "S03582",
+    "rim": "S01992",
+    "texture": "S04188"
    },
    "weakest_hazard": "shadow",
-   "reason": "No close Earth match for low-sun shadows; weakest is low-sun shadows (best: Screen window S00241, 2.56 Moon-IQRs off)."
+   "reason": "No close Earth match for low-sun shadows; weakest is low-sun shadows (best: 109 km SE of Bor-Udzuur, 2.30 Moon-IQRs off)."
   }
  ],
  "validation": {
@@ -264,107 +270,110 @@
   },
   "known_vs_decoy_auc": 0.803,
   "known_vs_decoy_detail": {
+   "source": "method.json validation.auc (stage-1 best rank)",
+   "known_median_pct": 4.66,
+   "decoy_median_pct": 60.3,
+   "screen_report_auc_original13": 0.803,
+   "screen_report_auc_with_heldout_documented": 0.803,
    "recomputed_stage1_auc_original13": 0.803,
    "recomputed_stage1_n": {
     "known": 13,
     "decoy": 9
    },
    "heldout_documented_note": "7 held-out documented analogs exist but none has a stage-1 rank yet; AUC uses the original 13 only",
-   "source": "recomputed here from data/interim/earth/stage1_ranking.json best ranks (original 13 known analogs vs decoys); method.json/screen_report.json not yet written",
-   "final_30m_auc": null,
+   "final_30m_auc": 0.726,
    "final_30m_n": {
     "known": 13,
-    "decoy": 0
+    "decoy": 9
    },
-   "final_30m_note": "no decoys in the current earth_sites.json snapshot; final-stage AUC not computable",
-   "positive_set": "original 13 hand-listed known analogs (role heldout_positive)"
+   "positive_set": "original 13 hand-listed known analogs (role heldout_positive) + held-out documented analogs (split=holdout) where reported"
   },
-  "weight_stability_jaccard": 0.911,
+  "weight_stability_jaccard": 0.9095,
   "weight_stability_detail": {
-   "mean": 0.911,
+   "mean": 0.9095,
    "n_draws": 200,
    "jitter": "±20%",
    "seed": 20261115,
    "least_stable": [
     {
      "search": "nobile_rim_2|rim",
-     "jaccard": 0.688
+     "jaccard": 0.578
     },
     {
-     "search": "mons_mouton|shadow",
-     "jaccard": 0.767
+     "search": "malapert_massif|texture",
+     "jaccard": 0.723
     },
     {
-     "search": "malapert_massif|rim",
-     "jaccard": 0.772
+     "search": "haworth|texture",
+     "jaccard": 0.745
     }
    ]
   },
   "classifier_two_sample": {
    "per_region_auc": {
-    "cabeus_b_peak": 0.986,
-    "haworth": 0.931,
-    "malapert_massif": 0.974,
-    "mons_mouton_plateau": 0.929,
-    "mons_mouton": 0.935,
-    "nobile_rim_1": 0.956,
-    "nobile_rim_2": 0.922,
-    "de_gerlache_rim_2": 0.968,
-    "slater_plain": 0.964
+    "cabeus_b_peak": 0.998,
+    "haworth": 0.956,
+    "malapert_massif": 0.998,
+    "mons_mouton_plateau": 0.913,
+    "mons_mouton": 0.953,
+    "nobile_rim_1": 0.967,
+    "nobile_rim_2": 0.92,
+    "de_gerlache_rim_2": 0.994,
+    "slater_plain": 0.953
    },
    "top_features": [
     {
      "feature": "curvature_std_per_km",
-     "importance": 0.0944
-    },
-    {
-     "feature": "roughness_m",
-     "importance": 0.0458
+     "importance": 0.1208
     },
     {
      "feature": "slope_p90_deg",
-     "importance": 0.0448
+     "importance": 0.0559
+    },
+    {
+     "feature": "roughness_m",
+     "importance": 0.0247
     },
     {
      "feature": "jump1km_p95_m",
-     "importance": 0.0421
+     "importance": 0.0199
     },
     {
      "feature": "relief_m",
-     "importance": 0.0342
+     "importance": 0.0169
     },
     {
      "feature": "slope_mean_deg",
-     "importance": 0.0058
+     "importance": 0.009
     }
    ],
    "per_pair": [
     {
      "region_id": "cabeus_b_peak",
      "hazard": "shadow",
-     "site_id": "S00241",
-     "auc": 0.99,
-     "lr_auc": 0.966,
-     "rf_auc": 0.99,
-     "top_feature": "curvature_std_per_km"
+     "site_id": "S03582",
+     "auc": 1.0,
+     "lr_auc": 0.997,
+     "rf_auc": 1.0,
+     "top_feature": "jump1km_p95_m"
     },
     {
      "region_id": "cabeus_b_peak",
      "hazard": "rim",
-     "site_id": "S01026",
-     "auc": 0.982,
-     "lr_auc": 0.956,
-     "rf_auc": 0.982,
-     "top_feature": "roughness_m"
+     "site_id": "S01992",
+     "auc": 1.0,
+     "lr_auc": 1.0,
+     "rf_auc": 1.0,
+     "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "cabeus_b_peak",
      "hazard": "texture",
-     "site_id": "S00366",
-     "auc": 0.985,
-     "lr_auc": 0.985,
-     "rf_auc": 0.981,
-     "top_feature": "jump1km_p95_m"
+     "site_id": "S04188",
+     "auc": 0.995,
+     "lr_auc": 0.995,
+     "rf_auc": 0.993,
+     "top_feature": "slope_p90_deg"
     },
     {
      "region_id": "haworth",
@@ -378,56 +387,56 @@
     {
      "region_id": "haworth",
      "hazard": "rim",
-     "site_id": "S00356",
-     "auc": 0.916,
-     "lr_auc": 0.832,
-     "rf_auc": 0.916,
+     "site_id": "S04010",
+     "auc": 0.934,
+     "lr_auc": 0.93,
+     "rf_auc": 0.934,
      "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "haworth",
      "hazard": "texture",
-     "site_id": "S01100",
-     "auc": 0.941,
-     "lr_auc": 0.873,
-     "rf_auc": 0.941,
+     "site_id": "S03631",
+     "auc": 0.998,
+     "lr_auc": 0.92,
+     "rf_auc": 0.998,
      "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "malapert_massif",
      "hazard": "shadow",
-     "site_id": "S00241",
-     "auc": 0.971,
-     "lr_auc": 0.906,
-     "rf_auc": 0.971,
-     "top_feature": "relief_m"
+     "site_id": "S03582",
+     "auc": 0.997,
+     "lr_auc": 0.976,
+     "rf_auc": 0.997,
+     "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "malapert_massif",
      "hazard": "rim",
-     "site_id": "S01152",
-     "auc": 0.991,
-     "lr_auc": 0.984,
-     "rf_auc": 0.991,
+     "site_id": "S02310",
+     "auc": 0.998,
+     "lr_auc": 0.998,
+     "rf_auc": 0.998,
      "top_feature": "roughness_m"
     },
     {
      "region_id": "malapert_massif",
      "hazard": "texture",
-     "site_id": "S00239",
-     "auc": 0.96,
-     "lr_auc": 0.939,
-     "rf_auc": 0.96,
-     "top_feature": "roughness_m"
+     "site_id": "S02247",
+     "auc": 0.999,
+     "lr_auc": 0.999,
+     "rf_auc": 0.998,
+     "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "mons_mouton_plateau",
      "hazard": "shadow",
-     "site_id": "S00255",
-     "auc": 0.922,
-     "lr_auc": 0.922,
-     "rf_auc": 0.893,
-     "top_feature": "slope_p90_deg"
+     "site_id": "S03644",
+     "auc": 0.875,
+     "lr_auc": 0.744,
+     "rf_auc": 0.875,
+     "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "mons_mouton_plateau",
@@ -459,101 +468,101 @@
     {
      "region_id": "mons_mouton",
      "hazard": "rim",
-     "site_id": "S01026",
-     "auc": 0.921,
-     "lr_auc": 0.826,
-     "rf_auc": 0.921,
-     "top_feature": "roughness_m"
+     "site_id": "S02302",
+     "auc": 0.974,
+     "lr_auc": 0.974,
+     "rf_auc": 0.962,
+     "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "mons_mouton",
      "hazard": "texture",
-     "site_id": "S01158",
-     "auc": 0.996,
-     "lr_auc": 0.996,
+     "site_id": "S02247",
+     "auc": 0.997,
+     "lr_auc": 0.997,
+     "rf_auc": 0.996,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "nobile_rim_1",
+     "hazard": "shadow",
+     "site_id": "S03018",
+     "auc": 0.968,
+     "lr_auc": 0.927,
+     "rf_auc": 0.968,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "nobile_rim_1",
+     "hazard": "rim",
+     "site_id": "S01417",
+     "auc": 0.984,
+     "lr_auc": 0.984,
+     "rf_auc": 0.975,
+     "top_feature": "slope_p90_deg"
+    },
+    {
+     "region_id": "nobile_rim_1",
+     "hazard": "texture",
+     "site_id": "S01331",
+     "auc": 0.949,
+     "lr_auc": 0.908,
+     "rf_auc": 0.949,
+     "top_feature": "roughness_m"
+    },
+    {
+     "region_id": "nobile_rim_2",
+     "hazard": "shadow",
+     "site_id": "S04053",
+     "auc": 0.861,
+     "lr_auc": 0.815,
+     "rf_auc": 0.861,
+     "top_feature": "slope_p90_deg"
+    },
+    {
+     "region_id": "nobile_rim_2",
+     "hazard": "rim",
+     "site_id": "S04078",
+     "auc": 0.998,
+     "lr_auc": 0.998,
+     "rf_auc": 0.993,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "nobile_rim_2",
+     "hazard": "texture",
+     "site_id": "S04676",
+     "auc": 0.901,
+     "lr_auc": 0.901,
+     "rf_auc": 0.892,
+     "top_feature": "slope_p90_deg"
+    },
+    {
+     "region_id": "de_gerlache_rim_2",
+     "hazard": "shadow",
+     "site_id": "S01264",
+     "auc": 0.986,
+     "lr_auc": 0.947,
      "rf_auc": 0.986,
      "top_feature": "curvature_std_per_km"
     },
     {
-     "region_id": "nobile_rim_1",
-     "hazard": "shadow",
-     "site_id": "S00356",
-     "auc": 0.946,
-     "lr_auc": 0.927,
-     "rf_auc": 0.946,
-     "top_feature": "jump1km_p95_m"
-    },
-    {
-     "region_id": "nobile_rim_1",
-     "hazard": "rim",
-     "site_id": "S01191",
-     "auc": 1.0,
-     "lr_auc": 1.0,
-     "rf_auc": 0.999,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
-     "region_id": "nobile_rim_1",
-     "hazard": "texture",
-     "site_id": "S01095",
-     "auc": 0.923,
-     "lr_auc": 0.923,
-     "rf_auc": 0.923,
-     "top_feature": "slope_p90_deg"
-    },
-    {
-     "region_id": "nobile_rim_2",
-     "hazard": "shadow",
-     "site_id": "S00356",
-     "auc": 0.899,
-     "lr_auc": 0.885,
-     "rf_auc": 0.899,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
-     "region_id": "nobile_rim_2",
-     "hazard": "rim",
-     "site_id": "S00241",
-     "auc": 0.987,
-     "lr_auc": 0.92,
-     "rf_auc": 0.987,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
-     "region_id": "nobile_rim_2",
-     "hazard": "texture",
-     "site_id": "S01095",
-     "auc": 0.881,
-     "lr_auc": 0.842,
-     "rf_auc": 0.881,
-     "top_feature": "roughness_m"
-    },
-    {
-     "region_id": "de_gerlache_rim_2",
-     "hazard": "shadow",
-     "site_id": "S00241",
-     "auc": 0.966,
-     "lr_auc": 0.881,
-     "rf_auc": 0.966,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
      "region_id": "de_gerlache_rim_2",
      "hazard": "rim",
-     "site_id": "S00239",
-     "auc": 0.942,
-     "lr_auc": 0.918,
-     "rf_auc": 0.942,
+     "site_id": "S02247",
+     "auc": 0.998,
+     "lr_auc": 0.998,
+     "rf_auc": 0.996,
      "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "de_gerlache_rim_2",
      "hazard": "texture",
-     "site_id": "S01158",
-     "auc": 0.996,
-     "lr_auc": 0.996,
-     "rf_auc": 0.99,
-     "top_feature": "slope_p90_deg"
+     "site_id": "S02247",
+     "auc": 0.998,
+     "lr_auc": 0.998,
+     "rf_auc": 0.996,
+     "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "slater_plain",
@@ -576,14 +585,14 @@
     {
      "region_id": "slater_plain",
      "hazard": "texture",
-     "site_id": "S00241",
-     "auc": 0.964,
-     "lr_auc": 0.721,
-     "rf_auc": 0.964,
+     "site_id": "S01222",
+     "auc": 0.933,
+     "lr_auc": 0.886,
+     "rf_auc": 0.933,
      "top_feature": "curvature_std_per_km"
     }
    ],
-   "mean_auc": 0.952,
+   "mean_auc": 0.961,
    "method": "Lopez-Paz & Oquab (2017) classifier two-sample test on 1 km sub-tiles of the 30 m tiles (each region vs its top-1 Earth site per hazard); logistic regression and a 100-tree depth-4 random forest; StratifiedGroupKFold(6) grouped by 5 km block; reported AUC = the better of the two (out-of-fold); importance = permutation drop in AUC on held-out folds. 0.5 = indistinguishable, 1.0 = trivially separable.",
    "features": [
     "slope_mean_deg",
@@ -666,75 +675,75 @@
    "Vegetation and buildings sit inside the Copernicus surface model; we mask them with ESA WorldCover (DSM-safe filter) but low shrubs and grass remain",
    "Atmospheric refraction near the horizon: windows with the sun below 1° are refraction-sensitive (a few tenths of a degree can shift them by minutes)",
    "Low sun lasts minutes on Earth but days on the Moon, so rehearsal windows are short",
-   "The Earth search covers only ~5–6% of the planet's bare land (a seeded sample of 15 km windows), so better analogs may exist unsampled",
+   "The Earth search covers only ~5.8% of the planet's bare land (a seeded sample of 15 km windows), so better analogs may exist unsampled",
    "Metrics describe terrain shape and lighting geometry only, not regolith, rock strength or dust"
   ],
-  "earth_coverage_pct_bare": "5–6",
-  "earth_coverage_source": "data/interim/earth/screen_draw_stats.json coverage.pct_of_bare_land_range",
+  "earth_coverage_pct_bare": "5.8",
+  "earth_coverage_source": "method.json screen.coverage_pct_bare",
   "heldout_ranks": {
    "EP001": {
     "role": "heldout_positive",
     "name": "Haughton impact crater (Devon Is.)",
-    "best_rank": 8,
-    "best_search": "cabeus_b_peak|shadow",
-    "best_distance": 4.052,
-    "n_pool": 49
+    "best_rank": 29,
+    "best_search": "slater_plain|shadow",
+    "best_distance": 0.4596,
+    "n_pool": 188
    },
    "EP002": {
     "role": "heldout_positive",
     "name": "Meteor (Barringer) Crater",
-    "best_rank": 25,
-    "best_search": "haworth|rim",
-    "best_distance": 1.4261,
-    "n_pool": 49
+    "best_rank": 109,
+    "best_search": "slater_plain|rim",
+    "best_distance": 1.7378,
+    "n_pool": 188
    },
    "EP003": {
     "role": "heldout_positive",
     "name": "Mistastin crater",
-    "best_rank": 2,
+    "best_rank": 7,
     "best_search": "haworth|texture",
     "best_distance": 0.4058,
-    "n_pool": 49
+    "n_pool": 188
    },
    "EP004": {
     "role": "heldout_positive",
     "name": "Death Valley (Badwater Basin)",
-    "best_rank": 5,
+    "best_rank": 23,
     "best_search": "nobile_rim_1|rim",
     "best_distance": 0.9394,
-    "n_pool": 49
+    "n_pool": 188
    },
    "EP005": {
     "role": "heldout_positive",
     "name": "Craters of the Moon NM",
-    "best_rank": 2,
-    "best_search": "cabeus_b_peak|shadow",
-    "best_distance": 3.3574,
-    "n_pool": 49
+    "best_rank": 7,
+    "best_search": "slater_plain|shadow",
+    "best_distance": 0.3237,
+    "n_pool": 188
    },
    "EP007": {
     "role": "heldout_positive",
     "name": "McMurdo Dry Valleys (Taylor Valley)",
-    "best_rank": 20,
+    "best_rank": 85,
     "best_search": "nobile_rim_1|rim",
     "best_distance": 1.6779,
-    "n_pool": 49
+    "n_pool": 188
    },
    "EP008": {
     "role": "heldout_positive",
     "name": "Atacama (Salar de Atacama)",
-    "best_rank": 25,
+    "best_rank": 103,
     "best_search": "malapert_massif|shadow",
     "best_distance": 3.1582,
-    "n_pool": 49
+    "n_pool": 188
    },
    "EP009": {
     "role": "heldout_positive",
     "name": "Sudbury Basin",
-    "best_rank": 14,
+    "best_rank": 59,
     "best_search": "cabeus_b_peak|shadow",
     "best_distance": 5.2164,
-    "n_pool": 49
+    "n_pool": 188
    },
    "EP010": {
     "role": "heldout_positive",
@@ -742,40 +751,118 @@
     "best_rank": 1,
     "best_search": "cabeus_b_peak|shadow",
     "best_distance": 1.9492,
-    "n_pool": 49
+    "n_pool": 188
    },
    "EP011": {
     "role": "heldout_positive",
     "name": "Askja caldera",
-    "best_rank": 2,
+    "best_rank": 4,
     "best_search": "cabeus_b_peak|shadow",
     "best_distance": 3.0384,
-    "n_pool": 49
+    "n_pool": 188
    },
    "EP012": {
     "role": "heldout_positive",
     "name": "Kilauea summit (Hawai'i)",
-    "best_rank": 9,
+    "best_rank": 37,
     "best_search": "cabeus_b_peak|shadow",
     "best_distance": 4.2826,
-    "n_pool": 49
+    "n_pool": 188
    },
    "EP013": {
     "role": "heldout_positive",
     "name": "Sunset Crater / Cinder Lake",
-    "best_rank": 2,
+    "best_rank": 11,
     "best_search": "mons_mouton_plateau|rim",
     "best_distance": 0.787,
-    "n_pool": 49
+    "n_pool": 188
    },
    "EP014": {
     "role": "heldout_positive",
     "name": "Kilbourne Hole",
-    "best_rank": 24,
+    "best_rank": 84,
+    "best_search": "slater_plain|texture",
+    "best_distance": 0.7129,
+    "n_pool": 188
+   },
+   "EP117": {
+    "role": "decoy",
+    "name": "Champaign IL farmland",
+    "best_rank": 130,
+    "best_search": "slater_plain|rim",
+    "best_distance": 1.9794,
+    "n_pool": 188
+   },
+   "EP118": {
+    "role": "decoy",
+    "name": "Saskatoon farmland",
+    "best_rank": 114,
+    "best_search": "slater_plain|rim",
+    "best_distance": 1.7893,
+    "n_pool": 188
+   },
+   "EP119": {
+    "role": "decoy",
+    "name": "Black Forest",
+    "best_rank": 16,
+    "best_search": "mons_mouton_plateau|rim",
+    "best_distance": 0.8193,
+    "n_pool": 188
+   },
+   "EP121": {
+    "role": "decoy",
+    "name": "Houston",
+    "best_rank": 132,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 8.4276,
+    "n_pool": 188
+   },
+   "EP122": {
+    "role": "decoy",
+    "name": "Tokyo",
+    "best_rank": 75,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 5.8802,
+    "n_pool": 188
+   },
+   "EP123": {
+    "role": "decoy",
+    "name": "Salinas Valley",
+    "best_rank": 16,
     "best_search": "haworth|texture",
-    "best_distance": 0.9662,
-    "n_pool": 49
+    "best_distance": 0.5276,
+    "n_pool": 188
+   },
+   "EP124": {
+    "role": "decoy",
+    "name": "Po Valley",
+    "best_rank": 135,
+    "best_search": "slater_plain|rim",
+    "best_distance": 2.019,
+    "n_pool": 188
+   },
+   "EP125": {
+    "role": "decoy",
+    "name": "Congo rainforest",
+    "best_rank": 58,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 5.1125,
+    "n_pool": 188
+   },
+   "EP126": {
+    "role": "decoy",
+    "name": "Palouse",
+    "best_rank": 27,
+    "best_search": "slater_plain|shadow",
+    "best_distance": 0.4454,
+    "n_pool": 188
    }
+  },
+  "walk_findback": {
+   "winner": "euclid_height_slope",
+   "top1": null,
+   "top5": null,
+   "n_routes": 300
   }
  },
  "notes": {
@@ -792,7 +879,7 @@
     "selected_by": "validation",
     "distance": 1.9492,
     "would_rank": 1,
-    "n_pool": 49
+    "n_pool": 188
    },
    "cabeus_b_peak|rim": {
     "site_id": "EP011",
@@ -803,8 +890,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 1.0414,
-    "would_rank": 15,
-    "n_pool": 49
+    "would_rank": 64,
+    "n_pool": 188
    },
    "cabeus_b_peak|texture": {
     "site_id": "EP013",
@@ -815,8 +902,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.9949,
-    "would_rank": 14,
-    "n_pool": 49
+    "would_rank": 87,
+    "n_pool": 188
    },
    "haworth|shadow": {
     "site_id": "EP011",
@@ -827,8 +914,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.5598,
-    "would_rank": 3,
-    "n_pool": 49
+    "would_rank": 9,
+    "n_pool": 188
    },
    "haworth|rim": {
     "site_id": "EP011",
@@ -839,8 +926,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.5261,
-    "would_rank": 4,
-    "n_pool": 49
+    "would_rank": 8,
+    "n_pool": 188
    },
    "haworth|texture": {
     "site_id": "EP003",
@@ -851,8 +938,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.4058,
-    "would_rank": 2,
-    "n_pool": 49
+    "would_rank": 7,
+    "n_pool": 188
    },
    "malapert_massif|shadow": {
     "site_id": "EP010",
@@ -864,7 +951,7 @@
     "selected_by": "validation",
     "distance": 1.115,
     "would_rank": 1,
-    "n_pool": 49
+    "n_pool": 188
    },
    "malapert_massif|rim": {
     "site_id": "EP004",
@@ -875,8 +962,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 1.1759,
-    "would_rank": 7,
-    "n_pool": 49
+    "would_rank": 36,
+    "n_pool": 188
    },
    "malapert_massif|texture": {
     "site_id": "EP003",
@@ -887,8 +974,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.5221,
-    "would_rank": 12,
-    "n_pool": 49
+    "would_rank": 51,
+    "n_pool": 188
    },
    "mons_mouton_plateau|shadow": {
     "site_id": "EP011",
@@ -899,8 +986,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.2903,
-    "would_rank": 3,
-    "n_pool": 49
+    "would_rank": 13,
+    "n_pool": 188
    },
    "mons_mouton_plateau|rim": {
     "site_id": "EP011",
@@ -911,8 +998,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.7478,
-    "would_rank": 2,
-    "n_pool": 49
+    "would_rank": 4,
+    "n_pool": 188
    },
    "mons_mouton_plateau|texture": {
     "site_id": "EP011",
@@ -923,8 +1010,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.3326,
-    "would_rank": 7,
-    "n_pool": 49
+    "would_rank": 17,
+    "n_pool": 188
    },
    "mons_mouton|shadow": {
     "site_id": "EP013",
@@ -935,8 +1022,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.5883,
-    "would_rank": 7,
-    "n_pool": 49
+    "would_rank": 36,
+    "n_pool": 188
    },
    "mons_mouton|rim": {
     "site_id": "EP011",
@@ -947,8 +1034,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.8936,
-    "would_rank": 11,
-    "n_pool": 49
+    "would_rank": 44,
+    "n_pool": 188
    },
    "mons_mouton|texture": {
     "site_id": "EP005",
@@ -959,8 +1046,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.7331,
-    "would_rank": 15,
-    "n_pool": 49
+    "would_rank": 98,
+    "n_pool": 188
    },
    "nobile_rim_1|shadow": {
     "site_id": "EP013",
@@ -971,8 +1058,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.8105,
-    "would_rank": 8,
-    "n_pool": 49
+    "would_rank": 26,
+    "n_pool": 188
    },
    "nobile_rim_1|rim": {
     "site_id": "EP004",
@@ -983,8 +1070,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.9394,
-    "would_rank": 5,
-    "n_pool": 49
+    "would_rank": 23,
+    "n_pool": 188
    },
    "nobile_rim_1|texture": {
     "site_id": "EP013",
@@ -995,8 +1082,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.4788,
-    "would_rank": 9,
-    "n_pool": 49
+    "would_rank": 66,
+    "n_pool": 188
    },
    "nobile_rim_2|shadow": {
     "site_id": "EP013",
@@ -1007,8 +1094,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.3428,
-    "would_rank": 5,
-    "n_pool": 49
+    "would_rank": 16,
+    "n_pool": 188
    },
    "nobile_rim_2|rim": {
     "site_id": "EP011",
@@ -1019,8 +1106,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.7627,
-    "would_rank": 11,
-    "n_pool": 49
+    "would_rank": 40,
+    "n_pool": 188
    },
    "nobile_rim_2|texture": {
     "site_id": "EP013",
@@ -1031,8 +1118,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.9323,
-    "would_rank": 17,
-    "n_pool": 49
+    "would_rank": 88,
+    "n_pool": 188
    },
    "de_gerlache_rim_2|shadow": {
     "site_id": "EP010",
@@ -1043,8 +1130,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 1.3324,
-    "would_rank": 2,
-    "n_pool": 49
+    "would_rank": 7,
+    "n_pool": 188
    },
    "de_gerlache_rim_2|rim": {
     "site_id": "EP011",
@@ -1055,8 +1142,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.7193,
-    "would_rank": 15,
-    "n_pool": 49
+    "would_rank": 46,
+    "n_pool": 188
    },
    "de_gerlache_rim_2|texture": {
     "site_id": "EP003",
@@ -1067,8 +1154,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 1.1246,
-    "would_rank": 13,
-    "n_pool": 49
+    "would_rank": 81,
+    "n_pool": 188
    },
    "slater_plain|shadow": {
     "site_id": "EP011",
@@ -1079,8 +1166,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.3056,
-    "would_rank": 3,
-    "n_pool": 49
+    "would_rank": 4,
+    "n_pool": 188
    },
    "slater_plain|rim": {
     "site_id": "EP011",
@@ -1091,8 +1178,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.5731,
-    "would_rank": 2,
-    "n_pool": 49
+    "would_rank": 6,
+    "n_pool": 188
    },
    "slater_plain|texture": {
     "site_id": "EP011",
@@ -1103,8 +1190,8 @@
     "role": "heldout_positive",
     "selected_by": "validation",
     "distance": 0.4529,
-    "would_rank": 7,
-    "n_pool": 49
+    "would_rank": 26,
+    "n_pool": 188
    }
   }
  }
