@@ -1,0 +1,5 @@
+lat,lon,reason
+80.0250,-20.5744,near_known: Grottedal caves Mars-analog study 45 km (novelty_final_arctic.csv)
+70.2750,-69.5727,ice: 71% snow/ice (WorldCover)
+-31.4095,-70.0250,ice: 36.5% snow/ice (WorldCover)
+-24.2905,-69.5371,near_known: Atacama hyperarid core 53 km from Yungay (novelty_final_other.csv)

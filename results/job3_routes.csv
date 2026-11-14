@@ -1,0 +1,1201 @@
+route,region,length,two_leg,matcher,hidden_rank,best_earth,best_dir,rmse_m,max_slope_diff,route_relief,route_max_slope
+0,Haworth,2630.875,False,euclid_height,1,bare_80.025_-60.775_12,337.500,12.028,3.432,283.432,16.931
+0,Haworth,2630.875,False,euclid_height_slope,1,bare_80.025_-60.775_12,337.500,12.028,3.432,283.432,16.931
+0,Haworth,2630.875,False,dtw_10pct,2,bare_75.875_-19.925_12,67.500,13.916,1.834,283.432,16.931
+0,Haworth,2630.875,False,matrix_profile,255,bare_19.425_-155.625_12,337.500,14.659,4.655,283.432,16.931
+1,Malapert Massif,3011.873,False,euclid_height,3,bare_80.025_-60.775_11,247.500,18.220,8.670,432.631,17.926
+1,Malapert Massif,3011.873,False,euclid_height_slope,2,bare_80.025_-60.775_11,247.500,18.220,8.670,432.631,17.926
+1,Malapert Massif,3011.873,False,dtw_10pct,29,bare_80.025_-60.775_11,247.500,18.220,8.670,432.631,17.926
+1,Malapert Massif,3011.873,False,matrix_profile,133,bare_19.425_-155.625_01,90.000,72.404,3.349,432.631,17.926
+2,Mons Mouton,3056.626,False,euclid_height,1,bare_78.825_14.325_02,225.000,18.930,11.486,403.226,15.018
+2,Mons Mouton,3056.626,False,euclid_height_slope,1,bare_-25.075_-67.775_20,0.000,19.334,13.075,403.226,15.018
+2,Mons Mouton,3056.626,False,dtw_10pct,2,bare_70.275_-69.675_21,90.000,21.952,5.878,403.226,15.018
+2,Mons Mouton,3056.626,False,matrix_profile,187,bare_19.425_-155.625_10,292.500,30.069,2.234,403.226,15.018
+3,Mons Mouton Plateau,1930.726,True,euclid_height,1,bare_75.875_-19.925_00,0.000,13.619,10.089,397.426,17.416
+3,Mons Mouton Plateau,1930.726,True,euclid_height_slope,1,bare_62.075_141.375_00,112.500,14.167,8.644,397.426,17.416
+3,Mons Mouton Plateau,1930.726,True,dtw_10pct,7,bare_74.425_-19.775_10,270.000,14.354,10.283,397.426,17.416
+3,Mons Mouton Plateau,1930.726,True,matrix_profile,163,bare_19.425_-155.625_22,157.500,44.606,4.238,397.426,17.416
+4,Nobile Rim 1,2782.900,True,euclid_height,3,bare_66.575_-62.775_12,202.500,13.322,18.729,539.383,19.703
+4,Nobile Rim 1,2782.900,True,euclid_height_slope,2,bare_66.575_-62.775_12,202.500,13.322,18.729,539.383,19.703
+4,Nobile Rim 1,2782.900,True,dtw_10pct,7,bare_66.575_-62.775_12,202.500,13.322,18.729,539.383,19.703
+4,Nobile Rim 1,2782.900,True,matrix_profile,17,bare_19.425_-155.625_22,0.000,62.788,6.639,539.383,19.703
+5,Nobile Rim 2,3388.973,True,euclid_height,1,bare_77.275_-68.675_11,112.500,18.896,17.754,749.396,28.912
+5,Nobile Rim 2,3388.973,True,euclid_height_slope,1,bare_77.275_-68.675_11,112.500,18.896,17.754,749.396,28.912
+5,Nobile Rim 2,3388.973,True,dtw_10pct,1,bare_77.275_-68.675_11,112.500,18.896,17.754,749.396,28.912
+5,Nobile Rim 2,3388.973,True,matrix_profile,1,bare_-19.225_-69.925_11,45.000,166.050,0.215,749.396,28.912
+6,Peak Near Cabeus B,2321.131,False,euclid_height,1,bare_-35.625_-70.675_10,157.500,19.374,6.620,617.187,22.695
+6,Peak Near Cabeus B,2321.131,False,euclid_height_slope,1,bare_-35.625_-70.675_10,157.500,19.374,6.620,617.187,22.695
+6,Peak Near Cabeus B,2321.131,False,dtw_10pct,1,bare_79.975_-81.225_22,90.000,19.518,8.922,617.187,22.695
+6,Peak Near Cabeus B,2321.131,False,matrix_profile,3,bare_-35.625_-70.675_10,157.500,53.586,2.222,617.187,22.695
+7,Slater Plain,2380.135,False,euclid_height,3,bare_-0.725_-91.175_12,315.000,6.108,1.121,223.208,10.450
+7,Slater Plain,2380.135,False,euclid_height_slope,7,bare_-0.725_-91.175_12,315.000,6.108,1.121,223.208,10.450
+7,Slater Plain,2380.135,False,dtw_10pct,14,bare_-0.725_-91.175_12,135.000,6.352,1.121,223.208,10.450
+7,Slater Plain,2380.135,False,matrix_profile,3389,bare_-0.725_-91.175_12,135.000,4.093,1.121,223.208,10.450
+8,de Gerlache Rim 2,3203.451,False,euclid_height,1,bare_-28.725_-69.325_10,67.500,27.415,9.700,707.367,17.572
+8,de Gerlache Rim 2,3203.451,False,euclid_height_slope,1,bare_-28.725_-69.325_10,67.500,27.415,9.700,707.367,17.572
+8,de Gerlache Rim 2,3203.451,False,dtw_10pct,6,bare_-28.725_-69.325_10,67.500,27.415,9.700,707.367,17.572
+8,de Gerlache Rim 2,3203.451,False,matrix_profile,31,bare_19.425_-155.625_22,337.500,84.314,4.816,707.367,17.572
+9,Haworth,3669.807,False,euclid_height,1,bare_74.975_60.025_21,247.500,19.883,16.208,281.071,15.607
+9,Haworth,3669.807,False,euclid_height_slope,1,bare_74.975_60.025_21,247.500,19.883,16.208,281.071,15.607
+9,Haworth,3669.807,False,dtw_10pct,1,bare_74.975_60.025_21,247.500,19.883,16.208,281.071,15.607
+9,Haworth,3669.807,False,matrix_profile,9,bare_-35.625_-70.425_01,0.000,49.755,1.526,281.071,15.607
+10,Malapert Massif,2616.803,True,euclid_height,1,bare_-35.625_-70.425_02,112.500,13.848,8.811,367.184,16.680
+10,Malapert Massif,2616.803,True,euclid_height_slope,1,bare_-35.625_-70.425_02,112.500,13.848,8.811,367.184,16.680
+10,Malapert Massif,2616.803,True,dtw_10pct,11,bare_-35.625_-70.425_02,112.500,13.848,8.811,367.184,16.680
+10,Malapert Massif,2616.803,True,matrix_profile,381,bare_-0.725_-91.175_12,0.000,31.014,4.443,367.184,16.680
+11,Mons Mouton,3157.659,True,euclid_height,1,bare_76.625_68.175_10,247.500,14.329,9.256,209.918,10.970
+11,Mons Mouton,3157.659,True,euclid_height_slope,1,bare_19.425_-155.625_12,22.500,15.511,2.946,209.918,10.970
+11,Mons Mouton,3157.659,True,dtw_10pct,3,bare_79.075_-74.625_11,225.000,15.527,10.585,209.918,10.970
+11,Mons Mouton,3157.659,True,matrix_profile,21143,bare_19.525_-155.525_11,0.000,21.790,0.023,209.918,10.970
+12,Mons Mouton Plateau,2032.930,True,euclid_height,1,bare_28.925_86.525_20,67.500,23.421,10.262,719.625,25.015
+12,Mons Mouton Plateau,2032.930,True,euclid_height_slope,1,bare_58.325_-155.125_11,202.500,25.534,3.659,719.625,25.015
+12,Mons Mouton Plateau,2032.930,True,dtw_10pct,8,bare_58.325_-155.125_11,22.500,37.888,3.659,719.625,25.015
+12,Mons Mouton Plateau,2032.930,True,matrix_profile,1,bare_66.575_-62.775_10,202.500,19.852,6.215,719.625,25.015
+13,Nobile Rim 1,1677.608,True,euclid_height,59,bare_78.425_-84.325_00,202.500,4.998,5.651,103.105,18.601
+13,Nobile Rim 1,1677.608,True,euclid_height_slope,59,bare_80.025_-60.875_00,180.000,5.631,9.821,103.105,18.601
+13,Nobile Rim 1,1677.608,True,dtw_10pct,73,bare_37.025_96.475_21,22.500,8.741,7.718,103.105,18.601
+13,Nobile Rim 1,1677.608,True,matrix_profile,35793,bare_36.375_-117.925_22,112.500,17.824,5.919,103.105,18.601
+14,Nobile Rim 2,2238.689,False,euclid_height,1,bare_39.375_92.975_01,0.000,3.824,6.533,67.315,7.019
+14,Nobile Rim 2,2238.689,False,euclid_height_slope,85,bare_-24.325_-69.575_10,112.500,3.964,1.933,67.315,7.019
+14,Nobile Rim 2,2238.689,False,dtw_10pct,45,bare_-10.175_-77.925_12,225.000,4.610,0.207,67.315,7.019
+14,Nobile Rim 2,2238.689,False,matrix_profile,48979,bare_19.525_-155.525_02,270.000,10.611,1.861,67.315,7.019
+15,Peak Near Cabeus B,2781.773,False,euclid_height,9,bare_19.425_-155.625_01,315.000,4.641,8.605,254.451,19.445
+15,Peak Near Cabeus B,2781.773,False,euclid_height_slope,13,bare_19.425_-155.625_01,315.000,4.641,8.605,254.451,19.445
+15,Peak Near Cabeus B,2781.773,False,dtw_10pct,21,bare_19.525_-155.525_21,315.000,11.513,8.679,254.451,19.445
+15,Peak Near Cabeus B,2781.773,False,matrix_profile,1155,bare_19.525_-155.525_10,337.500,15.658,10.160,254.451,19.445
+16,Slater Plain,2246.152,False,euclid_height,2,bare_-0.725_-91.175_22,225.000,2.906,1.086,157.061,7.618
+16,Slater Plain,2246.152,False,euclid_height_slope,17,bare_-0.725_-91.175_22,225.000,2.906,1.086,157.061,7.618
+16,Slater Plain,2246.152,False,dtw_10pct,18,bare_-0.725_-91.175_22,135.000,6.033,1.001,157.061,7.618
+16,Slater Plain,2246.152,False,matrix_profile,37849,bare_19.525_-155.525_12,180.000,5.403,0.183,157.061,7.618
+17,de Gerlache Rim 2,1821.547,False,euclid_height,38,bare_76.625_68.175_12,180.000,7.655,2.353,131.748,15.586
+17,de Gerlache Rim 2,1821.547,False,euclid_height_slope,29,bare_76.625_68.175_12,180.000,7.655,2.353,131.748,15.586
+17,de Gerlache Rim 2,1821.547,False,dtw_10pct,49,bare_76.625_68.175_12,337.500,8.406,0.253,131.748,15.586
+17,de Gerlache Rim 2,1821.547,False,matrix_profile,1811,bare_19.525_-155.525_12,180.000,12.469,4.505,131.748,15.586
+18,Haworth,3643.922,False,euclid_height,1,bare_65.625_-39.175_21,157.500,12.194,6.880,244.653,9.912
+18,Haworth,3643.922,False,euclid_height_slope,1,bare_65.625_-39.175_21,157.500,12.194,6.880,244.653,9.912
+18,Haworth,3643.922,False,dtw_10pct,1,bare_-25.075_-67.775_01,45.000,17.334,7.511,244.653,9.912
+18,Haworth,3643.922,False,matrix_profile,9789,bare_19.425_-155.625_10,22.500,16.323,0.100,244.653,9.912
+19,Malapert Massif,3437.006,False,euclid_height,1,bare_70.375_-69.875_00,315.000,31.573,12.928,652.102,23.366
+19,Malapert Massif,3437.006,False,euclid_height_slope,1,bare_78.775_-92.425_12,0.000,31.936,9.163,652.102,23.366
+19,Malapert Massif,3437.006,False,dtw_10pct,4,bare_65.625_-39.225_01,202.500,41.401,12.698,652.102,23.366
+19,Malapert Massif,3437.006,False,matrix_profile,1,bare_78.775_-92.425_12,0.000,24.382,9.163,652.102,23.366
+20,Mons Mouton,1741.440,True,euclid_height,1,bare_23.975_44.875_20,0.000,7.102,2.234,51.198,12.075
+20,Mons Mouton,1741.440,True,euclid_height_slope,1,bare_31.975_-114.425_21,67.500,7.125,0.357,51.198,12.075
+20,Mons Mouton,1741.440,True,dtw_10pct,1,bare_79.075_-74.625_21,315.000,9.639,5.135,51.198,12.075
+20,Mons Mouton,1741.440,True,matrix_profile,35599,bare_18.575_46.825_11,292.500,7.457,3.487,51.198,12.075
+21,Mons Mouton Plateau,2735.008,True,euclid_height,1,bare_27.725_55.625_22,22.500,16.719,14.029,289.219,16.892
+21,Mons Mouton Plateau,2735.008,True,euclid_height_slope,1,bare_-19.225_-69.925_00,135.000,18.095,8.908,289.219,16.892
+21,Mons Mouton Plateau,2735.008,True,dtw_10pct,1,bare_-19.225_-69.925_00,135.000,18.095,8.908,289.219,16.892
+21,Mons Mouton Plateau,2735.008,True,matrix_profile,1,bare_80.025_-81.225_00,135.000,21.910,0.132,289.219,16.892
+22,Nobile Rim 1,2416.901,False,euclid_height,1,bare_39.325_104.125_20,292.500,7.462,5.142,59.348,8.846
+22,Nobile Rim 1,2416.901,False,euclid_height_slope,1,bare_-41.825_-70.275_01,90.000,7.712,2.475,59.348,8.846
+22,Nobile Rim 1,2416.901,False,dtw_10pct,1,bare_70.775_-75.675_20,45.000,8.402,6.848,59.348,8.846
+22,Nobile Rim 1,2416.901,False,matrix_profile,39135,bare_19.525_-155.525_11,315.000,23.073,1.580,59.348,8.846
+23,Nobile Rim 2,1210.979,False,euclid_height,1,bare_70.375_-69.875_02,270.000,3.234,4.875,96.434,8.513
+23,Nobile Rim 2,1210.979,False,euclid_height_slope,8,bare_19.525_-155.525_12,135.000,4.485,0.320,96.434,8.513
+23,Nobile Rim 2,1210.979,False,dtw_10pct,10,bare_80.025_-60.775_00,0.000,7.745,0.006,96.434,8.513
+23,Nobile Rim 2,1210.979,False,matrix_profile,12497,bare_80.025_-71.575_10,0.000,5.859,1.936,96.434,8.513
+24,Peak Near Cabeus B,3132.640,True,euclid_height,1,bare_74.425_-19.775_02,0.000,29.669,2.403,413.047,27.644
+24,Peak Near Cabeus B,3132.640,True,euclid_height_slope,1,bare_74.425_-19.775_02,0.000,29.669,2.403,413.047,27.644
+24,Peak Near Cabeus B,3132.640,True,dtw_10pct,1,bare_78.425_-84.325_10,202.500,60.172,7.250,413.047,27.644
+24,Peak Near Cabeus B,3132.640,True,matrix_profile,1,bare_74.425_-19.775_02,180.000,68.996,1.618,413.047,27.644
+25,Slater Plain,3424.410,True,euclid_height,1,bare_79.625_-87.125_21,90.000,11.051,5.256,209.892,12.714
+25,Slater Plain,3424.410,True,euclid_height_slope,1,bare_69.575_-24.175_11,292.500,11.316,4.285,209.892,12.714
+25,Slater Plain,3424.410,True,dtw_10pct,26,bare_73.425_-90.975_01,0.000,12.227,8.961,209.892,12.714
+25,Slater Plain,3424.410,True,matrix_profile,221,bare_80.025_-72.075_01,225.000,24.115,4.413,209.892,12.714
+26,de Gerlache Rim 2,2808.547,False,euclid_height,2,bare_-15.175_-75.025_10,337.500,4.383,2.781,96.352,6.468
+26,de Gerlache Rim 2,2808.547,False,euclid_height_slope,5,bare_-15.175_-75.025_10,337.500,4.383,2.781,96.352,6.468
+26,de Gerlache Rim 2,2808.547,False,dtw_10pct,2,bare_-15.175_-75.025_10,337.500,4.383,2.781,96.352,6.468
+26,de Gerlache Rim 2,2808.547,False,matrix_profile,40571,bare_19.525_-155.525_02,315.000,30.911,1.385,96.352,6.468
+27,Haworth,1976.637,False,euclid_height,5,bare_-35.625_-70.675_02,337.500,8.378,3.236,269.292,19.690
+27,Haworth,1976.637,False,euclid_height_slope,6,bare_-35.625_-70.675_02,337.500,8.378,3.236,269.292,19.690
+27,Haworth,1976.637,False,dtw_10pct,8,bare_76.825_-23.625_10,157.500,15.879,4.576,269.292,19.690
+27,Haworth,1976.637,False,matrix_profile,203,bare_80.025_-71.575_10,0.000,11.273,1.427,269.292,19.690
+28,Malapert Massif,3125.256,False,euclid_height,3,bare_19.525_-155.525_11,315.000,4.758,2.160,107.710,7.908
+28,Malapert Massif,3125.256,False,euclid_height_slope,4,bare_19.525_-155.525_11,315.000,4.758,2.160,107.710,7.908
+28,Malapert Massif,3125.256,False,dtw_10pct,5,bare_79.225_-77.625_01,90.000,7.943,12.521,107.710,7.908
+28,Malapert Massif,3125.256,False,matrix_profile,38221,bare_19.525_-155.525_11,315.000,5.905,1.759,107.710,7.908
+29,Mons Mouton,2086.924,True,euclid_height,1,bare_76.425_-87.775_00,315.000,9.470,8.155,194.434,18.209
+29,Mons Mouton,2086.924,True,euclid_height_slope,1,bare_76.425_-87.775_00,315.000,9.470,8.155,194.434,18.209
+29,Mons Mouton,2086.924,True,dtw_10pct,1,bare_76.425_-87.775_00,315.000,9.470,8.155,194.434,18.209
+29,Mons Mouton,2086.924,True,matrix_profile,31,bare_-19.225_-69.925_22,45.000,12.319,3.857,194.434,18.209
+30,Mons Mouton Plateau,1416.795,False,euclid_height,1,bare_-15.175_-75.175_20,292.500,5.656,10.074,83.480,10.298
+30,Mons Mouton Plateau,1416.795,False,euclid_height_slope,1,bare_-35.625_-70.425_02,67.500,6.159,1.925,83.480,10.298
+30,Mons Mouton Plateau,1416.795,False,dtw_10pct,1,bare_24.825_11.025_20,180.000,6.898,8.366,83.480,10.298
+30,Mons Mouton Plateau,1416.795,False,matrix_profile,21015,bare_-0.725_-91.225_22,90.000,4.756,2.871,83.480,10.298
+31,Nobile Rim 1,3939.066,False,euclid_height,8,bare_77.275_-68.675_22,225.000,20.208,5.858,431.277,17.037
+31,Nobile Rim 1,3939.066,False,euclid_height_slope,11,bare_19.425_-155.625_11,225.000,20.541,9.061,431.277,17.037
+31,Nobile Rim 1,3939.066,False,dtw_10pct,39,bare_70.825_-25.675_22,112.500,22.895,4.127,431.277,17.037
+31,Nobile Rim 1,3939.066,False,matrix_profile,257,bare_-0.725_-91.175_21,112.500,27.794,5.914,431.277,17.037
+32,Nobile Rim 2,3104.706,True,euclid_height,1,bare_67.625_-67.425_11,22.500,15.346,10.168,410.149,17.284
+32,Nobile Rim 2,3104.706,True,euclid_height_slope,1,bare_70.675_-22.225_10,202.500,16.385,9.029,410.149,17.284
+32,Nobile Rim 2,3104.706,True,dtw_10pct,2,bare_70.675_-22.225_10,202.500,16.385,9.029,410.149,17.284
+32,Nobile Rim 2,3104.706,True,matrix_profile,83,bare_70.675_-22.225_10,202.500,12.530,9.029,410.149,17.284
+33,Peak Near Cabeus B,2428.501,True,euclid_height,1,bare_79.625_-87.125_00,202.500,11.493,9.349,183.782,12.186
+33,Peak Near Cabeus B,2428.501,True,euclid_height_slope,1,bare_79.625_-87.125_00,202.500,11.493,9.349,183.782,12.186
+33,Peak Near Cabeus B,2428.501,True,dtw_10pct,1,bare_67.625_-67.425_21,225.000,16.147,11.171,183.782,12.186
+33,Peak Near Cabeus B,2428.501,True,matrix_profile,61,bare_-48.725_-72.025_21,90.000,13.823,3.747,183.782,12.186
+34,Slater Plain,2317.687,False,euclid_height,2,bare_19.425_-155.625_11,135.000,3.355,0.223,111.931,7.178
+34,Slater Plain,2317.687,False,euclid_height_slope,10,bare_19.425_-155.625_11,135.000,3.355,0.223,111.931,7.178
+34,Slater Plain,2317.687,False,dtw_10pct,7,bare_19.425_-155.625_11,135.000,3.355,0.223,111.931,7.178
+34,Slater Plain,2317.687,False,matrix_profile,24875,bare_19.525_-155.525_20,315.000,6.269,0.348,111.931,7.178
+35,de Gerlache Rim 2,1526.229,False,euclid_height,1,bare_65.625_-39.175_00,90.000,6.343,3.243,243.713,18.251
+35,de Gerlache Rim 2,1526.229,False,euclid_height_slope,1,bare_65.625_-39.175_00,90.000,6.343,3.243,243.713,18.251
+35,de Gerlache Rim 2,1526.229,False,dtw_10pct,1,bare_-29.175_-70.625_11,292.500,19.742,6.763,243.713,18.251
+35,de Gerlache Rim 2,1526.229,False,matrix_profile,1389,bare_-35.625_-70.675_10,0.000,14.242,1.330,243.713,18.251
+36,Haworth,2536.521,True,euclid_height,1,bare_-31.375_-70.025_02,135.000,26.882,7.118,769.261,23.894
+36,Haworth,2536.521,True,euclid_height_slope,1,bare_58.325_-155.125_11,45.000,29.099,9.490,769.261,23.894
+36,Haworth,2536.521,True,dtw_10pct,8,bare_80.025_-81.275_22,22.500,33.053,9.016,769.261,23.894
+36,Haworth,2536.521,True,matrix_profile,1,bare_58.325_-155.125_11,22.500,73.060,5.075,769.261,23.894
+37,Malapert Massif,1036.440,False,euclid_height,15,bare_-16.325_-72.625_12,247.500,4.624,4.255,167.499,14.884
+37,Malapert Massif,1036.440,False,euclid_height_slope,44,bare_19.425_-155.625_10,270.000,6.292,4.436,167.499,14.884
+37,Malapert Massif,1036.440,False,dtw_10pct,68,bare_74.425_-19.775_01,112.500,7.142,2.122,167.499,14.884
+37,Malapert Massif,1036.440,False,matrix_profile,5017,bare_-0.725_-91.175_21,315.000,5.602,0.817,167.499,14.884
+38,Mons Mouton,3088.645,True,euclid_height,1,bare_69.975_-70.675_10,67.500,12.232,32.122,251.454,10.426
+38,Mons Mouton,3088.645,True,euclid_height_slope,1,bare_79.975_-64.225_22,225.000,12.458,9.432,251.454,10.426
+38,Mons Mouton,3088.645,True,dtw_10pct,4,bare_19.425_-155.625_20,45.000,18.488,2.432,251.454,10.426
+38,Mons Mouton,3088.645,True,matrix_profile,15091,bare_19.525_-155.525_01,22.500,36.051,1.379,251.454,10.426
+39,Mons Mouton Plateau,3465.376,False,euclid_height,1,bare_-0.725_-91.175_11,45.000,8.018,2.160,121.723,10.604
+39,Mons Mouton Plateau,3465.376,False,euclid_height_slope,1,bare_-0.725_-91.175_11,45.000,8.018,2.160,121.723,10.604
+39,Mons Mouton Plateau,3465.376,False,dtw_10pct,1,bare_76.625_68.175_10,22.500,8.774,5.553,121.723,10.604
+39,Mons Mouton Plateau,3465.376,False,matrix_profile,38123,bare_19.525_-155.525_12,225.000,26.807,3.497,121.723,10.604
+40,Nobile Rim 1,1573.331,False,euclid_height,1,bare_40.125_70.475_00,157.500,2.956,0.749,64.342,9.058
+40,Nobile Rim 1,1573.331,False,euclid_height_slope,28,bare_-24.325_-69.575_10,270.000,2.990,4.456,64.342,9.058
+40,Nobile Rim 1,1573.331,False,dtw_10pct,44,bare_-0.725_-91.175_22,67.500,3.330,3.589,64.342,9.058
+40,Nobile Rim 1,1573.331,False,matrix_profile,24403,bare_-23.525_-69.525_22,270.000,6.806,4.444,64.342,9.058
+41,Nobile Rim 2,1121.853,True,euclid_height,1,bare_76.475_-95.875_01,0.000,3.507,1.756,45.761,6.825
+41,Nobile Rim 2,1121.853,True,euclid_height_slope,1,bare_76.475_-95.875_01,180.000,3.516,1.756,45.761,6.825
+41,Nobile Rim 2,1121.853,True,dtw_10pct,1,bare_76.475_-95.875_01,180.000,3.516,1.756,45.761,6.825
+41,Nobile Rim 2,1121.853,True,matrix_profile,18583,bare_79.975_-81.225_21,22.500,2.442,1.658,45.761,6.825
+42,Peak Near Cabeus B,2400.351,False,euclid_height,2,bare_66.575_-62.775_12,22.500,12.996,3.962,385.873,14.688
+42,Peak Near Cabeus B,2400.351,False,euclid_height_slope,3,bare_66.575_-62.775_12,22.500,12.996,3.962,385.873,14.688
+42,Peak Near Cabeus B,2400.351,False,dtw_10pct,11,bare_19.425_-155.625_22,135.000,16.531,1.723,385.873,14.688
+42,Peak Near Cabeus B,2400.351,False,matrix_profile,435,bare_19.425_-155.625_22,0.000,10.925,2.979,385.873,14.688
+43,Slater Plain,3813.715,True,euclid_height,1,bare_79.225_-77.625_11,180.000,18.859,10.476,184.106,14.961
+43,Slater Plain,3813.715,True,euclid_height_slope,1,bare_79.225_-77.625_12,292.500,18.876,3.804,184.106,14.961
+43,Slater Plain,3813.715,True,dtw_10pct,1,bare_-16.325_-72.625_22,180.000,30.955,8.195,184.106,14.961
+43,Slater Plain,3813.715,True,matrix_profile,6915,bare_-28.725_-69.325_20,0.000,41.679,0.800,184.106,14.961
+44,de Gerlache Rim 2,2759.135,False,euclid_height,1,bare_-15.175_-75.175_20,180.000,23.007,13.641,538.570,24.383
+44,de Gerlache Rim 2,2759.135,False,euclid_height_slope,1,bare_-15.175_-75.175_20,180.000,23.007,13.641,538.570,24.383
+44,de Gerlache Rim 2,2759.135,False,dtw_10pct,4,bare_79.025_16.625_20,45.000,42.017,8.005,538.570,24.383
+44,de Gerlache Rim 2,2759.135,False,matrix_profile,11,bare_66.575_-62.775_20,247.500,31.035,5.000,538.570,24.383
+45,Haworth,3511.141,False,euclid_height,2,bare_77.275_-68.675_21,337.500,27.705,13.533,719.363,26.492
+45,Haworth,3511.141,False,euclid_height_slope,1,bare_77.275_-68.675_21,337.500,27.705,13.533,719.363,26.492
+45,Haworth,3511.141,False,dtw_10pct,9,bare_58.325_-155.125_02,292.500,36.167,7.352,719.363,26.492
+45,Haworth,3511.141,False,matrix_profile,1,bare_19.425_-155.625_01,90.000,173.364,11.915,719.363,26.492
+46,Malapert Massif,3332.632,True,euclid_height,1,bare_70.125_26.325_00,247.500,14.843,8.523,277.127,13.708
+46,Malapert Massif,3332.632,True,euclid_height_slope,1,bare_-19.225_-69.925_11,90.000,16.278,3.025,277.127,13.708
+46,Malapert Massif,3332.632,True,dtw_10pct,1,bare_80.025_-60.775_21,135.000,22.377,16.607,277.127,13.708
+46,Malapert Massif,3332.632,True,matrix_profile,155,bare_19.425_-155.625_12,157.500,51.159,4.504,277.127,13.708
+47,Mons Mouton,2874.823,True,euclid_height,1,bare_35.675_83.475_00,202.500,11.110,7.617,85.389,12.005
+47,Mons Mouton,2874.823,True,euclid_height_slope,1,bare_35.675_83.475_00,202.500,11.110,7.617,85.389,12.005
+47,Mons Mouton,2874.823,True,dtw_10pct,1,bare_35.675_83.475_00,22.500,13.471,7.617,85.389,12.005
+47,Mons Mouton,2874.823,True,matrix_profile,35821,bare_31.075_0.175_11,0.000,37.370,3.461,85.389,12.005
+48,Mons Mouton Plateau,1860.307,True,euclid_height,1,bare_21.925_8.475_11,22.500,4.251,3.533,26.442,6.740
+48,Mons Mouton Plateau,1860.307,True,euclid_height_slope,3,bare_21.925_8.475_11,22.500,4.251,3.533,26.442,6.740
+48,Mons Mouton Plateau,1860.307,True,dtw_10pct,1,bare_75.475_-109.475_00,292.500,5.222,5.200,26.442,6.740
+48,Mons Mouton Plateau,1860.307,True,matrix_profile,20713,bare_19.525_-155.525_02,112.500,16.949,2.881,26.442,6.740
+49,Nobile Rim 1,2593.648,False,euclid_height,1,bare_70.575_-53.525_20,292.500,34.278,7.996,819.914,30.230
+49,Nobile Rim 1,2593.648,False,euclid_height_slope,1,bare_70.575_-53.525_20,292.500,34.278,7.996,819.914,30.230
+49,Nobile Rim 1,2593.648,False,dtw_10pct,1,bare_33.475_79.025_22,0.000,62.179,6.546,819.914,30.230
+49,Nobile Rim 1,2593.648,False,matrix_profile,1,bare_79.975_-81.225_22,270.000,71.750,1.387,819.914,30.230
+50,Nobile Rim 2,3532.333,False,euclid_height,1,bare_32.275_-115.475_11,90.000,14.773,16.971,316.448,14.444
+50,Nobile Rim 2,3532.333,False,euclid_height_slope,1,bare_65.425_-63.575_02,112.500,15.055,4.473,316.448,14.444
+50,Nobile Rim 2,3532.333,False,dtw_10pct,1,bare_32.275_-115.475_11,112.500,19.467,9.536,316.448,14.444
+50,Nobile Rim 2,3532.333,False,matrix_profile,497,bare_-0.725_-91.225_22,90.000,29.700,5.954,316.448,14.444
+51,Peak Near Cabeus B,2163.023,True,euclid_height,1,bare_78.825_14.325_00,315.000,19.744,16.293,511.734,25.520
+51,Peak Near Cabeus B,2163.023,True,euclid_height_slope,1,bare_78.825_14.325_00,315.000,19.744,16.293,511.734,25.520
+51,Peak Near Cabeus B,2163.023,True,dtw_10pct,1,bare_78.825_14.325_00,270.000,31.668,10.268,511.734,25.520
+51,Peak Near Cabeus B,2163.023,True,matrix_profile,1,bare_-35.625_-70.675_12,180.000,39.736,6.778,511.734,25.520
+52,Slater Plain,2653.135,True,euclid_height,1,bare_72.325_-82.225_20,135.000,6.738,10.218,75.620,8.447
+52,Slater Plain,2653.135,True,euclid_height_slope,1,bare_65.125_-17.175_00,225.000,7.930,3.285,75.620,8.447
+52,Slater Plain,2653.135,True,dtw_10pct,1,bare_72.325_-82.225_20,135.000,6.738,10.218,75.620,8.447
+52,Slater Plain,2653.135,True,matrix_profile,33293,bare_79.975_-81.225_21,180.000,5.649,2.830,75.620,8.447
+53,de Gerlache Rim 2,2082.914,False,euclid_height,1,bare_26.275_38.175_01,157.500,3.838,7.604,64.970,7.520
+53,de Gerlache Rim 2,2082.914,False,euclid_height_slope,53,bare_26.275_38.175_01,157.500,3.838,7.604,64.970,7.520
+53,de Gerlache Rim 2,2082.914,False,dtw_10pct,18,bare_40.925_-118.375_20,135.000,5.708,6.138,64.970,7.520
+53,de Gerlache Rim 2,2082.914,False,matrix_profile,46861,bare_-0.725_-91.225_12,292.500,3.155,0.989,64.970,7.520
+54,Haworth,2674.837,True,euclid_height,1,bare_76.875_-69.425_22,90.000,5.964,6.147,102.125,10.603
+54,Haworth,2674.837,True,euclid_height_slope,1,bare_76.875_-69.425_22,90.000,5.964,6.147,102.125,10.603
+54,Haworth,2674.837,True,dtw_10pct,1,bare_76.875_-69.425_22,90.000,5.964,6.147,102.125,10.603
+54,Haworth,2674.837,True,matrix_profile,24623,bare_31.075_0.175_11,0.000,29.407,2.059,102.125,10.603
+55,Malapert Massif,3693.095,False,euclid_height,3,bare_19.525_-155.525_10,67.500,10.583,2.233,252.258,11.630
+55,Malapert Massif,3693.095,False,euclid_height_slope,3,bare_19.525_-155.525_10,67.500,10.583,2.233,252.258,11.630
+55,Malapert Massif,3693.095,False,dtw_10pct,31,bare_19.525_-155.525_10,247.500,10.876,2.233,252.258,11.630
+55,Malapert Massif,3693.095,False,matrix_profile,12159,bare_19.525_-155.525_10,67.500,10.149,2.233,252.258,11.630
+56,Mons Mouton,1745.673,False,euclid_height,32,bare_-31.375_-70.025_10,202.500,7.596,2.342,254.988,13.877
+56,Mons Mouton,1745.673,False,euclid_height_slope,39,bare_19.425_-155.625_10,112.500,8.809,3.404,254.988,13.877
+56,Mons Mouton,1745.673,False,dtw_10pct,28,bare_19.425_-155.625_00,270.000,9.690,0.480,254.988,13.877
+56,Mons Mouton,1745.673,False,matrix_profile,1739,bare_19.425_-155.625_10,67.500,8.932,2.171,254.988,13.877
+57,Mons Mouton Plateau,3151.723,True,euclid_height,1,bare_78.425_-84.325_21,315.000,23.374,3.038,697.572,28.100
+57,Mons Mouton Plateau,3151.723,True,euclid_height_slope,1,bare_78.425_-84.325_21,315.000,23.374,3.038,697.572,28.100
+57,Mons Mouton Plateau,3151.723,True,dtw_10pct,1,bare_73.275_55.725_21,135.000,54.159,12.748,697.572,28.100
+57,Mons Mouton Plateau,3151.723,True,matrix_profile,1,bare_78.425_-84.325_21,135.000,73.998,3.038,697.572,28.100
+58,Nobile Rim 1,2296.795,False,euclid_height,1,bare_69.575_-24.175_21,202.500,14.651,6.527,267.042,18.960
+58,Nobile Rim 1,2296.795,False,euclid_height_slope,1,bare_-24.125_-70.275_11,135.000,15.415,1.830,267.042,18.960
+58,Nobile Rim 1,2296.795,False,dtw_10pct,6,bare_-24.125_-70.275_11,135.000,15.415,1.830,267.042,18.960
+58,Nobile Rim 1,2296.795,False,matrix_profile,57,bare_-31.375_-70.025_22,67.500,33.766,1.424,267.042,18.960
+59,Nobile Rim 2,2524.193,False,euclid_height,2,bare_-35.625_-70.425_02,292.500,10.471,10.956,357.356,14.535
+59,Nobile Rim 2,2524.193,False,euclid_height_slope,2,bare_-35.625_-70.425_02,292.500,10.471,10.956,357.356,14.535
+59,Nobile Rim 2,2524.193,False,dtw_10pct,3,bare_76.825_-23.625_11,270.000,16.817,18.004,357.356,14.535
+59,Nobile Rim 2,2524.193,False,matrix_profile,669,bare_-0.725_-91.175_12,0.000,20.420,2.298,357.356,14.535
+60,Peak Near Cabeus B,3699.837,True,euclid_height,1,bare_28.925_86.525_20,292.500,35.355,17.491,576.331,18.822
+60,Peak Near Cabeus B,3699.837,True,euclid_height_slope,1,bare_28.925_86.525_20,292.500,35.355,17.491,576.331,18.822
+60,Peak Near Cabeus B,3699.837,True,dtw_10pct,1,bare_80.025_-81.225_20,90.000,51.182,14.889,576.331,18.822
+60,Peak Near Cabeus B,3699.837,True,matrix_profile,1,bare_78.425_-84.325_21,315.000,114.767,12.317,576.331,18.822
+61,Slater Plain,3586.827,True,euclid_height,1,bare_41.575_54.175_22,292.500,15.022,7.273,161.969,11.338
+61,Slater Plain,3586.827,True,euclid_height_slope,1,bare_-28.725_-69.325_20,22.500,15.090,0.695,161.969,11.338
+61,Slater Plain,3586.827,True,dtw_10pct,3,bare_-41.825_-70.275_21,270.000,18.431,2.789,161.969,11.338
+61,Slater Plain,3586.827,True,matrix_profile,507,bare_19.525_-155.525_12,0.000,23.390,0.257,161.969,11.338
+62,de Gerlache Rim 2,1365.707,True,euclid_height,1,bare_76.875_-69.425_22,67.500,6.233,9.891,66.061,9.114
+62,de Gerlache Rim 2,1365.707,True,euclid_height_slope,1,bare_34.025_86.225_12,315.000,7.437,4.926,66.061,9.114
+62,de Gerlache Rim 2,1365.707,True,dtw_10pct,1,bare_72.875_-108.025_12,22.500,8.764,7.902,66.061,9.114
+62,de Gerlache Rim 2,1365.707,True,matrix_profile,19395,bare_-31.375_-70.025_22,112.500,5.569,0.100,66.061,9.114
+63,Haworth,2419.612,True,euclid_height,1,bare_79.975_-64.225_22,22.500,7.140,2.139,194.434,15.419
+63,Haworth,2419.612,True,euclid_height_slope,1,bare_79.975_-64.225_22,22.500,7.140,2.139,194.434,15.419
+63,Haworth,2419.612,True,dtw_10pct,8,bare_19.425_-155.625_20,45.000,9.499,7.425,194.434,15.419
+63,Haworth,2419.612,True,matrix_profile,299,bare_-0.725_-91.175_22,157.500,31.192,7.421,194.434,15.419
+64,Malapert Massif,3386.705,False,euclid_height,1,bare_40.775_55.775_02,157.500,9.473,6.726,88.876,9.699
+64,Malapert Massif,3386.705,False,euclid_height_slope,1,bare_40.775_55.775_02,157.500,9.473,6.726,88.876,9.699
+64,Malapert Massif,3386.705,False,dtw_10pct,1,bare_78.575_-102.875_10,202.500,16.983,11.278,88.876,9.699
+64,Malapert Massif,3386.705,False,matrix_profile,20975,bare_34.025_86.225_11,247.500,14.280,0.209,88.876,9.699
+65,Mons Mouton,3686.422,True,euclid_height,1,bare_19.425_-155.625_01,270.000,26.933,1.636,490.223,16.213
+65,Mons Mouton,3686.422,True,euclid_height_slope,1,bare_19.425_-155.625_01,270.000,26.933,1.636,490.223,16.213
+65,Mons Mouton,3686.422,True,dtw_10pct,2,bare_-35.625_-70.675_01,22.500,30.201,22.814,490.223,16.213
+65,Mons Mouton,3686.422,True,matrix_profile,15,bare_19.425_-155.625_01,67.500,50.579,3.983,490.223,16.213
+66,Mons Mouton Plateau,1797.124,True,euclid_height,1,bare_-0.725_-91.175_10,135.000,3.901,10.588,76.902,8.852
+66,Mons Mouton Plateau,1797.124,True,euclid_height_slope,4,bare_-0.725_-91.175_10,135.000,3.901,10.588,76.902,8.852
+66,Mons Mouton Plateau,1797.124,True,dtw_10pct,1,bare_80.025_-81.225_10,292.500,4.737,8.315,76.902,8.852
+66,Mons Mouton Plateau,1797.124,True,matrix_profile,39147,bare_79.975_-81.225_21,0.000,4.210,2.425,76.902,8.852
+67,Nobile Rim 1,3007.611,True,euclid_height,1,bare_73.525_-83.025_22,135.000,14.546,19.737,180.241,13.007
+67,Nobile Rim 1,3007.611,True,euclid_height_slope,1,bare_75.975_-91.175_22,0.000,15.607,4.189,180.241,13.007
+67,Nobile Rim 1,3007.611,True,dtw_10pct,1,bare_32.375_54.575_12,225.000,18.119,8.841,180.241,13.007
+67,Nobile Rim 1,3007.611,True,matrix_profile,131,bare_19.525_-155.525_12,0.000,31.573,1.927,180.241,13.007
+68,Nobile Rim 2,2870.852,True,euclid_height,1,bare_77.275_-68.675_12,22.500,17.795,8.252,489.507,16.366
+68,Nobile Rim 2,2870.852,True,euclid_height_slope,1,bare_19.425_-155.625_10,67.500,20.167,4.077,489.507,16.366
+68,Nobile Rim 2,2870.852,True,dtw_10pct,1,bare_19.425_-155.625_22,157.500,28.431,3.188,489.507,16.366
+68,Nobile Rim 2,2870.852,True,matrix_profile,137,bare_19.425_-155.625_10,67.500,24.448,4.077,489.507,16.366
+69,Peak Near Cabeus B,1410.302,False,euclid_height,4,bare_70.675_-22.225_10,0.000,10.451,2.731,407.019,21.758
+69,Peak Near Cabeus B,1410.302,False,euclid_height_slope,3,bare_70.675_-22.225_10,0.000,10.451,2.731,407.019,21.758
+69,Peak Near Cabeus B,1410.302,False,dtw_10pct,1,bare_69.975_-70.675_12,202.500,18.311,19.615,407.019,21.758
+69,Peak Near Cabeus B,1410.302,False,matrix_profile,13,bare_-31.375_-70.025_20,112.500,13.066,0.068,407.019,21.758
+70,Slater Plain,3196.240,False,euclid_height,8,bare_31.425_61.125_12,112.500,5.463,6.772,105.462,8.083
+70,Slater Plain,3196.240,False,euclid_height_slope,12,bare_31.425_61.125_12,112.500,5.463,6.772,105.462,8.083
+70,Slater Plain,3196.240,False,dtw_10pct,51,bare_-24.325_-69.575_12,112.500,6.059,6.714,105.462,8.083
+70,Slater Plain,3196.240,False,matrix_profile,36323,bare_-24.325_-69.575_10,90.000,28.054,1.602,105.462,8.083
+71,de Gerlache Rim 2,1742.024,False,euclid_height,96,bare_19.425_-155.625_11,67.500,4.283,2.786,190.447,11.561
+71,de Gerlache Rim 2,1742.024,False,euclid_height_slope,99,bare_19.425_-155.625_11,67.500,4.283,2.786,190.447,11.561
+71,de Gerlache Rim 2,1742.024,False,dtw_10pct,100,bare_-0.725_-91.225_22,180.000,9.298,2.556,190.447,11.561
+71,de Gerlache Rim 2,1742.024,False,matrix_profile,2321,bare_-0.725_-91.175_21,292.500,5.855,0.437,190.447,11.561
+72,Haworth,1948.666,True,euclid_height,2,bare_-25.075_-67.775_02,225.000,4.146,1.080,74.916,7.336
+72,Haworth,1948.666,True,euclid_height_slope,31,bare_19.425_-155.625_12,225.000,4.959,1.816,74.916,7.336
+72,Haworth,1948.666,True,dtw_10pct,30,bare_80.025_-81.275_11,112.500,4.758,1.015,74.916,7.336
+72,Haworth,1948.666,True,matrix_profile,31619,bare_-0.725_-91.225_12,157.500,4.185,1.455,74.916,7.336
+73,Malapert Massif,3667.139,True,euclid_height,1,bare_80.025_-81.275_00,22.500,15.314,10.854,378.594,13.332
+73,Malapert Massif,3667.139,True,euclid_height_slope,1,bare_80.025_-81.275_00,22.500,15.314,10.854,378.594,13.332
+73,Malapert Massif,3667.139,True,dtw_10pct,8,bare_70.125_-53.675_21,270.000,22.111,21.442,378.594,13.332
+73,Malapert Massif,3667.139,True,matrix_profile,71,bare_-0.725_-91.225_22,292.500,41.803,3.148,378.594,13.332
+74,Mons Mouton,2426.275,True,euclid_height,1,bare_-24.125_-70.275_02,292.500,21.787,7.313,268.688,18.179
+74,Mons Mouton,2426.275,True,euclid_height_slope,1,bare_-24.125_-70.275_02,292.500,21.787,7.313,268.688,18.179
+74,Mons Mouton,2426.275,True,dtw_10pct,1,bare_35.075_5.425_01,315.000,30.059,27.423,268.688,18.179
+74,Mons Mouton,2426.275,True,matrix_profile,17,bare_-28.725_-69.325_22,292.500,41.704,7.325,268.688,18.179
+75,Mons Mouton Plateau,3886.784,True,euclid_height,1,bare_-41.825_-70.275_00,157.500,25.807,1.044,219.711,19.498
+75,Mons Mouton Plateau,3886.784,True,euclid_height_slope,1,bare_-41.825_-70.275_00,157.500,25.807,1.044,219.711,19.498
+75,Mons Mouton Plateau,3886.784,True,dtw_10pct,1,bare_73.525_-83.025_10,0.000,31.892,20.988,219.711,19.498
+75,Mons Mouton Plateau,3886.784,True,matrix_profile,29,bare_79.575_20.775_00,67.500,89.958,4.739,219.711,19.498
+76,Nobile Rim 1,2729.261,False,euclid_height,4,bare_80.025_-81.275_22,22.500,17.757,9.096,811.559,23.814
+76,Nobile Rim 1,2729.261,False,euclid_height_slope,3,bare_80.025_-81.275_22,22.500,17.757,9.096,811.559,23.814
+76,Nobile Rim 1,2729.261,False,dtw_10pct,9,bare_80.025_-81.275_22,202.500,28.151,9.096,811.559,23.814
+76,Nobile Rim 1,2729.261,False,matrix_profile,1,bare_-35.625_-70.675_10,157.500,149.132,1.328,811.559,23.814
+77,Nobile Rim 2,1447.630,True,euclid_height,1,bare_78.425_102.175_20,90.000,4.689,13.949,72.605,8.028
+77,Nobile Rim 2,1447.630,True,euclid_height_slope,2,bare_19.525_-155.525_12,157.500,6.753,0.449,72.605,8.028
+77,Nobile Rim 2,1447.630,True,dtw_10pct,2,bare_19.525_-155.525_12,157.500,6.753,0.449,72.605,8.028
+77,Nobile Rim 2,1447.630,True,matrix_profile,49031,bare_19.525_-155.525_12,135.000,3.377,0.201,72.605,8.028
+78,Peak Near Cabeus B,2360.572,False,euclid_height,1,bare_-28.725_-69.325_22,135.000,14.134,2.287,241.408,15.979
+78,Peak Near Cabeus B,2360.572,False,euclid_height_slope,1,bare_-28.725_-69.325_22,135.000,14.134,2.287,241.408,15.979
+78,Peak Near Cabeus B,2360.572,False,dtw_10pct,2,bare_29.725_97.175_10,270.000,17.199,5.774,241.408,15.979
+78,Peak Near Cabeus B,2360.572,False,matrix_profile,161,bare_19.525_-155.525_12,180.000,50.484,4.899,241.408,15.979
+79,Slater Plain,3788.535,True,euclid_height,1,bare_61.875_142.975_12,157.500,24.199,9.407,267.658,21.379
+79,Slater Plain,3788.535,True,euclid_height_slope,1,bare_61.875_142.975_12,157.500,24.199,9.407,267.658,21.379
+79,Slater Plain,3788.535,True,dtw_10pct,1,bare_70.375_-69.875_12,337.500,32.046,6.696,267.658,21.379
+79,Slater Plain,3788.535,True,matrix_profile,3,bare_-31.375_-70.025_21,292.500,82.114,0.773,267.658,21.379
+80,de Gerlache Rim 2,1373.286,False,euclid_height,3,bare_76.475_-95.875_00,22.500,3.841,7.461,39.011,6.998
+80,de Gerlache Rim 2,1373.286,False,euclid_height_slope,8,bare_79.575_20.775_22,292.500,3.857,3.638,39.011,6.998
+80,de Gerlache Rim 2,1373.286,False,dtw_10pct,3,bare_34.025_86.225_12,292.500,6.499,3.119,39.011,6.998
+80,de Gerlache Rim 2,1373.286,False,matrix_profile,35221,bare_18.575_46.825_10,202.500,5.322,1.274,39.011,6.998
+81,Haworth,3563.493,True,euclid_height,1,bare_76.875_-69.425_10,135.000,14.212,17.870,179.903,9.236
+81,Haworth,3563.493,True,euclid_height_slope,1,bare_76.875_-69.425_22,22.500,14.277,8.217,179.903,9.236
+81,Haworth,3563.493,True,dtw_10pct,1,bare_76.875_-69.425_22,22.500,14.277,8.217,179.903,9.236
+81,Haworth,3563.493,True,matrix_profile,16801,bare_79.575_20.775_22,0.000,34.736,1.695,179.903,9.236
+82,Malapert Massif,2697.264,False,euclid_height,1,bare_69.575_-24.175_01,45.000,17.175,25.503,455.426,16.813
+82,Malapert Massif,2697.264,False,euclid_height_slope,1,bare_19.425_-155.625_10,67.500,22.042,4.524,455.426,16.813
+82,Malapert Massif,2697.264,False,dtw_10pct,4,bare_-35.625_-70.425_02,180.000,38.888,8.324,455.426,16.813
+82,Malapert Massif,2697.264,False,matrix_profile,587,bare_-0.725_-91.175_12,0.000,48.921,4.576,455.426,16.813
+83,Mons Mouton,3543.908,True,euclid_height,1,bare_74.925_60.025_12,67.500,23.655,8.682,256.708,15.983
+83,Mons Mouton,3543.908,True,euclid_height_slope,1,bare_-41.825_-70.275_21,157.500,24.107,0.399,256.708,15.983
+83,Mons Mouton,3543.908,True,dtw_10pct,1,bare_76.875_-69.425_00,45.000,26.664,11.227,256.708,15.983
+83,Mons Mouton,3543.908,True,matrix_profile,5,bare_80.025_-60.875_22,157.500,45.393,2.480,256.708,15.983
+84,Mons Mouton Plateau,3242.759,True,euclid_height,1,bare_79.225_-77.625_11,337.500,28.619,25.694,240.221,19.308
+84,Mons Mouton Plateau,3242.759,True,euclid_height_slope,1,bare_79.225_-77.625_11,337.500,28.619,25.694,240.221,19.308
+84,Mons Mouton Plateau,3242.759,True,dtw_10pct,1,bare_80.025_-60.775_02,225.000,38.294,14.285,240.221,19.308
+84,Mons Mouton Plateau,3242.759,True,matrix_profile,1,bare_34.775_78.725_22,157.500,26.794,2.963,240.221,19.308
+85,Nobile Rim 1,3757.570,True,euclid_height,1,bare_79.325_14.375_12,225.000,39.050,22.489,601.513,27.921
+85,Nobile Rim 1,3757.570,True,euclid_height_slope,1,bare_79.225_-77.625_01,112.500,42.440,14.211,601.513,27.921
+85,Nobile Rim 1,3757.570,True,dtw_10pct,1,bare_73.675_-55.675_20,180.000,47.602,5.849,601.513,27.921
+85,Nobile Rim 1,3757.570,True,matrix_profile,1,bare_-19.225_-69.925_11,225.000,94.944,1.206,601.513,27.921
+86,Nobile Rim 2,1887.062,False,euclid_height,1,bare_69.675_-23.875_22,135.000,6.862,7.847,164.857,10.265
+86,Nobile Rim 2,1887.062,False,euclid_height_slope,3,bare_69.675_-23.875_22,135.000,6.862,7.847,164.857,10.265
+86,Nobile Rim 2,1887.062,False,dtw_10pct,6,bare_-25.075_-67.775_22,90.000,12.060,6.210,164.857,10.265
+86,Nobile Rim 2,1887.062,False,matrix_profile,3061,bare_-0.725_-91.225_22,270.000,9.663,1.775,164.857,10.265
+87,Peak Near Cabeus B,1042.177,True,euclid_height,1,bare_28.925_86.525_02,157.500,6.733,0.080,222.398,29.273
+87,Peak Near Cabeus B,1042.177,True,euclid_height_slope,1,bare_28.925_86.525_02,157.500,6.733,0.080,222.398,29.273
+87,Peak Near Cabeus B,1042.177,True,dtw_10pct,1,bare_28.925_86.525_02,337.500,11.549,0.080,222.398,29.273
+87,Peak Near Cabeus B,1042.177,True,matrix_profile,17,bare_78.825_14.325_20,67.500,14.881,0.921,222.398,29.273
+88,Slater Plain,1811.916,True,euclid_height,1,bare_71.575_-78.025_11,270.000,3.876,4.237,80.699,7.329
+88,Slater Plain,1811.916,True,euclid_height_slope,3,bare_71.575_-78.025_11,270.000,3.876,4.237,80.699,7.329
+88,Slater Plain,1811.916,True,dtw_10pct,2,bare_79.975_-64.275_11,247.500,5.969,2.316,80.699,7.329
+88,Slater Plain,1811.916,True,matrix_profile,28693,bare_-0.725_-91.225_12,292.500,4.095,0.798,80.699,7.329
+89,de Gerlache Rim 2,1250.612,False,euclid_height,10,bare_34.775_78.725_01,22.500,2.917,4.954,72.803,6.868
+89,de Gerlache Rim 2,1250.612,False,euclid_height_slope,38,bare_34.775_78.725_01,22.500,2.917,4.954,72.803,6.868
+89,de Gerlache Rim 2,1250.612,False,dtw_10pct,29,bare_-0.725_-91.175_21,202.500,4.318,0.446,72.803,6.868
+89,de Gerlache Rim 2,1250.612,False,matrix_profile,14981,bare_19.525_-155.525_20,292.500,3.480,0.193,72.803,6.868
+90,Haworth,2317.205,False,euclid_height,1,bare_74.925_60.025_12,225.000,8.760,7.601,191.519,12.042
+90,Haworth,2317.205,False,euclid_height_slope,1,bare_75.975_-91.175_12,247.500,9.145,6.346,191.519,12.042
+90,Haworth,2317.205,False,dtw_10pct,1,bare_74.925_60.025_12,225.000,8.760,7.601,191.519,12.042
+90,Haworth,2317.205,False,matrix_profile,2189,bare_80.025_-60.775_00,0.000,27.082,3.456,191.519,12.042
+91,Malapert Massif,1226.166,True,euclid_height,1,bare_73.675_-55.675_21,22.500,5.798,4.510,157.047,15.423
+91,Malapert Massif,1226.166,True,euclid_height_slope,1,bare_73.675_-55.675_21,22.500,5.798,4.510,157.047,15.423
+91,Malapert Massif,1226.166,True,dtw_10pct,12,bare_73.675_-55.675_21,22.500,5.798,4.510,157.047,15.423
+91,Malapert Massif,1226.166,True,matrix_profile,947,bare_-18.875_-69.875_01,0.000,6.269,4.605,157.047,15.423
+92,Mons Mouton,3976.504,True,euclid_height,1,bare_67.625_-67.425_12,292.500,28.434,10.083,385.513,22.586
+92,Mons Mouton,3976.504,True,euclid_height_slope,1,bare_67.625_-67.425_12,292.500,28.434,10.083,385.513,22.586
+92,Mons Mouton,3976.504,True,dtw_10pct,1,bare_79.825_-72.675_00,315.000,41.530,21.759,385.513,22.586
+92,Mons Mouton,3976.504,True,matrix_profile,1,bare_-31.375_-70.025_21,112.500,97.014,1.979,385.513,22.586
+93,Mons Mouton Plateau,2726.620,True,euclid_height,1,bare_80.025_-81.275_22,22.500,23.706,8.983,745.533,23.927
+93,Mons Mouton Plateau,2726.620,True,euclid_height_slope,1,bare_80.025_-81.275_22,22.500,23.706,8.983,745.533,23.927
+93,Mons Mouton Plateau,2726.620,True,dtw_10pct,1,bare_-28.725_-69.325_10,112.500,59.799,10.578,745.533,23.927
+93,Mons Mouton Plateau,2726.620,True,matrix_profile,1,bare_-35.625_-70.675_10,157.500,37.367,5.388,745.533,23.927
+94,Nobile Rim 1,1376.294,False,euclid_height,2,bare_58.325_-155.125_22,67.500,6.868,6.151,224.234,15.894
+94,Nobile Rim 1,1376.294,False,euclid_height_slope,6,bare_58.325_-155.125_22,67.500,6.868,6.151,224.234,15.894
+94,Nobile Rim 1,1376.294,False,dtw_10pct,23,bare_19.425_-155.625_22,315.000,12.800,2.929,224.234,15.894
+94,Nobile Rim 1,1376.294,False,matrix_profile,2011,bare_-28.725_-69.325_22,292.500,14.203,2.564,224.234,15.894
+95,Nobile Rim 2,1541.008,False,euclid_height,5,bare_-19.225_-69.925_21,22.500,14.067,6.062,524.608,22.447
+95,Nobile Rim 2,1541.008,False,euclid_height_slope,2,bare_-19.225_-69.925_21,22.500,14.067,6.062,524.608,22.447
+95,Nobile Rim 2,1541.008,False,dtw_10pct,33,bare_38.175_72.875_01,112.500,20.758,6.327,524.608,22.447
+95,Nobile Rim 2,1541.008,False,matrix_profile,81,bare_-31.375_-70.025_20,112.500,32.956,0.095,524.608,22.447
+96,Peak Near Cabeus B,2438.127,False,euclid_height,1,bare_79.975_-81.225_22,270.000,20.225,9.969,592.108,21.648
+96,Peak Near Cabeus B,2438.127,False,euclid_height_slope,1,bare_79.975_-81.225_22,270.000,20.225,9.969,592.108,21.648
+96,Peak Near Cabeus B,2438.127,False,dtw_10pct,2,bare_66.575_-62.775_11,157.500,41.619,11.951,592.108,21.648
+96,Peak Near Cabeus B,2438.127,False,matrix_profile,7,bare_-28.725_-69.325_10,67.500,26.289,5.624,592.108,21.648
+97,Slater Plain,3569.715,True,euclid_height,1,bare_79.075_-74.625_10,225.000,19.750,6.890,203.106,17.653
+97,Slater Plain,3569.715,True,euclid_height_slope,1,bare_79.075_-74.625_10,225.000,19.750,6.890,203.106,17.653
+97,Slater Plain,3569.715,True,dtw_10pct,1,bare_36.175_67.675_11,337.500,24.986,11.707,203.106,17.653
+97,Slater Plain,3569.715,True,matrix_profile,265,bare_-31.375_-70.025_22,90.000,43.541,1.416,203.106,17.653
+98,de Gerlache Rim 2,2490.804,True,euclid_height,1,bare_19.425_-155.625_21,180.000,10.492,4.153,307.410,16.697
+98,de Gerlache Rim 2,2490.804,True,euclid_height_slope,1,bare_19.425_-155.625_21,180.000,10.492,4.153,307.410,16.697
+98,de Gerlache Rim 2,2490.804,True,dtw_10pct,18,bare_-0.725_-91.225_22,135.000,21.975,4.129,307.410,16.697
+98,de Gerlache Rim 2,2490.804,True,matrix_profile,495,bare_-0.725_-91.175_12,157.500,15.509,4.137,307.410,16.697
+99,Haworth,3404.330,False,euclid_height,1,bare_19.425_-155.625_22,180.000,20.966,2.181,523.768,15.245
+99,Haworth,3404.330,False,euclid_height_slope,1,bare_19.425_-155.625_22,180.000,20.966,2.181,523.768,15.245
+99,Haworth,3404.330,False,dtw_10pct,3,bare_19.425_-155.625_10,90.000,26.068,3.135,523.768,15.245
+99,Haworth,3404.330,False,matrix_profile,165,bare_19.425_-155.625_10,67.500,22.506,2.956,523.768,15.245
+100,Malapert Massif,3682.783,False,euclid_height,1,bare_25.475_42.775_12,67.500,18.740,10.188,330.976,15.987
+100,Malapert Massif,3682.783,False,euclid_height_slope,1,bare_25.475_42.775_12,67.500,18.740,10.188,330.976,15.987
+100,Malapert Massif,3682.783,False,dtw_10pct,4,bare_78.425_-84.325_10,0.000,29.154,9.799,330.976,15.987
+100,Malapert Massif,3682.783,False,matrix_profile,17,bare_80.025_-81.225_00,22.500,39.029,2.109,330.976,15.987
+101,Mons Mouton,3046.849,False,euclid_height,1,bare_-16.325_-72.625_10,247.500,24.330,0.681,309.951,17.807
+101,Mons Mouton,3046.849,False,euclid_height_slope,1,bare_-16.325_-72.625_10,247.500,24.330,0.681,309.951,17.807
+101,Mons Mouton,3046.849,False,dtw_10pct,3,bare_80.025_-94.525_20,315.000,25.966,10.729,309.951,17.807
+101,Mons Mouton,3046.849,False,matrix_profile,9,bare_-19.225_-69.925_11,270.000,24.582,1.075,309.951,17.807
+102,Mons Mouton Plateau,3525.748,False,euclid_height,1,bare_-19.225_-69.925_20,22.500,19.256,4.186,331.029,18.076
+102,Mons Mouton Plateau,3525.748,False,euclid_height_slope,1,bare_-19.225_-69.925_20,22.500,19.256,4.186,331.029,18.076
+102,Mons Mouton Plateau,3525.748,False,dtw_10pct,1,bare_-16.325_-72.625_10,90.000,22.835,0.446,331.029,18.076
+102,Mons Mouton Plateau,3525.748,False,matrix_profile,67,bare_-19.225_-69.925_11,90.000,29.620,1.343,331.029,18.076
+103,Nobile Rim 1,3559.930,True,euclid_height,15,bare_-0.725_-91.175_22,157.500,10.273,2.589,409.069,12.551
+103,Nobile Rim 1,3559.930,True,euclid_height_slope,16,bare_-0.725_-91.175_22,157.500,10.273,2.589,409.069,12.551
+103,Nobile Rim 1,3559.930,True,dtw_10pct,25,bare_19.425_-155.625_22,292.500,20.161,0.152,409.069,12.551
+103,Nobile Rim 1,3559.930,True,matrix_profile,461,bare_-0.725_-91.175_22,0.000,22.205,2.455,409.069,12.551
+104,Nobile Rim 2,2009.677,False,euclid_height,1,bare_19.425_-155.625_12,180.000,4.456,2.057,177.115,9.869
+104,Nobile Rim 2,2009.677,False,euclid_height_slope,8,bare_19.425_-155.625_12,180.000,4.456,2.057,177.115,9.869
+104,Nobile Rim 2,2009.677,False,dtw_10pct,22,bare_19.525_-155.525_11,0.000,7.514,0.673,177.115,9.869
+104,Nobile Rim 2,2009.677,False,matrix_profile,3641,bare_19.425_-155.625_11,247.500,13.397,1.094,177.115,9.869
+105,Peak Near Cabeus B,1872.550,False,euclid_height,2,bare_-48.725_-72.025_02,180.000,5.492,7.811,236.391,12.687
+105,Peak Near Cabeus B,1872.550,False,euclid_height_slope,3,bare_-48.725_-72.025_02,180.000,5.492,7.811,236.391,12.687
+105,Peak Near Cabeus B,1872.550,False,dtw_10pct,16,bare_19.425_-155.625_01,90.000,8.739,1.046,236.391,12.687
+105,Peak Near Cabeus B,1872.550,False,matrix_profile,509,bare_19.425_-155.625_21,180.000,3.562,0.144,236.391,12.687
+106,Slater Plain,2824.002,True,euclid_height,1,bare_-41.825_-70.275_00,90.000,9.539,7.367,166.142,18.829
+106,Slater Plain,2824.002,True,euclid_height_slope,1,bare_-41.825_-70.275_00,90.000,9.539,7.367,166.142,18.829
+106,Slater Plain,2824.002,True,dtw_10pct,1,bare_-41.675_-70.575_22,157.500,10.295,10.522,166.142,18.829
+106,Slater Plain,2824.002,True,matrix_profile,5347,bare_-41.825_-70.275_00,112.500,19.768,6.939,166.142,18.829
+107,de Gerlache Rim 2,3118.325,False,euclid_height,1,bare_19.525_-155.525_12,225.000,9.357,2.432,151.579,9.539
+107,de Gerlache Rim 2,3118.325,False,euclid_height_slope,4,bare_19.525_-155.525_12,225.000,9.357,2.432,151.579,9.539
+107,de Gerlache Rim 2,3118.325,False,dtw_10pct,9,bare_19.525_-155.525_12,45.000,9.622,2.432,151.579,9.539
+107,de Gerlache Rim 2,3118.325,False,matrix_profile,35583,bare_19.425_-155.625_12,90.000,6.364,0.769,151.579,9.539
+108,Haworth,1881.470,False,euclid_height,3,bare_-41.825_-70.275_10,270.000,4.557,5.552,138.284,8.872
+108,Haworth,1881.470,False,euclid_height_slope,8,bare_-41.825_-70.275_10,270.000,4.557,5.552,138.284,8.872
+108,Haworth,1881.470,False,dtw_10pct,12,bare_-41.825_-70.275_10,90.000,4.733,5.552,138.284,8.872
+108,Haworth,1881.470,False,matrix_profile,27749,bare_-0.725_-91.225_22,90.000,6.361,0.382,138.284,8.872
+109,Malapert Massif,3566.053,True,euclid_height,1,bare_29.725_97.175_20,292.500,24.596,18.427,821.130,20.306
+109,Malapert Massif,3566.053,True,euclid_height_slope,1,bare_29.725_97.175_20,292.500,24.596,18.427,821.130,20.306
+109,Malapert Massif,3566.053,True,dtw_10pct,2,bare_77.275_-68.675_21,202.500,50.943,16.257,821.130,20.306
+109,Malapert Massif,3566.053,True,matrix_profile,3,bare_-35.625_-70.675_10,337.500,73.789,9.008,821.130,20.306
+110,Mons Mouton,1370.207,False,euclid_height,17,bare_74.175_57.775_11,0.000,5.306,8.687,134.880,15.409
+110,Mons Mouton,1370.207,False,euclid_height_slope,16,bare_74.175_57.775_11,180.000,5.532,8.687,134.880,15.409
+110,Mons Mouton,1370.207,False,dtw_10pct,50,bare_74.175_57.775_11,0.000,5.306,8.687,134.880,15.409
+110,Mons Mouton,1370.207,False,matrix_profile,2719,bare_-28.725_-69.325_22,112.500,9.127,2.079,134.880,15.409
+111,Mons Mouton Plateau,3892.635,False,euclid_height,1,bare_32.275_-115.475_12,67.500,14.139,11.620,180.325,13.363
+111,Mons Mouton Plateau,3892.635,False,euclid_height_slope,1,bare_67.625_-67.425_20,202.500,15.364,7.404,180.325,13.363
+111,Mons Mouton Plateau,3892.635,False,dtw_10pct,1,bare_-10.175_-77.925_10,90.000,18.255,10.831,180.325,13.363
+111,Mons Mouton Plateau,3892.635,False,matrix_profile,21793,bare_74.425_-19.775_02,90.000,31.861,2.267,180.325,13.363
+112,Nobile Rim 1,1368.271,False,euclid_height,1,bare_80.025_-60.775_02,67.500,4.310,5.092,196.516,15.751
+112,Nobile Rim 1,1368.271,False,euclid_height_slope,2,bare_80.025_-60.775_02,67.500,4.310,5.092,196.516,15.751
+112,Nobile Rim 1,1368.271,False,dtw_10pct,5,bare_-28.725_-69.325_22,292.500,9.138,2.420,196.516,15.751
+112,Nobile Rim 1,1368.271,False,matrix_profile,1157,bare_69.975_-70.675_10,315.000,6.361,1.696,196.516,15.751
+113,Nobile Rim 2,1675.489,False,euclid_height,1,bare_-19.225_-69.925_21,112.500,10.061,8.150,293.838,15.231
+113,Nobile Rim 2,1675.489,False,euclid_height_slope,1,bare_-31.375_-70.025_21,315.000,10.501,9.906,293.838,15.231
+113,Nobile Rim 2,1675.489,False,dtw_10pct,6,bare_19.425_-155.625_22,157.500,15.451,2.594,293.838,15.231
+113,Nobile Rim 2,1675.489,False,matrix_profile,571,bare_19.425_-155.625_01,90.000,13.289,0.654,293.838,15.231
+114,Peak Near Cabeus B,3805.807,False,euclid_height,20,bare_80.025_-94.525_01,67.500,13.424,6.314,100.590,12.519
+114,Peak Near Cabeus B,3805.807,False,euclid_height_slope,13,bare_80.025_-94.525_01,67.500,13.424,6.314,100.590,12.519
+114,Peak Near Cabeus B,3805.807,False,dtw_10pct,27,bare_80.025_-81.275_00,270.000,18.173,5.094,100.590,12.519
+114,Peak Near Cabeus B,3805.807,False,matrix_profile,149,bare_19.425_-155.625_11,157.500,58.329,5.063,100.590,12.519
+115,Slater Plain,1872.487,False,euclid_height,1,bare_75.975_-91.175_22,0.000,11.312,0.989,137.425,18.186
+115,Slater Plain,1872.487,False,euclid_height_slope,1,bare_75.975_-91.175_22,180.000,11.519,0.989,137.425,18.186
+115,Slater Plain,1872.487,False,dtw_10pct,1,bare_28.925_85.975_12,67.500,13.887,16.483,137.425,18.186
+115,Slater Plain,1872.487,False,matrix_profile,191,bare_80.025_-60.775_01,135.000,21.133,1.762,137.425,18.186
+116,de Gerlache Rim 2,1551.505,True,euclid_height,1,bare_34.025_86.225_11,157.500,6.628,1.386,76.076,12.417
+116,de Gerlache Rim 2,1551.505,True,euclid_height_slope,1,bare_34.025_86.225_11,157.500,6.628,1.386,76.076,12.417
+116,de Gerlache Rim 2,1551.505,True,dtw_10pct,1,bare_34.025_86.225_11,180.000,7.375,1.862,76.076,12.417
+116,de Gerlache Rim 2,1551.505,True,matrix_profile,2375,bare_32.025_68.325_22,45.000,5.543,0.485,76.076,12.417
+117,Haworth,3177.262,False,euclid_height,2,bare_19.425_-155.625_01,67.500,8.804,3.674,369.600,15.904
+117,Haworth,3177.262,False,euclid_height_slope,3,bare_19.425_-155.625_01,67.500,8.804,3.674,369.600,15.904
+117,Haworth,3177.262,False,dtw_10pct,2,bare_19.425_-155.625_01,112.500,12.111,1.855,369.600,15.904
+117,Haworth,3177.262,False,matrix_profile,433,bare_19.425_-155.625_21,135.000,25.830,5.457,369.600,15.904
+118,Malapert Massif,1339.660,False,euclid_height,2,bare_75.975_-91.175_00,247.500,5.800,19.296,136.205,13.727
+118,Malapert Massif,1339.660,False,euclid_height_slope,3,bare_-48.725_-72.025_21,247.500,6.581,0.167,136.205,13.727
+118,Malapert Massif,1339.660,False,dtw_10pct,4,bare_-48.725_-72.025_21,247.500,6.581,0.167,136.205,13.727
+118,Malapert Massif,1339.660,False,matrix_profile,2271,bare_79.825_-72.675_12,112.500,4.913,0.109,136.205,13.727
+119,Mons Mouton,2512.615,True,euclid_height,1,bare_75.875_-19.925_21,315.000,29.039,11.059,351.487,26.974
+119,Mons Mouton,2512.615,True,euclid_height_slope,1,bare_75.875_-19.925_21,315.000,29.039,11.059,351.487,26.974
+119,Mons Mouton,2512.615,True,dtw_10pct,2,bare_73.675_-55.675_10,22.500,40.784,30.186,351.487,26.974
+119,Mons Mouton,2512.615,True,matrix_profile,1,bare_79.825_-72.675_02,135.000,42.755,4.469,351.487,26.974
+120,Mons Mouton Plateau,1564.464,True,euclid_height,1,bare_77.175_-18.475_20,292.500,4.858,1.053,54.301,12.576
+120,Mons Mouton Plateau,1564.464,True,euclid_height_slope,2,bare_80.025_-81.275_12,0.000,5.167,2.273,54.301,12.576
+120,Mons Mouton Plateau,1564.464,True,dtw_10pct,1,bare_-35.625_-70.425_01,157.500,6.903,4.639,54.301,12.576
+120,Mons Mouton Plateau,1564.464,True,matrix_profile,42487,bare_36.175_67.675_00,90.000,4.406,4.279,54.301,12.576
+121,Nobile Rim 1,1329.342,True,euclid_height,2,bare_33.475_79.025_21,180.000,7.308,4.976,274.964,22.844
+121,Nobile Rim 1,1329.342,True,euclid_height_slope,2,bare_33.475_79.025_21,180.000,7.308,4.976,274.964,22.844
+121,Nobile Rim 1,1329.342,True,dtw_10pct,23,bare_78.425_-84.325_20,0.000,11.395,3.792,274.964,22.844
+121,Nobile Rim 1,1329.342,True,matrix_profile,817,bare_69.675_-23.875_22,0.000,6.496,0.195,274.964,22.844
+122,Nobile Rim 2,1796.478,False,euclid_height,1,bare_-16.325_-72.625_02,202.500,9.503,3.712,121.893,13.951
+122,Nobile Rim 2,1796.478,False,euclid_height_slope,1,bare_-16.325_-72.625_02,202.500,9.503,3.712,121.893,13.951
+122,Nobile Rim 2,1796.478,False,dtw_10pct,1,bare_34.775_78.725_11,202.500,11.773,6.026,121.893,13.951
+122,Nobile Rim 2,1796.478,False,matrix_profile,907,bare_-41.825_-70.275_21,67.500,17.689,0.270,121.893,13.951
+123,Peak Near Cabeus B,3611.660,True,euclid_height,1,bare_77.275_-68.675_12,22.500,19.832,4.945,536.048,19.672
+123,Peak Near Cabeus B,3611.660,True,euclid_height_slope,1,bare_19.425_-155.625_22,180.000,22.057,6.608,536.048,19.672
+123,Peak Near Cabeus B,3611.660,True,dtw_10pct,6,bare_19.425_-155.625_10,67.500,33.774,7.383,536.048,19.672
+123,Peak Near Cabeus B,3611.660,True,matrix_profile,101,bare_19.425_-155.625_10,67.500,25.630,7.383,536.048,19.672
+124,Slater Plain,1378.517,False,euclid_height,7,bare_28.925_86.525_20,112.500,6.986,6.512,278.501,16.766
+124,Slater Plain,1378.517,False,euclid_height_slope,7,bare_28.925_86.525_20,112.500,6.986,6.512,278.501,16.766
+124,Slater Plain,1378.517,False,dtw_10pct,19,bare_65.625_-39.225_11,247.500,10.593,6.307,278.501,16.766
+124,Slater Plain,1378.517,False,matrix_profile,607,bare_-31.375_-70.025_20,315.000,11.076,2.276,278.501,16.766
+125,de Gerlache Rim 2,3230.772,True,euclid_height,1,bare_79.125_15.875_10,135.000,7.658,12.666,209.542,13.769
+125,de Gerlache Rim 2,3230.772,True,euclid_height_slope,1,bare_80.025_-72.075_01,45.000,8.107,3.358,209.542,13.769
+125,de Gerlache Rim 2,3230.772,True,dtw_10pct,2,bare_-48.075_-70.425_12,67.500,10.929,14.236,209.542,13.769
+125,de Gerlache Rim 2,3230.772,True,matrix_profile,1501,bare_80.025_-86.925_20,247.500,13.240,3.599,209.542,13.769
+126,Haworth,2404.851,True,euclid_height,1,bare_26.475_38.525_01,112.500,13.596,19.737,143.114,14.248
+126,Haworth,2404.851,True,euclid_height_slope,1,bare_76.175_-116.375_22,270.000,13.688,5.573,143.114,14.248
+126,Haworth,2404.851,True,dtw_10pct,1,bare_64.475_-66.025_20,22.500,18.317,16.620,143.114,14.248
+126,Haworth,2404.851,True,matrix_profile,3607,bare_76.475_-95.875_12,90.000,28.628,1.686,143.114,14.248
+127,Malapert Massif,2450.577,True,euclid_height,1,bare_2.725_36.375_12,45.000,11.196,14.207,176.322,15.095
+127,Malapert Massif,2450.577,True,euclid_height_slope,1,bare_2.725_36.375_12,45.000,11.196,14.207,176.322,15.095
+127,Malapert Massif,2450.577,True,dtw_10pct,1,bare_2.725_36.375_12,45.000,11.196,14.207,176.322,15.095
+127,Malapert Massif,2450.577,True,matrix_profile,317,bare_79.225_-77.625_12,22.500,25.570,2.096,176.322,15.095
+128,Mons Mouton,1183.761,False,euclid_height,1,bare_20.475_27.275_20,225.000,4.655,0.303,46.115,11.382
+128,Mons Mouton,1183.761,False,euclid_height_slope,1,bare_20.475_27.275_20,225.000,4.655,0.303,46.115,11.382
+128,Mons Mouton,1183.761,False,dtw_10pct,1,bare_27.925_25.425_11,292.500,5.472,0.332,46.115,11.382
+128,Mons Mouton,1183.761,False,matrix_profile,22473,bare_-17.475_11.875_12,90.000,10.344,1.784,46.115,11.382
+129,Mons Mouton Plateau,3232.094,True,euclid_height,1,bare_65.125_146.125_12,247.500,23.608,13.391,758.150,32.820
+129,Mons Mouton Plateau,3232.094,True,euclid_height_slope,1,bare_65.125_146.125_12,247.500,23.608,13.391,758.150,32.820
+129,Mons Mouton Plateau,3232.094,True,dtw_10pct,3,bare_-15.175_-75.175_20,225.000,55.634,7.005,758.150,32.820
+129,Mons Mouton Plateau,3232.094,True,matrix_profile,3,bare_61.625_-42.325_11,270.000,93.831,6.469,758.150,32.820
+130,Nobile Rim 1,2407.723,False,euclid_height,1,bare_-24.325_-69.575_00,247.500,8.773,9.091,323.923,13.028
+130,Nobile Rim 1,2407.723,False,euclid_height_slope,3,bare_-0.725_-91.175_12,0.000,9.929,0.791,323.923,13.028
+130,Nobile Rim 1,2407.723,False,dtw_10pct,11,bare_78.825_14.325_02,45.000,14.509,13.476,323.923,13.028
+130,Nobile Rim 1,2407.723,False,matrix_profile,207,bare_-0.725_-91.175_22,0.000,24.422,0.099,323.923,13.028
+131,Nobile Rim 2,2195.818,True,euclid_height,1,bare_80.025_-81.275_00,67.500,11.677,1.603,193.269,16.465
+131,Nobile Rim 2,2195.818,True,euclid_height_slope,1,bare_80.025_-81.275_00,67.500,11.677,1.603,193.269,16.465
+131,Nobile Rim 2,2195.818,True,dtw_10pct,1,bare_80.025_-81.275_00,247.500,14.259,1.603,193.269,16.465
+131,Nobile Rim 2,2195.818,True,matrix_profile,549,bare_70.825_-25.675_00,270.000,11.452,5.404,193.269,16.465
+132,Peak Near Cabeus B,3720.057,True,euclid_height,1,bare_73.525_-83.025_12,337.500,29.573,22.498,509.820,18.323
+132,Peak Near Cabeus B,3720.057,True,euclid_height_slope,1,bare_73.525_-83.025_12,337.500,29.573,22.498,509.820,18.323
+132,Peak Near Cabeus B,3720.057,True,dtw_10pct,3,bare_73.675_-55.675_20,180.000,42.838,15.446,509.820,18.323
+132,Peak Near Cabeus B,3720.057,True,matrix_profile,1,bare_19.525_-155.525_12,135.000,72.008,8.933,509.820,18.323
+133,Slater Plain,3498.283,False,euclid_height,1,bare_63.675_-64.525_12,0.000,9.411,4.660,151.874,11.641
+133,Slater Plain,3498.283,False,euclid_height_slope,1,bare_63.675_-64.525_12,0.000,9.411,4.660,151.874,11.641
+133,Slater Plain,3498.283,False,dtw_10pct,1,bare_71.575_-78.025_11,247.500,17.334,8.241,151.874,11.641
+133,Slater Plain,3498.283,False,matrix_profile,35059,bare_75.875_-19.925_02,202.500,27.031,0.061,151.874,11.641
+134,de Gerlache Rim 2,1029.602,False,euclid_height,16,bare_80.025_-71.575_11,112.500,7.786,11.941,313.724,21.522
+134,de Gerlache Rim 2,1029.602,False,euclid_height_slope,9,bare_80.025_-60.775_01,0.000,9.009,8.951,313.724,21.522
+134,de Gerlache Rim 2,1029.602,False,dtw_10pct,66,bare_38.175_72.875_01,112.500,17.113,7.253,313.724,21.522
+134,de Gerlache Rim 2,1029.602,False,matrix_profile,651,bare_-31.375_-70.025_20,292.500,6.265,0.168,313.724,21.522
+135,Haworth,1050.016,True,euclid_height,1,bare_-18.875_-69.875_00,112.500,5.055,4.047,153.932,17.477
+135,Haworth,1050.016,True,euclid_height_slope,2,bare_-18.875_-69.875_00,112.500,5.055,4.047,153.932,17.477
+135,Haworth,1050.016,True,dtw_10pct,4,bare_-16.325_-72.625_01,292.500,5.899,6.327,153.932,17.477
+135,Haworth,1050.016,True,matrix_profile,3641,bare_-19.225_-69.925_11,90.000,7.228,1.072,153.932,17.477
+136,Malapert Massif,1860.351,False,euclid_height,1,bare_79.825_-72.675_01,292.500,14.296,12.054,337.594,24.567
+136,Malapert Massif,1860.351,False,euclid_height_slope,1,bare_79.825_-72.675_01,292.500,14.296,12.054,337.594,24.567
+136,Malapert Massif,1860.351,False,dtw_10pct,1,bare_70.825_-25.675_01,67.500,20.950,4.664,337.594,24.567
+136,Malapert Massif,1860.351,False,matrix_profile,11,bare_80.025_-71.575_10,0.000,20.053,2.149,337.594,24.567
+137,Mons Mouton,3472.607,True,euclid_height,1,bare_58.275_-155.125_01,67.500,20.211,10.291,274.114,17.254
+137,Mons Mouton,3472.607,True,euclid_height_slope,1,bare_75.875_-19.925_22,67.500,22.416,2.592,274.114,17.254
+137,Mons Mouton,3472.607,True,dtw_10pct,1,bare_-24.125_-70.275_12,157.500,22.913,14.358,274.114,17.254
+137,Mons Mouton,3472.607,True,matrix_profile,23,bare_70.825_-25.675_00,157.500,60.703,0.300,274.114,17.254
+138,Mons Mouton Plateau,3737.889,True,euclid_height,1,bare_32.075_13.975_11,247.500,7.496,9.311,77.947,8.642
+138,Mons Mouton Plateau,3737.889,True,euclid_height_slope,1,bare_77.175_-18.475_02,0.000,8.028,1.446,77.947,8.642
+138,Mons Mouton Plateau,3737.889,True,dtw_10pct,1,bare_75.475_-109.425_12,315.000,10.212,8.396,77.947,8.642
+138,Mons Mouton Plateau,3737.889,True,matrix_profile,25577,bare_-0.725_-91.175_11,67.500,22.552,5.248,77.947,8.642
+139,Nobile Rim 1,3541.740,True,euclid_height,1,bare_73.525_-83.025_01,202.500,24.245,11.349,510.004,16.570
+139,Nobile Rim 1,3541.740,True,euclid_height_slope,1,bare_73.525_-83.025_01,202.500,24.245,11.349,510.004,16.570
+139,Nobile Rim 1,3541.740,True,dtw_10pct,1,bare_70.825_-25.675_22,315.000,38.919,7.879,510.004,16.570
+139,Nobile Rim 1,3541.740,True,matrix_profile,95,bare_19.425_-155.625_01,90.000,50.421,1.993,510.004,16.570
+140,Nobile Rim 2,2635.760,True,euclid_height,1,bare_32.375_54.575_12,22.500,16.195,11.333,198.520,13.762
+140,Nobile Rim 2,2635.760,True,euclid_height_slope,1,bare_32.375_54.575_12,22.500,16.195,11.333,198.520,13.762
+140,Nobile Rim 2,2635.760,True,dtw_10pct,1,bare_-24.125_-70.275_22,112.500,21.416,8.398,198.520,13.762
+140,Nobile Rim 2,2635.760,True,matrix_profile,99,bare_19.525_-155.525_12,0.000,39.446,2.681,198.520,13.762
+141,Peak Near Cabeus B,1393.848,True,euclid_height,1,bare_63.175_-41.225_21,292.500,6.290,3.773,118.929,11.557
+141,Peak Near Cabeus B,1393.848,True,euclid_height_slope,1,bare_63.175_-41.225_21,292.500,6.290,3.773,118.929,11.557
+141,Peak Near Cabeus B,1393.848,True,dtw_10pct,1,bare_63.175_-41.225_21,112.500,6.442,3.773,118.929,11.557
+141,Peak Near Cabeus B,1393.848,True,matrix_profile,1531,bare_-25.075_-67.775_00,292.500,13.708,1.485,118.929,11.557
+142,Slater Plain,1095.317,True,euclid_height,5,bare_79.025_16.625_20,180.000,4.943,5.443,200.447,15.933
+142,Slater Plain,1095.317,True,euclid_height_slope,5,bare_79.025_16.625_20,180.000,4.943,5.443,200.447,15.933
+142,Slater Plain,1095.317,True,dtw_10pct,15,bare_-32.725_-70.125_12,22.500,9.540,0.623,200.447,15.933
+142,Slater Plain,1095.317,True,matrix_profile,1163,bare_-24.125_-70.275_01,292.500,6.576,1.679,200.447,15.933
+143,de Gerlache Rim 2,1915.267,False,euclid_height,1,bare_38.975_83.825_22,135.000,6.066,2.664,48.742,7.382
+143,de Gerlache Rim 2,1915.267,False,euclid_height_slope,1,bare_38.975_83.825_22,135.000,6.066,2.664,48.742,7.382
+143,de Gerlache Rim 2,1915.267,False,dtw_10pct,1,bare_-17.475_11.875_12,90.000,6.101,6.565,48.742,7.382
+143,de Gerlache Rim 2,1915.267,False,matrix_profile,34427,bare_18.575_46.825_01,0.000,15.759,1.624,48.742,7.382
+144,Haworth,1971.351,False,euclid_height,2,bare_75.975_-91.175_00,90.000,4.552,1.641,139.580,10.476
+144,Haworth,1971.351,False,euclid_height_slope,4,bare_75.975_-91.175_00,90.000,4.552,1.641,139.580,10.476
+144,Haworth,1971.351,False,dtw_10pct,3,bare_80.025_-60.775_00,22.500,9.703,0.770,139.580,10.476
+144,Haworth,1971.351,False,matrix_profile,8395,bare_19.425_-155.625_21,90.000,16.029,1.657,139.580,10.476
+145,Malapert Massif,3928.172,False,euclid_height,18,bare_-0.725_-91.175_21,112.500,6.596,7.738,470.363,18.861
+145,Malapert Massif,3928.172,False,euclid_height_slope,24,bare_-0.725_-91.175_21,112.500,6.596,7.738,470.363,18.861
+145,Malapert Massif,3928.172,False,dtw_10pct,29,bare_-0.725_-91.175_21,112.500,6.596,7.738,470.363,18.861
+145,Malapert Massif,3928.172,False,matrix_profile,357,bare_19.525_-155.525_21,270.000,36.234,8.486,470.363,18.861
+146,Mons Mouton,2272.691,False,euclid_height,1,bare_76.925_-23.375_22,225.000,6.636,10.393,164.588,10.447
+146,Mons Mouton,2272.691,False,euclid_height_slope,1,bare_19.425_-155.625_10,202.500,7.151,0.636,164.588,10.447
+146,Mons Mouton,2272.691,False,dtw_10pct,6,bare_76.825_-23.625_00,90.000,7.526,7.235,164.588,10.447
+146,Mons Mouton,2272.691,False,matrix_profile,12345,bare_19.525_-155.525_02,157.500,11.249,4.075,164.588,10.447
+147,Mons Mouton Plateau,3948.901,True,euclid_height,1,bare_-15.175_-75.175_21,225.000,40.347,12.107,671.425,23.316
+147,Mons Mouton Plateau,3948.901,True,euclid_height_slope,1,bare_-15.175_-75.175_21,225.000,40.347,12.107,671.425,23.316
+147,Mons Mouton Plateau,3948.901,True,dtw_10pct,5,bare_-15.175_-75.175_21,225.000,40.347,12.107,671.425,23.316
+147,Mons Mouton Plateau,3948.901,True,matrix_profile,1,bare_-19.225_-69.925_11,67.500,68.263,5.615,671.425,23.316
+148,Nobile Rim 1,1039.745,False,euclid_height,1,bare_76.875_-69.425_01,0.000,3.388,0.954,148.855,13.372
+148,Nobile Rim 1,1039.745,False,euclid_height_slope,3,bare_19.425_-155.625_00,90.000,3.671,2.199,148.855,13.372
+148,Nobile Rim 1,1039.745,False,dtw_10pct,9,bare_19.425_-155.625_21,157.500,7.303,0.053,148.855,13.372
+148,Nobile Rim 1,1039.745,False,matrix_profile,1173,bare_19.525_-155.525_10,22.500,1.566,0.060,148.855,13.372
+149,Nobile Rim 2,1782.226,True,euclid_height,1,bare_67.625_-67.425_21,90.000,6.831,8.923,103.966,12.208
+149,Nobile Rim 2,1782.226,True,euclid_height_slope,1,bare_63.675_-64.525_00,157.500,8.050,4.378,103.966,12.208
+149,Nobile Rim 2,1782.226,True,dtw_10pct,2,bare_63.675_-64.525_00,157.500,8.050,4.378,103.966,12.208
+149,Nobile Rim 2,1782.226,True,matrix_profile,1625,bare_-25.075_-67.775_22,112.500,22.512,6.841,103.966,12.208
+150,Peak Near Cabeus B,1574.219,False,euclid_height,2,bare_74.875_-19.975_10,22.500,8.167,9.078,184.879,13.030
+150,Peak Near Cabeus B,1574.219,False,euclid_height_slope,5,bare_-48.725_-72.025_21,225.000,9.289,0.075,184.879,13.030
+150,Peak Near Cabeus B,1574.219,False,dtw_10pct,40,bare_-48.725_-72.025_21,22.500,13.304,1.691,184.879,13.030
+150,Peak Near Cabeus B,1574.219,False,matrix_profile,3557,bare_-28.725_-69.325_22,292.500,6.629,0.301,184.879,13.030
+151,Slater Plain,2783.842,True,euclid_height,1,bare_43.025_65.225_21,247.500,4.121,0.735,20.947,5.271
+151,Slater Plain,2783.842,True,euclid_height_slope,28,bare_43.025_65.225_21,247.500,4.121,0.735,20.947,5.271
+151,Slater Plain,2783.842,True,dtw_10pct,4,bare_29.625_54.875_11,225.000,4.798,3.315,20.947,5.271
+151,Slater Plain,2783.842,True,matrix_profile,42663,bare_-30.025_-64.825_02,90.000,6.949,1.793,20.947,5.271
+152,de Gerlache Rim 2,3779.850,True,euclid_height,1,bare_77.275_-68.675_11,270.000,37.132,16.247,639.378,24.869
+152,de Gerlache Rim 2,3779.850,True,euclid_height_slope,1,bare_77.275_-68.675_11,270.000,37.132,16.247,639.378,24.869
+152,de Gerlache Rim 2,3779.850,True,dtw_10pct,1,bare_79.225_-77.625_01,315.000,53.966,27.488,639.378,24.869
+152,de Gerlache Rim 2,3779.850,True,matrix_profile,1,bare_-19.225_-69.925_11,67.500,53.330,4.062,639.378,24.869
+153,Haworth,3558.619,False,euclid_height,1,bare_76.825_-23.625_11,292.500,16.071,3.878,417.695,15.346
+153,Haworth,3558.619,False,euclid_height_slope,1,bare_76.825_-23.625_11,292.500,16.071,3.878,417.695,15.346
+153,Haworth,3558.619,False,dtw_10pct,1,bare_-0.725_-91.175_12,180.000,37.001,5.361,417.695,15.346
+153,Haworth,3558.619,False,matrix_profile,721,bare_-0.725_-91.225_22,135.000,21.319,2.778,417.695,15.346
+154,Malapert Massif,1416.538,True,euclid_height,1,bare_80.025_-60.775_01,112.500,8.873,4.512,298.363,18.547
+154,Malapert Massif,1416.538,True,euclid_height_slope,1,bare_80.025_-60.775_01,292.500,9.136,4.512,298.363,18.547
+154,Malapert Massif,1416.538,True,dtw_10pct,13,bare_80.025_-60.775_01,292.500,9.136,4.512,298.363,18.547
+154,Malapert Massif,1416.538,True,matrix_profile,15,bare_-31.375_-70.025_20,135.000,3.621,0.495,298.363,18.547
+155,Mons Mouton,2002.528,False,euclid_height,3,bare_80.025_-81.275_22,22.500,14.194,8.002,549.006,22.908
+155,Mons Mouton,2002.528,False,euclid_height_slope,2,bare_80.025_-81.275_22,22.500,14.194,8.002,549.006,22.908
+155,Mons Mouton,2002.528,False,dtw_10pct,14,bare_79.975_-81.225_22,90.000,23.809,8.710,549.006,22.908
+155,Mons Mouton,2002.528,False,matrix_profile,17,bare_66.575_-62.775_20,247.500,20.334,6.476,549.006,22.908
+156,Mons Mouton Plateau,1712.758,True,euclid_height,2,bare_33.475_79.025_21,225.000,10.552,17.451,510.048,21.943
+156,Mons Mouton Plateau,1712.758,True,euclid_height_slope,2,bare_33.475_79.025_21,225.000,10.552,17.451,510.048,21.943
+156,Mons Mouton Plateau,1712.758,True,dtw_10pct,7,bare_-19.225_-69.925_21,202.500,32.024,6.567,510.048,21.943
+156,Mons Mouton Plateau,1712.758,True,matrix_profile,11,bare_-32.275_-69.675_22,247.500,30.629,6.060,510.048,21.943
+157,Nobile Rim 1,2654.923,True,euclid_height,25,bare_-15.175_-75.175_21,112.500,7.654,0.931,53.866,12.148
+157,Nobile Rim 1,2654.923,True,euclid_height_slope,42,bare_35.675_83.475_01,112.500,8.001,3.609,53.866,12.148
+157,Nobile Rim 1,2654.923,True,dtw_10pct,64,bare_67.625_-67.425_20,180.000,8.718,0.973,53.866,12.148
+157,Nobile Rim 1,2654.923,True,matrix_profile,37861,bare_79.175_-76.625_22,67.500,17.270,0.818,53.866,12.148
+158,Nobile Rim 2,1521.922,True,euclid_height,1,bare_79.175_-76.625_02,22.500,11.410,2.184,106.474,18.024
+158,Nobile Rim 2,1521.922,True,euclid_height_slope,1,bare_79.175_-76.625_02,22.500,11.410,2.184,106.474,18.024
+158,Nobile Rim 2,1521.922,True,dtw_10pct,2,bare_76.625_68.175_22,157.500,12.946,8.306,106.474,18.024
+158,Nobile Rim 2,1521.922,True,matrix_profile,439,bare_79.625_-87.125_00,45.000,5.535,6.402,106.474,18.024
+159,Peak Near Cabeus B,2377.110,False,euclid_height,1,bare_19.425_-155.625_10,67.500,14.782,8.490,401.324,20.779
+159,Peak Near Cabeus B,2377.110,False,euclid_height_slope,1,bare_19.425_-155.625_10,67.500,14.782,8.490,401.324,20.779
+159,Peak Near Cabeus B,2377.110,False,dtw_10pct,1,bare_-35.625_-70.425_02,135.000,16.689,6.213,401.324,20.779
+159,Peak Near Cabeus B,2377.110,False,matrix_profile,361,bare_19.425_-155.625_22,180.000,28.848,7.715,401.324,20.779
+160,Slater Plain,1789.528,True,euclid_height,7,bare_-35.625_-70.425_11,112.500,5.151,0.281,165.044,11.431
+160,Slater Plain,1789.528,True,euclid_height_slope,24,bare_-35.625_-70.425_11,112.500,5.151,0.281,165.044,11.431
+160,Slater Plain,1789.528,True,dtw_10pct,37,bare_19.525_-155.525_21,67.500,11.734,1.729,165.044,11.431
+160,Slater Plain,1789.528,True,matrix_profile,21907,bare_67.775_177.175_20,157.500,13.419,0.238,165.044,11.431
+161,de Gerlache Rim 2,3370.474,False,euclid_height,1,bare_71.575_-78.025_22,225.000,9.821,1.240,174.396,12.293
+161,de Gerlache Rim 2,3370.474,False,euclid_height_slope,1,bare_71.575_-78.025_22,225.000,9.821,1.240,174.396,12.293
+161,de Gerlache Rim 2,3370.474,False,dtw_10pct,2,bare_71.575_-78.025_22,225.000,9.821,1.240,174.396,12.293
+161,de Gerlache Rim 2,3370.474,False,matrix_profile,203,bare_19.425_-155.625_00,22.500,14.411,4.995,174.396,12.293
+162,Haworth,3541.814,False,euclid_height,1006,bare_34.025_86.225_12,225.000,6.359,3.351,92.945,13.734
+162,Haworth,3541.814,False,euclid_height_slope,1481,bare_34.025_86.225_12,225.000,6.359,3.351,92.945,13.734
+162,Haworth,3541.814,False,dtw_10pct,761,bare_34.025_86.225_12,225.000,6.359,3.351,92.945,13.734
+162,Haworth,3541.814,False,matrix_profile,46519,bare_-29.125_122.375_00,0.000,36.324,4.169,92.945,13.734
+163,Malapert Massif,3708.643,False,euclid_height,1,bare_34.775_78.725_01,157.500,15.345,5.308,133.243,16.983
+163,Malapert Massif,3708.643,False,euclid_height_slope,1,bare_34.775_78.725_01,157.500,15.345,5.308,133.243,16.983
+163,Malapert Massif,3708.643,False,dtw_10pct,1,bare_65.625_-39.175_00,180.000,26.467,1.500,133.243,16.983
+163,Malapert Massif,3708.643,False,matrix_profile,585,bare_34.775_78.725_01,157.500,15.175,5.308,133.243,16.983
+164,Mons Mouton,2524.290,False,euclid_height,1,bare_70.125_26.325_20,270.000,8.525,15.499,78.777,7.037
+164,Mons Mouton,2524.290,False,euclid_height_slope,1,bare_38.375_-110.775_22,157.500,9.125,6.429,78.777,7.037
+164,Mons Mouton,2524.290,False,dtw_10pct,2,bare_78.425_102.175_02,337.500,9.990,1.625,78.777,7.037
+164,Mons Mouton,2524.290,False,matrix_profile,33183,bare_19.525_-155.525_01,90.000,19.920,2.534,78.777,7.037
+165,Mons Mouton Plateau,2515.687,False,euclid_height,1,bare_65.625_-39.175_21,337.500,9.147,5.724,253.658,11.067
+165,Mons Mouton Plateau,2515.687,False,euclid_height_slope,3,bare_-0.725_-91.175_12,135.000,10.152,1.738,253.658,11.067
+165,Mons Mouton Plateau,2515.687,False,dtw_10pct,7,bare_-24.325_-69.575_00,202.500,13.058,9.697,253.658,11.067
+165,Mons Mouton Plateau,2515.687,False,matrix_profile,2157,bare_-0.725_-91.225_22,135.000,7.223,1.501,253.658,11.067
+166,Nobile Rim 1,3588.458,False,euclid_height,1,bare_19.425_-155.625_11,135.000,7.278,3.317,146.219,10.272
+166,Nobile Rim 1,3588.458,False,euclid_height_slope,2,bare_19.425_-155.625_11,135.000,7.278,3.317,146.219,10.272
+166,Nobile Rim 1,3588.458,False,dtw_10pct,3,bare_-0.725_-91.175_21,247.500,12.741,2.768,146.219,10.272
+166,Nobile Rim 1,3588.458,False,matrix_profile,30461,bare_19.525_-155.525_02,135.000,17.244,5.188,146.219,10.272
+167,Nobile Rim 2,3166.660,True,euclid_height,1,bare_74.875_140.225_01,270.000,7.543,20.090,61.358,5.583
+167,Nobile Rim 2,3166.660,True,euclid_height_slope,1,bare_31.075_0.175_22,67.500,8.747,3.106,61.358,5.583
+167,Nobile Rim 2,3166.660,True,dtw_10pct,1,bare_29.325_22.775_22,135.000,10.481,9.540,61.358,5.583
+167,Nobile Rim 2,3166.660,True,matrix_profile,38295,bare_19.525_-155.525_01,90.000,26.131,1.080,61.358,5.583
+168,Peak Near Cabeus B,1959.883,True,euclid_height,3,bare_19.425_-155.625_12,315.000,5.785,6.331,156.029,16.526
+168,Peak Near Cabeus B,1959.883,True,euclid_height_slope,6,bare_19.425_-155.625_12,315.000,5.785,6.331,156.029,16.526
+168,Peak Near Cabeus B,1959.883,True,dtw_10pct,2,bare_76.425_-87.775_02,337.500,6.998,5.422,156.029,16.526
+168,Peak Near Cabeus B,1959.883,True,matrix_profile,1799,bare_19.425_-155.625_01,135.000,9.528,6.056,156.029,16.526
+169,Slater Plain,1395.157,True,euclid_height,1,bare_78.425_102.175_02,337.500,5.846,1.193,45.716,9.854
+169,Slater Plain,1395.157,True,euclid_height_slope,1,bare_41.275_-108.275_11,135.000,5.982,2.181,45.716,9.854
+169,Slater Plain,1395.157,True,dtw_10pct,1,bare_41.275_-108.275_11,180.000,6.577,1.133,45.716,9.854
+169,Slater Plain,1395.157,True,matrix_profile,20551,bare_18.575_46.825_10,270.000,7.572,3.714,45.716,9.854
+170,de Gerlache Rim 2,1158.957,False,euclid_height,4,bare_-0.725_-91.225_22,90.000,2.530,0.747,131.904,9.237
+170,de Gerlache Rim 2,1158.957,False,euclid_height_slope,36,bare_-0.725_-91.225_22,90.000,2.530,0.747,131.904,9.237
+170,de Gerlache Rim 2,1158.957,False,dtw_10pct,22,bare_-24.325_-69.575_00,67.500,4.530,0.892,131.904,9.237
+170,de Gerlache Rim 2,1158.957,False,matrix_profile,16087,bare_-0.725_-91.175_22,180.000,3.023,0.542,131.904,9.237
+171,Haworth,3843.399,True,euclid_height,1,bare_58.325_-155.125_11,270.000,19.976,8.043,516.540,15.501
+171,Haworth,3843.399,True,euclid_height_slope,1,bare_58.325_-155.125_11,270.000,19.976,8.043,516.540,15.501
+171,Haworth,3843.399,True,dtw_10pct,1,bare_-0.725_-91.175_21,135.000,29.646,1.434,516.540,15.501
+171,Haworth,3843.399,True,matrix_profile,235,bare_19.425_-155.625_01,90.000,25.648,0.924,516.540,15.501
+172,Malapert Massif,2978.194,False,euclid_height,1,bare_80.025_-60.775_11,45.000,15.443,13.897,353.868,17.810
+172,Malapert Massif,2978.194,False,euclid_height_slope,1,bare_19.425_-155.625_01,292.500,15.906,3.761,353.868,17.810
+172,Malapert Massif,2978.194,False,dtw_10pct,13,bare_19.525_-155.525_10,337.500,19.279,7.663,353.868,17.810
+172,Malapert Massif,2978.194,False,matrix_profile,505,bare_19.425_-155.625_12,135.000,35.091,6.391,353.868,17.810
+173,Mons Mouton,2661.330,True,euclid_height,1,bare_69.975_-70.675_11,112.500,18.215,25.108,663.506,22.836
+173,Mons Mouton,2661.330,True,euclid_height_slope,1,bare_-28.725_-69.325_10,270.000,19.511,2.535,663.506,22.836
+173,Mons Mouton,2661.330,True,dtw_10pct,8,bare_58.325_-155.125_11,247.500,23.464,3.599,663.506,22.836
+173,Mons Mouton,2661.330,True,matrix_profile,39,bare_66.575_-62.775_22,112.500,73.545,0.715,663.506,22.836
+174,Mons Mouton Plateau,2654.323,False,euclid_height,1,bare_19.425_-155.625_22,157.500,19.545,2.033,486.031,14.789
+174,Mons Mouton Plateau,2654.323,False,euclid_height_slope,1,bare_19.425_-155.625_22,157.500,19.545,2.033,486.031,14.789
+174,Mons Mouton Plateau,2654.323,False,dtw_10pct,6,bare_66.575_-62.775_12,202.500,35.580,17.054,486.031,14.789
+174,Mons Mouton Plateau,2654.323,False,matrix_profile,215,bare_19.425_-155.625_22,157.500,22.170,1.612,486.031,14.789
+175,Nobile Rim 1,2137.539,False,euclid_height,1,bare_34.925_80.925_10,337.500,32.419,10.288,548.071,27.662
+175,Nobile Rim 1,2137.539,False,euclid_height_slope,1,bare_34.925_80.925_10,337.500,32.419,10.288,548.071,27.662
+175,Nobile Rim 1,2137.539,False,dtw_10pct,1,bare_79.825_-72.675_01,270.000,64.777,4.029,548.071,27.662
+175,Nobile Rim 1,2137.539,False,matrix_profile,1,bare_80.025_-20.375_21,157.500,59.989,3.062,548.071,27.662
+176,Nobile Rim 2,3016.739,False,euclid_height,1,bare_76.925_-23.375_11,90.000,8.306,3.504,141.888,8.714
+176,Nobile Rim 2,3016.739,False,euclid_height_slope,1,bare_76.925_-23.375_11,90.000,8.306,3.504,141.888,8.714
+176,Nobile Rim 2,3016.739,False,dtw_10pct,2,bare_79.975_-64.225_21,67.500,9.833,7.724,141.888,8.714
+176,Nobile Rim 2,3016.739,False,matrix_profile,28631,bare_19.425_-155.625_12,225.000,11.884,2.900,141.888,8.714
+177,Peak Near Cabeus B,1654.050,False,euclid_height,1,bare_66.575_-62.775_22,292.500,8.233,4.472,392.178,17.649
+177,Peak Near Cabeus B,1654.050,False,euclid_height_slope,1,bare_66.575_-62.775_22,292.500,8.233,4.472,392.178,17.649
+177,Peak Near Cabeus B,1654.050,False,dtw_10pct,1,bare_-31.375_-70.025_11,180.000,16.510,8.152,392.178,17.649
+177,Peak Near Cabeus B,1654.050,False,matrix_profile,107,bare_19.425_-155.625_22,157.500,54.012,4.471,392.178,17.649
+178,Slater Plain,1911.441,False,euclid_height,3,bare_62.075_141.375_00,292.500,10.315,6.594,434.861,19.466
+178,Slater Plain,1911.441,False,euclid_height_slope,3,bare_62.075_141.375_00,292.500,10.315,6.594,434.861,19.466
+178,Slater Plain,1911.441,False,dtw_10pct,8,bare_66.575_-62.775_22,112.500,29.154,2.654,434.861,19.466
+178,Slater Plain,1911.441,False,matrix_profile,77,bare_19.425_-155.625_22,157.500,65.321,6.289,434.861,19.466
+179,de Gerlache Rim 2,3951.109,True,euclid_height,1,bare_58.325_-155.125_01,135.000,50.533,9.027,1158.467,26.778
+179,de Gerlache Rim 2,3951.109,True,euclid_height_slope,1,bare_58.325_-155.125_01,135.000,50.533,9.027,1158.467,26.778
+179,de Gerlache Rim 2,3951.109,True,dtw_10pct,3,bare_-31.375_-70.025_02,67.500,64.828,13.427,1158.467,26.778
+179,de Gerlache Rim 2,3951.109,True,matrix_profile,1,bare_-28.725_-69.325_10,90.000,168.596,1.407,1158.467,26.778
+180,Haworth,2524.540,False,euclid_height,1,bare_31.075_0.175_11,0.000,9.381,0.872,76.200,9.416
+180,Haworth,2524.540,False,euclid_height_slope,1,bare_31.075_0.175_11,0.000,9.381,0.872,76.200,9.416
+180,Haworth,2524.540,False,dtw_10pct,1,bare_42.075_-108.725_10,45.000,10.923,7.468,76.200,9.416
+180,Haworth,2524.540,False,matrix_profile,35455,bare_79.975_-81.225_21,0.000,21.740,1.862,76.200,9.416
+181,Malapert Massif,3943.670,True,euclid_height,1,bare_19.425_-155.625_11,90.000,23.189,12.161,355.630,24.280
+181,Malapert Massif,3943.670,True,euclid_height_slope,1,bare_19.425_-155.625_11,90.000,23.189,12.161,355.630,24.280
+181,Malapert Massif,3943.670,True,dtw_10pct,1,bare_19.425_-155.625_11,247.500,23.780,0.224,355.630,24.280
+181,Malapert Massif,3943.670,True,matrix_profile,9,bare_19.525_-155.525_12,112.500,55.120,15.226,355.630,24.280
+182,Mons Mouton,1623.959,False,euclid_height,1,bare_-23.525_-69.525_00,247.500,4.344,5.759,135.074,12.123
+182,Mons Mouton,1623.959,False,euclid_height_slope,2,bare_-23.525_-69.525_00,247.500,4.344,5.759,135.074,12.123
+182,Mons Mouton,1623.959,False,dtw_10pct,2,bare_-23.525_-69.525_00,247.500,4.344,5.759,135.074,12.123
+182,Mons Mouton,1623.959,False,matrix_profile,5147,bare_-0.725_-91.225_22,112.500,9.784,2.145,135.074,12.123
+183,Mons Mouton Plateau,3771.653,False,euclid_height,1,bare_74.175_57.775_10,247.500,17.591,8.254,181.261,26.829
+183,Mons Mouton Plateau,3771.653,False,euclid_height_slope,1,bare_73.325_-91.675_12,0.000,20.007,0.996,181.261,26.829
+183,Mons Mouton Plateau,3771.653,False,dtw_10pct,4,bare_79.075_-74.625_11,315.000,28.027,2.417,181.261,26.829
+183,Mons Mouton Plateau,3771.653,False,matrix_profile,5,bare_79.975_-64.275_12,292.500,37.766,0.367,181.261,26.829
+184,Nobile Rim 1,2455.433,True,euclid_height,1,bare_78.425_-84.325_21,202.500,17.393,10.729,502.726,23.940
+184,Nobile Rim 1,2455.433,True,euclid_height_slope,1,bare_78.425_-84.325_21,202.500,17.393,10.729,502.726,23.940
+184,Nobile Rim 1,2455.433,True,dtw_10pct,1,bare_77.275_-68.675_11,22.500,35.653,22.211,502.726,23.940
+184,Nobile Rim 1,2455.433,True,matrix_profile,3,bare_-32.275_-69.675_22,67.500,31.151,4.063,502.726,23.940
+185,Nobile Rim 2,3520.923,True,euclid_height,1,bare_76.475_-95.875_01,337.500,10.882,3.534,153.790,13.433
+185,Nobile Rim 2,3520.923,True,euclid_height_slope,1,bare_76.475_-95.875_01,337.500,10.882,3.534,153.790,13.433
+185,Nobile Rim 2,3520.923,True,dtw_10pct,1,bare_76.825_-23.625_02,90.000,16.993,7.839,153.790,13.433
+185,Nobile Rim 2,3520.923,True,matrix_profile,24875,bare_19.425_-155.625_12,90.000,19.670,4.663,153.790,13.433
+186,Peak Near Cabeus B,1984.123,False,euclid_height,1,bare_77.175_-18.475_02,202.500,4.532,6.407,55.566,8.686
+186,Peak Near Cabeus B,1984.123,False,euclid_height_slope,3,bare_-15.175_-75.175_01,337.500,4.665,0.759,55.566,8.686
+186,Peak Near Cabeus B,1984.123,False,dtw_10pct,1,bare_77.175_-18.475_02,202.500,4.532,6.407,55.566,8.686
+186,Peak Near Cabeus B,1984.123,False,matrix_profile,44447,bare_19.425_-155.625_20,0.000,4.263,3.777,55.566,8.686
+187,Slater Plain,3118.896,True,euclid_height,1,bare_77.275_-68.675_02,45.000,11.519,7.603,325.042,14.903
+187,Slater Plain,3118.896,True,euclid_height_slope,1,bare_77.275_-68.675_02,45.000,11.519,7.603,325.042,14.903
+187,Slater Plain,3118.896,True,dtw_10pct,2,bare_77.275_-68.675_02,45.000,11.519,7.603,325.042,14.903
+187,Slater Plain,3118.896,True,matrix_profile,239,bare_19.425_-155.625_12,135.000,25.081,3.484,325.042,14.903
+188,de Gerlache Rim 2,2899.431,True,euclid_height,2,bare_67.625_-67.425_01,0.000,11.230,10.499,217.895,13.828
+188,de Gerlache Rim 2,2899.431,True,euclid_height_slope,1,bare_67.625_-67.425_01,0.000,11.230,10.499,217.895,13.828
+188,de Gerlache Rim 2,2899.431,True,dtw_10pct,12,bare_67.625_-67.425_01,0.000,11.230,10.499,217.895,13.828
+188,de Gerlache Rim 2,2899.431,True,matrix_profile,97,bare_69.575_-24.175_20,180.000,45.767,5.672,217.895,13.828
+189,Haworth,1100.666,False,euclid_height,1,bare_26.675_16.025_20,337.500,7.199,3.349,49.759,16.127
+189,Haworth,1100.666,False,euclid_height_slope,1,bare_23.425_44.925_20,22.500,7.205,3.398,49.759,16.127
+189,Haworth,1100.666,False,dtw_10pct,1,bare_-17.875_11.925_20,315.000,8.261,2.847,49.759,16.127
+189,Haworth,1100.666,False,matrix_profile,531,bare_27.725_55.625_10,337.500,11.135,0.483,49.759,16.127
+190,Malapert Massif,1424.171,True,euclid_height,1,bare_-25.075_-67.775_22,292.500,4.219,1.007,95.583,8.375
+190,Malapert Massif,1424.171,True,euclid_height_slope,5,bare_-25.075_-67.775_22,292.500,4.219,1.007,95.583,8.375
+190,Malapert Massif,1424.171,True,dtw_10pct,6,bare_-28.725_-69.325_21,225.000,6.794,2.267,95.583,8.375
+190,Malapert Massif,1424.171,True,matrix_profile,41987,bare_80.025_-94.525_12,135.000,4.295,0.693,95.583,8.375
+191,Mons Mouton,1330.758,True,euclid_height,1,bare_28.925_86.525_02,157.500,12.534,5.670,261.862,23.523
+191,Mons Mouton,1330.758,True,euclid_height_slope,1,bare_28.925_86.525_02,157.500,12.534,5.670,261.862,23.523
+191,Mons Mouton,1330.758,True,dtw_10pct,3,bare_36.175_77.825_21,202.500,25.286,8.880,261.862,23.523
+191,Mons Mouton,1330.758,True,matrix_profile,1,bare_80.025_-81.225_20,135.000,32.047,0.560,261.862,23.523
+192,Mons Mouton Plateau,1639.030,False,euclid_height,1,bare_74.875_-19.975_10,157.500,8.659,3.522,314.687,21.319
+192,Mons Mouton Plateau,1639.030,False,euclid_height_slope,1,bare_-35.625_-70.425_02,337.500,9.060,6.839,314.687,21.319
+192,Mons Mouton Plateau,1639.030,False,dtw_10pct,18,bare_74.425_-19.775_01,112.500,16.811,1.992,314.687,21.319
+192,Mons Mouton Plateau,1639.030,False,matrix_profile,633,bare_-0.725_-91.175_12,0.000,30.491,9.082,314.687,21.319
+193,Nobile Rim 1,3908.642,True,euclid_height,1,bare_-35.625_-70.675_01,315.000,48.076,19.546,895.549,29.009
+193,Nobile Rim 1,3908.642,True,euclid_height_slope,1,bare_-35.625_-70.675_01,315.000,48.076,19.546,895.549,29.009
+193,Nobile Rim 1,3908.642,True,dtw_10pct,3,bare_-32.725_-70.125_00,67.500,54.586,20.689,895.549,29.009
+193,Nobile Rim 1,3908.642,True,matrix_profile,1,bare_-15.175_-75.175_20,22.500,206.587,4.845,895.549,29.009
+194,Nobile Rim 2,1552.607,False,euclid_height,1,bare_79.175_-76.625_20,270.000,5.039,4.720,126.599,9.044
+194,Nobile Rim 2,1552.607,False,euclid_height_slope,3,bare_80.025_-60.775_12,180.000,6.005,0.271,126.599,9.044
+194,Nobile Rim 2,1552.607,False,dtw_10pct,4,bare_-41.825_-70.275_10,90.000,9.128,5.379,126.599,9.044
+194,Nobile Rim 2,1552.607,False,matrix_profile,6571,bare_-0.725_-91.175_20,112.500,6.015,0.352,126.599,9.044
+195,Peak Near Cabeus B,3724.943,False,euclid_height,1,bare_79.325_14.375_20,0.000,56.460,31.005,980.270,22.550
+195,Peak Near Cabeus B,3724.943,False,euclid_height_slope,1,bare_-35.625_-70.675_10,157.500,57.509,6.765,980.270,22.550
+195,Peak Near Cabeus B,3724.943,False,dtw_10pct,2,bare_33.475_79.025_11,202.500,71.725,13.242,980.270,22.550
+195,Peak Near Cabeus B,3724.943,False,matrix_profile,1,bare_19.425_-155.625_22,157.500,135.042,9.372,980.270,22.550
+196,Slater Plain,1088.426,False,euclid_height,1,bare_73.675_-55.675_21,292.500,4.155,0.362,72.906,12.597
+196,Slater Plain,1088.426,False,euclid_height_slope,1,bare_75.875_59.575_22,180.000,5.073,2.717,72.906,12.597
+196,Slater Plain,1088.426,False,dtw_10pct,1,bare_64.475_-66.025_01,225.000,4.853,3.094,72.906,12.597
+196,Slater Plain,1088.426,False,matrix_profile,4339,bare_-0.725_-91.175_20,180.000,19.441,0.950,72.906,12.597
+197,de Gerlache Rim 2,3746.366,True,euclid_height,1,bare_-41.825_-70.275_20,67.500,12.509,0.507,196.380,15.951
+197,de Gerlache Rim 2,3746.366,True,euclid_height_slope,1,bare_-41.825_-70.275_20,67.500,12.509,0.507,196.380,15.951
+197,de Gerlache Rim 2,3746.366,True,dtw_10pct,1,bare_-24.125_-70.275_00,315.000,16.212,4.234,196.380,15.951
+197,de Gerlache Rim 2,3746.366,True,matrix_profile,19365,bare_79.575_20.775_22,0.000,19.720,5.019,196.380,15.951
+198,Haworth,2426.553,False,euclid_height,1,bare_-24.325_-69.575_22,292.500,2.767,1.548,61.390,4.255
+198,Haworth,2426.553,False,euclid_height_slope,123,bare_-24.325_-69.575_22,292.500,2.767,1.548,61.390,4.255
+198,Haworth,2426.553,False,dtw_10pct,66,bare_39.475_-113.625_01,90.000,3.492,0.486,61.390,4.255
+198,Haworth,2426.553,False,matrix_profile,48521,bare_40.675_-114.075_10,90.000,7.938,1.135,61.390,4.255
+199,Malapert Massif,2805.995,True,euclid_height,1,bare_-16.325_-72.625_10,67.500,14.978,1.375,296.700,15.751
+199,Malapert Massif,2805.995,True,euclid_height_slope,1,bare_-16.325_-72.625_10,67.500,14.978,1.375,296.700,15.751
+199,Malapert Massif,2805.995,True,dtw_10pct,1,bare_79.175_-76.625_20,135.000,23.529,26.511,296.700,15.751
+199,Malapert Massif,2805.995,True,matrix_profile,43,bare_19.425_-155.625_11,90.000,72.397,3.632,296.700,15.751
+200,Mons Mouton,3657.037,False,euclid_height,1,bare_63.675_-64.525_02,337.500,22.266,12.678,211.461,13.029
+200,Mons Mouton,3657.037,False,euclid_height_slope,1,bare_19.525_-155.525_12,337.500,22.476,2.460,211.461,13.029
+200,Mons Mouton,3657.037,False,dtw_10pct,1,bare_75.875_-19.925_20,337.500,28.059,13.968,211.461,13.029
+200,Mons Mouton,3657.037,False,matrix_profile,79,bare_19.525_-155.525_12,0.000,48.176,1.949,211.461,13.029
+201,Mons Mouton Plateau,3287.438,False,euclid_height,1,bare_72.275_-110.475_11,270.000,6.128,7.195,91.075,9.312
+201,Mons Mouton Plateau,3287.438,False,euclid_height_slope,1,bare_-0.725_-91.175_10,135.000,6.212,10.128,91.075,9.312
+201,Mons Mouton Plateau,3287.438,False,dtw_10pct,1,bare_-38.825_-69.575_20,67.500,7.003,2.323,91.075,9.312
+201,Mons Mouton Plateau,3287.438,False,matrix_profile,34657,bare_19.425_-155.625_10,0.000,12.864,1.299,91.075,9.312
+202,Nobile Rim 1,1374.749,True,euclid_height,2,bare_75.875_-19.925_01,67.500,10.981,6.305,524.829,33.085
+202,Nobile Rim 1,1374.749,True,euclid_height_slope,2,bare_75.875_-19.925_01,67.500,10.981,6.305,524.829,33.085
+202,Nobile Rim 1,1374.749,True,dtw_10pct,6,bare_75.875_-19.925_01,67.500,10.981,6.305,524.829,33.085
+202,Nobile Rim 1,1374.749,True,matrix_profile,1,bare_77.275_-68.675_21,22.500,18.730,3.479,524.829,33.085
+203,Nobile Rim 2,2057.877,True,euclid_height,1,bare_-15.175_-75.175_22,90.000,5.078,3.395,69.996,7.038
+203,Nobile Rim 2,2057.877,True,euclid_height_slope,1,bare_-15.175_-75.175_22,90.000,5.078,3.395,69.996,7.038
+203,Nobile Rim 2,2057.877,True,dtw_10pct,1,bare_31.075_0.175_11,180.000,5.404,0.266,69.996,7.038
+203,Nobile Rim 2,2057.877,True,matrix_profile,26143,bare_79.975_-81.225_12,0.000,13.624,0.933,69.996,7.038
+204,Peak Near Cabeus B,2722.117,True,euclid_height,1,bare_73.525_-83.025_12,292.500,34.225,21.417,386.429,18.332
+204,Peak Near Cabeus B,2722.117,True,euclid_height_slope,1,bare_73.525_-83.025_12,292.500,34.225,21.417,386.429,18.332
+204,Peak Near Cabeus B,2722.117,True,dtw_10pct,1,bare_73.525_-83.025_12,112.500,40.573,21.417,386.429,18.332
+204,Peak Near Cabeus B,2722.117,True,matrix_profile,3,bare_74.425_-19.775_01,90.000,79.308,1.902,386.429,18.332
+205,Slater Plain,3961.099,False,euclid_height,1,bare_19.525_-155.525_10,337.500,11.759,1.619,401.905,11.766
+205,Slater Plain,3961.099,False,euclid_height_slope,1,bare_19.525_-155.525_10,337.500,11.759,1.619,401.905,11.766
+205,Slater Plain,3961.099,False,dtw_10pct,5,bare_19.425_-155.625_01,45.000,12.525,0.288,401.905,11.766
+205,Slater Plain,3961.099,False,matrix_profile,643,bare_19.425_-155.625_11,225.000,18.495,3.790,401.905,11.766
+206,de Gerlache Rim 2,2249.245,True,euclid_height,4,bare_75.975_-91.175_10,202.500,9.071,3.547,169.250,12.336
+206,de Gerlache Rim 2,2249.245,True,euclid_height_slope,3,bare_75.975_-91.175_10,202.500,9.071,3.547,169.250,12.336
+206,de Gerlache Rim 2,2249.245,True,dtw_10pct,4,bare_75.975_-91.175_10,22.500,9.121,3.547,169.250,12.336
+206,de Gerlache Rim 2,2249.245,True,matrix_profile,107,bare_19.525_-155.525_12,180.000,29.444,1.256,169.250,12.336
+207,Haworth,3058.598,True,euclid_height,1,bare_72.325_-110.475_02,315.000,16.709,11.878,245.629,15.760
+207,Haworth,3058.598,True,euclid_height_slope,1,bare_76.925_-23.375_21,112.500,17.031,10.594,245.629,15.760
+207,Haworth,3058.598,True,dtw_10pct,1,bare_80.025_-60.875_11,45.000,28.799,25.563,245.629,15.760
+207,Haworth,3058.598,True,matrix_profile,115,bare_61.625_-42.325_00,67.500,49.342,0.003,245.629,15.760
+208,Malapert Massif,3027.338,True,euclid_height,1,bare_29.475_97.025_12,135.000,22.482,17.454,406.994,18.431
+208,Malapert Massif,3027.338,True,euclid_height_slope,1,bare_29.475_97.025_12,135.000,22.482,17.454,406.994,18.431
+208,Malapert Massif,3027.338,True,dtw_10pct,1,bare_80.025_-71.575_22,67.500,42.210,18.592,406.994,18.431
+208,Malapert Massif,3027.338,True,matrix_profile,1,bare_-35.625_-70.425_22,22.500,20.112,9.265,406.994,18.431
+209,Mons Mouton,1333.422,True,euclid_height,16,bare_73.275_-95.275_00,292.500,2.811,5.175,43.149,7.321
+209,Mons Mouton,1333.422,True,euclid_height_slope,300,bare_20.625_49.875_11,270.000,3.087,3.066,43.149,7.321
+209,Mons Mouton,1333.422,True,dtw_10pct,25,bare_46.225_87.075_01,337.500,4.171,0.460,43.149,7.321
+209,Mons Mouton,1333.422,True,matrix_profile,9856,bare_19.425_-155.625_11,0.000,7.679,2.232,43.149,7.321
+210,Mons Mouton Plateau,1838.043,False,euclid_height,1,bare_73.525_-83.025_20,45.000,11.809,9.911,251.137,18.257
+210,Mons Mouton Plateau,1838.043,False,euclid_height_slope,1,bare_73.525_-83.025_20,45.000,11.809,9.911,251.137,18.257
+210,Mons Mouton Plateau,1838.043,False,dtw_10pct,1,bare_34.375_70.925_10,270.000,18.581,9.620,251.137,18.257
+210,Mons Mouton Plateau,1838.043,False,matrix_profile,569,bare_-19.225_-69.925_21,0.000,12.408,0.660,251.137,18.257
+211,Nobile Rim 1,3343.020,True,euclid_height,2,bare_78.775_-92.425_12,112.500,24.537,8.914,505.331,21.869
+211,Nobile Rim 1,3343.020,True,euclid_height_slope,2,bare_78.775_-92.425_12,112.500,24.537,8.914,505.331,21.869
+211,Nobile Rim 1,3343.020,True,dtw_10pct,6,bare_79.175_-76.625_02,225.000,38.398,33.397,505.331,21.869
+211,Nobile Rim 1,3343.020,True,matrix_profile,1,bare_78.775_-92.425_12,90.000,104.978,10.330,505.331,21.869
+212,Nobile Rim 2,2245.867,True,euclid_height,1,bare_29.175_83.525_22,180.000,29.914,3.310,510.412,26.670
+212,Nobile Rim 2,2245.867,True,euclid_height_slope,1,bare_29.175_83.525_22,180.000,29.914,3.310,510.412,26.670
+212,Nobile Rim 2,2245.867,True,dtw_10pct,1,bare_33.575_80.875_01,157.500,34.287,13.546,510.412,26.670
+212,Nobile Rim 2,2245.867,True,matrix_profile,1,bare_80.025_-81.225_20,180.000,48.235,1.951,510.412,26.670
+213,Peak Near Cabeus B,1788.477,False,euclid_height,1,bare_79.825_-72.675_01,22.500,14.628,1.343,528.816,27.245
+213,Peak Near Cabeus B,1788.477,False,euclid_height_slope,1,bare_79.825_-72.675_01,22.500,14.628,1.343,528.816,27.245
+213,Peak Near Cabeus B,1788.477,False,dtw_10pct,7,bare_79.825_-72.675_01,202.500,22.071,1.343,528.816,27.245
+213,Peak Near Cabeus B,1788.477,False,matrix_profile,3,bare_-31.375_-70.025_20,112.500,13.514,4.702,528.816,27.245
+214,Slater Plain,1241.026,False,euclid_height,24,bare_19.525_-155.525_20,247.500,2.352,1.328,126.930,9.212
+214,Slater Plain,1241.026,False,euclid_height_slope,96,bare_19.525_-155.525_20,270.000,2.467,0.044,126.930,9.212
+214,Slater Plain,1241.026,False,dtw_10pct,62,bare_-0.725_-91.225_22,0.000,5.903,0.208,126.930,9.212
+214,Slater Plain,1241.026,False,matrix_profile,13101,bare_19.525_-155.525_20,90.000,3.960,1.617,126.930,9.212
+215,de Gerlache Rim 2,2476.235,True,euclid_height,1,bare_80.025_-81.225_00,292.500,16.401,3.397,228.103,20.126
+215,de Gerlache Rim 2,2476.235,True,euclid_height_slope,1,bare_75.875_-19.925_21,225.000,16.770,1.302,228.103,20.126
+215,de Gerlache Rim 2,2476.235,True,dtw_10pct,13,bare_67.625_-67.425_01,202.500,18.773,3.902,228.103,20.126
+215,de Gerlache Rim 2,2476.235,True,matrix_profile,15,bare_80.025_-60.875_02,270.000,35.520,3.752,228.103,20.126
+216,Haworth,1135.657,True,euclid_height,10,bare_-24.325_-69.575_02,0.000,3.008,2.830,51.264,7.374
+216,Haworth,1135.657,True,euclid_height_slope,90,bare_-24.325_-69.575_02,0.000,3.008,2.830,51.264,7.374
+216,Haworth,1135.657,True,dtw_10pct,36,bare_-24.325_-69.575_02,0.000,3.008,2.830,51.264,7.374
+216,Haworth,1135.657,True,matrix_profile,29497,bare_79.975_-81.225_21,202.500,9.578,0.028,51.264,7.374
+217,Malapert Massif,1021.264,False,euclid_height,124,bare_80.025_-81.225_11,247.500,1.699,0.259,55.823,6.978
+217,Malapert Massif,1021.264,False,euclid_height_slope,423,bare_19.525_-155.525_02,315.000,2.176,2.135,55.823,6.978
+217,Malapert Massif,1021.264,False,dtw_10pct,191,bare_19.425_-155.625_12,292.500,2.380,1.076,55.823,6.978
+217,Malapert Massif,1021.264,False,matrix_profile,24338,bare_19.525_-155.525_22,0.000,1.611,1.956,55.823,6.978
+218,Mons Mouton,1908.619,True,euclid_height,1,bare_28.925_85.975_12,225.000,19.197,13.067,295.088,23.855
+218,Mons Mouton,1908.619,True,euclid_height_slope,1,bare_28.925_85.975_12,225.000,19.197,13.067,295.088,23.855
+218,Mons Mouton,1908.619,True,dtw_10pct,1,bare_78.425_-84.325_11,135.000,20.834,10.780,295.088,23.855
+218,Mons Mouton,1908.619,True,matrix_profile,1,bare_80.025_-72.075_22,315.000,38.430,5.357,295.088,23.855
+219,Mons Mouton Plateau,3823.300,False,euclid_height,1,bare_38.175_72.875_21,225.000,110.404,14.582,2006.247,33.946
+219,Mons Mouton Plateau,3823.300,False,euclid_height_slope,1,bare_-31.375_-70.025_02,45.000,115.850,8.496,2006.247,33.946
+219,Mons Mouton Plateau,3823.300,False,dtw_10pct,1,bare_-31.375_-70.025_02,225.000,164.801,8.496,2006.247,33.946
+219,Mons Mouton Plateau,3823.300,False,matrix_profile,1,bare_-31.375_-70.025_02,225.000,181.788,8.496,2006.247,33.946
+220,Nobile Rim 1,2652.008,True,euclid_height,1,bare_75.875_-19.925_01,22.500,24.679,2.354,713.849,30.892
+220,Nobile Rim 1,2652.008,True,euclid_height_slope,1,bare_75.875_-19.925_01,22.500,24.679,2.354,713.849,30.892
+220,Nobile Rim 1,2652.008,True,dtw_10pct,1,bare_72.175_-22.375_21,135.000,42.442,11.594,713.849,30.892
+220,Nobile Rim 1,2652.008,True,matrix_profile,1,bare_78.425_-84.325_21,315.000,42.833,0.247,713.849,30.892
+221,Nobile Rim 2,3554.732,True,euclid_height,1,bare_19.425_-155.625_22,135.000,13.345,0.831,524.592,13.797
+221,Nobile Rim 2,3554.732,True,euclid_height_slope,1,bare_19.425_-155.625_22,135.000,13.345,0.831,524.592,13.797
+221,Nobile Rim 2,3554.732,True,dtw_10pct,1,bare_19.425_-155.625_10,247.500,26.962,1.508,524.592,13.797
+221,Nobile Rim 2,3554.732,True,matrix_profile,153,bare_19.525_-155.525_00,0.000,54.265,0.654,524.592,13.797
+222,Peak Near Cabeus B,2487.368,True,euclid_height,1,bare_74.925_60.025_21,45.000,17.505,8.199,227.384,17.687
+222,Peak Near Cabeus B,2487.368,True,euclid_height_slope,1,bare_74.925_60.025_21,45.000,17.505,8.199,227.384,17.687
+222,Peak Near Cabeus B,2487.368,True,dtw_10pct,1,bare_76.425_-87.775_00,315.000,27.505,8.677,227.384,17.687
+222,Peak Near Cabeus B,2487.368,True,matrix_profile,5,bare_75.875_-19.925_21,112.500,16.827,0.821,227.384,17.687
+223,Slater Plain,1597.708,False,euclid_height,6,bare_74.425_-19.775_02,270.000,3.454,2.945,65.686,10.560
+223,Slater Plain,1597.708,False,euclid_height_slope,28,bare_74.425_-19.775_02,270.000,3.454,2.945,65.686,10.560
+223,Slater Plain,1597.708,False,dtw_10pct,8,bare_74.425_-19.775_02,270.000,3.454,2.945,65.686,10.560
+223,Slater Plain,1597.708,False,matrix_profile,44247,bare_-0.725_-91.225_12,112.500,8.157,4.029,65.686,10.560
+224,de Gerlache Rim 2,1763.442,False,euclid_height,23390,bare_32.025_68.325_00,202.500,1.750,2.186,11.252,6.980
+224,de Gerlache Rim 2,1763.442,False,euclid_height_slope,25695,bare_75.325_141.025_11,135.000,1.797,0.847,11.252,6.980
+224,de Gerlache Rim 2,1763.442,False,dtw_10pct,22398,bare_40.175_82.825_11,202.500,2.535,1.961,11.252,6.980
+224,de Gerlache Rim 2,1763.442,False,matrix_profile,26957,bare_-24.675_116.575_00,90.000,4.013,0.230,11.252,6.980
+225,Haworth,3144.658,True,euclid_height,1,bare_58.325_-155.125_02,270.000,31.867,18.153,849.301,22.108
+225,Haworth,3144.658,True,euclid_height_slope,1,bare_58.325_-155.125_02,270.000,31.867,18.153,849.301,22.108
+225,Haworth,3144.658,True,dtw_10pct,2,bare_29.725_97.175_20,112.500,43.596,16.625,849.301,22.108
+225,Haworth,3144.658,True,matrix_profile,1,bare_19.425_-155.625_22,337.500,168.139,8.930,849.301,22.108
+226,Malapert Massif,2636.414,True,euclid_height,2,bare_24.675_32.475_20,90.000,9.527,8.099,139.148,9.928
+226,Malapert Massif,2636.414,True,euclid_height_slope,1,bare_24.675_32.475_20,90.000,9.527,8.099,139.148,9.928
+226,Malapert Massif,2636.414,True,dtw_10pct,4,bare_79.625_-87.125_10,112.500,15.276,10.262,139.148,9.928
+226,Malapert Massif,2636.414,True,matrix_profile,30061,bare_-24.125_-70.275_20,157.500,25.373,0.570,139.148,9.928
+227,Mons Mouton,1181.098,False,euclid_height,130,bare_42.075_-108.725_11,112.500,1.374,0.596,13.458,4.509
+227,Mons Mouton,1181.098,False,euclid_height_slope,8870,bare_42.075_-108.725_11,112.500,1.374,0.596,13.458,4.509
+227,Mons Mouton,1181.098,False,dtw_10pct,511,bare_42.075_-108.725_11,112.500,1.374,0.596,13.458,4.509
+227,Mons Mouton,1181.098,False,matrix_profile,3669,bare_23.275_71.475_20,0.000,5.825,1.210,13.458,4.509
+228,Mons Mouton Plateau,1316.516,False,euclid_height,1,bare_38.375_-110.775_02,180.000,5.381,6.955,93.565,13.804
+228,Mons Mouton Plateau,1316.516,False,euclid_height_slope,1,bare_38.375_-110.775_02,180.000,5.381,6.955,93.565,13.804
+228,Mons Mouton Plateau,1316.516,False,dtw_10pct,1,bare_-14.725_-74.975_12,337.500,7.591,4.848,93.565,13.804
+228,Mons Mouton Plateau,1316.516,False,matrix_profile,5211,bare_69.675_-23.875_20,180.000,14.596,0.982,93.565,13.804
+229,Nobile Rim 1,1472.064,False,euclid_height,10,bare_-19.225_-69.925_21,45.000,12.841,5.804,529.479,26.868
+229,Nobile Rim 1,1472.064,False,euclid_height_slope,7,bare_80.025_-20.375_21,292.500,13.758,0.833,529.479,26.868
+229,Nobile Rim 1,1472.064,False,dtw_10pct,25,bare_80.025_-71.575_11,157.500,22.001,0.352,529.479,26.868
+229,Nobile Rim 1,1472.064,False,matrix_profile,23,bare_80.025_-20.375_21,292.500,6.284,1.121,529.479,26.868
+230,Nobile Rim 2,3741.494,True,euclid_height,1,bare_75.875_-19.925_22,67.500,20.226,6.612,357.588,13.331
+230,Nobile Rim 2,3741.494,True,euclid_height_slope,1,bare_75.875_-19.925_22,67.500,20.226,6.612,357.588,13.331
+230,Nobile Rim 2,3741.494,True,dtw_10pct,2,bare_75.875_-19.925_22,67.500,20.226,6.612,357.588,13.331
+230,Nobile Rim 2,3741.494,True,matrix_profile,5,bare_75.875_-19.925_22,45.000,44.477,9.710,357.588,13.331
+231,Peak Near Cabeus B,1559.961,False,euclid_height,1,bare_80.025_-81.225_20,0.000,14.491,4.228,434.688,24.393
+231,Peak Near Cabeus B,1559.961,False,euclid_height_slope,1,bare_80.025_-81.225_20,0.000,14.491,4.228,434.688,24.393
+231,Peak Near Cabeus B,1559.961,False,dtw_10pct,1,bare_-31.375_-70.025_02,315.000,29.327,5.633,434.688,24.393
+231,Peak Near Cabeus B,1559.961,False,matrix_profile,13,bare_-35.625_-70.675_10,157.500,24.421,0.524,434.688,24.393
+232,Slater Plain,1959.620,True,euclid_height,1,bare_75.875_59.575_22,0.000,6.977,0.613,101.591,14.345
+232,Slater Plain,1959.620,True,euclid_height_slope,1,bare_-35.625_-70.425_22,157.500,8.263,2.229,101.591,14.345
+232,Slater Plain,1959.620,True,dtw_10pct,1,bare_33.575_80.875_21,22.500,10.098,7.202,101.591,14.345
+232,Slater Plain,1959.620,True,matrix_profile,44569,bare_40.125_70.475_02,247.500,7.537,0.363,101.591,14.345
+233,de Gerlache Rim 2,2554.389,True,euclid_height,1,bare_37.825_87.175_20,135.000,12.451,17.137,360.901,19.437
+233,de Gerlache Rim 2,2554.389,True,euclid_height_slope,1,bare_-28.725_-69.325_11,292.500,12.755,0.193,360.901,19.437
+233,de Gerlache Rim 2,2554.389,True,dtw_10pct,2,bare_61.625_-42.325_00,90.000,14.022,6.953,360.901,19.437
+233,de Gerlache Rim 2,2554.389,True,matrix_profile,541,bare_-28.725_-69.325_11,112.500,64.683,0.193,360.901,19.437
+234,Haworth,2009.234,True,euclid_height,1,bare_-0.725_-91.225_22,112.500,7.059,6.901,220.838,17.085
+234,Haworth,2009.234,True,euclid_height_slope,1,bare_-0.725_-91.225_22,112.500,7.059,6.901,220.838,17.085
+234,Haworth,2009.234,True,dtw_10pct,5,bare_-0.725_-91.225_22,292.500,7.432,6.901,220.838,17.085
+234,Haworth,2009.234,True,matrix_profile,405,bare_80.025_-60.775_01,270.000,8.707,0.450,220.838,17.085
+235,Malapert Massif,1787.109,True,euclid_height,1,bare_74.175_57.775_00,315.000,12.954,23.831,194.042,21.019
+235,Malapert Massif,1787.109,True,euclid_height_slope,1,bare_74.175_57.775_00,315.000,12.954,23.831,194.042,21.019
+235,Malapert Massif,1787.109,True,dtw_10pct,1,bare_76.825_-23.625_10,270.000,26.559,6.833,194.042,21.019
+235,Malapert Massif,1787.109,True,matrix_profile,21,bare_-19.225_-69.925_12,292.500,22.280,4.301,194.042,21.019
+236,Mons Mouton,3421.463,True,euclid_height,1,bare_72.175_-22.375_01,225.000,24.307,13.175,429.099,21.812
+236,Mons Mouton,3421.463,True,euclid_height_slope,1,bare_72.175_-22.375_01,225.000,24.307,13.175,429.099,21.812
+236,Mons Mouton,3421.463,True,dtw_10pct,2,bare_72.175_-22.375_01,225.000,24.307,13.175,429.099,21.812
+236,Mons Mouton,3421.463,True,matrix_profile,1,bare_80.025_-81.225_00,0.000,76.679,1.945,429.099,21.812
+237,Mons Mouton Plateau,1290.219,False,euclid_height,1,bare_79.975_-64.275_21,22.500,5.641,1.275,120.539,16.207
+237,Mons Mouton Plateau,1290.219,False,euclid_height_slope,4,bare_70.575_-53.525_12,112.500,5.774,0.377,120.539,16.207
+237,Mons Mouton Plateau,1290.219,False,dtw_10pct,15,bare_26.725_60.675_00,45.000,6.289,2.647,120.539,16.207
+237,Mons Mouton Plateau,1290.219,False,matrix_profile,5889,bare_71.575_-78.025_11,90.000,4.606,0.954,120.539,16.207
+238,Nobile Rim 1,1141.148,True,euclid_height,374,bare_-17.625_-71.175_02,292.500,2.914,3.081,26.075,6.687
+238,Nobile Rim 1,1141.148,True,euclid_height_slope,2097,bare_-17.625_-71.175_02,292.500,2.914,3.081,26.075,6.687
+238,Nobile Rim 1,1141.148,True,dtw_10pct,297,bare_34.425_70.925_10,90.000,3.707,1.903,26.075,6.687
+238,Nobile Rim 1,1141.148,True,matrix_profile,16245,bare_19.525_-155.525_02,112.500,8.897,1.611,26.075,6.687
+239,Nobile Rim 2,1990.657,True,euclid_height,1,bare_-23.525_-69.525_02,202.500,5.265,4.129,184.265,11.468
+239,Nobile Rim 2,1990.657,True,euclid_height_slope,1,bare_-23.525_-69.525_02,202.500,5.265,4.129,184.265,11.468
+239,Nobile Rim 2,1990.657,True,dtw_10pct,4,bare_-0.725_-91.175_12,315.000,8.566,2.139,184.265,11.468
+239,Nobile Rim 2,1990.657,True,matrix_profile,1999,bare_-0.725_-91.175_12,45.000,9.685,1.950,184.265,11.468
+240,Peak Near Cabeus B,1648.361,True,euclid_height,1,bare_78.425_-84.325_01,225.000,13.477,21.663,358.854,21.126
+240,Peak Near Cabeus B,1648.361,True,euclid_height_slope,1,bare_78.425_-84.325_01,225.000,13.477,21.663,358.854,21.126
+240,Peak Near Cabeus B,1648.361,True,dtw_10pct,2,bare_29.175_83.525_22,0.000,20.938,7.019,358.854,21.126
+240,Peak Near Cabeus B,1648.361,True,matrix_profile,1,bare_70.675_-22.225_22,292.500,33.386,10.731,358.854,21.126
+241,Slater Plain,2411.868,True,euclid_height,1,bare_74.875_-19.975_00,157.500,5.430,0.212,77.734,8.237
+241,Slater Plain,2411.868,True,euclid_height_slope,6,bare_74.875_-19.975_00,157.500,5.430,0.212,77.734,8.237
+241,Slater Plain,2411.868,True,dtw_10pct,2,bare_42.075_-108.725_11,337.500,8.577,7.116,77.734,8.237
+241,Slater Plain,2411.868,True,matrix_profile,44653,bare_16.725_-22.925_02,112.500,9.813,5.415,77.734,8.237
+242,de Gerlache Rim 2,1598.246,True,euclid_height,1,bare_36.125_55.675_20,225.000,14.188,7.330,183.470,18.462
+242,de Gerlache Rim 2,1598.246,True,euclid_height_slope,1,bare_36.125_55.675_20,225.000,14.188,7.330,183.470,18.462
+242,de Gerlache Rim 2,1598.246,True,dtw_10pct,1,bare_36.125_55.675_20,45.000,15.628,7.330,183.470,18.462
+242,de Gerlache Rim 2,1598.246,True,matrix_profile,121,bare_-29.175_-70.625_21,67.500,38.521,9.635,183.470,18.462
+243,Haworth,1283.989,True,euclid_height,8,bare_37.025_96.475_11,90.000,5.466,2.742,157.876,17.531
+243,Haworth,1283.989,True,euclid_height_slope,7,bare_37.025_96.475_11,90.000,5.466,2.742,157.876,17.531
+243,Haworth,1283.989,True,dtw_10pct,64,bare_80.025_-81.275_00,22.500,7.378,6.655,157.876,17.531
+243,Haworth,1283.989,True,matrix_profile,2157,bare_-23.525_-69.525_02,180.000,6.302,0.202,157.876,17.531
+244,Malapert Massif,3898.277,True,euclid_height,1,bare_78.425_-84.325_02,202.500,28.188,10.639,387.910,17.127
+244,Malapert Massif,3898.277,True,euclid_height_slope,1,bare_78.425_-84.325_02,202.500,28.188,10.639,387.910,17.127
+244,Malapert Massif,3898.277,True,dtw_10pct,1,bare_35.075_5.425_01,157.500,32.056,17.450,387.910,17.127
+244,Malapert Massif,3898.277,True,matrix_profile,1,bare_19.525_-155.525_12,180.000,142.742,6.047,387.910,17.127
+245,Mons Mouton,1391.688,True,euclid_height,1,bare_79.175_-76.625_00,157.500,7.263,5.203,90.644,15.726
+245,Mons Mouton,1391.688,True,euclid_height_slope,1,bare_79.175_-76.625_00,157.500,7.263,5.203,90.644,15.726
+245,Mons Mouton,1391.688,True,dtw_10pct,1,bare_73.325_-95.325_20,225.000,10.542,9.206,90.644,15.726
+245,Mons Mouton,1391.688,True,matrix_profile,7339,bare_79.225_-77.625_10,157.500,9.149,2.392,90.644,15.726
+246,Mons Mouton Plateau,3342.620,True,euclid_height,1,bare_72.175_-22.375_01,45.000,25.858,15.380,399.723,19.607
+246,Mons Mouton Plateau,3342.620,True,euclid_height_slope,1,bare_72.175_-22.375_01,45.000,25.858,15.380,399.723,19.607
+246,Mons Mouton Plateau,3342.620,True,dtw_10pct,1,bare_72.175_-22.375_01,45.000,25.858,15.380,399.723,19.607
+246,Mons Mouton Plateau,3342.620,True,matrix_profile,7,bare_80.025_-72.075_01,22.500,66.390,1.695,399.723,19.607
+247,Nobile Rim 1,2346.660,True,euclid_height,2,bare_74.975_60.025_12,135.000,9.986,19.663,200.259,14.692
+247,Nobile Rim 1,2346.660,True,euclid_height_slope,1,bare_75.975_-91.175_11,157.500,11.257,1.567,200.259,14.692
+247,Nobile Rim 1,2346.660,True,dtw_10pct,20,bare_33.825_37.125_11,112.500,19.192,8.136,200.259,14.692
+247,Nobile Rim 1,2346.660,True,matrix_profile,1123,bare_75.975_-91.175_12,67.500,11.992,3.696,200.259,14.692
+248,Nobile Rim 2,3150.069,True,euclid_height,1,bare_77.275_-68.675_21,202.500,34.034,11.404,852.121,25.159
+248,Nobile Rim 2,3150.069,True,euclid_height_slope,1,bare_77.275_-68.675_21,202.500,34.034,11.404,852.121,25.159
+248,Nobile Rim 2,3150.069,True,dtw_10pct,1,bare_67.775_-66.125_20,180.000,45.807,22.725,852.121,25.159
+248,Nobile Rim 2,3150.069,True,matrix_profile,1,bare_-32.275_-69.675_22,67.500,139.513,2.844,852.121,25.159
+249,Peak Near Cabeus B,3581.084,False,euclid_height,1,bare_65.425_-63.575_11,67.500,14.792,21.787,274.089,13.846
+249,Peak Near Cabeus B,3581.084,False,euclid_height_slope,1,bare_-0.725_-91.225_22,270.000,16.313,5.356,274.089,13.846
+249,Peak Near Cabeus B,3581.084,False,dtw_10pct,1,bare_75.875_-19.925_12,0.000,14.902,7.745,274.089,13.846
+249,Peak Near Cabeus B,3581.084,False,matrix_profile,747,bare_-0.725_-91.225_22,270.000,20.796,5.356,274.089,13.846
+250,Slater Plain,2336.584,False,euclid_height,5,bare_19.425_-155.625_00,112.500,7.653,1.124,338.539,13.214
+250,Slater Plain,2336.584,False,euclid_height_slope,8,bare_19.425_-155.625_00,112.500,7.653,1.124,338.539,13.214
+250,Slater Plain,2336.584,False,dtw_10pct,9,bare_19.425_-155.625_00,292.500,7.732,1.124,338.539,13.214
+250,Slater Plain,2336.584,False,matrix_profile,693,bare_19.425_-155.625_01,67.500,8.674,0.985,338.539,13.214
+251,de Gerlache Rim 2,2672.875,True,euclid_height,1,bare_76.875_-69.425_10,0.000,15.514,11.523,211.229,14.007
+251,de Gerlache Rim 2,2672.875,True,euclid_height_slope,1,bare_80.025_-81.225_00,337.500,16.424,9.839,211.229,14.007
+251,de Gerlache Rim 2,2672.875,True,dtw_10pct,1,bare_80.025_-81.225_00,337.500,16.424,9.839,211.229,14.007
+251,de Gerlache Rim 2,2672.875,True,matrix_profile,13,bare_-31.375_-70.025_22,112.500,42.696,0.449,211.229,14.007
+252,Haworth,1155.330,False,euclid_height,1,bare_19.425_-155.625_10,270.000,5.137,6.400,180.208,16.848
+252,Haworth,1155.330,False,euclid_height_slope,3,bare_19.425_-155.625_10,270.000,5.137,6.400,180.208,16.848
+252,Haworth,1155.330,False,dtw_10pct,3,bare_19.425_-155.625_10,270.000,5.137,6.400,180.208,16.848
+252,Haworth,1155.330,False,matrix_profile,1647,bare_19.425_-155.625_01,90.000,6.984,2.271,180.208,16.848
+253,Malapert Massif,3548.045,True,euclid_height,1,bare_19.525_-155.525_12,157.500,22.941,13.733,299.711,24.301
+253,Malapert Massif,3548.045,True,euclid_height_slope,1,bare_19.525_-155.525_12,157.500,22.941,13.733,299.711,24.301
+253,Malapert Massif,3548.045,True,dtw_10pct,3,bare_78.425_-84.325_02,202.500,26.962,3.465,299.711,24.301
+253,Malapert Massif,3548.045,True,matrix_profile,11,bare_19.525_-155.525_12,157.500,25.591,13.733,299.711,24.301
+254,Mons Mouton,2205.848,False,euclid_height,1,bare_19.425_-155.625_22,337.500,13.045,5.490,392.867,18.127
+254,Mons Mouton,2205.848,False,euclid_height_slope,1,bare_19.425_-155.625_22,337.500,13.045,5.490,392.867,18.127
+254,Mons Mouton,2205.848,False,dtw_10pct,2,bare_19.425_-155.625_22,157.500,14.190,5.490,392.867,18.127
+254,Mons Mouton,2205.848,False,matrix_profile,335,bare_19.425_-155.625_22,157.500,14.475,5.490,392.867,18.127
+255,Mons Mouton Plateau,1514.713,False,euclid_height,1,bare_79.975_-64.225_02,67.500,2.475,1.885,49.857,6.787
+255,Mons Mouton Plateau,1514.713,False,euclid_height_slope,10,bare_79.975_-64.225_02,67.500,2.475,1.885,49.857,6.787
+255,Mons Mouton Plateau,1514.713,False,dtw_10pct,5,bare_79.975_-64.225_02,67.500,2.475,1.885,49.857,6.787
+255,Mons Mouton Plateau,1514.713,False,matrix_profile,28311,bare_19.525_-155.525_11,292.500,5.722,1.722,49.857,6.787
+256,Nobile Rim 1,2119.161,False,euclid_height,3,bare_79.825_-72.675_01,0.000,13.687,8.205,395.387,17.307
+256,Nobile Rim 1,2119.161,False,euclid_height_slope,2,bare_79.825_-72.675_01,0.000,13.687,8.205,395.387,17.307
+256,Nobile Rim 1,2119.161,False,dtw_10pct,13,bare_73.525_-83.025_01,22.500,22.374,10.612,395.387,17.307
+256,Nobile Rim 1,2119.161,False,matrix_profile,215,bare_19.425_-155.625_01,90.000,42.288,2.730,395.387,17.307
+257,Nobile Rim 2,2375.560,False,euclid_height,3,bare_58.325_-155.125_11,247.500,15.498,5.294,581.876,31.728
+257,Nobile Rim 2,2375.560,False,euclid_height_slope,2,bare_58.325_-155.125_11,247.500,15.498,5.294,581.876,31.728
+257,Nobile Rim 2,2375.560,False,dtw_10pct,8,bare_-28.725_-69.325_10,270.000,26.624,6.358,581.876,31.728
+257,Nobile Rim 2,2375.560,False,matrix_profile,11,bare_-28.725_-69.325_10,67.500,19.408,4.456,581.876,31.728
+258,Peak Near Cabeus B,1809.088,True,euclid_height,1,bare_70.575_-53.525_20,315.000,18.843,8.286,574.905,30.741
+258,Peak Near Cabeus B,1809.088,True,euclid_height_slope,1,bare_70.575_-53.525_20,315.000,18.843,8.286,574.905,30.741
+258,Peak Near Cabeus B,1809.088,True,dtw_10pct,1,bare_79.325_14.375_11,270.000,20.662,27.102,574.905,30.741
+258,Peak Near Cabeus B,1809.088,True,matrix_profile,1,bare_78.425_-84.325_11,90.000,35.647,2.156,574.905,30.741
+259,Slater Plain,2819.707,True,euclid_height,1,bare_74.975_60.025_12,337.500,12.358,6.620,279.447,14.649
+259,Slater Plain,2819.707,True,euclid_height_slope,1,bare_74.975_60.025_12,337.500,12.358,6.620,279.447,14.649
+259,Slater Plain,2819.707,True,dtw_10pct,1,bare_80.025_-81.275_00,22.500,23.813,9.537,279.447,14.649
+259,Slater Plain,2819.707,True,matrix_profile,649,bare_-0.725_-91.175_12,337.500,22.027,2.089,279.447,14.649
+260,de Gerlache Rim 2,2159.110,True,euclid_height,1,bare_19.425_-155.625_22,337.500,12.819,7.644,379.436,20.281
+260,de Gerlache Rim 2,2159.110,True,euclid_height_slope,1,bare_19.425_-155.625_22,180.000,12.904,7.217,379.436,20.281
+260,de Gerlache Rim 2,2159.110,True,dtw_10pct,3,bare_19.425_-155.625_22,157.500,14.274,7.644,379.436,20.281
+260,de Gerlache Rim 2,2159.110,True,matrix_profile,145,bare_19.425_-155.625_22,157.500,12.330,7.644,379.436,20.281
+261,Haworth,2231.969,True,euclid_height,1,bare_-16.325_-72.625_10,67.500,9.186,0.281,214.056,17.407
+261,Haworth,2231.969,True,euclid_height_slope,1,bare_-16.325_-72.625_10,67.500,9.186,0.281,214.056,17.407
+261,Haworth,2231.969,True,dtw_10pct,5,bare_76.825_-23.625_20,67.500,19.857,6.341,214.056,17.407
+261,Haworth,2231.969,True,matrix_profile,357,bare_-19.225_-69.925_11,90.000,28.066,0.675,214.056,17.407
+262,Malapert Massif,2318.761,True,euclid_height,1,bare_32.375_54.575_12,225.000,16.538,4.022,191.749,17.826
+262,Malapert Massif,2318.761,True,euclid_height_slope,1,bare_32.375_54.575_12,225.000,16.538,4.022,191.749,17.826
+262,Malapert Massif,2318.761,True,dtw_10pct,1,bare_78.425_-84.325_02,225.000,18.090,18.053,191.749,17.826
+262,Malapert Massif,2318.761,True,matrix_profile,33,bare_-41.825_-70.275_21,67.500,14.701,3.604,191.749,17.826
+263,Mons Mouton,2075.924,False,euclid_height,2,bare_-48.725_-72.025_21,180.000,4.693,1.445,228.248,11.555
+263,Mons Mouton,2075.924,False,euclid_height_slope,4,bare_-48.725_-72.025_21,180.000,4.693,1.445,228.248,11.555
+263,Mons Mouton,2075.924,False,dtw_10pct,18,bare_19.425_-155.625_11,247.500,9.461,2.779,228.248,11.555
+263,Mons Mouton,2075.924,False,matrix_profile,915,bare_19.425_-155.625_01,90.000,18.111,0.087,228.248,11.555
+264,Mons Mouton Plateau,2822.992,True,euclid_height,2,bare_76.475_-95.875_01,90.000,6.648,2.961,149.691,11.252
+264,Mons Mouton Plateau,2822.992,True,euclid_height_slope,3,bare_76.475_-95.875_01,90.000,6.648,2.961,149.691,11.252
+264,Mons Mouton Plateau,2822.992,True,dtw_10pct,3,bare_76.475_-95.875_01,90.000,6.648,2.961,149.691,11.252
+264,Mons Mouton Plateau,2822.992,True,matrix_profile,3865,bare_19.525_-155.525_12,202.500,23.631,3.347,149.691,11.252
+265,Nobile Rim 1,3483.843,False,euclid_height,4,bare_72.175_-22.375_01,315.000,21.634,5.084,148.484,15.450
+265,Nobile Rim 1,3483.843,False,euclid_height_slope,1,bare_79.575_20.775_21,0.000,22.019,2.657,148.484,15.450
+265,Nobile Rim 1,3483.843,False,dtw_10pct,4,bare_37.025_96.475_01,112.500,29.503,7.039,148.484,15.450
+265,Nobile Rim 1,3483.843,False,matrix_profile,5,bare_-41.825_-70.275_01,0.000,40.102,0.676,148.484,15.450
+266,Nobile Rim 2,1923.064,False,euclid_height,6,bare_-28.725_-69.325_02,225.000,9.709,11.506,146.349,15.546
+266,Nobile Rim 2,1923.064,False,euclid_height_slope,5,bare_-28.725_-69.325_02,225.000,9.709,11.506,146.349,15.546
+266,Nobile Rim 2,1923.064,False,dtw_10pct,8,bare_73.325_-91.675_22,202.500,18.028,2.957,146.349,15.546
+266,Nobile Rim 2,1923.064,False,matrix_profile,3613,bare_80.025_-60.875_01,0.000,19.764,1.026,146.349,15.546
+267,Peak Near Cabeus B,3160.746,True,euclid_height,1,bare_28.925_86.525_20,225.000,34.415,2.731,820.658,32.551
+267,Peak Near Cabeus B,3160.746,True,euclid_height_slope,1,bare_28.925_86.525_20,225.000,34.415,2.731,820.658,32.551
+267,Peak Near Cabeus B,3160.746,True,dtw_10pct,1,bare_77.275_-68.675_11,135.000,45.795,12.781,820.658,32.551
+267,Peak Near Cabeus B,3160.746,True,matrix_profile,1,bare_79.975_-81.225_22,90.000,119.610,0.933,820.658,32.551
+268,Slater Plain,1727.580,True,euclid_height,1,bare_80.025_-94.525_01,270.000,6.791,1.942,190.148,16.067
+268,Slater Plain,1727.580,True,euclid_height_slope,1,bare_80.025_-94.525_01,270.000,6.791,1.942,190.148,16.067
+268,Slater Plain,1727.580,True,dtw_10pct,1,bare_-41.825_-70.275_20,45.000,14.426,2.716,190.148,16.067
+268,Slater Plain,1727.580,True,matrix_profile,933,bare_34.775_78.725_11,135.000,11.102,3.464,190.148,16.067
+269,de Gerlache Rim 2,1122.416,True,euclid_height,2,bare_33.525_90.725_12,67.500,4.724,5.398,70.908,12.261
+269,de Gerlache Rim 2,1122.416,True,euclid_height_slope,2,bare_33.525_90.725_12,67.500,4.724,5.398,70.908,12.261
+269,de Gerlache Rim 2,1122.416,True,dtw_10pct,7,bare_-25.975_-70.225_11,112.500,5.417,0.761,70.908,12.261
+269,de Gerlache Rim 2,1122.416,True,matrix_profile,449,bare_33.525_90.725_12,67.500,4.724,5.398,70.908,12.261
+270,Haworth,1196.417,False,euclid_height,5,bare_37.825_87.175_21,157.500,5.991,7.928,318.641,19.193
+270,Haworth,1196.417,False,euclid_height_slope,5,bare_37.825_87.175_21,157.500,5.991,7.928,318.641,19.193
+270,Haworth,1196.417,False,dtw_10pct,20,bare_76.825_-23.625_20,0.000,12.755,6.617,318.641,19.193
+270,Haworth,1196.417,False,matrix_profile,273,bare_-35.625_-70.675_10,22.500,13.597,6.274,318.641,19.193
+271,Malapert Massif,2973.937,True,euclid_height,1,bare_79.825_-72.675_20,270.000,25.301,19.123,468.228,21.514
+271,Malapert Massif,2973.937,True,euclid_height_slope,1,bare_79.825_-72.675_20,270.000,25.301,19.123,468.228,21.514
+271,Malapert Massif,2973.937,True,dtw_10pct,1,bare_79.825_-72.675_20,90.000,32.137,19.123,468.228,21.514
+271,Malapert Massif,2973.937,True,matrix_profile,1,bare_78.775_-92.425_12,0.000,69.543,11.015,468.228,21.514
+272,Mons Mouton,2662.287,False,euclid_height,1,bare_19.525_-155.525_22,67.500,4.263,1.728,255.359,8.843
+272,Mons Mouton,2662.287,False,euclid_height_slope,6,bare_19.525_-155.525_22,67.500,4.263,1.728,255.359,8.843
+272,Mons Mouton,2662.287,False,dtw_10pct,13,bare_19.425_-155.625_20,270.000,9.673,1.740,255.359,8.843
+272,Mons Mouton,2662.287,False,matrix_profile,2639,bare_19.525_-155.525_02,0.000,9.390,0.766,255.359,8.843
+273,Mons Mouton Plateau,2300.394,True,euclid_height,1,bare_70.125_26.325_01,157.500,6.715,3.567,92.696,7.979
+273,Mons Mouton Plateau,2300.394,True,euclid_height_slope,1,bare_70.125_26.325_01,157.500,6.715,3.567,92.696,7.979
+273,Mons Mouton Plateau,2300.394,True,dtw_10pct,1,bare_79.575_20.775_21,22.500,7.112,8.175,92.696,7.979
+273,Mons Mouton Plateau,2300.394,True,matrix_profile,36359,bare_19.525_-155.525_12,22.500,13.933,0.075,92.696,7.979
+274,Nobile Rim 1,1240.475,False,euclid_height,149,bare_80.025_-81.275_11,202.500,2.618,1.505,36.949,7.712
+274,Nobile Rim 1,1240.475,False,euclid_height_slope,278,bare_80.025_-81.275_11,202.500,2.618,1.505,36.949,7.712
+274,Nobile Rim 1,1240.475,False,dtw_10pct,304,bare_77.175_-18.475_20,225.000,3.577,1.947,36.949,7.712
+274,Nobile Rim 1,1240.475,False,matrix_profile,3019,bare_79.975_-81.225_21,180.000,3.863,1.504,36.949,7.712
+275,Nobile Rim 2,1801.376,False,euclid_height,1,bare_76.825_-23.625_11,45.000,3.333,3.646,40.936,6.515
+275,Nobile Rim 2,1801.376,False,euclid_height_slope,29,bare_-0.725_-91.175_11,45.000,4.239,3.435,40.936,6.515
+275,Nobile Rim 2,1801.376,False,dtw_10pct,5,bare_39.375_92.975_02,292.500,4.174,0.840,40.936,6.515
+275,Nobile Rim 2,1801.376,False,matrix_profile,37631,bare_19.425_-155.625_01,180.000,9.003,0.467,40.936,6.515
+276,Peak Near Cabeus B,3696.771,True,euclid_height,1,bare_58.325_-155.125_02,0.000,30.640,13.605,479.180,21.345
+276,Peak Near Cabeus B,3696.771,True,euclid_height_slope,1,bare_-19.225_-69.925_12,157.500,32.667,12.661,479.180,21.345
+276,Peak Near Cabeus B,3696.771,True,dtw_10pct,4,bare_-19.225_-69.925_12,157.500,32.667,12.661,479.180,21.345
+276,Peak Near Cabeus B,3696.771,True,matrix_profile,1,bare_-19.225_-69.925_12,45.000,49.687,8.965,479.180,21.345
+277,Slater Plain,2070.697,False,euclid_height,1,bare_-24.325_-69.575_01,225.000,8.286,16.612,189.144,12.125
+277,Slater Plain,2070.697,False,euclid_height_slope,1,bare_-24.325_-69.575_01,225.000,8.286,16.612,189.144,12.125
+277,Slater Plain,2070.697,False,dtw_10pct,1,bare_-23.525_-69.525_02,202.500,13.185,3.473,189.144,12.125
+277,Slater Plain,2070.697,False,matrix_profile,3127,bare_-0.725_-91.225_22,135.000,12.279,0.443,189.144,12.125
+278,de Gerlache Rim 2,2303.588,False,euclid_height,11,bare_19.425_-155.625_00,112.500,10.687,3.628,364.051,15.718
+278,de Gerlache Rim 2,2303.588,False,euclid_height_slope,13,bare_19.425_-155.625_00,112.500,10.687,3.628,364.051,15.718
+278,de Gerlache Rim 2,2303.588,False,dtw_10pct,11,bare_19.425_-155.625_10,90.000,15.170,3.608,364.051,15.718
+278,de Gerlache Rim 2,2303.588,False,matrix_profile,1063,bare_19.425_-155.625_22,0.000,16.315,4.009,364.051,15.718
+279,Haworth,1872.853,True,euclid_height,1,bare_-18.875_-69.875_01,225.000,11.679,7.622,263.304,19.940
+279,Haworth,1872.853,True,euclid_height_slope,1,bare_-18.875_-69.875_01,225.000,11.679,7.622,263.304,19.940
+279,Haworth,1872.853,True,dtw_10pct,5,bare_-28.725_-69.325_01,247.500,18.777,6.881,263.304,19.940
+279,Haworth,1872.853,True,matrix_profile,325,bare_34.775_78.725_22,135.000,26.257,2.870,263.304,19.940
+280,Malapert Massif,2108.772,False,euclid_height,4,bare_80.025_-60.775_12,157.500,8.204,0.661,233.499,12.837
+280,Malapert Massif,2108.772,False,euclid_height_slope,8,bare_80.025_-60.775_12,157.500,8.204,0.661,233.499,12.837
+280,Malapert Massif,2108.772,False,dtw_10pct,14,bare_-0.725_-91.175_21,180.000,14.104,0.497,233.499,12.837
+280,Malapert Massif,2108.772,False,matrix_profile,1939,bare_70.825_-25.675_22,112.500,9.769,0.073,233.499,12.837
+281,Mons Mouton,2029.783,True,euclid_height,3,bare_66.575_-62.775_11,157.500,16.725,10.371,566.834,23.228
+281,Mons Mouton,2029.783,True,euclid_height_slope,2,bare_66.575_-62.775_11,157.500,16.725,10.371,566.834,23.228
+281,Mons Mouton,2029.783,True,dtw_10pct,15,bare_79.825_-72.675_01,22.500,28.606,5.360,566.834,23.228
+281,Mons Mouton,2029.783,True,matrix_profile,9,bare_-35.625_-70.675_10,337.500,49.661,1.689,566.834,23.228
+282,Mons Mouton Plateau,3684.012,True,euclid_height,1,bare_67.625_-67.425_01,157.500,24.914,0.797,286.077,21.512
+282,Mons Mouton Plateau,3684.012,True,euclid_height_slope,1,bare_-48.725_-72.025_01,270.000,25.541,0.253,286.077,21.512
+282,Mons Mouton Plateau,3684.012,True,dtw_10pct,1,bare_-31.375_-70.025_21,112.500,30.886,0.905,286.077,21.512
+282,Mons Mouton Plateau,3684.012,True,matrix_profile,1,bare_-48.725_-72.025_01,112.500,34.560,4.106,286.077,21.512
+283,Nobile Rim 1,1435.695,False,euclid_height,2,bare_-19.225_-69.925_21,22.500,7.649,5.034,477.476,23.476
+283,Nobile Rim 1,1435.695,False,euclid_height_slope,2,bare_-19.225_-69.925_21,22.500,7.649,5.034,477.476,23.476
+283,Nobile Rim 1,1435.695,False,dtw_10pct,15,bare_58.325_-155.125_11,22.500,22.790,4.361,477.476,23.476
+283,Nobile Rim 1,1435.695,False,matrix_profile,11,bare_-31.375_-70.025_20,292.500,18.969,1.786,477.476,23.476
+284,Nobile Rim 2,3133.164,False,euclid_height,7,bare_19.425_-155.625_10,90.000,11.159,2.644,496.784,14.754
+284,Nobile Rim 2,3133.164,False,euclid_height_slope,7,bare_19.425_-155.625_10,90.000,11.159,2.644,496.784,14.754
+284,Nobile Rim 2,3133.164,False,dtw_10pct,12,bare_19.425_-155.625_22,135.000,11.672,1.788,496.784,14.754
+284,Nobile Rim 2,3133.164,False,matrix_profile,179,bare_19.425_-155.625_10,270.000,13.207,2.644,496.784,14.754
+285,Peak Near Cabeus B,2044.443,False,euclid_height,7,bare_78.425_-84.325_00,247.500,9.453,11.900,257.857,16.612
+285,Peak Near Cabeus B,2044.443,False,euclid_height_slope,4,bare_78.425_-84.325_00,247.500,9.453,11.900,257.857,16.612
+285,Peak Near Cabeus B,2044.443,False,dtw_10pct,30,bare_78.425_-84.325_00,247.500,9.453,11.900,257.857,16.612
+285,Peak Near Cabeus B,2044.443,False,matrix_profile,361,bare_-19.225_-69.925_11,90.000,18.667,0.121,257.857,16.612
+286,Slater Plain,1917.108,False,euclid_height,2,bare_41.575_54.175_22,180.000,5.613,10.238,122.431,13.852
+286,Slater Plain,1917.108,False,euclid_height_slope,1,bare_80.025_-60.775_22,315.000,7.274,3.521,122.431,13.852
+286,Slater Plain,1917.108,False,dtw_10pct,9,bare_77.175_-18.475_20,67.500,6.742,0.714,122.431,13.852
+286,Slater Plain,1917.108,False,matrix_profile,15489,bare_19.525_-155.525_11,67.500,16.519,2.244,122.431,13.852
+287,de Gerlache Rim 2,2819.690,False,euclid_height,1,bare_-19.225_-69.925_20,202.500,13.375,4.424,270.768,17.838
+287,de Gerlache Rim 2,2819.690,False,euclid_height_slope,1,bare_-19.225_-69.925_20,202.500,13.375,4.424,270.768,17.838
+287,de Gerlache Rim 2,2819.690,False,dtw_10pct,1,bare_-18.875_-69.875_02,112.500,23.999,17.598,270.768,17.838
+287,de Gerlache Rim 2,2819.690,False,matrix_profile,3,bare_-19.225_-69.925_11,90.000,21.670,1.105,270.768,17.838
+288,Haworth,1850.366,True,euclid_height,4,bare_27.925_25.425_00,90.000,2.137,4.117,22.652,5.236
+288,Haworth,1850.366,True,euclid_height_slope,288,bare_27.925_25.425_00,90.000,2.137,4.117,22.652,5.236
+288,Haworth,1850.366,True,dtw_10pct,14,bare_27.925_25.425_00,90.000,2.137,4.117,22.652,5.236
+288,Haworth,1850.366,True,matrix_profile,41729,bare_-0.725_-91.225_12,90.000,6.042,2.024,22.652,5.236
+289,Malapert Massif,3022.478,False,euclid_height,1,bare_77.275_-68.675_21,202.500,37.627,10.212,790.977,26.351
+289,Malapert Massif,3022.478,False,euclid_height_slope,1,bare_77.275_-68.675_21,202.500,37.627,10.212,790.977,26.351
+289,Malapert Massif,3022.478,False,dtw_10pct,1,bare_77.275_-68.675_21,202.500,37.627,10.212,790.977,26.351
+289,Malapert Massif,3022.478,False,matrix_profile,1,bare_-35.625_-70.675_10,337.500,99.034,2.963,790.977,26.351
+290,Mons Mouton,1029.012,False,euclid_height,1,bare_65.375_-16.175_22,337.500,2.515,5.123,56.539,6.084
+290,Mons Mouton,1029.012,False,euclid_height_slope,32,bare_19.525_-155.525_01,67.500,2.663,0.889,56.539,6.084
+290,Mons Mouton,1029.012,False,dtw_10pct,15,bare_18.575_46.825_01,135.000,3.632,3.183,56.539,6.084
+290,Mons Mouton,1029.012,False,matrix_profile,25278,bare_19.525_-155.525_01,67.500,2.246,0.889,56.539,6.084
+291,Mons Mouton Plateau,3301.502,True,euclid_height,1,bare_16.675_30.075_01,337.500,11.197,16.242,194.659,14.377
+291,Mons Mouton Plateau,3301.502,True,euclid_height_slope,1,bare_-48.725_-72.025_02,202.500,11.398,3.070,194.659,14.377
+291,Mons Mouton Plateau,3301.502,True,dtw_10pct,1,bare_16.675_30.075_01,135.000,13.839,16.143,194.659,14.377
+291,Mons Mouton Plateau,3301.502,True,matrix_profile,493,bare_67.625_-67.425_22,157.500,18.046,3.425,194.659,14.377
+292,Nobile Rim 1,1760.641,True,euclid_height,1,bare_67.625_-67.425_11,247.500,12.279,0.499,294.095,24.919
+292,Nobile Rim 1,1760.641,True,euclid_height_slope,1,bare_67.625_-67.425_11,247.500,12.279,0.499,294.095,24.919
+292,Nobile Rim 1,1760.641,True,dtw_10pct,6,bare_67.625_-67.425_11,247.500,12.279,0.499,294.095,24.919
+292,Nobile Rim 1,1760.641,True,matrix_profile,1,bare_-28.725_-69.325_10,157.500,19.929,7.059,294.095,24.919
+293,Nobile Rim 2,1941.059,False,euclid_height,2,bare_75.875_59.575_20,67.500,5.944,11.994,66.147,9.356
+293,Nobile Rim 2,1941.059,False,euclid_height_slope,2,bare_75.875_59.575_20,67.500,5.944,11.994,66.147,9.356
+293,Nobile Rim 2,1941.059,False,dtw_10pct,6,bare_70.875_-74.975_00,157.500,7.091,5.241,66.147,9.356
+293,Nobile Rim 2,1941.059,False,matrix_profile,16333,bare_19.525_-155.525_11,135.000,15.541,2.090,66.147,9.356
+294,Peak Near Cabeus B,1253.321,True,euclid_height,1,bare_-28.725_-69.325_10,180.000,5.174,7.752,139.433,16.546
+294,Peak Near Cabeus B,1253.321,True,euclid_height_slope,2,bare_-28.725_-69.325_10,180.000,5.174,7.752,139.433,16.546
+294,Peak Near Cabeus B,1253.321,True,dtw_10pct,1,bare_-28.725_-69.325_10,180.000,5.174,7.752,139.433,16.546
+294,Peak Near Cabeus B,1253.321,True,matrix_profile,1485,bare_75.875_-19.925_21,292.500,8.088,1.961,139.433,16.546
+295,Slater Plain,3719.265,True,euclid_height,1,bare_76.925_-23.375_21,337.500,11.167,1.765,169.920,14.872
+295,Slater Plain,3719.265,True,euclid_height_slope,1,bare_76.925_-23.375_21,337.500,11.167,1.765,169.920,14.872
+295,Slater Plain,3719.265,True,dtw_10pct,3,bare_-48.725_-72.025_20,180.000,20.312,1.087,169.920,14.872
+295,Slater Plain,3719.265,True,matrix_profile,31595,bare_-0.725_-91.175_12,112.500,68.098,6.402,169.920,14.872
+296,de Gerlache Rim 2,3233.338,False,euclid_height,1,bare_79.575_20.775_22,180.000,9.853,0.292,146.481,11.223
+296,de Gerlache Rim 2,3233.338,False,euclid_height_slope,1,bare_79.575_20.775_22,180.000,9.853,0.292,146.481,11.223
+296,de Gerlache Rim 2,3233.338,False,dtw_10pct,1,bare_38.375_-110.775_00,292.500,15.579,31.150,146.481,11.223
+296,de Gerlache Rim 2,3233.338,False,matrix_profile,32761,bare_-28.725_-69.325_20,0.000,23.027,1.132,146.481,11.223
+297,Haworth,1259.810,True,euclid_height,1,bare_32.025_68.325_11,225.000,5.459,10.235,55.088,10.452
+297,Haworth,1259.810,True,euclid_height_slope,1,bare_14.775_27.575_02,157.500,5.604,2.688,55.088,10.452
+297,Haworth,1259.810,True,dtw_10pct,6,bare_65.625_-39.225_10,337.500,6.603,0.280,55.088,10.452
+297,Haworth,1259.810,True,matrix_profile,677,bare_32.025_68.325_22,45.000,14.413,1.480,55.088,10.452
+298,Malapert Massif,1741.699,False,euclid_height,6,bare_-31.375_-70.025_02,157.500,17.715,6.114,855.715,31.752
+298,Malapert Massif,1741.699,False,euclid_height_slope,5,bare_-31.375_-70.025_02,157.500,17.715,6.114,855.715,31.752
+298,Malapert Massif,1741.699,False,dtw_10pct,13,bare_38.175_72.875_22,45.000,36.890,8.113,855.715,31.752
+298,Malapert Massif,1741.699,False,matrix_profile,1,bare_-31.375_-70.025_02,157.500,19.019,6.114,855.715,31.752
+299,Mons Mouton,2057.037,True,euclid_height,1,bare_43.575_52.275_22,270.000,5.541,5.649,80.523,7.810
+299,Mons Mouton,2057.037,True,euclid_height_slope,1,bare_43.575_52.275_22,270.000,5.541,5.649,80.523,7.810
+299,Mons Mouton,2057.037,True,dtw_10pct,1,bare_-31.825_-69.325_12,22.500,7.245,6.599,80.523,7.810
+299,Mons Mouton,2057.037,True,matrix_profile,45977,bare_19.525_-155.525_01,90.000,10.425,3.307,80.523,7.810

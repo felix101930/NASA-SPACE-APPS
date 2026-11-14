@@ -1,0 +1,722 @@
+[
+ {
+  "name": "Meteor Crater, AZ",
+  "lat": 35.027,
+  "lon": -111.022,
+  "body": "moon",
+  "basis": "Apollo crew impact-geology training",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Cinder Lake Crater Field, AZ",
+  "lat": 35.31,
+  "lon": -111.55,
+  "body": "moon",
+  "basis": "Crater field built to simulate Apollo 11 site; rover and EVA practice",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Black Point Lava Flow, AZ",
+  "lat": 35.68,
+  "lon": -111.47,
+  "body": "moon",
+  "basis": "NASA Desert RATS 2008-2011 lunar rover and EVA tests",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "SP Crater, San Francisco Volcanic Field, AZ",
+  "lat": 35.58,
+  "lon": -111.63,
+  "body": "moon",
+  "basis": "Desert RATS and JETT Artemis EVA field tests",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Craters of the Moon, ID",
+  "lat": 43.42,
+  "lon": -113.52,
+  "body": "moon",
+  "basis": "Apollo 14 training; NASA FINESSE/BASALT field work",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Mauna Kea quarry, HI",
+  "lat": 19.76,
+  "lon": -155.46,
+  "body": "moon",
+  "basis": "PISCES / NASA ISRU (RESOLVE) field tests",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Kilauea caldera, HI",
+  "lat": 19.41,
+  "lon": -155.28,
+  "body": "moon",
+  "basis": "Apollo crew volcanic geology training",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Mauna Ulu, Kilauea, HI",
+  "lat": 19.36,
+  "lon": -155.21,
+  "body": "moon",
+  "basis": "NASA BASALT / FINESSE EVA science tests",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "HI-SEAS, Mauna Loa, HI",
+  "lat": 19.6,
+  "lon": -155.48,
+  "body": "moon",
+  "basis": "Habitat and mission-simulation analog",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Timanfaya, Lanzarote",
+  "lat": 29.0,
+  "lon": -13.75,
+  "body": "moon",
+  "basis": "ESA PANGAEA training; CanMoon rover mission",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Nordlinger Ries, Germany",
+  "lat": 48.88,
+  "lon": 10.56,
+  "body": "moon",
+  "basis": "Apollo 14 and ESA PANGAEA impact-geology training",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Sudbury Basin, ON",
+  "lat": 46.6,
+  "lon": -81.18,
+  "body": "moon",
+  "basis": "Apollo crew impact-geology training",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Sierra del Pinacate, Mexico",
+  "lat": 31.77,
+  "lon": -113.5,
+  "body": "moon",
+  "basis": "Apollo crew training in volcanic craters",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Medicine Lake / Lava Beds, CA",
+  "lat": 41.71,
+  "lon": -121.51,
+  "body": "moon",
+  "basis": "Apollo-era training on lava flows",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Lava Butte / Newberry, Bend OR",
+  "lat": 43.92,
+  "lon": -121.36,
+  "body": "moon",
+  "basis": "Apollo crew training on volcanic terrain",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Rio Grande Gorge, NM",
+  "lat": 36.47,
+  "lon": -105.73,
+  "body": "moon",
+  "basis": "Apollo 15 training (Hadley Rille analog)",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Orocopia Mountains, CA",
+  "lat": 33.55,
+  "lon": -115.85,
+  "body": "moon",
+  "basis": "Apollo 15/17 crew geology training",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Moses Lake sand dunes, WA",
+  "lat": 46.98,
+  "lon": -119.27,
+  "body": "moon",
+  "basis": "NASA Desert RATS 2008 rover tests",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Mistastin Lake crater, Labrador",
+  "lat": 55.88,
+  "lon": -63.31,
+  "body": "moon",
+  "basis": "Anorthosite impact crater; NASA FINESSE lunar analog",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Lonar crater, India",
+  "lat": 19.98,
+  "lon": 76.51,
+  "body": "moon",
+  "basis": "Basalt-hosted impact crater, lunar analog literature",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Kamil crater, Egypt",
+  "lat": 22.02,
+  "lon": 26.09,
+  "body": "moon",
+  "basis": "Fresh small impact crater, ejecta studies",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Lofoten anorthosite, Norway",
+  "lat": 68.2,
+  "lon": 13.9,
+  "body": "moon",
+  "basis": "ESA PANGAEA lunar highland anorthosite",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Bletterbach, Italy",
+  "lat": 46.35,
+  "lon": 11.43,
+  "body": "mars",
+  "basis": "ESA PANGAEA sedimentary geology training",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "JSC Rock Yard, TX",
+  "lat": 29.56,
+  "lon": -95.09,
+  "body": "moon",
+  "basis": "NASA JSC surface-ops test yard",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Ubehebe crater, Death Valley CA",
+  "lat": 37.01,
+  "lon": -117.45,
+  "body": "mars",
+  "basis": "Named in challenge text; volcanic/arid analog",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Mars Desert Research Station, UT",
+  "lat": 38.41,
+  "lon": -110.79,
+  "body": "mars",
+  "basis": "Habitat simulation analog",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Atacama (Yungay), Chile",
+  "lat": -24.08,
+  "lon": -70.01,
+  "body": "mars",
+  "basis": "Hyperarid Mars soil and rover tests",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Rio Tinto, Spain",
+  "lat": 37.7,
+  "lon": -6.55,
+  "body": "mars",
+  "basis": "Acidic iron-rich Mars analog",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Haughton crater, Devon Island",
+  "lat": 75.38,
+  "lon": -89.68,
+  "body": "moon",
+  "basis": "Haughton-Mars Project crater, rover and EVA tests",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Axel Heiberg Island",
+  "lat": 79.43,
+  "lon": -90.77,
+  "body": "mars",
+  "basis": "Cold springs and permafrost",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "McMurdo Dry Valleys",
+  "lat": -77.5,
+  "lon": 162.0,
+  "body": "mars",
+  "basis": "Cold dry polar desert",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Svalbard (Bockfjorden)",
+  "lat": 79.42,
+  "lon": 13.33,
+  "body": "mars",
+  "basis": "AMASE volcanic and ice analog",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Askja, Iceland",
+  "lat": 65.05,
+  "lon": -16.75,
+  "body": "moon",
+  "basis": "Apollo crew geology training (volcanic)",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Valley of Ten Thousand Smokes, Katmai AK",
+  "lat": 58.37,
+  "lon": -155.25,
+  "body": "moon",
+  "basis": "Apollo crew training 1965-66; NASA Goddard field work 2024",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Eureka, Ellesmere Island",
+  "lat": 79.99,
+  "lon": -85.94,
+  "body": "mars",
+  "basis": "NASA-listed astrobiology drill and permafrost tests",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Moriusaq (LUNARK habitat), Greenland",
+  "lat": 76.75,
+  "lon": -69.9,
+  "body": "moon",
+  "basis": "LUNARK lunar habitat test 2020",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Nuussuaq impact spherule bed, Greenland",
+  "lat": 70.55,
+  "lon": -53.2,
+  "body": "",
+  "basis": "Impact deposit listed in the Impact Earth layer of TADP",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Pozo Bravo, Salar de Antofalla, Argentina",
+  "lat": -25.55,
+  "lon": -67.65,
+  "body": "mars",
+  "basis": "Microbialite early-Mars analog",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Puga / Chumathang, Ladakh",
+  "lat": 33.22,
+  "lon": 78.33,
+  "body": "mars",
+  "basis": "Ladakh Mars analog sites (Pandey et al. 2019)",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Tso Kar, Ladakh",
+  "lat": 33.3,
+  "lon": 77.98,
+  "body": "mars",
+  "basis": "ISRO HOPE analog / Tso Kar GPR studies",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Grottedal caves, NE Greenland",
+  "lat": 80.38,
+  "lon": -21.64,
+  "body": "mars",
+  "basis": "Cave Mars-analog study (Barton et al. 2020)",
+  "catalog": "NASA/ESA/literature field site"
+ },
+ {
+  "name": "Pisgah Lava Flow",
+  "lat": 34.7412,
+  "lon": -116.374,
+  "body": "",
+  "basis": "Volcanic analog",
+  "catalog": "USGS TADP"
+ },
+ {
+  "name": "Holuhraun Lava Flow",
+  "lat": 64.9282,
+  "lon": -16.5217,
+  "body": "",
+  "basis": "Volcanic analog",
+  "catalog": "USGS TADP"
+ },
+ {
+  "name": "Oskjuvatn",
+  "lat": 65.01,
+  "lon": -16.71,
+  "body": "",
+  "basis": "Volcanic analog",
+  "catalog": "USGS TADP"
+ },
+ {
+  "name": "Baugur",
+  "lat": 64.85942,
+  "lon": -16.85907,
+  "body": "",
+  "basis": "Volcanic analog",
+  "catalog": "USGS TADP"
+ },
+ {
+  "name": "Algodones Dunes, USA",
+  "lat": 32.929,
+  "lon": -115.064,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Gran Desierto, Mexico",
+  "lat": 32.0,
+  "lon": -114.3,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Salton Sea, USA",
+  "lat": 33.1837,
+  "lon": -115.8542,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Bristol/Palen, USA",
+  "lat": 33.7564,
+  "lon": -115.2434,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Cactus Plain, USA",
+  "lat": 34.0513,
+  "lon": -113.9807,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Cady Mtns./Kelso, USA",
+  "lat": 34.9101,
+  "lon": -115.7325,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Dumont, USA",
+  "lat": 35.6861,
+  "lon": -116.2168,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Ibex, USA",
+  "lat": 35.6966,
+  "lon": -116.3679,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Eureka, USA",
+  "lat": 37.0843,
+  "lon": -119.6784,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Big Dune, USA",
+  "lat": 36.6471,
+  "lon": -116.5842,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Clayton Valley, USA",
+  "lat": 37.6583,
+  "lon": -117.6272,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Sand Mtn., USA",
+  "lat": 39.3124,
+  "lon": -118.3982,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Winnemucca, USA",
+  "lat": 41.0974,
+  "lon": -117.9092,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Little Sahara, USA",
+  "lat": 39.699,
+  "lon": -112.3902,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Coral Pink, USA",
+  "lat": 37.052,
+  "lon": -112.7092,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Navajo, USA",
+  "lat": 36.5692,
+  "lon": -109.7416,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "White Sands, USA",
+  "lat": 32.9027,
+  "lon": -106.2674,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Great Sand Dunes, USA",
+  "lat": 37.7767,
+  "lon": -105.5447,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Killpecker, USA",
+  "lat": 41.9744,
+  "lon": -109.0833,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "St. Anthony dune field, USA",
+  "lat": 44.0,
+  "lon": -111.8,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Bruneau, USA",
+  "lat": 42.8888,
+  "lon": -115.6943,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Shifting Sands dune field/Christmas Valley sand dunes, USA",
+  "lat": 43.3297,
+  "lon": -120.3784,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Moses Lake dune field, USA",
+  "lat": 47.0498,
+  "lon": -119.3099,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Lut desert, Iran",
+  "lat": 30.4246,
+  "lon": 58.8358,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Campo Piedra Pomez (CPP), Argentina",
+  "lat": -26.6049,
+  "lon": -67.581,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Laguna Purulla (LP) field, Argentina",
+  "lat": -26.6629,
+  "lon": -67.816,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Campo Purulla (CP) field, Argentina",
+  "lat": -26.6199,
+  "lon": -67.767,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Salar de Incahuasi (SI) field, Argentina",
+  "lat": -26.5309,
+  "lon": -67.6941,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "White Barchan field, Argentina",
+  "lat": -26.5588,
+  "lon": -67.4461,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Sigatoka Dune, Fiji",
+  "lat": -18.17,
+  "lon": 177.5,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Wright Valley, Antarctica",
+  "lat": -77.5599,
+  "lon": 161.8502,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Nahal Kasuy mega-ripple field, Israel",
+  "lat": 29.9767,
+  "lon": 34.9855,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Kumtagh Desert, China",
+  "lat": 40.0605,
+  "lon": 92.4302,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Sanlongsha dune field, China",
+  "lat": 40.5214,
+  "lon": 92.903,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Northern Alxa Plateau dune field, China",
+  "lat": 40.603,
+  "lon": 104.6394,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Grand Falls dune field, USA",
+  "lat": 35.4316,
+  "lon": -111.1673,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Barchan dune field, Qatar",
+  "lat": 24.91,
+  "lon": 51.3696,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Victoria Valley dune field, Antarctica",
+  "lat": -77.3705,
+  "lon": 162.2057,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Ferris dune field, USA",
+  "lat": 42.2002,
+  "lon": -107.2101,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Simpson dune field, Australia",
+  "lat": -25.7029,
+  "lon": 138.866,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Dyngjusandur, Iceland",
+  "lat": 64.9405,
+  "lon": -16.6893,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Lambahraun, Iceland",
+  "lat": 64.4418,
+  "lon": -20.4442,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Badain Jaran Sand Sea, China",
+  "lat": 40.4295,
+  "lon": 102.0982,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Ojos del Salado inactive volcano, Chile-Argentina border",
+  "lat": -27.1085,
+  "lon": -68.539,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ },
+ {
+  "name": "Ka'u Desert, USA",
+  "lat": 19.353,
+  "lon": -155.3238,
+  "body": "mars",
+  "basis": "Aeolian analog",
+  "catalog": "USGS PAAD"
+ }
+]
