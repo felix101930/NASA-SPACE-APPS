@@ -203,7 +203,19 @@ The search is Moon-first, global and in two stages.
 - **ShadowAstra:** works at a coarse 55 km scale.
 - **Only rival with rock type:** Max1-CE.
 
-## Failure facts: safe wording for the pitch
+## Failure facts: FINAL stage wording (triple-checked 2026-11-14; supersedes the list below)
+- **Hakuto-R M1:** "Hakuto-R crossed a crater-rim cliff about 3 km high. Its software rejected the sudden altitude jump as a sensor error and estimated it was on the surface while still about 5 km up."
+  - Source: ispace, 26 May 2023, https://www.ispace-inc.com/2023/05/26/ispace-announces-results-of-the-hakuto-r-mission-1-lunar-landing/. We read the page directly and its wording matches.
+- **IM-2 Athena:** "Intuitive Machines' CEO said altimeter signal noise, long shadows from low-angle sunlight, and navigation imagery taken from 100 km that didn't match how craters look lower down all contributed."
+  - Source: IM Q1 2025 earnings call, 13 May 2025, as reported by The Register and Spaceflight Now (14 May 2025).
+  - This is the company's own account. No NASA or independent root-cause report has been published. IM's 8-K and 10-Q give no cause.
+- **Ingenuity Flight 72:** "NASA's most likely explanation is that a lack of surface texture over steep, relatively featureless sand ripples gave Ingenuity's navigation system too little information to work with."
+  - Source: NASA JPL, 11 Dec 2024. Keep the "most likely" hedge.
+- **Heading:** "Three missions where terrain and lighting fooled the navigation".
+  - Do not say "Why these four", because there are three missions.
+  - Do not include ispace Mission 2 (2025, laser rangefinder hardware) or IM-1 (2024, a safety switch not enabled) under this heading. Neither was a terrain failure.
+
+## Failure facts: safe wording for the pitch (earlier draft)
 - **Hakuto-R** ([ispace, 2023-05-26](https://www.ispace-inc.com/2023/05/26/ispace-announces-results-of-the-hakuto-r-mission-1-lunar-landing/)): the lander passed over a crater-rim cliff about 3 km high. Its software rejected the altitude jump as a sensor error, so it thought it had landed while still about 5 km up.
 - **IM-2:** "IM said on its May 2025 earnings call" that altimeter noise and long low-sun shadows contributed. Its optical navigation used reference imagery from about 100 km up, which did not show how craters look at low altitude. Source: The Register, 2025-05-14. No primary source has been found.
 - **Ingenuity** ([JPL, 2024-12-11](https://www.jpl.nasa.gov/news/nasa-performs-first-aircraft-accident-investigation-on-another-world/)): "Lack of surface texture gave the navigation system too little information to work with". The release describes "steep, relatively featureless sand ripples".
