@@ -5,6 +5,7 @@ import type { HazardId } from '../types/contract';
 import { HazardGlyph } from '../components/Glyphs';
 import { Explainer } from '../components/explainer/Explainer';
 import { LanderTally } from '../components/LanderTally';
+import { ImpactPanel } from '../components/ImpactPanel';
 
 /** Schematic drawings, explicitly not to scale. */
 function Diagram({ hazard }: { hazard: HazardId }): JSX.Element {
@@ -172,6 +173,8 @@ export function Story(): JSX.Element {
         <HazardGlyph hazard="slope" />
         {FOURTH_MEASURE}
       </p>
+
+      <ImpactPanel />
 
       <Explainer />
 

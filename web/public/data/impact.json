@@ -1,0 +1,2450 @@
+{
+ "meta": {
+  "generated_utc": "2026-11-14T22:19:06Z",
+  "pipeline_version": "impact-0.1.0",
+  "checked": "2026-11-14",
+  "kinds": {
+   "sourced": "copied from the cited source",
+   "computed": "computed from our data and a cited factor",
+   "estimate": "order-of-magnitude estimate; formula shown"
+  },
+  "sources": [
+   {
+    "name": "NASA OIG, Audit of NASA's Commercial Lunar Payload Services Initiative (IG-24-013, 6 June 2024), Table 2",
+    "url": "https://oig.nasa.gov/wp-content/uploads/2024/06/final-report-ig-24-013-nasas-commercial-lunar-payload-services-initiative.pdf"
+   },
+   {
+    "name": "UK DESNZ 2026 GHG conversion factors (flat file v1.2): Business travel - air, International to/from non-UK, Economy class, kg CO2e per passenger-km",
+    "url": "https://assets.publishing.service.gov.uk/media/6a6c9748862aaf18d9c62ac9/ghg-conversion-factors-2026-flat-format-revised.xlsx"
+   },
+   {
+    "name": "DESNZ 2026 methodology paper, para 8.38 (8% great-circle uplift already applied)",
+    "url": "https://assets.publishing.service.gov.uk/media/6a2940543b15d05a7ce3202e/2026-GHG-conversion-factors-methodology-report.pdf"
+   },
+   {
+    "name": "GSA per diem FY2026",
+    "url": "https://www.gsa.gov/policy-regulations/regulations/federal-travel-regulation/ftr-and-related-files/gsa-per-diem-bulletin-ftr-2601"
+   },
+   {
+    "name": "NASA CLPS overview",
+    "url": "https://www.nasa.gov/commercial-lunar-payload-services/"
+   },
+   {
+    "name": "ESA WorldCover 10 m 2021 v200",
+    "url": "https://doi.org/10.5281/zenodo.7254221"
+   }
+  ]
+ },
+ "headline": [
+  {
+   "id": "at_stake",
+   "kind": "sourced",
+   "value": 172,
+   "prefix": "$",
+   "unit": "M",
+   "label": "of NASA lander contracts ended on their side",
+   "how": [
+    "IM-1 Odysseus $122M + IM-2 Athena $50M: NASA CLPS task-order values as of Feb 2024.",
+    "Both touched down, then tipped. IM-2 came to rest inside a crater near Mons Mouton.",
+    "Peregrine ($108M) is left out: it never tried to land."
+   ],
+   "formula": "122.0 + 50.0 = 172.0 ($ millions)",
+   "sources": [
+    {
+     "name": "NASA OIG, Audit of NASA's Commercial Lunar Payload Services Initiative (IG-24-013, 6 June 2024), Table 2",
+     "url": "https://oig.nasa.gov/wp-content/uploads/2024/06/final-report-ig-24-013-nasas-commercial-lunar-payload-services-initiative.pdf"
+    },
+    {
+     "name": "NASA release on IM-2 (on its side, inside a crater)",
+     "url": "https://www.nasa.gov/news-release/nasa-receives-some-data-before-intuitive-machines-ends-lunar-mission/"
+    }
+   ]
+  },
+  {
+   "id": "field_week",
+   "kind": "estimate",
+   "value": 12.5,
+   "prefix": "~$",
+   "unit": "k",
+   "label": "for a 10-person field week on Earth",
+   "how": [
+    "Lodging and meals only, at US federal per-diem rates. No airfare, vehicles, gear or salaries.",
+    "Even at 10× that, it is about 0.25% of the smaller of the two contracts above.",
+    "No published cost found for NASA terrain/landing field campaigns (Desert RATS, JETT, Mars 2020 Lander Vision System field tests, Flight Opportunities terrain-navigation flights)."
+   ],
+   "formula": "10 people × 7 days × ($110 + $68) = $12,460",
+   "sources": [
+    {
+     "name": "GSA FY2026 per diem bulletin FTR 26-01 (standard CONUS rate)",
+     "url": "https://www.gsa.gov/policy-regulations/regulations/federal-travel-regulation/ftr-and-related-files/gsa-per-diem-bulletin-ftr-2601"
+    }
+   ]
+  },
+  {
+   "id": "co2_saved",
+   "kind": "computed",
+   "value": 8.9,
+   "prefix": "",
+   "unit": "t CO₂e",
+   "label": "less per team trip by flying to the nearest top-3 match",
+   "how": [
+    "From Calgary, 10 people, round trip. Average over all 27 region × hazard rehearsals: nearest of our top 3 matches vs the farthest.",
+    "Nearest averages 15.1 t, farthest 24.0 t. The nearest is also the #1 match in 8 of 27; otherwise you trade a little fit for less travel.",
+    "Straight-line distance (real routes emit more). Includes contrail warming (radiative forcing); without it, multiply by 0.59."
+   ],
+   "formula": "saving = (km_far − km_near) × 2 × 0.10916 kg/pkm × 10",
+   "sources": [
+    {
+     "name": "UK DESNZ 2026 GHG conversion factors (flat file v1.2): Business travel - air, International to/from non-UK, Economy class, kg CO2e per passenger-km",
+     "url": "https://assets.publishing.service.gov.uk/media/6a6c9748862aaf18d9c62ac9/ghg-conversion-factors-2026-flat-format-revised.xlsx"
+    },
+    {
+     "name": "DESNZ 2026 methodology paper, para 8.38 (8% great-circle uplift already applied)",
+     "url": "https://assets.publishing.service.gov.uk/media/6a2940543b15d05a7ce3202e/2026-GHG-conversion-factors-methodology-report.pdf"
+    }
+   ]
+  },
+  {
+   "id": "open_ground",
+   "kind": "computed",
+   "value": 57,
+   "prefix": "",
+   "unit": "/ 57",
+   "label": "matched sites are open ground, not forest or wetland",
+   "how": [
+    "Trees ≤ 10% and wetland ≤ 10% of the 15 km site (ESA WorldCover 2021). Median tree cover: 0%.",
+    "Our filter keeps trees out so the elevation model sees bare ground; the low footprint is a side effect.",
+    "Protected areas are not checked. Check protectedplanet.net and local permits first."
+   ],
+   "formula": "count(tree ≤ 0.10 and wetland + mangrove ≤ 0.10) over sites in any top 3",
+   "sources": [
+    {
+     "name": "ESA WorldCover 10 m 2021 v200",
+     "url": "https://doi.org/10.5281/zenodo.7254221"
+    },
+    {
+     "name": "World Database on Protected Areas",
+     "url": "https://www.protectedplanet.net/"
+    }
+   ]
+  }
+ ],
+ "money": [
+  {
+   "id": "im1",
+   "item": "IM-1 Odysseus (Intuitive Machines) CLPS task orders",
+   "value_usd": 122000000.0,
+   "year": 2024,
+   "outcome": "Landed Feb 2024, tipped onto its side",
+   "outcome_class": "on_side",
+   "nasa_clps": true,
+   "source": "https://oig.nasa.gov/wp-content/uploads/2024/06/final-report-ig-24-013-nasas-commercial-lunar-payload-services-initiative.pdf",
+   "source_name": "NASA OIG, Audit of NASA's Commercial Lunar Payload Services Initiative (IG-24-013, 6 June 2024), Table 2",
+   "quote": "Nova-C lander, successfully landed on the lunar surface but tipped over onto its side.",
+   "note": "Value as of Feb 2024 (initial $81.7M; includes two add-on task orders). NASA's 2019 award release said $77M."
+  },
+  {
+   "id": "im2",
+   "item": "IM-2 Athena / PRIME-1 (Intuitive Machines) CLPS task order",
+   "value_usd": 50000000.0,
+   "year": 2024,
+   "outcome": "Landed Mar 2025 inside a crater near Mons Mouton, on its side",
+   "outcome_class": "on_side",
+   "nasa_clps": true,
+   "source": "https://oig.nasa.gov/wp-content/uploads/2024/06/final-report-ig-24-013-nasas-commercial-lunar-payload-services-initiative.pdf",
+   "source_name": "NASA OIG, Audit of NASA's Commercial Lunar Payload Services Initiative (IG-24-013, 6 June 2024), Table 2",
+   "outcome_source": "https://www.nasa.gov/news-release/nasa-receives-some-data-before-intuitive-machines-ends-lunar-mission/",
+   "quote": "Shortly after touching down inside a crater on the Moon ... images collected later confirmed the lander was on its side",
+   "note": "Value as of Feb 2024 (initial $47.0M). Mons Mouton is one of the nine Artemis III regions this app matches."
+  },
+  {
+   "id": "bg1",
+   "item": "Blue Ghost Mission 1 (Firefly) CLPS task order",
+   "value_usd": 101500000.0,
+   "year": 2024,
+   "outcome": "Landed upright, Mar 2025",
+   "outcome_class": "upright",
+   "nasa_clps": true,
+   "source": "https://oig.nasa.gov/wp-content/uploads/2024/06/final-report-ig-24-013-nasas-commercial-lunar-payload-services-initiative.pdf",
+   "source_name": "NASA OIG, Audit of NASA's Commercial Lunar Payload Services Initiative (IG-24-013, 6 June 2024), Table 2",
+   "outcome_source": "https://www.nasa.gov/news-release/touchdown-carrying-nasa-science-fireflys-blue-ghost-lands-on-moon/",
+   "quote": "in an upright and stable configuration",
+   "note": "Value as of Feb 2024 (initial $93.3M)."
+  },
+  {
+   "id": "pm1",
+   "item": "Peregrine Mission One (Astrobotic) CLPS task order",
+   "value_usd": 107900000.0,
+   "year": 2024,
+   "outcome": "Propellant leak in space; never attempted a landing",
+   "outcome_class": "no_landing",
+   "nasa_clps": true,
+   "source": "https://oig.nasa.gov/wp-content/uploads/2024/06/final-report-ig-24-013-nasas-commercial-lunar-payload-services-initiative.pdf",
+   "source_name": "NASA OIG, Audit of NASA's Commercial Lunar Payload Services Initiative (IG-24-013, 6 June 2024), Table 2",
+   "outcome_source": "https://www.astrobotic.com/wp-content/uploads/2024/08/PM1_Post-Mission-Report_Website.pdf",
+   "quote": "failure of a singular helium pressure control valve, called PCV2",
+   "note": "Not a terrain failure: excluded from the landing-hazard total. Shown for completeness."
+  },
+  {
+   "id": "viper",
+   "item": "VIPER rover project (cancelled Jul 2024)",
+   "value_usd": 505400000.0,
+   "year": 2024,
+   "outcome": "Cancelled before flight",
+   "outcome_class": "context",
+   "nasa_clps": false,
+   "source": "https://oig.nasa.gov/wp-content/uploads/2024/06/final-report-ig-24-013-nasas-commercial-lunar-payload-services-initiative.pdf",
+   "source_name": "NASA OIG IG-24-013",
+   "quote": "NASA's $505.4-million Volatiles Investigating Polar Exploration Rover (VIPER)",
+   "note": "Context only: the kind of south-pole payload a landing has to deliver intact. Griffin delivery task order was $322.8M (Feb 2024)."
+  },
+  {
+   "id": "clps_cap",
+   "item": "CLPS contract maximum value through Nov 2028",
+   "value_usd": 2600000000.0,
+   "year": 2028,
+   "outcome": "Context",
+   "outcome_class": "context",
+   "nasa_clps": true,
+   "source": "https://www.nasa.gov/commercial-lunar-payload-services/",
+   "source_name": "NASA CLPS overview",
+   "quote": "combined maximum contract value of $2.6 billion through November 2028",
+   "note": "OIG: delivery task orders grew from $781.4M to $984.3M by Feb 2024; NASA had paid $673M."
+  },
+  {
+   "id": "ispace_m1_ins",
+   "item": "ispace Hakuto-R Mission 1 insurance income",
+   "value_jpy": 3793000000.0,
+   "value_usd": null,
+   "year": 2024,
+   "outcome": "Crashed Apr 2023: altitude estimate went wrong after passing a ~3 km crater rim",
+   "outcome_class": "crashed",
+   "nasa_clps": false,
+   "source": "https://www.ispace-inc.com/2024/11/12/ispace-reports-q2-financial-results-for-fy-ending-march-2025-and-mission-2-launch-scheduled-no-earlier-than-jan-2025/",
+   "outcome_source": "https://www.ispace-inc.com/2023/05/26/ispace-announces-results-of-the-hakuto-r-mission-1-lunar-landing/",
+   "source_name": "ispace Q2 FY2025 results",
+   "quote": "recorded lunar insurance of ¥3,793MM in the extraordinary income",
+   "note": "Reported in yen; not converted. No official mission cost published."
+  },
+  {
+   "id": "ispace_m2",
+   "item": "ispace Mission 2 'Resilience': fix for Missions 3-4",
+   "value_jpy": 1500000000.0,
+   "value_usd": null,
+   "year": 2025,
+   "outcome": "Crashed Jun 2025: laser range finder anomaly (hard landing)",
+   "outcome_class": "crashed",
+   "nasa_clps": false,
+   "source": "https://www.ispace-inc.com/2025/06/24/ispace-releases-technical-cause-analysis-for-hakuto-r-mission-2/",
+   "source_name": "ispace technical cause analysis, Mission 2",
+   "quote": "increase combined development costs by a maximum of approximately 1.5 billion yen",
+   "note": "Insurance did not pay out for Mission 2 (ispace Q1 FY2027 results). Yen, not converted."
+  }
+ ],
+ "testing_cost": {
+  "published": null,
+  "not_found": "No published cost found for NASA terrain/landing field campaigns (Desert RATS, JETT, Mars 2020 Lander Vision System field tests, Flight Opportunities terrain-navigation flights).",
+  "context": {
+   "item": "Astrobotic terrain-relative navigation sensor, development incl. tests (NASA Tipping Point)",
+   "value_usd": 10000000.0,
+   "source": "https://www.astrobotic.com/lunar-delivery/manifest/",
+   "quote": "developed under a $10 million NASA Tipping Point contract",
+   "note": "A whole sensor development programme, not a field week; shown as an upper bound on scale."
+  },
+  "estimate": {
+   "value_usd": 12460,
+   "kind": "estimate",
+   "people": 10,
+   "days": 7,
+   "lodging_usd": 110,
+   "mie_usd": 68,
+   "formula": "10 people × 7 days × ($110 + $68) = $12,460",
+   "excludes": "airfare, vehicles, equipment, salaries",
+   "source": "https://www.gsa.gov/policy-regulations/regulations/federal-travel-regulation/ftr-and-related-files/gsa-per-diem-bulletin-ftr-2601"
+  },
+  "ratio_contract_to_week": 4013
+ },
+ "co2": {
+  "factor_kg_per_pkm": 0.10916,
+  "factor_no_rf_kg_per_pkm": 0.06449,
+  "factor_source": {
+   "name": "UK DESNZ 2026 GHG conversion factors (flat file v1.2): Business travel - air, International to/from non-UK, Economy class, kg CO2e per passenger-km",
+   "url": "https://assets.publishing.service.gov.uk/media/6a6c9748862aaf18d9c62ac9/ghg-conversion-factors-2026-flat-format-revised.xlsx"
+  },
+  "method_source": {
+   "name": "DESNZ 2026 methodology paper, para 8.38 (8% great-circle uplift already applied)",
+   "url": "https://assets.publishing.service.gov.uk/media/6a2940543b15d05a7ce3202e/2026-GHG-conversion-factors-methodology-report.pdf"
+  },
+  "formula": "kg CO2e per person = great-circle km × 2 (round trip) × factor",
+  "distance": "haversine, mean Earth radius 6371.0088 km; no extra uplift (8% is inside the factor)",
+  "bases": {
+   "calgary": {
+    "name": "Calgary",
+    "lat": 51.05,
+    "lon": -114.07
+   },
+   "houston_jsc": {
+    "name": "Houston (NASA JSC)",
+    "lat": 29.56,
+    "lon": -95.09
+   }
+  },
+  "team_size": 10,
+  "limits": [
+   "Straight-line distance; connecting flights and ground legs add emissions.",
+   "One average factor for all flight lengths; short flights emit more per km."
+  ],
+  "per_region": [
+   {
+    "region_id": "cabeus_b_peak",
+    "region_name": "Peak near Cabeus B",
+    "hazard": "rim",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00050",
+       "site_name": "20 km S of Hirna",
+       "country": "Ethiopia",
+       "match_distance": 0.5128,
+       "gc_km": 12918.4,
+       "kg_co2e_pp": 2820.3,
+       "kg_co2e_pp_no_rf": 1666.2
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00103",
+       "site_name": "159 km E of Talnakh",
+       "country": "Russia",
+       "match_distance": 0.5828,
+       "gc_km": 6463.0,
+       "kg_co2e_pp": 1411.0,
+       "kg_co2e_pp_no_rf": 833.6
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00050",
+       "site_name": "20 km S of Hirna",
+       "country": "Ethiopia",
+       "match_distance": 0.5128,
+       "gc_km": 12918.4,
+       "kg_co2e_pp": 2820.3,
+       "kg_co2e_pp_no_rf": 1666.2
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 14.09,
+      "team_saving_t_vs_rank1": 14.09
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00050",
+       "site_name": "20 km S of Hirna",
+       "country": "Ethiopia",
+       "match_distance": 0.5128,
+       "gc_km": 13658.7,
+       "kg_co2e_pp": 2982.0,
+       "kg_co2e_pp_no_rf": 1761.7
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00071",
+       "site_name": "77 km S of Antofagasta",
+       "country": "Chile",
+       "match_distance": 0.5808,
+       "gc_km": 6549.4,
+       "kg_co2e_pp": 1429.9,
+       "kg_co2e_pp_no_rf": 844.7
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00050",
+       "site_name": "20 km S of Hirna",
+       "country": "Ethiopia",
+       "match_distance": 0.5128,
+       "gc_km": 13658.7,
+       "kg_co2e_pp": 2982.0,
+       "kg_co2e_pp_no_rf": 1761.7
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 15.52,
+      "team_saving_t_vs_rank1": 15.52
+     }
+    }
+   },
+   {
+    "region_id": "cabeus_b_peak",
+    "region_name": "Peak near Cabeus B",
+    "hazard": "shadow",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00030",
+       "site_name": "114 km SW of Mangnai Zhen",
+       "country": "People's Republic of China",
+       "match_distance": 2.1691,
+       "gc_km": 9891.4,
+       "kg_co2e_pp": 2159.5,
+       "kg_co2e_pp_no_rf": 1275.8
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00097",
+       "site_name": "82 km S of Andamarca",
+       "country": "Bolivia",
+       "match_distance": 2.2237,
+       "gc_km": 9056.9,
+       "kg_co2e_pp": 1977.3,
+       "kg_co2e_pp_no_rf": 1168.2
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00030",
+       "site_name": "114 km SW of Mangnai Zhen",
+       "country": "People's Republic of China",
+       "match_distance": 2.1691,
+       "gc_km": 9891.4,
+       "kg_co2e_pp": 2159.5,
+       "kg_co2e_pp_no_rf": 1275.8
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 1.82,
+      "team_saving_t_vs_rank1": 1.82
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00030",
+       "site_name": "114 km SW of Mangnai Zhen",
+       "country": "People's Republic of China",
+       "match_distance": 2.1691,
+       "gc_km": 12525.9,
+       "kg_co2e_pp": 2734.6,
+       "kg_co2e_pp_no_rf": 1615.6
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00097",
+       "site_name": "82 km S of Andamarca",
+       "country": "Bolivia",
+       "match_distance": 2.2237,
+       "gc_km": 6199.1,
+       "kg_co2e_pp": 1353.4,
+       "kg_co2e_pp_no_rf": 799.6
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00030",
+       "site_name": "114 km SW of Mangnai Zhen",
+       "country": "People's Republic of China",
+       "match_distance": 2.1691,
+       "gc_km": 12525.9,
+       "kg_co2e_pp": 2734.6,
+       "kg_co2e_pp_no_rf": 1615.6
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 13.81,
+      "team_saving_t_vs_rank1": 13.81
+     }
+    }
+   },
+   {
+    "region_id": "cabeus_b_peak",
+    "region_name": "Peak near Cabeus B",
+    "hazard": "texture",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00038",
+       "site_name": "52 km E of Dzuunmod",
+       "country": "Mongolia",
+       "match_distance": 0.0627,
+       "gc_km": 8567.3,
+       "kg_co2e_pp": 1870.4,
+       "kg_co2e_pp_no_rf": 1105.0
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00108",
+       "site_name": "7 km W of Cullhuas",
+       "country": "Peru",
+       "match_distance": 0.0711,
+       "gc_km": 7975.4,
+       "kg_co2e_pp": 1741.2,
+       "kg_co2e_pp_no_rf": 1028.7
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00133",
+       "site_name": "49 km W of Muxihe",
+       "country": "People's Republic of China",
+       "match_distance": 0.0786,
+       "gc_km": 9973.7,
+       "kg_co2e_pp": 2177.4,
+       "kg_co2e_pp_no_rf": 1286.4
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 4.36,
+      "team_saving_t_vs_rank1": 1.29
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00038",
+       "site_name": "52 km E of Dzuunmod",
+       "country": "Mongolia",
+       "match_distance": 0.0627,
+       "gc_km": 11275.1,
+       "kg_co2e_pp": 2461.6,
+       "kg_co2e_pp_no_rf": 1454.3
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00108",
+       "site_name": "7 km W of Cullhuas",
+       "country": "Peru",
+       "match_distance": 0.0711,
+       "gc_km": 5113.1,
+       "kg_co2e_pp": 1116.3,
+       "kg_co2e_pp_no_rf": 659.5
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00133",
+       "site_name": "49 km W of Muxihe",
+       "country": "People's Republic of China",
+       "match_distance": 0.0786,
+       "gc_km": 12765.3,
+       "kg_co2e_pp": 2786.9,
+       "kg_co2e_pp_no_rf": 1646.5
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 16.71,
+      "team_saving_t_vs_rank1": 13.45
+     }
+    }
+   },
+   {
+    "region_id": "de_gerlache_rim_2",
+    "region_name": "de Gerlache Rim 2",
+    "hazard": "rim",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00174",
+       "site_name": "8 km SE of Poopo",
+       "country": "Bolivia",
+       "match_distance": 0.3183,
+       "gc_km": 8984.5,
+       "kg_co2e_pp": 1961.5,
+       "kg_co2e_pp_no_rf": 1158.8
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00123",
+       "site_name": "12 km SW of Pucara",
+       "country": "Peru",
+       "match_distance": 0.3483,
+       "gc_km": 8527.4,
+       "kg_co2e_pp": 1861.7,
+       "kg_co2e_pp_no_rf": 1099.9
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00149",
+       "site_name": "21 km NW of Mukalla",
+       "country": "Yemen",
+       "match_distance": 0.3447,
+       "gc_km": 12527.1,
+       "kg_co2e_pp": 2734.9,
+       "kg_co2e_pp_no_rf": 1615.7
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 8.73,
+      "team_saving_t_vs_rank1": 1.0
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00174",
+       "site_name": "8 km SE of Poopo",
+       "country": "Bolivia",
+       "match_distance": 0.3183,
+       "gc_km": 6130.8,
+       "kg_co2e_pp": 1338.5,
+       "kg_co2e_pp_no_rf": 790.8
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00123",
+       "site_name": "12 km SW of Pucara",
+       "country": "Peru",
+       "match_distance": 0.3483,
+       "gc_km": 5665.7,
+       "kg_co2e_pp": 1236.9,
+       "kg_co2e_pp_no_rf": 730.8
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00149",
+       "site_name": "21 km NW of Mukalla",
+       "country": "Yemen",
+       "match_distance": 0.3447,
+       "gc_km": 13768.4,
+       "kg_co2e_pp": 3005.9,
+       "kg_co2e_pp_no_rf": 1775.8
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 17.69,
+      "team_saving_t_vs_rank1": 1.02
+     }
+    }
+   },
+   {
+    "region_id": "de_gerlache_rim_2",
+    "region_name": "de Gerlache Rim 2",
+    "hazard": "shadow",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00030",
+       "site_name": "114 km SW of Mangnai Zhen",
+       "country": "People's Republic of China",
+       "match_distance": 0.4775,
+       "gc_km": 9891.4,
+       "kg_co2e_pp": 2159.5,
+       "kg_co2e_pp_no_rf": 1275.8
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00017",
+       "site_name": "87 km NW of Delta",
+       "country": "United States of America",
+       "match_distance": 0.8559,
+       "gc_km": 1255.0,
+       "kg_co2e_pp": 274.0,
+       "kg_co2e_pp_no_rf": 161.9
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00042",
+       "site_name": "89 km S of Qiongkulecun",
+       "country": "People's Republic of China",
+       "match_distance": 0.8851,
+       "gc_km": 10009.3,
+       "kg_co2e_pp": 2185.2,
+       "kg_co2e_pp_no_rf": 1291.0
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 19.11,
+      "team_saving_t_vs_rank1": 18.86
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00030",
+       "site_name": "114 km SW of Mangnai Zhen",
+       "country": "People's Republic of China",
+       "match_distance": 0.4775,
+       "gc_km": 12525.9,
+       "kg_co2e_pp": 2734.6,
+       "kg_co2e_pp_no_rf": 1615.6
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00017",
+       "site_name": "87 km NW of Delta",
+       "country": "United States of America",
+       "match_distance": 0.8559,
+       "gc_km": 2019.2,
+       "kg_co2e_pp": 440.8,
+       "kg_co2e_pp_no_rf": 260.4
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00042",
+       "site_name": "89 km S of Qiongkulecun",
+       "country": "People's Republic of China",
+       "match_distance": 0.8851,
+       "gc_km": 12580.6,
+       "kg_co2e_pp": 2746.6,
+       "kg_co2e_pp_no_rf": 1622.6
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 23.06,
+      "team_saving_t_vs_rank1": 22.94
+     }
+    }
+   },
+   {
+    "region_id": "de_gerlache_rim_2",
+    "region_name": "de Gerlache Rim 2",
+    "hazard": "texture",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "EP084",
+       "site_name": "Valle de la Luna (Chile)",
+       "country": "Chile",
+       "match_distance": 0.3094,
+       "gc_km": 9361.0,
+       "kg_co2e_pp": 2043.7,
+       "kg_co2e_pp_no_rf": 1207.4
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "EP084",
+       "site_name": "Valle de la Luna (Chile)",
+       "country": "Chile",
+       "match_distance": 0.3094,
+       "gc_km": 9361.0,
+       "kg_co2e_pp": 2043.7,
+       "kg_co2e_pp_no_rf": 1207.4
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00149",
+       "site_name": "21 km NW of Mukalla",
+       "country": "Yemen",
+       "match_distance": 0.3918,
+       "gc_km": 12527.1,
+       "kg_co2e_pp": 2734.9,
+       "kg_co2e_pp_no_rf": 1615.7
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 6.91,
+      "team_saving_t_vs_rank1": 0.0
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "EP084",
+       "site_name": "Valle de la Luna (Chile)",
+       "country": "Chile",
+       "match_distance": 0.3094,
+       "gc_km": 6498.9,
+       "kg_co2e_pp": 1418.8,
+       "kg_co2e_pp_no_rf": 838.2
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "EP084",
+       "site_name": "Valle de la Luna (Chile)",
+       "country": "Chile",
+       "match_distance": 0.3094,
+       "gc_km": 6498.9,
+       "kg_co2e_pp": 1418.8,
+       "kg_co2e_pp_no_rf": 838.2
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00149",
+       "site_name": "21 km NW of Mukalla",
+       "country": "Yemen",
+       "match_distance": 0.3918,
+       "gc_km": 13768.4,
+       "kg_co2e_pp": 3005.9,
+       "kg_co2e_pp_no_rf": 1775.8
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 15.87,
+      "team_saving_t_vs_rank1": 0.0
+     }
+    }
+   },
+   {
+    "region_id": "haworth",
+    "region_name": "Haworth",
+    "hazard": "rim",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00070",
+       "site_name": "161 km S of Pond Inlet",
+       "country": "Canada",
+       "match_distance": 0.3898,
+       "gc_km": 2899.5,
+       "kg_co2e_pp": 633.0,
+       "kg_co2e_pp_no_rf": 374.0
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00070",
+       "site_name": "161 km S of Pond Inlet",
+       "country": "Canada",
+       "match_distance": 0.3898,
+       "gc_km": 2899.5,
+       "kg_co2e_pp": 633.0,
+       "kg_co2e_pp_no_rf": 374.0
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00045",
+       "site_name": "137 km NW of Antofagasta de la Sierra",
+       "country": "Argentina",
+       "match_distance": 0.4552,
+       "gc_km": 9581.4,
+       "kg_co2e_pp": 2091.8,
+       "kg_co2e_pp_no_rf": 1235.8
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 14.59,
+      "team_saving_t_vs_rank1": 0.0
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00070",
+       "site_name": "161 km S of Pond Inlet",
+       "country": "Canada",
+       "match_distance": 0.3898,
+       "gc_km": 4764.2,
+       "kg_co2e_pp": 1040.1,
+       "kg_co2e_pp_no_rf": 614.5
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00070",
+       "site_name": "161 km S of Pond Inlet",
+       "country": "Canada",
+       "match_distance": 0.3898,
+       "gc_km": 4764.2,
+       "kg_co2e_pp": 1040.1,
+       "kg_co2e_pp_no_rf": 614.5
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00045",
+       "site_name": "137 km NW of Antofagasta de la Sierra",
+       "country": "Argentina",
+       "match_distance": 0.4552,
+       "gc_km": 6718.9,
+       "kg_co2e_pp": 1466.9,
+       "kg_co2e_pp_no_rf": 866.6
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 4.27,
+      "team_saving_t_vs_rank1": 0.0
+     }
+    }
+   },
+   {
+    "region_id": "haworth",
+    "region_name": "Haworth",
+    "hazard": "shadow",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00023",
+       "site_name": "29 km S of Calama",
+       "country": "Chile",
+       "match_distance": 0.3211,
+       "gc_km": 9310.7,
+       "kg_co2e_pp": 2032.7,
+       "kg_co2e_pp_no_rf": 1200.9
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00043",
+       "site_name": "37 km N of Battle Mountain",
+       "country": "United States of America",
+       "match_distance": 0.3433,
+       "gc_km": 1141.2,
+       "kg_co2e_pp": 249.2,
+       "kg_co2e_pp_no_rf": 147.2
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00028",
+       "site_name": "131 km E of Taltal",
+       "country": "Chile",
+       "match_distance": 0.3436,
+       "gc_km": 9542.8,
+       "kg_co2e_pp": 2083.4,
+       "kg_co2e_pp_no_rf": 1230.8
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 18.34,
+      "team_saving_t_vs_rank1": 17.84
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00023",
+       "site_name": "29 km S of Calama",
+       "country": "Chile",
+       "match_distance": 0.3211,
+       "gc_km": 6448.3,
+       "kg_co2e_pp": 1407.8,
+       "kg_co2e_pp_no_rf": 831.7
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00043",
+       "site_name": "37 km N of Battle Mountain",
+       "country": "United States of America",
+       "match_distance": 0.3433,
+       "gc_km": 2340.0,
+       "kg_co2e_pp": 510.9,
+       "kg_co2e_pp_no_rf": 301.8
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00028",
+       "site_name": "131 km E of Taltal",
+       "country": "Chile",
+       "match_distance": 0.3436,
+       "gc_km": 6680.6,
+       "kg_co2e_pp": 1458.5,
+       "kg_co2e_pp_no_rf": 861.7
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 9.48,
+      "team_saving_t_vs_rank1": 8.97
+     }
+    }
+   },
+   {
+    "region_id": "haworth",
+    "region_name": "Haworth",
+    "hazard": "texture",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00020",
+       "site_name": "126 km SE of Baquedano",
+       "country": "Chile",
+       "match_distance": 0.2003,
+       "gc_km": 9449.7,
+       "kg_co2e_pp": 2063.1,
+       "kg_co2e_pp_no_rf": 1218.8
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00027",
+       "site_name": "25 km SW of Klyuchi",
+       "country": "Russia",
+       "match_distance": 0.2313,
+       "gc_km": 5290.2,
+       "kg_co2e_pp": 1155.0,
+       "kg_co2e_pp_no_rf": 682.3
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00020",
+       "site_name": "126 km SE of Baquedano",
+       "country": "Chile",
+       "match_distance": 0.2003,
+       "gc_km": 9449.7,
+       "kg_co2e_pp": 2063.1,
+       "kg_co2e_pp_no_rf": 1218.8
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 9.08,
+      "team_saving_t_vs_rank1": 9.08
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00020",
+       "site_name": "126 km SE of Baquedano",
+       "country": "Chile",
+       "match_distance": 0.2003,
+       "gc_km": 6587.3,
+       "kg_co2e_pp": 1438.1,
+       "kg_co2e_pp_no_rf": 849.6
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00020",
+       "site_name": "126 km SE of Baquedano",
+       "country": "Chile",
+       "match_distance": 0.2003,
+       "gc_km": 6587.3,
+       "kg_co2e_pp": 1438.1,
+       "kg_co2e_pp_no_rf": 849.6
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00034",
+       "site_name": "22 km NE of Darvi",
+       "country": "Mongolia",
+       "match_distance": 0.213,
+       "gc_km": 11496.5,
+       "kg_co2e_pp": 2509.9,
+       "kg_co2e_pp_no_rf": 1482.8
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 10.72,
+      "team_saving_t_vs_rank1": 0.0
+     }
+    }
+   },
+   {
+    "region_id": "malapert_massif",
+    "region_name": "Malapert Massif",
+    "hazard": "rim",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00199",
+       "site_name": "6 km NE of Marias",
+       "country": "Peru",
+       "match_distance": 0.5341,
+       "gc_km": 7639.1,
+       "kg_co2e_pp": 1667.8,
+       "kg_co2e_pp_no_rf": 985.3
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00199",
+       "site_name": "6 km NE of Marias",
+       "country": "Peru",
+       "match_distance": 0.5341,
+       "gc_km": 7639.1,
+       "kg_co2e_pp": 1667.8,
+       "kg_co2e_pp_no_rf": 985.3
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00048",
+       "site_name": "76 km NW of Rodeo",
+       "country": "Argentina",
+       "match_distance": 0.6324,
+       "gc_km": 9974.3,
+       "kg_co2e_pp": 2177.6,
+       "kg_co2e_pp_no_rf": 1286.5
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 5.1,
+      "team_saving_t_vs_rank1": 0.0
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00199",
+       "site_name": "6 km NE of Marias",
+       "country": "Peru",
+       "match_distance": 0.5341,
+       "gc_km": 4776.9,
+       "kg_co2e_pp": 1042.9,
+       "kg_co2e_pp_no_rf": 616.1
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00199",
+       "site_name": "6 km NE of Marias",
+       "country": "Peru",
+       "match_distance": 0.5341,
+       "gc_km": 4776.9,
+       "kg_co2e_pp": 1042.9,
+       "kg_co2e_pp_no_rf": 616.1
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00048",
+       "site_name": "76 km NW of Rodeo",
+       "country": "Argentina",
+       "match_distance": 0.6324,
+       "gc_km": 7116.1,
+       "kg_co2e_pp": 1553.6,
+       "kg_co2e_pp_no_rf": 917.8
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 5.11,
+      "team_saving_t_vs_rank1": 0.0
+     }
+    }
+   },
+   {
+    "region_id": "malapert_massif",
+    "region_name": "Malapert Massif",
+    "hazard": "shadow",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00007",
+       "site_name": "154 km NE of Taltal",
+       "country": "Chile",
+       "match_distance": 0.9972,
+       "gc_km": 9502.6,
+       "kg_co2e_pp": 2074.6,
+       "kg_co2e_pp_no_rf": 1225.6
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00097",
+       "site_name": "82 km S of Andamarca",
+       "country": "Bolivia",
+       "match_distance": 1.0952,
+       "gc_km": 9056.9,
+       "kg_co2e_pp": 1977.3,
+       "kg_co2e_pp_no_rf": 1168.2
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00030",
+       "site_name": "114 km SW of Mangnai Zhen",
+       "country": "People's Republic of China",
+       "match_distance": 1.0976,
+       "gc_km": 9891.4,
+       "kg_co2e_pp": 2159.5,
+       "kg_co2e_pp_no_rf": 1275.8
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 1.82,
+      "team_saving_t_vs_rank1": 0.97
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00007",
+       "site_name": "154 km NE of Taltal",
+       "country": "Chile",
+       "match_distance": 0.9972,
+       "gc_km": 6640.3,
+       "kg_co2e_pp": 1449.7,
+       "kg_co2e_pp_no_rf": 856.5
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00097",
+       "site_name": "82 km S of Andamarca",
+       "country": "Bolivia",
+       "match_distance": 1.0952,
+       "gc_km": 6199.1,
+       "kg_co2e_pp": 1353.4,
+       "kg_co2e_pp_no_rf": 799.6
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00030",
+       "site_name": "114 km SW of Mangnai Zhen",
+       "country": "People's Republic of China",
+       "match_distance": 1.0976,
+       "gc_km": 12525.9,
+       "kg_co2e_pp": 2734.6,
+       "kg_co2e_pp_no_rf": 1615.6
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 13.81,
+      "team_saving_t_vs_rank1": 0.96
+     }
+    }
+   },
+   {
+    "region_id": "malapert_massif",
+    "region_name": "Malapert Massif",
+    "hazard": "texture",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00189",
+       "site_name": "14 km SE of Yenisu",
+       "country": "Turkey",
+       "match_distance": 0.1119,
+       "gc_km": 9749.3,
+       "kg_co2e_pp": 2128.5,
+       "kg_co2e_pp_no_rf": 1257.5
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00189",
+       "site_name": "14 km SE of Yenisu",
+       "country": "Turkey",
+       "match_distance": 0.1119,
+       "gc_km": 9749.3,
+       "kg_co2e_pp": 2128.5,
+       "kg_co2e_pp_no_rf": 1257.5
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00116",
+       "site_name": "37 km N of Hualfin",
+       "country": "Argentina",
+       "match_distance": 0.115,
+       "gc_km": 9821.6,
+       "kg_co2e_pp": 2144.2,
+       "kg_co2e_pp_no_rf": 1266.8
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 0.16,
+      "team_saving_t_vs_rank1": 0.0
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00189",
+       "site_name": "14 km SE of Yenisu",
+       "country": "Turkey",
+       "match_distance": 0.1119,
+       "gc_km": 11167.6,
+       "kg_co2e_pp": 2438.1,
+       "kg_co2e_pp_no_rf": 1440.4
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00080",
+       "site_name": "81 km W of Palo Blanco",
+       "country": "Argentina",
+       "match_distance": 0.1576,
+       "gc_km": 6904.7,
+       "kg_co2e_pp": 1507.4,
+       "kg_co2e_pp_no_rf": 890.6
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00189",
+       "site_name": "14 km SE of Yenisu",
+       "country": "Turkey",
+       "match_distance": 0.1119,
+       "gc_km": 11167.6,
+       "kg_co2e_pp": 2438.1,
+       "kg_co2e_pp_no_rf": 1440.4
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 9.31,
+      "team_saving_t_vs_rank1": 9.31
+     }
+    }
+   },
+   {
+    "region_id": "mons_mouton",
+    "region_name": "Mons Mouton",
+    "hazard": "rim",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00103",
+       "site_name": "159 km E of Talnakh",
+       "country": "Russia",
+       "match_distance": 0.6283,
+       "gc_km": 6463.0,
+       "kg_co2e_pp": 1411.0,
+       "kg_co2e_pp_no_rf": 833.6
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00103",
+       "site_name": "159 km E of Talnakh",
+       "country": "Russia",
+       "match_distance": 0.6283,
+       "gc_km": 6463.0,
+       "kg_co2e_pp": 1411.0,
+       "kg_co2e_pp_no_rf": 833.6
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00116",
+       "site_name": "37 km N of Hualfin",
+       "country": "Argentina",
+       "match_distance": 0.6943,
+       "gc_km": 9821.6,
+       "kg_co2e_pp": 2144.2,
+       "kg_co2e_pp_no_rf": 1266.8
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 7.33,
+      "team_saving_t_vs_rank1": 0.0
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00103",
+       "site_name": "159 km E of Talnakh",
+       "country": "Russia",
+       "match_distance": 0.6283,
+       "gc_km": 9009.3,
+       "kg_co2e_pp": 1966.9,
+       "kg_co2e_pp_no_rf": 1162.0
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00213",
+       "site_name": "40 km NW of Las Mojarras",
+       "country": "Argentina",
+       "match_distance": 0.6354,
+       "gc_km": 6943.1,
+       "kg_co2e_pp": 1515.8,
+       "kg_co2e_pp_no_rf": 895.5
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00103",
+       "site_name": "159 km E of Talnakh",
+       "country": "Russia",
+       "match_distance": 0.6283,
+       "gc_km": 9009.3,
+       "kg_co2e_pp": 1966.9,
+       "kg_co2e_pp_no_rf": 1162.0
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 4.51,
+      "team_saving_t_vs_rank1": 4.51
+     }
+    }
+   },
+   {
+    "region_id": "mons_mouton",
+    "region_name": "Mons Mouton",
+    "hazard": "shadow",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00021",
+       "site_name": "49 km W of Waikouaiti",
+       "country": "New Zealand",
+       "match_distance": 0.1973,
+       "gc_km": 12955.5,
+       "kg_co2e_pp": 2828.5,
+       "kg_co2e_pp_no_rf": 1671.0
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00034",
+       "site_name": "22 km NE of Darvi",
+       "country": "Mongolia",
+       "match_distance": 0.2516,
+       "gc_km": 8823.9,
+       "kg_co2e_pp": 1926.4,
+       "kg_co2e_pp_no_rf": 1138.1
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00021",
+       "site_name": "49 km W of Waikouaiti",
+       "country": "New Zealand",
+       "match_distance": 0.1973,
+       "gc_km": 12955.5,
+       "kg_co2e_pp": 2828.5,
+       "kg_co2e_pp_no_rf": 1671.0
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 9.02,
+      "team_saving_t_vs_rank1": 9.02
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00021",
+       "site_name": "49 km W of Waikouaiti",
+       "country": "New Zealand",
+       "match_distance": 0.1973,
+       "gc_km": 12650.6,
+       "kg_co2e_pp": 2761.9,
+       "kg_co2e_pp_no_rf": 1631.7
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00028",
+       "site_name": "131 km E of Taltal",
+       "country": "Chile",
+       "match_distance": 0.2567,
+       "gc_km": 6680.6,
+       "kg_co2e_pp": 1458.5,
+       "kg_co2e_pp_no_rf": 861.7
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00021",
+       "site_name": "49 km W of Waikouaiti",
+       "country": "New Zealand",
+       "match_distance": 0.1973,
+       "gc_km": 12650.6,
+       "kg_co2e_pp": 2761.9,
+       "kg_co2e_pp_no_rf": 1631.7
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 13.03,
+      "team_saving_t_vs_rank1": 13.03
+     }
+    }
+   },
+   {
+    "region_id": "mons_mouton",
+    "region_name": "Mons Mouton",
+    "hazard": "texture",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00149",
+       "site_name": "21 km NW of Mukalla",
+       "country": "Yemen",
+       "match_distance": 0.1473,
+       "gc_km": 12527.1,
+       "kg_co2e_pp": 2734.9,
+       "kg_co2e_pp_no_rf": 1615.7
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00080",
+       "site_name": "81 km W of Palo Blanco",
+       "country": "Argentina",
+       "match_distance": 0.1848,
+       "gc_km": 9766.5,
+       "kg_co2e_pp": 2132.2,
+       "kg_co2e_pp_no_rf": 1259.7
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00073",
+       "site_name": "26 km SE of Jack's Point",
+       "country": "New Zealand",
+       "match_distance": 0.1595,
+       "gc_km": 12999.6,
+       "kg_co2e_pp": 2838.1,
+       "kg_co2e_pp_no_rf": 1676.7
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 7.06,
+      "team_saving_t_vs_rank1": 6.03
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00149",
+       "site_name": "21 km NW of Mukalla",
+       "country": "Yemen",
+       "match_distance": 0.1473,
+       "gc_km": 13768.4,
+       "kg_co2e_pp": 3005.9,
+       "kg_co2e_pp_no_rf": 1775.8
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00080",
+       "site_name": "81 km W of Palo Blanco",
+       "country": "Argentina",
+       "match_distance": 0.1848,
+       "gc_km": 6904.7,
+       "kg_co2e_pp": 1507.4,
+       "kg_co2e_pp_no_rf": 890.6
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00149",
+       "site_name": "21 km NW of Mukalla",
+       "country": "Yemen",
+       "match_distance": 0.1473,
+       "gc_km": 13768.4,
+       "kg_co2e_pp": 3005.9,
+       "kg_co2e_pp_no_rf": 1775.8
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 14.98,
+      "team_saving_t_vs_rank1": 14.98
+     }
+    }
+   },
+   {
+    "region_id": "mons_mouton_plateau",
+    "region_name": "Mons Mouton Plateau",
+    "hazard": "rim",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00233",
+       "site_name": "57 km E of Mo i Rana",
+       "country": "Norway",
+       "match_distance": 0.673,
+       "gc_km": 6267.1,
+       "kg_co2e_pp": 1368.2,
+       "kg_co2e_pp_no_rf": 808.3
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00233",
+       "site_name": "57 km E of Mo i Rana",
+       "country": "Norway",
+       "match_distance": 0.673,
+       "gc_km": 6267.1,
+       "kg_co2e_pp": 1368.2,
+       "kg_co2e_pp_no_rf": 808.3
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00025",
+       "site_name": "74 km NE of El Chalten",
+       "country": "Argentina",
+       "match_distance": 0.6932,
+       "gc_km": 11808.5,
+       "kg_co2e_pp": 2578.0,
+       "kg_co2e_pp_no_rf": 1523.1
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 12.1,
+      "team_saving_t_vs_rank1": 0.0
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00233",
+       "site_name": "57 km E of Mo i Rana",
+       "country": "Norway",
+       "match_distance": 0.673,
+       "gc_km": 7856.6,
+       "kg_co2e_pp": 1715.2,
+       "kg_co2e_pp_no_rf": 1013.3
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00107",
+       "site_name": "11 km SE of Oppdal",
+       "country": "Norway",
+       "match_distance": 0.6876,
+       "gc_km": 7836.4,
+       "kg_co2e_pp": 1710.8,
+       "kg_co2e_pp_no_rf": 1010.7
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00025",
+       "site_name": "74 km NE of El Chalten",
+       "country": "Argentina",
+       "match_distance": 0.6932,
+       "gc_km": 9019.3,
+       "kg_co2e_pp": 1969.1,
+       "kg_co2e_pp_no_rf": 1163.3
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 2.58,
+      "team_saving_t_vs_rank1": 0.04
+     }
+    }
+   },
+   {
+    "region_id": "mons_mouton_plateau",
+    "region_name": "Mons Mouton Plateau",
+    "hazard": "shadow",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00100",
+       "site_name": "154 km E of Taltal",
+       "country": "Chile",
+       "match_distance": 0.1511,
+       "gc_km": 9575.7,
+       "kg_co2e_pp": 2090.6,
+       "kg_co2e_pp_no_rf": 1235.1
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00100",
+       "site_name": "154 km E of Taltal",
+       "country": "Chile",
+       "match_distance": 0.1511,
+       "gc_km": 9575.7,
+       "kg_co2e_pp": 2090.6,
+       "kg_co2e_pp_no_rf": 1235.1
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00063",
+       "site_name": "117 km SW of Luring",
+       "country": "People's Republic of China",
+       "match_distance": 0.198,
+       "gc_km": 10667.1,
+       "kg_co2e_pp": 2328.9,
+       "kg_co2e_pp_no_rf": 1375.8
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 2.38,
+      "team_saving_t_vs_rank1": 0.0
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00100",
+       "site_name": "154 km E of Taltal",
+       "country": "Chile",
+       "match_distance": 0.1511,
+       "gc_km": 6713.5,
+       "kg_co2e_pp": 1465.7,
+       "kg_co2e_pp_no_rf": 865.9
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00100",
+       "site_name": "154 km E of Taltal",
+       "country": "Chile",
+       "match_distance": 0.1511,
+       "gc_km": 6713.5,
+       "kg_co2e_pp": 1465.7,
+       "kg_co2e_pp_no_rf": 865.9
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00063",
+       "site_name": "117 km SW of Luring",
+       "country": "People's Republic of China",
+       "match_distance": 0.198,
+       "gc_km": 13209.4,
+       "kg_co2e_pp": 2883.9,
+       "kg_co2e_pp_no_rf": 1703.7
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 14.18,
+      "team_saving_t_vs_rank1": 0.0
+     }
+    }
+   },
+   {
+    "region_id": "mons_mouton_plateau",
+    "region_name": "Mons Mouton Plateau",
+    "hazard": "texture",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00025",
+       "site_name": "74 km NE of El Chalten",
+       "country": "Argentina",
+       "match_distance": 0.1322,
+       "gc_km": 11808.5,
+       "kg_co2e_pp": 2578.0,
+       "kg_co2e_pp_no_rf": 1523.1
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00066",
+       "site_name": "near Kuhbanan",
+       "country": "Iran",
+       "match_distance": 0.1523,
+       "gc_km": 10799.0,
+       "kg_co2e_pp": 2357.6,
+       "kg_co2e_pp_no_rf": 1392.9
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00025",
+       "site_name": "74 km NE of El Chalten",
+       "country": "Argentina",
+       "match_distance": 0.1322,
+       "gc_km": 11808.5,
+       "kg_co2e_pp": 2578.0,
+       "kg_co2e_pp_no_rf": 1523.1
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 2.2,
+      "team_saving_t_vs_rank1": 2.2
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00025",
+       "site_name": "74 km NE of El Chalten",
+       "country": "Argentina",
+       "match_distance": 0.1322,
+       "gc_km": 9019.3,
+       "kg_co2e_pp": 1969.1,
+       "kg_co2e_pp_no_rf": 1163.3
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00196",
+       "site_name": "22 km NE of Dina Huapi",
+       "country": "Argentina",
+       "match_distance": 0.1868,
+       "gc_km": 8221.2,
+       "kg_co2e_pp": 1794.8,
+       "kg_co2e_pp_no_rf": 1060.4
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00066",
+       "site_name": "near Kuhbanan",
+       "country": "Iran",
+       "match_distance": 0.1523,
+       "gc_km": 12592.5,
+       "kg_co2e_pp": 2749.2,
+       "kg_co2e_pp_no_rf": 1624.2
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 9.54,
+      "team_saving_t_vs_rank1": 1.74
+     }
+    }
+   },
+   {
+    "region_id": "nobile_rim_1",
+    "region_name": "Nobile Rim 1",
+    "hazard": "rim",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00048",
+       "site_name": "76 km NW of Rodeo",
+       "country": "Argentina",
+       "match_distance": 0.4406,
+       "gc_km": 9974.3,
+       "kg_co2e_pp": 2177.6,
+       "kg_co2e_pp_no_rf": 1286.5
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00106",
+       "site_name": "near Llauta",
+       "country": "Peru",
+       "match_distance": 0.6068,
+       "gc_km": 8190.6,
+       "kg_co2e_pp": 1788.2,
+       "kg_co2e_pp_no_rf": 1056.4
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00048",
+       "site_name": "76 km NW of Rodeo",
+       "country": "Argentina",
+       "match_distance": 0.4406,
+       "gc_km": 9974.3,
+       "kg_co2e_pp": 2177.6,
+       "kg_co2e_pp_no_rf": 1286.5
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 3.89,
+      "team_saving_t_vs_rank1": 3.89
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00048",
+       "site_name": "76 km NW of Rodeo",
+       "country": "Argentina",
+       "match_distance": 0.4406,
+       "gc_km": 7116.1,
+       "kg_co2e_pp": 1553.6,
+       "kg_co2e_pp_no_rf": 917.8
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00106",
+       "site_name": "near Llauta",
+       "country": "Peru",
+       "match_distance": 0.6068,
+       "gc_km": 5328.7,
+       "kg_co2e_pp": 1163.4,
+       "kg_co2e_pp_no_rf": 687.3
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00048",
+       "site_name": "76 km NW of Rodeo",
+       "country": "Argentina",
+       "match_distance": 0.4406,
+       "gc_km": 7116.1,
+       "kg_co2e_pp": 1553.6,
+       "kg_co2e_pp_no_rf": 917.8
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 3.9,
+      "team_saving_t_vs_rank1": 3.9
+     }
+    }
+   },
+   {
+    "region_id": "nobile_rim_1",
+    "region_name": "Nobile Rim 1",
+    "hazard": "shadow",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00027",
+       "site_name": "25 km SW of Klyuchi",
+       "country": "Russia",
+       "match_distance": 0.4096,
+       "gc_km": 5290.2,
+       "kg_co2e_pp": 1155.0,
+       "kg_co2e_pp_no_rf": 682.3
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00027",
+       "site_name": "25 km SW of Klyuchi",
+       "country": "Russia",
+       "match_distance": 0.4096,
+       "gc_km": 5290.2,
+       "kg_co2e_pp": 1155.0,
+       "kg_co2e_pp_no_rf": 682.3
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00014",
+       "site_name": "100 km W of San Antonio de los Cobres",
+       "country": "Argentina",
+       "match_distance": 0.4312,
+       "gc_km": 9564.2,
+       "kg_co2e_pp": 2088.1,
+       "kg_co2e_pp_no_rf": 1233.6
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 9.33,
+      "team_saving_t_vs_rank1": 0.0
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00027",
+       "site_name": "25 km SW of Klyuchi",
+       "country": "Russia",
+       "match_distance": 0.4096,
+       "gc_km": 8130.9,
+       "kg_co2e_pp": 1775.1,
+       "kg_co2e_pp_no_rf": 1048.7
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00007",
+       "site_name": "154 km NE of Taltal",
+       "country": "Chile",
+       "match_distance": 0.4296,
+       "gc_km": 6640.3,
+       "kg_co2e_pp": 1449.7,
+       "kg_co2e_pp_no_rf": 856.5
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00027",
+       "site_name": "25 km SW of Klyuchi",
+       "country": "Russia",
+       "match_distance": 0.4096,
+       "gc_km": 8130.9,
+       "kg_co2e_pp": 1775.1,
+       "kg_co2e_pp_no_rf": 1048.7
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 3.25,
+      "team_saving_t_vs_rank1": 3.25
+     }
+    }
+   },
+   {
+    "region_id": "nobile_rim_1",
+    "region_name": "Nobile Rim 1",
+    "hazard": "texture",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "EP080",
+       "site_name": "Ol Doinyo Lengai",
+       "country": "Tanzania",
+       "match_distance": 0.1015,
+       "gc_km": 13958.9,
+       "kg_co2e_pp": 3047.5,
+       "kg_co2e_pp_no_rf": 1800.4
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00041",
+       "site_name": "608 km NW of Olonkinbyen",
+       "country": "Greenland",
+       "match_distance": 0.1343,
+       "gc_km": 4634.1,
+       "kg_co2e_pp": 1011.7,
+       "kg_co2e_pp_no_rf": 597.7
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "EP080",
+       "site_name": "Ol Doinyo Lengai",
+       "country": "Tanzania",
+       "match_distance": 0.1015,
+       "gc_km": 13958.9,
+       "kg_co2e_pp": 3047.5,
+       "kg_co2e_pp_no_rf": 1800.4
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 20.36,
+      "team_saving_t_vs_rank1": 20.36
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "EP080",
+       "site_name": "Ol Doinyo Lengai",
+       "country": "Tanzania",
+       "match_distance": 0.1015,
+       "gc_km": 14058.4,
+       "kg_co2e_pp": 3069.2,
+       "kg_co2e_pp_no_rf": 1813.2
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00041",
+       "site_name": "608 km NW of Olonkinbyen",
+       "country": "Greenland",
+       "match_distance": 0.1343,
+       "gc_km": 6283.7,
+       "kg_co2e_pp": 1371.8,
+       "kg_co2e_pp_no_rf": 810.5
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "EP080",
+       "site_name": "Ol Doinyo Lengai",
+       "country": "Tanzania",
+       "match_distance": 0.1015,
+       "gc_km": 14058.4,
+       "kg_co2e_pp": 3069.2,
+       "kg_co2e_pp_no_rf": 1813.2
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 16.97,
+      "team_saving_t_vs_rank1": 16.97
+     }
+    }
+   },
+   {
+    "region_id": "nobile_rim_2",
+    "region_name": "Nobile Rim 2",
+    "hazard": "rim",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00213",
+       "site_name": "40 km NW of Las Mojarras",
+       "country": "Argentina",
+       "match_distance": 0.4476,
+       "gc_km": 9805.2,
+       "kg_co2e_pp": 2140.7,
+       "kg_co2e_pp_no_rf": 1264.7
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00103",
+       "site_name": "159 km E of Talnakh",
+       "country": "Russia",
+       "match_distance": 0.4538,
+       "gc_km": 6463.0,
+       "kg_co2e_pp": 1411.0,
+       "kg_co2e_pp_no_rf": 833.6
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00021",
+       "site_name": "49 km W of Waikouaiti",
+       "country": "New Zealand",
+       "match_distance": 0.4796,
+       "gc_km": 12955.5,
+       "kg_co2e_pp": 2828.5,
+       "kg_co2e_pp_no_rf": 1671.0
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 14.18,
+      "team_saving_t_vs_rank1": 7.3
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00213",
+       "site_name": "40 km NW of Las Mojarras",
+       "country": "Argentina",
+       "match_distance": 0.4476,
+       "gc_km": 6943.1,
+       "kg_co2e_pp": 1515.8,
+       "kg_co2e_pp_no_rf": 895.5
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00213",
+       "site_name": "40 km NW of Las Mojarras",
+       "country": "Argentina",
+       "match_distance": 0.4476,
+       "gc_km": 6943.1,
+       "kg_co2e_pp": 1515.8,
+       "kg_co2e_pp_no_rf": 895.5
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00021",
+       "site_name": "49 km W of Waikouaiti",
+       "country": "New Zealand",
+       "match_distance": 0.4796,
+       "gc_km": 12650.6,
+       "kg_co2e_pp": 2761.9,
+       "kg_co2e_pp_no_rf": 1631.7
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 12.46,
+      "team_saving_t_vs_rank1": 0.0
+     }
+    }
+   },
+   {
+    "region_id": "nobile_rim_2",
+    "region_name": "Nobile Rim 2",
+    "hazard": "shadow",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00112",
+       "site_name": "119 km NW of Rinconada",
+       "country": "Bolivia",
+       "match_distance": 0.218,
+       "gc_km": 9325.0,
+       "kg_co2e_pp": 2035.8,
+       "kg_co2e_pp_no_rf": 1202.7
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00156",
+       "site_name": "23 km NE of Putre",
+       "country": "Chile",
+       "match_distance": 0.2497,
+       "gc_km": 8832.9,
+       "kg_co2e_pp": 1928.4,
+       "kg_co2e_pp_no_rf": 1139.3
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00131",
+       "site_name": "105 km NW of Antofagasta de la Sierra",
+       "country": "Argentina",
+       "match_distance": 0.251,
+       "gc_km": 9609.9,
+       "kg_co2e_pp": 2098.0,
+       "kg_co2e_pp_no_rf": 1239.5
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 1.7,
+      "team_saving_t_vs_rank1": 1.07
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00112",
+       "site_name": "119 km NW of Rinconada",
+       "country": "Bolivia",
+       "match_distance": 0.218,
+       "gc_km": 6464.9,
+       "kg_co2e_pp": 1411.4,
+       "kg_co2e_pp_no_rf": 833.8
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00156",
+       "site_name": "23 km NE of Putre",
+       "country": "Chile",
+       "match_distance": 0.2497,
+       "gc_km": 5972.9,
+       "kg_co2e_pp": 1304.0,
+       "kg_co2e_pp_no_rf": 770.4
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00131",
+       "site_name": "105 km NW of Antofagasta de la Sierra",
+       "country": "Argentina",
+       "match_distance": 0.251,
+       "gc_km": 6747.4,
+       "kg_co2e_pp": 1473.1,
+       "kg_co2e_pp_no_rf": 870.3
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 1.69,
+      "team_saving_t_vs_rank1": 1.07
+     }
+    }
+   },
+   {
+    "region_id": "nobile_rim_2",
+    "region_name": "Nobile Rim 2",
+    "hazard": "texture",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00164",
+       "site_name": "46 km NW of Saga",
+       "country": "People's Republic of China",
+       "match_distance": 0.0987,
+       "gc_km": 10869.5,
+       "kg_co2e_pp": 2373.0,
+       "kg_co2e_pp_no_rf": 1401.9
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00063",
+       "site_name": "117 km SW of Luring",
+       "country": "People's Republic of China",
+       "match_distance": 0.1344,
+       "gc_km": 10667.1,
+       "kg_co2e_pp": 2328.9,
+       "kg_co2e_pp_no_rf": 1375.8
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00164",
+       "site_name": "46 km NW of Saga",
+       "country": "People's Republic of China",
+       "match_distance": 0.0987,
+       "gc_km": 10869.5,
+       "kg_co2e_pp": 2373.0,
+       "kg_co2e_pp_no_rf": 1401.9
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 0.44,
+      "team_saving_t_vs_rank1": 0.44
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00164",
+       "site_name": "46 km NW of Saga",
+       "country": "People's Republic of China",
+       "match_distance": 0.0987,
+       "gc_km": 13448.4,
+       "kg_co2e_pp": 2936.0,
+       "kg_co2e_pp_no_rf": 1734.6
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00063",
+       "site_name": "117 km SW of Luring",
+       "country": "People's Republic of China",
+       "match_distance": 0.1344,
+       "gc_km": 13209.4,
+       "kg_co2e_pp": 2883.9,
+       "kg_co2e_pp_no_rf": 1703.7
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00145",
+       "site_name": "26 km SW of Jiangzi",
+       "country": "People's Republic of China",
+       "match_distance": 0.1158,
+       "gc_km": 13506.6,
+       "kg_co2e_pp": 2948.8,
+       "kg_co2e_pp_no_rf": 1742.1
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 0.65,
+      "team_saving_t_vs_rank1": 0.52
+     }
+    }
+   },
+   {
+    "region_id": "slater_plain",
+    "region_name": "Slater Plain",
+    "hazard": "rim",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00184",
+       "site_name": "11 km NW of Sancos",
+       "country": "Peru",
+       "match_distance": 0.4338,
+       "gc_km": 8308.5,
+       "kg_co2e_pp": 1813.9,
+       "kg_co2e_pp_no_rf": 1071.6
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00107",
+       "site_name": "11 km SE of Oppdal",
+       "country": "Norway",
+       "match_distance": 0.5244,
+       "gc_km": 6461.9,
+       "kg_co2e_pp": 1410.8,
+       "kg_co2e_pp_no_rf": 833.5
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00025",
+       "site_name": "74 km NE of El Chalten",
+       "country": "Argentina",
+       "match_distance": 0.5121,
+       "gc_km": 11808.5,
+       "kg_co2e_pp": 2578.0,
+       "kg_co2e_pp_no_rf": 1523.1
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 11.67,
+      "team_saving_t_vs_rank1": 4.03
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00184",
+       "site_name": "11 km NW of Sancos",
+       "country": "Peru",
+       "match_distance": 0.4338,
+       "gc_km": 5446.2,
+       "kg_co2e_pp": 1189.0,
+       "kg_co2e_pp_no_rf": 702.5
+      },
+      "nearest_top3": {
+       "rank": 1,
+       "site_id": "R00184",
+       "site_name": "11 km NW of Sancos",
+       "country": "Peru",
+       "match_distance": 0.4338,
+       "gc_km": 5446.2,
+       "kg_co2e_pp": 1189.0,
+       "kg_co2e_pp_no_rf": 702.5
+      },
+      "farthest_top3": {
+       "rank": 2,
+       "site_id": "R00025",
+       "site_name": "74 km NE of El Chalten",
+       "country": "Argentina",
+       "match_distance": 0.5121,
+       "gc_km": 9019.3,
+       "kg_co2e_pp": 1969.1,
+       "kg_co2e_pp_no_rf": 1163.3
+      },
+      "nearest_is_rank1": true,
+      "team_saving_t_vs_farthest": 7.8,
+      "team_saving_t_vs_rank1": 0.0
+     }
+    }
+   },
+   {
+    "region_id": "slater_plain",
+    "region_name": "Slater Plain",
+    "hazard": "shadow",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00115",
+       "site_name": "69 km SE of Pevek",
+       "country": "Russia",
+       "match_distance": 0.1319,
+       "gc_km": 4239.2,
+       "kg_co2e_pp": 925.5,
+       "kg_co2e_pp_no_rf": 546.8
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00109",
+       "site_name": "71 km NW of Lorino",
+       "country": "Russia",
+       "match_distance": 0.1324,
+       "gc_km": 3601.9,
+       "kg_co2e_pp": 786.4,
+       "kg_co2e_pp_no_rf": 464.6
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00090",
+       "site_name": "53 km NE of El Calafate",
+       "country": "Argentina",
+       "match_distance": 0.1526,
+       "gc_km": 11925.2,
+       "kg_co2e_pp": 2603.5,
+       "kg_co2e_pp_no_rf": 1538.1
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 18.17,
+      "team_saving_t_vs_rank1": 1.39
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00115",
+       "site_name": "69 km SE of Pevek",
+       "country": "Russia",
+       "match_distance": 0.1319,
+       "gc_km": 7087.4,
+       "kg_co2e_pp": 1547.3,
+       "kg_co2e_pp_no_rf": 914.1
+      },
+      "nearest_top3": {
+       "rank": 2,
+       "site_id": "R00109",
+       "site_name": "71 km NW of Lorino",
+       "country": "Russia",
+       "match_distance": 0.1324,
+       "gc_km": 6464.4,
+       "kg_co2e_pp": 1411.3,
+       "kg_co2e_pp_no_rf": 833.8
+      },
+      "farthest_top3": {
+       "rank": 3,
+       "site_id": "R00090",
+       "site_name": "53 km NE of El Calafate",
+       "country": "Argentina",
+       "match_distance": 0.1526,
+       "gc_km": 9138.7,
+       "kg_co2e_pp": 1995.2,
+       "kg_co2e_pp_no_rf": 1178.7
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 5.84,
+      "team_saving_t_vs_rank1": 1.36
+     }
+    }
+   },
+   {
+    "region_id": "slater_plain",
+    "region_name": "Slater Plain",
+    "hazard": "texture",
+    "n_top": 3,
+    "bases": {
+     "calgary": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00160",
+       "site_name": "17 km N of Naser od Din",
+       "country": "Iran",
+       "match_distance": 0.0731,
+       "gc_km": 10454.0,
+       "kg_co2e_pp": 2282.3,
+       "kg_co2e_pp_no_rf": 1348.4
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00240",
+       "site_name": "198 km S of Clyde River",
+       "country": "Canada",
+       "match_distance": 0.1266,
+       "gc_km": 3038.8,
+       "kg_co2e_pp": 663.4,
+       "kg_co2e_pp_no_rf": 391.9
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00160",
+       "site_name": "17 km N of Naser od Din",
+       "country": "Iran",
+       "match_distance": 0.0731,
+       "gc_km": 10454.0,
+       "kg_co2e_pp": 2282.3,
+       "kg_co2e_pp_no_rf": 1348.4
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 16.19,
+      "team_saving_t_vs_rank1": 16.19
+     },
+     "houston_jsc": {
+      "rank1": {
+       "rank": 1,
+       "site_id": "R00160",
+       "site_name": "17 km N of Naser od Din",
+       "country": "Iran",
+       "match_distance": 0.0731,
+       "gc_km": 12042.6,
+       "kg_co2e_pp": 2629.1,
+       "kg_co2e_pp_no_rf": 1553.3
+      },
+      "nearest_top3": {
+       "rank": 3,
+       "site_id": "R00240",
+       "site_name": "198 km S of Clyde River",
+       "country": "Canada",
+       "match_distance": 0.1266,
+       "gc_km": 4651.3,
+       "kg_co2e_pp": 1015.5,
+       "kg_co2e_pp_no_rf": 599.9
+      },
+      "farthest_top3": {
+       "rank": 1,
+       "site_id": "R00160",
+       "site_name": "17 km N of Naser od Din",
+       "country": "Iran",
+       "match_distance": 0.0731,
+       "gc_km": 12042.6,
+       "kg_co2e_pp": 2629.1,
+       "kg_co2e_pp_no_rf": 1553.3
+      },
+      "nearest_is_rank1": false,
+      "team_saving_t_vs_farthest": 16.14,
+      "team_saving_t_vs_rank1": 16.14
+     }
+    }
+   }
+  ],
+  "summary": {
+   "calgary": {
+    "base": "Calgary",
+    "n_rehearsals": 27,
+    "team_size": 10,
+    "mean_team_t_nearest": 15.1,
+    "mean_team_t_farthest": 24.0,
+    "mean_team_saving_t_vs_farthest": 8.9,
+    "median_team_saving_t_vs_farthest": 8.7,
+    "max_team_saving_t_vs_farthest": 20.4,
+    "mean_team_saving_t_vs_rank1": 5.1,
+    "n_nearest_is_rank1": 8,
+    "total_saving_t_all_rehearsals_vs_farthest": 240.1
+   },
+   "houston_jsc": {
+    "base": "Houston (NASA JSC)",
+    "n_rehearsals": 27,
+    "team_size": 10,
+    "mean_team_t_nearest": 13.6,
+    "mean_team_t_farthest": 24.1,
+    "mean_team_saving_t_vs_farthest": 10.5,
+    "median_team_saving_t_vs_farthest": 10.7,
+    "max_team_saving_t_vs_farthest": 23.1,
+    "mean_team_saving_t_vs_rank1": 6.1,
+    "n_nearest_is_rank1": 7,
+    "total_saving_t_all_rehearsals_vs_farthest": 282.9
+   }
+  },
+  "headline": "Picking the nearest of our top-3 matches saves on average 8.9 t CO2e per 10-person team from Calgary (median 8.7 t, up to 20.4 t)."
+ },
+ "environment": {
+  "n_sites": 57,
+  "n_sites_missing_landcover": 0,
+  "n_trees_and_wetland_le_10pct": 57,
+  "n_dsm_safe": 57,
+  "median_tree_pct": 0.0,
+  "max_tree_pct": 10.0,
+  "max_wetland_pct": 0.2,
+  "median_bare_pct": 31.0,
+  "n_built_le_5pct": 57,
+  "filter_rule": "DSM-safe screen (pipeline/earth/screen.py, windows.py): tree <= 10%, built <= 5%, crop <= 20%, water <= 20%, wetland + mangrove <= 10%, snow < 30% of the 15 km core.",
+  "filter_purpose": "The rule exists so the 30 m surface model measures ground, not canopy. Steering field teams away from forests and wetlands is a side effect, not its design goal.",
+  "protected_areas": "Not checked. earth_sites.json has no protected-area flag; check the World Database on Protected Areas (https://www.protectedplanet.net/) and local permits before any visit.",
+  "source": "ESA WorldCover 10 m 2021 v200, doi:10.5281/zenodo.7254221"
+ }
+}
