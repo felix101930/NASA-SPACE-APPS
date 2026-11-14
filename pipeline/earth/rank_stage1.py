@@ -154,7 +154,7 @@ def rank(top_k: int = TOP_K, max_selected: int = MAX_SELECTED, fp_path=None, q_p
     res["mean_topk_dist_per_search"] = {k: float(np.mean([D[k][idx[t]] for t in v["top"]]))
                                         for k, v in res["searches"].items() if v["top"]}
     res["mean_best_dist"] = float(np.mean(list(res["best_dist_per_search"].values())))
-    res["features"] = "base+shape+brightness" if xt is not None else "base"
+    res["features"] = ("base+aspect+brightness" if xt is not None else "base")
     if write:
         (out_path or RANK_JSON).write_text(json.dumps(res))
     log.info("stage-1 ranking: %d eligible windows, %d searches, %d unique selected (top %d each)",
@@ -218,7 +218,8 @@ def _positive_sets(rows: list[dict]) -> dict[str, list[str]]:
     orig = [r["id"] for r in rows if r.get("role") == "heldout_positive" and not str(r["id"]).startswith("LA")]
     ext = orig + [r["id"] for r in rows if r.get("role") == "heldout_positive" and str(r["id"]).startswith("LA")
                   and not dup.get(r["id"])]
-    return {"heldout_positive": orig, "heldout_positive_ext": ext}
+    indep = [i for i in ext if str(i).startswith("LA")]
+    return {"heldout_positive": orig, "heldout_positive_ext": ext, "heldout_positive_indep": indep}
 
 
 def funnel(rank_res: dict, rows: list[dict] | None = None) -> dict:
@@ -228,7 +229,7 @@ def funnel(rank_res: dict, rows: list[dict] | None = None) -> dict:
     n = rank_res["n_eligible"]
     out = {}
     pos = _positive_sets(rows)
-    for role in ("heldout_positive", "heldout_positive_ext", "decoy", "listed_candidate"):
+    for role in ("heldout_positive", "heldout_positive_ext", "heldout_positive_indep", "decoy", "listed_candidate"):
         ids = pos[role] if role in pos else [r["id"] for r in rows if r.get("role") == role]
         bare = [i for i in ids if int(by_id[i].get("dsm_pass", by_id[i].get("bare_pass")) or 0) == 1]
         strict = [i for i in ids if int(by_id[i].get("bare_pass") or 0) == 1]
@@ -245,16 +246,23 @@ def funnel(rank_res: dict, rows: list[dict] | None = None) -> dict:
             "n_survive_stage2_cut_and_filter": sum(1 for i in bare if (rank_res["best_rank"].get(i) or math.inf) <= rank_res["top_k"]),
             "best_rank_median_pct": round(float(np.median([100.0 * b / n for b in best])), 2) if best else None,
             "per_search": per,
+            "ids_all": ids,
             "ids_surviving": [i for i in ids if (rank_res["best_rank"].get(i) or math.inf) <= rank_res["top_k"]],
             "ids_surviving_with_filter": [i for i in bare if (rank_res["best_rank"].get(i) or math.inf) <= rank_res["top_k"]],
         }
     # AUC known vs decoy on best rank across searches (lower = more Moon-like)
     de = [rank_res["best_rank"][r["id"]] for r in rows if r.get("role") == "decoy" and rank_res["best_rank"].get(r["id"])]
     for name, key in (("heldout_positive", "known_vs_decoy_auc_best_rank"),
-                      ("heldout_positive_ext", "known_ext_vs_decoy_auc_best_rank")):
+                      ("heldout_positive_ext", "known_ext_vs_decoy_auc_best_rank"),
+                      ("heldout_positive_indep", "known_indep_vs_decoy_auc_best_rank")):
         kn = [rank_res["best_rank"][i] for i in pos[name] if rank_res["best_rank"].get(i)]
         pairs = [(1.0 if a < b else 0.5 if a == b else 0.0) for a in kn for b in de]
         out[key] = round(float(np.mean(pairs)), 3) if pairs else None
+    out["feature_selection_note"] = ("shape rim term excluded because it lowered known-vs-decoy AUC (0.80 -> 0.70); "
+                                     "selection used the original 13 known analogs")
+    out["extended_auc_note"] = ("the extended-set AUC partly overlaps the selection set (it contains the original 13); "
+                                "heldout_positive_indep = documented hold-outs not within 20 km of the original 13 is "
+                                "the independent test")
     out["positives_failing_dsm_safe"] = [i for i in pos["heldout_positive_ext"]
                                          if not int(by_id[i].get("dsm_pass", by_id[i].get("bare_pass")) or 0)]
     return out

@@ -185,7 +185,7 @@ def cmd_report(args) -> dict:
     s2 = stage2_funnel(doc, cut_survivors=cut) if doc else {"note": "earth_sites.json not built"}
     if isinstance(s2.get("survivors"), dict):
         for role, src in (("heldout_positive", "heldout_positive"), ("heldout_positive_ext", "heldout_positive"),
-                          ("decoy", "decoy")):
+                          ("heldout_positive_indep", "heldout_positive"), ("decoy", "decoy")):
             ids = [i for i in s2["survivors"].get(src, []) if i in set(fn[role]["ids_surviving_with_filter"])]
             fn[role]["n_in_final_top3_approx"] = len(ids)
             fn[role]["ids_final_top3_approx"] = ids
@@ -233,8 +233,8 @@ def cmd_report(args) -> dict:
     for name, f in (("strict_bare>=0.6", fn_strict), ("dsm_safe", fn)):
         if not f:
             continue
-        for role in ("heldout_positive", "heldout_positive_ext", "decoy"):
-            if role not in f:
+        for role in ("heldout_positive", "heldout_positive_ext", "heldout_positive_indep", "decoy"):
+            if role not in f or not f[role]["n"]:
                 continue
             table.setdefault(name, {})[role] = {
                 "with_coords": f[role]["n"], "pass_filter": f[role]["n_pass_filter"],
@@ -243,6 +243,7 @@ def cmd_report(args) -> dict:
                 "final_top3_approx": f[role].get("n_in_final_top3_approx", "n/a")}
         table[name]["auc_known_vs_decoy_stage1"] = f.get("known_vs_decoy_auc_best_rank")
         table[name]["auc_known_ext_vs_decoy_stage1"] = f.get("known_ext_vs_decoy_auc_best_rank")
+        table[name]["auc_known_indep_vs_decoy_stage1"] = f.get("known_indep_vs_decoy_auc_best_rank")
     report = {
         "seed": screen.SEED,
         "sampling": {k: stats.get(k) for k in ("n_draw", "n_land", "n_pass", "pass_rate_of_land", "per_band")},
@@ -262,6 +263,10 @@ def cmd_report(args) -> dict:
         "stage1": {"n_eligible": rk["n_eligible"], "top_k_per_search": rk["top_k"], "n_searches": len(rk["searches"]),
                    "n_selected_unique": len(rk["selected"])},
         "funnel_table": table,
+        "validation_notes": {"feature_selection_note": fn.get("feature_selection_note"),
+                             "extended_auc_note": fn.get("extended_auc_note"),
+                             "independent_positives": fn.get("heldout_positive_indep", {}).get("ids_all"),
+                             "auc_independent": fn.get("known_indep_vs_decoy_auc_best_rank")},
         "nasadem_check": nasadem_summary,
         "documented_vs_screen_summary": doc_summary,
         "funnel": fn,

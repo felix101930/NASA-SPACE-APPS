@@ -2832,6 +2832,129 @@ code {
   max-width: 60ch;
 }
 
+/* ---------- Explore in 3D (Moon danger profiles) ---------- */
+
+.x3d {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.x3d-canvas {
+  position: relative;
+  height: calc(100vh - var(--header-h) - 330px);
+  min-height: 420px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.x3d-top {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.x3d-top > * {
+  pointer-events: auto;
+}
+
+.x3d-legend {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(10, 11, 14, 0.84);
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+}
+
+.x3d-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: center;
+}
+
+.x3d-layers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.x3d-sun {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.x3d-az {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.x3d-az .range {
+  width: 140px;
+}
+
+.x3d-tags {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.x3d-tags .x3d-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  will-change: transform;
+}
+
+.x3d-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background: rgba(10, 11, 14, 0.86);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.x3d-tag[data-hz] {
+  border-color: var(--hz);
+}
+
+.chip.layer-on {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 0 8px;
+}
+
+.profile-row[data-layer='true'] {
+  border-color: var(--line-strong);
+}
+
 /* MapLibre controls on the dark basemap */
 .maplibregl-ctrl-group {
   background: var(--surface-2) !important;

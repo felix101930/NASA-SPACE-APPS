@@ -1,7 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type JSX, type RefObject } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type JSX, type RefObject } from 'react';
 import { loadImage, type Origin } from '../data/loader';
 import { CoordBadge, DangerProfile, formatLatLon, profileSentence } from '../components/DangerProfile';
 import { ScreenHead } from '../components/ScreenHead';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import { Loading } from '../components/Loading';
+import type { ExploreLayer } from '../components/ExploreRegion';
+
+const ExploreRegion = lazy(() => import('../components/ExploreRegion'));
 import { useApp, useRegion, type CoreData } from '../store';
 import type { Region } from '../types/contract';
 
@@ -189,7 +194,18 @@ function useFontsReady(): boolean {
   return ready;
 }
 
-function PoleMap({ core, selected, onSelect }: { core: CoreData; selected: string; onSelect: (id: string) => void }): JSX.Element {
+function PoleMap({
+  core,
+  selected,
+  onSelect,
+  onOpen,
+}: {
+  core: CoreData;
+  selected: string;
+  onSelect: (id: string) => void;
+  /** Clicking a region square opens it in 3D. */
+  onOpen: (id: string) => void;
+}): JSX.Element {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { w, h } = useBox(wrapRef);
@@ -388,7 +404,8 @@ function PoleMap({ core, selected, onSelect }: { core: CoreData; selected: strin
             className="tile-hit"
             aria-hidden="true"
             style={{ left: t.x - pad, top: t.y - pad, width: t.w + pad * 2, height: t.h + pad * 2 }}
-            onClick={(): void => onSelect(t.r.id)}
+            onClick={(): void => onOpen(t.r.id)}
+            title={`Explore ${t.r.name} in 3D`}
             onMouseEnter={(): void => setHover(t.r.id)}
             onMouseLeave={(): void => setHover(null)}
           />
@@ -443,6 +460,24 @@ export function MoonOverview(): JSX.Element {
   const setRegion = useApp((s) => s.setRegion);
   const setScreen = useApp((s) => s.setScreen);
   const region = useRegion();
+  const [view, setView] = useState<'map' | '3d'>('map');
+  const [layers, setLayers] = useState<Set<ExploreLayer>>(new Set<ExploreLayer>(['shadow']));
+  const [available, setAvailable] = useState<ExploreLayer[]>([]);
+  const toggleLayer = useCallback((l: ExploreLayer): void => {
+    setLayers((prev: Set<ExploreLayer>): Set<ExploreLayer> => {
+      const next = new Set(prev);
+      if (next.has(l)) next.delete(l);
+      else next.add(l);
+      return next;
+    });
+  }, []);
+  const openRegion = useCallback(
+    (id: string): void => {
+      setRegion(id);
+      setView('3d');
+    },
+    [setRegion],
+  );
   const ovNote = usableOverview(core)?.file.note;
 
   return (
@@ -466,12 +501,40 @@ export function MoonOverview(): JSX.Element {
       />
       <div className="moon-layout">
         <div className="moon-map-col">
-          <PoleMap core={core} selected={regionId} onSelect={setRegion} />
-          <p className="map-caption">
-            South-polar stereographic, 0° longitude up. Each square is a 15 × 15 km analysis tile at true scale, shaded from our own
-            hillshade. Dashed outline: approximate location.
-            {ovNote ? ` Backdrop: ${ovNote}` : ''}
-          </p>
+          {view === '3d' && region ? (
+            <ErrorBoundary name={`Explore ${region.name} in 3D`} resetKey={region.id}>
+              <Suspense
+                fallback={
+                  <div className="x3d">
+                    <Loading label="Loading the 3D view…" />
+                  </div>
+                }
+              >
+                <ExploreRegion
+                  region={region}
+                  origin={core.regionsOrigin}
+                  layers={layers}
+                  onToggle={toggleLayer}
+                  onAvailable={setAvailable}
+                  onClose={(): void => setView('map')}
+                />
+              </Suspense>
+            </ErrorBoundary>
+          ) : (
+            <PoleMap core={core} selected={regionId} onSelect={setRegion} onOpen={openRegion} />
+          )}
+          {view === '3d' ? (
+            <p className="map-caption">
+              Drag to orbit. Click a danger row on the right to turn its layer on. Shadows are precomputed masks from the elevation model;
+              slope classes and the safest patch use illustrative thresholds, not mission rules.
+            </p>
+          ) : (
+            <p className="map-caption">
+              South-polar stereographic, 0° longitude up. Each square is a 15 × 15 km analysis tile at true scale, shaded from our own
+              hillshade. Dashed outline: approximate location.
+              {ovNote ? ` Backdrop: ${ovNote}` : ''}
+            </p>
+          )}
         </div>
         <aside className="panel panel-pad region-panel">
           <div className="region-list" role="group" aria-label="Choose a region">
@@ -497,7 +560,16 @@ export function MoonOverview(): JSX.Element {
                 </div>
                 <p className="region-sentence">{profileSentence(region)}</p>
               </div>
-              <DangerProfile region={region} regions={core.regions} />
+              <DangerProfile
+                region={region}
+                regions={core.regions}
+                activeLayers={view === '3d' ? layers : undefined}
+                onRowActivate={(id): void => {
+                  if (view !== '3d') return;
+                  const l: ExploreLayer = id;
+                  if (available.includes(l) && !layers.has(l)) toggleLayer(l);
+                }}
+              />
               <details className="method">
                 <summary>Sun and data quality here</summary>
                 <div className="method-body">
@@ -513,6 +585,9 @@ export function MoonOverview(): JSX.Element {
               <div className="panel-actions">
                 <button type="button" className="btn btn-primary" onClick={(): void => setScreen('region')}>
                   Find Earth sites for {region.name} →
+                </button>
+                <button type="button" className="btn" onClick={(): void => setView(view === '3d' ? 'map' : '3d')}>
+                  {view === '3d' ? 'Back to the map' : 'Explore in 3D'}
                 </button>
               </div>
             </>

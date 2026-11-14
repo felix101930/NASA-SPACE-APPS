@@ -143,6 +143,24 @@ def _clean(v):
     return v
 
 
+def _shape30(site_id: str) -> dict | None:
+    """Terrain-shape context at 30 m (pipeline.metrics.shape; NOT used in ranking). Cached per site."""
+    p = W.SITE_DIR / f"{site_id}_shape30.json"
+    if p.exists():
+        return json.loads(p.read_text())
+    try:
+        from pipeline.earth.extras import shape_from_core
+        near, _ = W.load_near(site_id)
+        sh = shape_from_core(fill_nan(near)[W.CORE_SLICE], W.RES)["s"]
+        out = {**{k: (None if v is None or not math.isfinite(v) else round(v, 4)) for k, v in sh.items()},
+               "note": "context only (30 m); shape rim term excluded from ranking after validation check"}
+    except Exception as exc:  # noqa: BLE001
+        log.warning("shape30 failed %s: %s", site_id, exc)
+        out = None
+    p.write_text(json.dumps(out))
+    return out
+
+
 def write_earth_sites(sites: list[dict], results: dict[str, dict], extra_meta: dict | None = None) -> dict:
     """Assemble web/public/data/earth_sites.json per docs/data-contract.md."""
     from pipeline.metrics import group_by_hazard
@@ -197,6 +215,7 @@ def write_earth_sites(sites: list[dict], results: dict[str, dict], extra_meta: d
                 "verified": s.get("verified"), "split": s.get("split"), "dup_of": s.get("dup_of")}
                if s.get("selected_by") == "documented" else {}),
             **({"name_source": s.get("name_source")} if s.get("name_source") else {}),
+            "shape": _shape30(s["id"]),
             **({"nasadem": (r.get("nasadem") or {"available": False})} if "nasadem" in r else {}),
         })
     md = meta()

@@ -98,7 +98,16 @@ export function RankStrip({
   );
 }
 
-export function DangerProfile({ region, regions }: { region: Region; regions: Region[] }): JSX.Element {
+interface DangerProfileProps {
+  region: Region;
+  regions: Region[];
+  /** Rows whose 3D layer is currently on (Explore in 3D). Optional. */
+  activeLayers?: ReadonlySet<string>;
+  /** Called when a row is clicked, e.g. to turn its 3D layer on. Optional. */
+  onRowActivate?: (id: ProfileRowId) => void;
+}
+
+export function DangerProfile({ region, regions, activeLayers, onRowActivate }: DangerProfileProps): JSX.Element {
   const [open, setOpen] = useState<ProfileRowId | null>(null);
 
   return (
@@ -115,18 +124,22 @@ export function DangerProfile({ region, regions }: { region: Region; regions: Re
           const isOpen = open === id;
           const levelWord = LEVEL_LABEL[level] ?? level;
           return (
-            <li key={id} className="profile-row" data-open={isOpen}>
+            <li key={id} className="profile-row" data-open={isOpen} data-layer={activeLayers?.has(id) ?? false}>
               <button
                 type="button"
                 className="profile-row-btn"
                 aria-expanded={isOpen}
                 aria-controls={`raw-${id}`}
-                onClick={(): void => setOpen(isOpen ? null : id)}
+                onClick={(): void => {
+                  setOpen(isOpen ? null : id);
+                  onRowActivate?.(id);
+                }}
               >
                 <span className="profile-name">
                   <HazardGlyph hazard={id} />
                   <span className="profile-name-text">{ROW_NAME[id]}</span>
                   <span className="caption">{ROW_SUB[id]}</span>
+                  {activeLayers?.has(id) && <span className="chip layer-on">On in 3D</span>}
                 </span>
                 <span className="profile-level">
                   <strong>{levelWord}</strong>

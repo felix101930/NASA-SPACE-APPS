@@ -29,6 +29,11 @@ SHAPE_JSONL = INTERIM / "screen_shape.jsonl"
 BRIGHT_JSON = INTERIM / "screen_brightness.json"
 MOON_EXTRA = INTERIM_ROOT / "moon" / "fingerprints_extra.json"
 BRIGHT_WEIGHT = 0.5
+# Validation check (stage 1, 11,940 windows): adding the shape rim sub-term dropped known-vs-decoy AUC
+# 0.80 -> 0.70 (decoy median best-rank 66 % -> 19 %: forest/farm DSMs mimic bowl/curvature stats),
+# while aspect (shadow) and brightness kept or raised it (0.80 / 0.82 ext). So the shape rim term is
+# computed and reported but NOT used in the ranking.
+USE_RIM_SHAPE = False
 SCALAR_FLOORS = {"shape_depr_per_100km2": 1.0, "shape_depr_area_frac": 0.01, "shape_hypso_integral": 0.05,
                  "shape_aspect_R": 0.05, "shape_aspect_R2": 0.05}
 
@@ -146,7 +151,7 @@ def extra_terms(sid: str, rid: str, shape: dict[str, dict], branks: dict[str, fl
     out = {"rim_shape": float("nan"), "shadow_aspect": float("nan"), "bright": float("nan")}
     m = moon_x[rid]
     e = shape.get(sid)
-    if e and e.get("s"):
+    if e and e.get("s") and USE_RIM_SHAPE:
         terms = []
         for k in SHAPE_HAZARD_KEYS["rim"]["scalars"]:
             a, b = e["s"].get(k), m["s"].get(k)
@@ -160,6 +165,7 @@ def extra_terms(sid: str, rid: str, shape: dict[str, dict], branks: dict[str, fl
                     terms.append(d)
         if terms:
             out["rim_shape"] = float(np.mean(terms))
+    if e and e.get("s"):
         at = [abs(e["s"][k] - m["s"][k]) / scales[k] for k in SHAPE_HAZARD_KEYS["shadow"]["scalars"]
               if e["s"].get(k) is not None and m["s"].get(k) is not None]
         if at:
