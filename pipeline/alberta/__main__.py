@@ -1,4 +1,4 @@
-"""CLI: python -m pipeline.alberta {all,screen,refine,export,calgary} [--force]
+"""CLI: python -m pipeline.alberta {all,screen,refine,export,calgary,equity} [--force]
 
 Every step is cached and idempotent; --force recomputes the selected step(s).
 """
@@ -60,9 +60,17 @@ def run_calgary(force: bool) -> dict:
     return out
 
 
+def run_equity(force: bool) -> dict:
+    from pipeline.alberta import equity_analysis as EA
+    t0 = time.time()
+    out = EA.build(force=force)
+    _record("equity", t0)
+    return out["summary"]
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(prog="python -m pipeline.alberta")
-    ap.add_argument("step", choices=["all", "screen", "refine", "export", "calgary"], nargs="?", default="all")
+    ap.add_argument("step", choices=["all", "screen", "refine", "export", "calgary", "equity"], nargs="?", default="all")
     ap.add_argument("--force", action="store_true", help="recompute instead of using caches")
     a = ap.parse_args()
     setup_logging()
@@ -73,6 +81,8 @@ def main() -> None:
             run_export(win, fps, dist, refined)
     if a.step in ("all", "calgary"):
         log.info("calgary: %s", run_calgary(a.force))
+    if a.step in ("all", "calgary", "equity"):
+        log.info("equity: %s", run_equity(a.force or a.step == "calgary"))
 
 
 if __name__ == "__main__":

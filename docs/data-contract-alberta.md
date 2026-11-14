@@ -180,3 +180,56 @@ null), `best_distance_terrain_only` (same, for every window), `best_hazard`, `be
 - **DTW.** Sakoe–Chiba band of 10 samples on the 100-point slope profiles. The cost is |Δslope| in degrees,
   averaged over the warping path, so `dtw_deg` reads as the typical slope mismatch.
 - **Tie band.** Walks within 10 % (+0.05°) of the best DTW are treated as ties.
+
+## `calgary/equity.json` (Calgary Equity Index analysis)
+
+Producer: `pipeline/alberta/equity_analysis.py` (`python -m pipeline.alberta equity [--force]`; also runs after
+`calgary` and `all`). Reads `walks.json`/`walks.bin`, `presets.json` and the cached Equity Index layer 2
+(Accessibility & Amenities domain with `TOTAL_POPULATION`, plus the Total Equity Score, Human and Social
+Wellbeing and Community Belonging and Safety domains, cached as `data/raw/alberta/calgary/equity_<key>.geojson`).
+About 20 kB. Equity Index direction: higher score = **greater need** (see above).
+
+Definitions:
+- **Suitable route**: starts within 400 m of an ACTIVE stop **and** matches at least one of the 18 Moon presets
+  with banded DTW **< 1.0°** (same matcher as `presets.json`: Sakoe–Chiba radius 10, candidates 0.6–1.6× the
+  Moon route's length; same threshold as the UI's "Calgary match").
+- **Covered tract**: at least one suitable route has its midpoint in the tract (`walks.json` `tract`).
+- **Event score** (top 5): `need × transit × quality`, one route per tract (its best `transit × quality`), starts
+  ≥ 2 km apart (greedy in rank order). `need` = percentile of the Accessibility & Amenities score among the
+  288 tracts (0–1); `transit` = 0.5·(1 − stop distance/400 m) + 0.5·min(routes at the stop, 4)/4 (school-term specials numbered 600–899 not counted; `near_stop.routes` lists the others, `n_school_routes` counts them);
+  `quality` = 1 − DTW/1°. Ties: tract id, then route id.
+- **Minutes' walk**: ceil(distance / 80 m per min), an assumed 4.8 km/h pace.
+
+```jsonc
+{
+  "meta": { ..., "method": {"suitable_route","covered_tract","need","population","event_score","minutes_walk",
+                            "nearest_suitable","robustness","scale_note"}, "cei_source", "cei_quote", "licence_note" },
+  "headline": "40 of 57 highest-need neighbourhoods have a Moon-walk route that starts within 400 m of a bus or train stop",
+  "summary": { "n_tracts": 288, "n_routes", "n_routes_in_a_tract", "n_routes_near_stop", "n_routes_moon_match",
+               "n_routes_suitable", "n_tracts_covered", "suitable_by_moon_route": {"<region>:<kind>": n},
+               "n_suitable_matching_a_steeper_moon_route": 0 },
+  "coverage": [                      // 5 rows, Highest -> Lowest (Accessibility & Amenities category)
+    { "category", "n_tracts", "n_with_any_route", "n_covered", "pct_covered",
+      "population", "population_covered", "pct_population_covered", "n_suitable_routes" } ],
+  "coverage_total_equity": [ ...same rows by Total Equity Score category (robustness check)... ],
+  "gap": { "high_need": {"categories": ["Highest","High"], "n_tracts", "n_covered", "pct_covered",
+                         "population", "population_covered", "pct_population_covered"},
+           "low_need": {...Low/Lowest...}, "gap_pct_points", "direction": "higher"|"lower"|"about the same",
+           "statement": "plain-language sentence" },
+  "top_events": [ { "rank", "ctuid", "tract", "communities", "place", "park", "access_category",
+                    "access_domain_score", "need_percentile", "population", "route_id", "length_m",
+                    "near_stop": {"name","dist_m","minutes_walk","routes","n_school_routes"},
+                    "moon_match": {"region","region_name","kind","dtw_deg"},
+                    "factors": {"need","transit","quality"}, "score", "why" } ],   // 5, score descending
+  "uncaptured_highest": { "n", "reasons": {"no_route","far_from_stop","no_slope_match"},
+    "tracts": [ { "ctuid", "tract", "communities", "population", "access_domain_score", "n_routes_sampled",
+                  "reason", "why",
+                  "nearest_suitable": {"route_id","place","ctuid","dist_km","stop_name","stop_dist_m"} } ] }
+}
+```
+
+- `route_id` and `nearest_suitable.route_id` are `walks.json` ids (row = `walks.bin` row).
+- `communities` drops the City's residual sub-area codes (e.g. `03W`); a tract with no named community shows
+  `Census tract <NAME>`. `nearest_suitable.dist_km` is straight-line, tract centroid → route start.
+- Coverage depends on where City pathways exist and on the 2,762-route sample; "not covered" means no suitable
+  route **in this sample**, not that the neighbourhood has no pathways.

@@ -246,3 +246,118 @@ export function isPresetsFile(v: unknown): v is PresetsFile {
     v.presets.every((p: unknown) => isObj(p) && typeof p.region === 'string' && Array.isArray(p.slope_deg) && isObj(p.match))
   );
 }
+
+// ------------------------------------------------------------------------------------------------
+// calgary/equity.json (Calgary Equity Index analysis; docs/data-contract-alberta.md)
+// ------------------------------------------------------------------------------------------------
+
+export interface EquityCoverageRow {
+  category: NeedCategory;
+  n_tracts: number;
+  n_with_any_route: number;
+  n_covered: number;
+  pct_covered: number | null;
+  population: number;
+  population_covered: number;
+  pct_population_covered: number | null;
+  n_suitable_routes: number;
+}
+
+export interface EquityGapSide {
+  categories: NeedCategory[];
+  n_tracts: number;
+  n_covered: number;
+  pct_covered: number;
+  population: number;
+  population_covered: number;
+  pct_population_covered: number | null;
+}
+
+export interface EquityEvent {
+  rank: number;
+  ctuid: string;
+  tract: string;
+  communities: string;
+  place: string;
+  park: string | null;
+  access_category: NeedCategory;
+  access_domain_score: number | null;
+  need_percentile: number;
+  population: number | null;
+  route_id: string;
+  length_m: number;
+  near_stop: { name: string; dist_m: number; minutes_walk: number; routes: string[]; n_school_routes: number };
+  moon_match: { region: string; region_name: string; kind: 'gentle' | 'steeper'; dtw_deg: number };
+  factors: { need: number; transit: number; quality: number };
+  score: number;
+  why: string;
+}
+
+export type UncapturedReason = 'no_route' | 'far_from_stop' | 'no_slope_match' | 'other';
+
+export interface UncapturedTract {
+  ctuid: string;
+  tract: string;
+  communities: string;
+  population: number | null;
+  access_domain_score: number | null;
+  n_routes_sampled: number;
+  reason: UncapturedReason;
+  why: string;
+  nearest_suitable: {
+    route_id: string;
+    place: string;
+    ctuid: string | null;
+    dist_km: number;
+    stop_name: string | null;
+    stop_dist_m: number;
+  } | null;
+}
+
+export interface EquityFile {
+  meta: Meta & { method?: Record<string, string>; cei_source?: string; cei_quote?: string };
+  headline: string;
+  summary: {
+    n_tracts: number;
+    n_routes: number;
+    n_routes_near_stop: number;
+    n_routes_moon_match: number;
+    n_routes_suitable: number;
+    n_tracts_covered: number;
+    n_suitable_matching_a_steeper_moon_route: number;
+  };
+  coverage: EquityCoverageRow[];
+  coverage_total_equity: EquityCoverageRow[];
+  gap: {
+    high_need: EquityGapSide;
+    low_need: EquityGapSide;
+    gap_pct_points: number;
+    direction: 'higher' | 'lower' | 'about the same';
+    statement: string;
+  };
+  top_events: EquityEvent[];
+  uncaptured_highest: { n: number; reasons: Record<string, number>; tracts: UncapturedTract[] };
+}
+
+function isCoverageRow(v: unknown): v is EquityCoverageRow {
+  return isObj(v) && typeof v.category === 'string' && typeof v.n_tracts === 'number' && typeof v.n_covered === 'number';
+}
+
+export function isEquityFile(v: unknown): v is EquityFile {
+  return (
+    isObj(v) &&
+    isMeta(v.meta) &&
+    typeof v.headline === 'string' &&
+    Array.isArray(v.coverage) &&
+    v.coverage.every(isCoverageRow) &&
+    Array.isArray(v.coverage_total_equity) &&
+    v.coverage_total_equity.every(isCoverageRow) &&
+    isObj(v.gap) &&
+    Array.isArray(v.top_events) &&
+    v.top_events.every(
+      (e: unknown): boolean => isObj(e) && typeof e.route_id === 'string' && typeof e.rank === 'number' && isObj(e.near_stop),
+    ) &&
+    isObj(v.uncaptured_highest) &&
+    Array.isArray(v.uncaptured_highest.tracts)
+  );
+}

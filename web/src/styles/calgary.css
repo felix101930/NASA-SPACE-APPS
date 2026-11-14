@@ -1,0 +1,281 @@
+/* Calgary tab (AlbertaCalgary.tsx): Equity Index coverage chart, event cards, unreached list.
+   Uses the global tokens from styles.css; nothing here overrides shared component styles. */
+
+.cg-panel {
+  gap: 20px;
+}
+
+.cg-mode {
+  align-self: flex-start;
+}
+
+.cg-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cg-h h3 {
+  margin: 0;
+  font-size: var(--fs-h3);
+  line-height: 1.3;
+}
+
+/* ---------------------------------------------------------------- coverage chart (single series) */
+
+.cg-cov {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cg-cov-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.seg.seg-sm button {
+  padding: 4px 10px;
+  font-size: var(--fs-caption);
+}
+
+.cg-cov-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.cg-cov-table tr {
+  cursor: default;
+}
+
+.cg-cov-table tr:hover th,
+.cg-cov-table tr:hover td {
+  color: var(--text);
+}
+
+.cg-cov-table th,
+.cg-cov-table td {
+  padding: 4px 0;
+  color: var(--text-2);
+  font-weight: 400;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.cg-cov-table th[scope='row'] {
+  width: 104px;
+  white-space: nowrap;
+}
+
+.cg-cov-table th[scope='row'] .need-swatch {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: -1px;
+}
+
+.cg-bar-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cg-bar {
+  flex: 1;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.cg-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  background: var(--text-2);
+  transition: width 240ms var(--ease-out);
+}
+
+.cg-cov-table tr:hover .cg-bar > span {
+  background: var(--text);
+}
+
+.cg-bar-pct {
+  width: 40px;
+  text-align: right;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.cg-bar-detail {
+  width: 92px;
+  text-align: right !important;
+  color: var(--text-3) !important;
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+
+.cg-gap {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-label);
+}
+
+.cg-gap strong {
+  color: var(--text);
+}
+
+/* ---------------------------------------------------------------- event cards */
+
+.cg-events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cg-event {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+  color: var(--text);
+  font-family: var(--font);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 140ms var(--ease-out),
+    background 140ms var(--ease-out);
+}
+
+.cg-event:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
+
+.cg-event[aria-pressed='true'] {
+  border-color: var(--text-2);
+  background: var(--surface-2);
+}
+
+.cg-event:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.cg-event-n {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-3);
+  border: 1.5px solid var(--text-3);
+}
+
+.cg-event[aria-pressed='true'] .cg-event-n {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.cg-event-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cg-event-place {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.cg-event-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-label);
+  color: var(--text-2);
+}
+
+.cg-event-line {
+  font-size: var(--fs-caption);
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------- unreached list */
+
+.cg-unreached {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  font-size: var(--fs-label);
+}
+
+.cg-unreached summary {
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.cg-unreached summary .muted {
+  font-weight: 400;
+}
+
+.cg-unreached ul {
+  list-style: none;
+  margin: 12px 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.cg-unreached li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cg-unreached-name {
+  color: var(--text);
+}
+
+.cg-unreached li .muted {
+  font-size: var(--fs-caption);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-bar > span,
+  .cg-event {
+    transition: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .cg-bar-detail {
+    display: none;
+  }
+  .cg-cov-table th[scope='row'] {
+    width: 92px;
+  }
+}

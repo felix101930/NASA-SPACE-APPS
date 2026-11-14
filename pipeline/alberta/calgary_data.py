@@ -77,20 +77,31 @@ def stops_by_route() -> list[dict]:
     return socrata_all("pm3p-838w", fmt="json")
 
 
+# Extra Equity Index indicators used only by equity_analysis.py (robustness checks on the overall index).
+EQUITY_EXTRA = {
+    "total_equity": "Total Equity Score",
+    "social_wellbeing": "*Domain Score - Human and Social Wellbeing",
+    "belonging_safety": "*Domain Score - Community Belonging and Safety",
+}
+
+
+def equity_indicator(key: str, label: str) -> list[dict]:
+    """GeoJSON features (one per tract) for one Equity Index indicator label (cached)."""
+    cache = CAL / f"equity_{key}.geojson"
+    if not cache.exists():
+        d = http_get(EQUITY_URL, params={
+            "where": f"INDICATOR_LABEL='{label}'",
+            "outFields": "NAME,CENSUSTRACT,COMMUNITIES,INDICATOR_VALUE,EQUITY_CATEGORY,TOTAL_POPULATION",
+            "outSR": "4326", "f": "geojson", "resultRecordCount": 2000}, timeout=180).json()
+        cache.write_text(json.dumps(d))
+    feats = json.loads(cache.read_text())["features"]
+    log.info("equity %s: %d tracts", key, len(feats))
+    return feats
+
+
 def equity() -> dict[str, list[dict]]:
     """{indicator_key: [geojson features (one per tract)]} (cached)."""
-    out = {}
-    for key, label in EQUITY_INDICATORS.items():
-        cache = CAL / f"equity_{key}.geojson"
-        if not cache.exists():
-            d = http_get(EQUITY_URL, params={
-                "where": f"INDICATOR_LABEL='{label}'",
-                "outFields": "NAME,CENSUSTRACT,COMMUNITIES,INDICATOR_VALUE,EQUITY_CATEGORY,TOTAL_POPULATION",
-                "outSR": "4326", "f": "geojson", "resultRecordCount": 2000}, timeout=180).json()
-            cache.write_text(json.dumps(d))
-        out[key] = json.loads(cache.read_text())["features"]
-        log.info("equity %s: %d tracts", key, len(out[key]))
-    return out
+    return {key: equity_indicator(key, label) for key, label in EQUITY_INDICATORS.items()}
 
 
 def dtm(bounds_3979: tuple[float, float, float, float], force: bool = False) -> tuple[np.ndarray, Affine]:
