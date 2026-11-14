@@ -7,3 +7,5 @@ __pycache__/
 node_modules/
 data/raw/
 data/interim/
+web/dist/
+*.tsbuildinfo
