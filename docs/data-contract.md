@@ -13,6 +13,10 @@ This file is the single source of truth. Change it here first, then update both 
   - Earth tiles are in a local UTM zone.
 - **Binary tiles:** raw little-endian `Float32`, row-major, row 0 = top (north / +y), no header.
   - Heights are in metres. NaN means no data.
+- **Tile origin:** `origin_x` / `origin_y` is the **top-left CORNER of pixel (0,0)**, matching rasterio `transform.c` / `transform.f`.
+  - Pixel (row r, col c) has its centre at `(origin_x + (c + 0.5)·res, origin_y − (r + 0.5)·res)`.
+  - Both the Python and TypeScript profile samplers must use this convention.
+- **Azimuth on grids:** measured clockwise from grid +y. On Moon polar-stereographic grids, +y is not geographic north.
 - **Times:** ISO 8601 UTC with a `Z` suffix. Angles are in degrees. Sun azimuth is clockwise from north.
 - **Every JSON file** carries a `"meta"` block:
   `{ "generated_utc", "pipeline_version", "sources": [ {"name","url","licence","citation"} ] }`.
