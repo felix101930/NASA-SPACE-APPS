@@ -25,34 +25,33 @@ const LIMITS: readonly string[] = [
 /** For each hazard, the one measure whose Moon–Earth gap the "How close?" line reports. */
 const GAP_METRIC: Record<HazardId, { metric: string; label: string; fmt: (v: number) => string }> = {
   rim: { metric: 'jump1km_p95_m', label: 'rim drop', fmt: (v: number): string => `~${fmtM(v)}` },
-  shadow: { metric: 'shadow_frac_el3', label: 'shadow', fmt: (v: number): string => `~${fmtNum(v * 100, 0)} pts` },
-  texture: { metric: 'empty_cell_frac_el3', label: 'blank ground', fmt: (v: number): string => `~${fmtNum(v * 100, 0)} pts` },
+  shadow: { metric: 'shadow_frac_el3', label: 'shadow', fmt: (v: number): string => `~${fmtNum(Math.max(1, v * 100), 0)}% of the ground` },
+  texture: { metric: 'empty_cell_frac_el3', label: 'blank ground', fmt: (v: number): string => `~${fmtNum(Math.max(1, v * 100), 0)}% of the ground` },
 };
 
-/** Each ranking cell's headline measure, shown as the real-unit gap between the Moon region and its #1 Earth match. */
-const CELL_GAP: Record<HazardId, { metric: string; text: (d: number) => string; what: string }> = {
+/** A 0–1 share as a whole percentage. */
+function pct(v: number): string {
+  return `${Math.round(v * 100)}%`;
+}
+
+/** Each ranking cell's headline measure, shown as Moon value vs Earth value (no derived units to decode). */
+const CELL_GAP: Record<HazardId, { metric: string; text: (moon: number, earth: number) => string; what: string }> = {
   shadow: {
     metric: 'shadow_frac_el3',
-    text: (d: number): string => `within ${pts(d)} of shadow`,
-    what: 'percentage points of ground in shadow at a 3° sun, averaged over all sun directions',
+    text: (moon: number, earth: number): string => `Moon ${pct(moon)} · Earth ${pct(earth)} dark`,
+    what: 'share of the ground in shadow at a 3° sun, averaged over all sun directions',
   },
   rim: {
     metric: 'jump1km_p95_m',
-    text: (d: number): string => `drops within ${Math.max(1, Math.round(d))} m`,
-    what: 'height change over 1 km, 95th percentile (the big drops)',
+    text: (moon: number, earth: number): string => `Moon ${Math.round(moon)} m · Earth ${Math.round(earth)} m drops`,
+    what: 'height change over 1 km, steepest 5% of 1 km stretches (the big drops)',
   },
   texture: {
     metric: 'empty_cell_frac_el3',
-    text: (d: number): string => `within ${pts(d)} featureless`,
-    what: 'percentage points of 1 km squares with nothing for a camera to track (3° sun)',
+    text: (moon: number, earth: number): string => `Moon ${pct(moon)} · Earth ${pct(earth)} featureless`,
+    what: 'share of 1 km squares with nothing for a camera to track (3° sun)',
   },
 };
-
-/** A share difference (0–1) as percentage points, never "0 pts": under half a point reads "within 1 pt". */
-function pts(d: number): string {
-  const v = Math.max(1, Math.round(d * 100));
-  return `${v} ${v === 1 ? 'pt' : 'pts'}`;
-}
 
 const TIMES_LINE = '× = how far off, compared with how much the Moon region varies within itself (under 0.5 = close)';
 
@@ -66,8 +65,7 @@ function cellGap(core: CoreData, row: RankingRow, h: HazardId): string | null {
   const m = pool.find((x: Match): boolean => x.site_id === best) ?? pool.find((x: Match): boolean => x.rank === 1);
   const l = m?.lights.find((x) => x.metric === CELL_GAP[h].metric);
   if (!l) return null;
-  const d = Math.abs(l.earth - l.moon);
-  return Number.isFinite(d) ? CELL_GAP[h].text(d) : null;
+  return Number.isFinite(l.moon) && Number.isFinite(l.earth) ? CELL_GAP[h].text(l.moon, l.earth) : null;
 }
 
 function median(xs: number[]): number | null {
