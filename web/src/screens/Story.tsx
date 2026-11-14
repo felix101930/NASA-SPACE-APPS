@@ -6,6 +6,7 @@ import { HazardGlyph } from '../components/Glyphs';
 import { Explainer } from '../components/explainer/Explainer';
 import { LanderTally } from '../components/LanderTally';
 import { ImpactPanel } from '../components/ImpactPanel';
+import '../styles/story.css';
 
 /** Schematic drawings, explicitly not to scale. */
 function Diagram({ hazard }: { hazard: HazardId }): JSX.Element {
@@ -116,13 +117,6 @@ function FailureCard({ f }: { f: FailureStory }): JSX.Element {
   );
 }
 
-function scrollToExplainer(): void {
-  document.getElementById('how-we-find-analogs')?.scrollIntoView({
-    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-    block: 'start',
-  });
-}
-
 export function Story(): JSX.Element {
   const setScreen = useApp((s) => s.setScreen);
   return (
@@ -131,36 +125,11 @@ export function Story(): JSX.Element {
         <div className="story-hero-grid">
           <div className="story-hero-text">
             <h1 id="story-h">{HERO.headline}</h1>
-            <p>{HERO.body}</p>
-            <p className="story-problem">
-              <strong>{HERO.problem.slice(0, HERO.problem.indexOf(':') + 1)}</strong>
-              {HERO.problem.slice(HERO.problem.indexOf(':') + 1)}
-            </p>
-            <p className="story-kicker">{HERO.kicker}</p>
-            <div className="story-cta">
-              <button type="button" className="btn btn-primary btn-lg" onClick={(): void => setScreen('moon')}>
-                See the Moon danger profiles →
-              </button>
-              <button type="button" className="link-btn" onClick={scrollToExplainer}>
-                How we find Earth analogs ↓
-              </button>
-            </div>
+            <p className="story-cause">{HERO.cause}</p>
+            <p className="story-artemis">{HERO.artemis}</p>
           </div>
           <LanderTally />
         </div>
-        <aside className="apollo" aria-label={APOLLO_HEADING}>
-          <h2 className="apollo-h">{APOLLO_HEADING}</h2>
-          <ul className="apollo-list">
-            {APOLLO_QUOTES.map((q: ApolloQuote) => (
-              <li key={q.mission}>
-                <span className="apollo-mission">{q.mission}</span>
-                <span>
-                  {q.setup} “{q.quote}.”
-                </span>
-              </li>
-            ))}
-          </ul>
-        </aside>
       </section>
 
       <h2 className="section-title">{FAILURES_HEADING}</h2>
@@ -174,22 +143,30 @@ export function Story(): JSX.Element {
         {FOURTH_MEASURE}
       </p>
 
+      <aside className="apollo apollo-small" aria-label={APOLLO_HEADING}>
+        <h2 className="apollo-h">{APOLLO_HEADING}</h2>
+        <ul className="apollo-list">
+          {APOLLO_QUOTES.map((q: ApolloQuote) => (
+            <li key={q.mission}>
+              <span className="apollo-mission">{q.mission}</span>
+              <span>
+                {q.setup} “{q.quote}.”
+              </span>
+            </li>
+          ))}
+        </ul>
+      </aside>
+
       <ImpactPanel />
 
       <Explainer />
 
-      <section className="question">
-        <div>
-          <h2>Where on Earth can we rehearse these before Artemis IV?</h2>
-          <p>
-            NASA’s current plan (October 2026) names Artemis IV, targeted for 2028, as the first crewed landing near the lunar south pole.
-            Every rehearsal we can run on Earth before then is cheaper than learning on the Moon.
-          </p>
-        </div>
-        <button type="button" className="btn btn-lg" onClick={(): void => setScreen('moon')}>
-          Profile the nine regions →
+      <nav className="story-end" aria-label="Next step">
+        <p>{HERO.deadline}</p>
+        <button type="button" className="btn" onClick={(): void => setScreen('moon')}>
+          {HERO.cta} →
         </button>
-      </section>
+      </nav>
     </div>
   );
 }

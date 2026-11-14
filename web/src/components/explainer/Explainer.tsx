@@ -2,8 +2,8 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type JSX, type ReactNode } from 'react';
 import { loadTile, type LoadedTile } from '../../data/tiles';
 import { loadJsonFrom, type Loaded } from '../../data/loader';
-import { listWords, metricInfo, NEW_PLACE_MIN_KM } from '../../content';
-import { parseMethodExtras, type DocumentedSite, type MethodExtras } from '../../lib/methodExtras';
+import { metricInfo, NEW_PLACE_MIN_KM } from '../../content';
+import { parseMethodExtras, type MethodExtras } from '../../lib/methodExtras';
 import { isFindbackRaw, parseFindback, type Findback } from '../../screens/walk/findback';
 import { InfoTip } from '../InfoTip';
 import { avgShadowAt } from '../../lib/shadow';
@@ -237,13 +237,56 @@ function WorldDots({
 // Step 4: terrain measurements
 // ------------------------------------------------------------------------------------------------
 
+/** Plain names for the example's measurements; the statistics terms (P95, P99) live in the info box. */
+const PLAIN_LABEL: Record<string, string> = {
+  jump1km_p95_m: 'Big drops — the steepest 5% of 1 km stretches',
+  jump1km_p99_m: 'Very biggest drops — steepest 1%',
+  frac_track_over_500m: 'Share of 1 km stretches with a drop over 500 m',
+};
+
+/** "Earth is 62 m gentler" for a height measure; null when the key is not in metres. */
+function dropDiffWords(key: string, moon: number, earth: number): string | null {
+  if (!key.endsWith('_m')) return null;
+  const d = Math.round(Math.abs(moon - earth));
+  if (d < Math.max(2, Math.abs(moon) * 0.02)) return 'about the same';
+  return earth < moon ? `Earth is ${nf.format(d)} m gentler` : `Earth is ${nf.format(d)} m steeper`;
+}
+
+/** Schematic: a terrain profile crossing a crater rim, a 1 km bracket, and the drop it measures. */
+function DropDiagram({ drop }: { drop: string }): JSX.Element {
+  return (
+    <svg className="ex-drop" viewBox="0 0 360 132" role="img" aria-label={`Schematic: along 1 km of ground crossing a crater rim, the height drops ${drop}`}>
+      <path d="M0 44 L110 42 Q140 30 158 36 L196 104 Q260 112 360 110 L360 132 L0 132Z" className="ex-drop-ground" />
+      <path d="M0 44 L110 42 Q140 30 158 36 L196 104 Q260 112 360 110" className="ex-drop-line" />
+      {/* 1 km bracket */}
+      <path d="M140 14 V22 M140 18 H246 M246 14 V22" className="ex-drop-bracket" />
+      <text x="193" y="11" textAnchor="middle" className="ex-drop-label">
+        1 km
+      </text>
+      <line x1="140" y1="22" x2="140" y2="33" className="ex-drop-guide" />
+      <line x1="140" y1="33" x2="252" y2="33" className="ex-drop-guide" />
+      {/* the drop */}
+      <path d="M252 37 V103 M247 97 L252 104 L257 97" className="ex-drop-arrow" />
+      <text x="262" y="74" className="ex-drop-value">
+        {drop}
+      </text>
+      <text x="4" y="126" className="ex-drop-note">
+        schematic, not to scale
+      </text>
+    </svg>
+  );
+}
+
 function Fingerprint({ method, siteName, regionName }: { method: MethodFile; siteName: string; regionName: string }): JSX.Element {
   const ex = method.example;
   const keys = Object.keys(ex.moon).filter((k: string): boolean => typeof ex.earth[k] === 'number');
   const hz: HazardKey = ex.hazard === 'shadow' || ex.hazard === 'rim' || ex.hazard === 'texture' ? ex.hazard : 'slope';
   const on = useEntered();
+  const lead = keys.find((k: string): boolean => k === 'jump1km_p95_m') ?? null;
+  const leadDiff = lead ? dropDiffWords(lead, ex.moon[lead], ex.earth[lead]) : null;
   return (
     <div className="ex-finger">
+      {lead && <DropDiagram drop={metricInfo(lead).fmt(ex.moon[lead])} />}
       <div className="ex-finger-head">
         <span className="legend-item">
           <span className="bar-key" aria-hidden="true" />
@@ -264,7 +307,7 @@ function Fingerprint({ method, siteName, regionName }: { method: MethodFile; sit
             <li key={k}>
               <span className="ex-finger-label">
                 <HazardGlyph hazard={hz} />
-                {mi.label}
+                {PLAIN_LABEL[k] ?? mi.label}
               </span>
               <span className="ex-bars">
                 <span className="ex-bar" style={{ transform: `scaleX(${on ? Math.abs(m) / max : 0})` }} />
@@ -278,6 +321,12 @@ function Fingerprint({ method, siteName, regionName }: { method: MethodFile; sit
           );
         })}
       </ul>
+      {lead && leadDiff && (
+        <p className="ex-diff">
+          Big drops: Moon <strong>{metricInfo(lead).fmt(ex.moon[lead])}</strong> vs Earth <strong>{metricInfo(lead).fmt(ex.earth[lead])}</strong>.{' '}
+          <span className="ex-diff-words">{leadDiff[0].toUpperCase() + leadDiff.slice(1)}.</span>
+        </p>
+      )}
       <p className="ex-also">
         <span className="ex-chip">+ ground brightness</span>
         <span className="ex-chip">+ slope direction</span>
@@ -332,113 +381,123 @@ function Funnel({ rows, moved }: { rows: MethodFunnelRow[]; moved: MethodExtras[
 }
 
 // ------------------------------------------------------------------------------------------------
-// Step 6: known analogs vs decoys
+// Step 6: real Moon-training sites vs decoys
 // ------------------------------------------------------------------------------------------------
 
-function StripPlot({ method }: { method: MethodFile }): JSX.Element {
+/** Two rows of dots on a best-to-worst axis: where real training sites and decoys rank among all Earth squares. */
+function CheckRows({ method }: { method: MethodFile }): JSX.Element {
   const v = method.validation;
   const W = 640;
-  const H = 168;
-  const x = (pct: number): number => 24 + (Math.min(Math.max(pct, 0), 100) / 100) * (W - 48);
-  const rowY = { known: 54, decoys: 118 };
-  const jitter = (i: number): number => ((i * 7) % 5) * 4 - 8;
-  const dot = (s: MethodValSite, i: number, kind: 'known' | 'decoys'): JSX.Element => (
-    <circle key={s.id} cx={x(s.best_rank_pct)} cy={rowY[kind] + jitter(i)} r="6" className={kind === 'known' ? 'sp-known' : 'sp-decoy'}>
-      <title>
-        {s.name}: best rank in the top {s.best_rank_pct.toFixed(1)}%
-      </title>
+  const H = 184;
+  const L = 16;
+  const R = W - 16;
+  const x = (pct: number): number => L + (Math.min(Math.max(pct, 0), 100) / 100) * (R - L);
+  const rowY = { known: 54, decoys: 128 };
+  interface Spot {
+    cx: number;
+    dy: number;
+  }
+  /** Simple dodge: put each dot in the nearest free slot above or below the lane; when a column is full, nudge it right. */
+  const dodge = (sites: MethodValSite[]): Map<string, Spot> => {
+    const slots = [0, -9, 9, -18, 18];
+    const placed: Spot[] = [];
+    const out = new Map<string, Spot>();
+    for (const s of [...sites].sort((a: MethodValSite, b: MethodValSite): number => a.best_rank_pct - b.best_rank_pct)) {
+      let cx = x(s.best_rank_pct);
+      let dy: number | undefined;
+      for (let tries = 0; dy === undefined && tries < 40; tries++) {
+        dy = slots.find((d: number): boolean => placed.every((p: Spot): boolean => Math.hypot(p.cx - cx, p.dy - d) >= 12.5));
+        if (dy === undefined) cx += 3;
+      }
+      const spot: Spot = { cx, dy: dy ?? 0 };
+      placed.push(spot);
+      out.set(s.id, spot);
+    }
+    return out;
+  };
+  const spots = { known: dodge(v.known), decoys: dodge(v.decoys) };
+  const dot = (s: MethodValSite, kind: 'known' | 'decoys'): JSX.Element => (
+    <circle
+      key={s.id}
+      cx={spots[kind].get(s.id)?.cx ?? x(s.best_rank_pct)}
+      cy={rowY[kind] + (spots[kind].get(s.id)?.dy ?? 0)}
+      r="6"
+      className={kind === 'known' ? 'sp-known' : 'sp-decoy'}
+    >
+      <title>{s.name}</title>
     </circle>
   );
   return (
-    <div className="ex-strip">
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        role="img"
-        aria-label={`Known Moon-training sites: median best rank top ${v.known_median_pct.toFixed(1)}%. Decoys: median ${v.decoy_median_pct.toFixed(0)}%.`}
-      >
-        <line x1={x(0)} x2={x(100)} y1={H - 22} y2={H - 22} className="sp-axis" />
-        {[0, 25, 50, 75, 100].map((t: number) => (
-          <g key={t}>
-            <line x1={x(t)} x2={x(t)} y1={H - 26} y2={H - 18} className="sp-axis" />
-            <text x={x(t)} y={H - 4} textAnchor="middle" className="sp-tick">
-              {t === 0 ? 'top' : `${t}%`}
-            </text>
-          </g>
-        ))}
-        <text x={x(0)} y={rowY.known - 22} className="sp-row">
-          Known Moon-training sites
-        </text>
-        <text x={x(0)} y={rowY.decoys - 22} className="sp-row">
-          Decoys: farmland, forest, cities, dunes
-        </text>
-        <line x1={x(v.known_median_pct)} x2={x(v.known_median_pct)} y1={rowY.known - 14} y2={rowY.known + 14} className="sp-median" />
-        <line x1={x(v.decoy_median_pct)} x2={x(v.decoy_median_pct)} y1={rowY.decoys - 14} y2={rowY.decoys + 14} className="sp-median" />
-        {v.known.map((s: MethodValSite, i: number) => dot(s, i, 'known'))}
-        {v.decoys.map((s: MethodValSite, i: number) => dot(s, i, 'decoys'))}
-      </svg>
-      <p className="caption">Best rank among all Earth squares; left is better. Dashed lines mark each group’s middle.</p>
-    </div>
+    <svg
+      className="ex-checkrows"
+      viewBox={`0 0 ${W} ${H}`}
+      role="img"
+      aria-label="Real Moon-training sites mostly rank toward the best-match end; farmland, forest and cities mostly toward the worst-match end."
+    >
+      <text x={L} y={rowY.known - 32} className="sp-row">
+        Real Moon-training sites
+      </text>
+      <line x1={L} x2={R} y1={rowY.known} y2={rowY.known} className="sp-lane" />
+      <text x={L} y={rowY.decoys - 32} className="sp-row">
+        Farmland, forest, cities
+      </text>
+      <line x1={L} x2={R} y1={rowY.decoys} y2={rowY.decoys} className="sp-lane" />
+      {v.known.map((s: MethodValSite) => dot(s, 'known'))}
+      {v.decoys.map((s: MethodValSite) => dot(s, 'decoys'))}
+      <path d={`M${L + 96} ${H - 16} H${R - 104}`} className="sp-axis-arrow" markerEnd="url(#sp-arrowhead)" />
+      <defs>
+        <marker id="sp-arrowhead" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0 0 L8 4 L0 8Z" className="sp-arrowhead" />
+        </marker>
+      </defs>
+      <text x={L} y={H - 11} className="sp-end">
+        Best match
+      </text>
+      <text x={R} y={H - 11} textAnchor="end" className="sp-end">
+        Worst match
+      </text>
+    </svg>
   );
 }
 
 function in100(v: number): string {
-  return `${Math.round(v * 100)} in 100`;
+  return `${Math.round(v * 100)} times in 100`;
 }
 
-function Scorecard({ x, findback, shadowR }: { x: MethodExtras; findback: Findback | null; shadowR: number | null }): JSX.Element {
-  const firsts = x.documented?.sites.filter((s: DocumentedSite): boolean => s.rank === 1).map((s: DocumentedSite): string => s.name.replace(/ volcanic field$/i, '')) ?? [];
-  const n = x.nasadem;
-  const rs = n ? [n.shadowR, n.jumpR, n.slopeR].filter((v: number | null): v is number => v !== null) : [];
+/** The single headline result: how often a real site outranks a decoy. */
+function CheckResult({ x }: { x: MethodExtras | null }): JSX.Element | null {
+  const auc = x?.aucIndependent ?? x?.aucOriginal ?? null;
+  if (auc === null) return null;
+  const held = x?.aucIndependent != null;
   return (
-    <dl className="ex-score">
-      {(x.aucIndependent ?? x.aucOriginal) !== null && (
-        <div>
-          <dt>Known analog beats a decoy</dt>
-          <dd>
-            <strong>{in100(x.aucIndependent ?? x.aucOriginal ?? 0)}</strong>
-            <span className="faint">{x.aucIndependent !== null ? 'new, held-out sites' : 'original set'}</span>
-          </dd>
-        </div>
-      )}
-      {x.documented && (
-        <div>
-          <dt>Famous field sites</dt>
-          <dd>
-            <strong>
-              {x.documented.nTop3 !== null ? `${x.documented.nTop3} of ${x.documented.nSites} reach a top 3` : `${x.documented.nSites} compared`}
-            </strong>
-            {firsts.length > 0 && <span className="faint">{listWords(firsts.slice(0, 4))} rank 1st in some searches</span>}
-          </dd>
-        </div>
-      )}
-      {rs.length > 0 && (
-        <div>
-          <dt>Second elevation map agrees</dt>
-          <dd>
-            <strong>r {rs.map((v: number): string => v.toFixed(2)).join(' · ')}</strong>
-            <span className="faint">shadow · jump · slope; exact top 3 can change</span>
-          </dd>
-        </div>
-      )}
-      {findback?.top1 != null && (
-        <div>
-          <dt>Walk test: hidden copy found first</dt>
-          <dd>
-            <strong>{Math.round(findback.top1 * 100)}%</strong>
-            <span className="faint">{findback.nRoutes ? `${nf.format(findback.nRoutes)} routes` : ''}</span>
-          </dd>
-        </div>
-      )}
-      {shadowR !== null && (
-        <div>
-          <dt>Shadows vs NASA’s map</dt>
-          <dd>
-            <strong>r {shadowR.toFixed(2)}</strong>
-            <span className="faint">pixel by pixel</span>
-          </dd>
-        </div>
-      )}
-    </dl>
+    <p className="ex-result">
+      <strong>Real sites beat decoys {in100(auc)}</strong>
+      <span className="faint">
+        {held ? `Tested on ${x?.nIndependent ?? 'new'} sites never used to build the method` : 'Original test set'} · a coin flip scores 50
+      </span>
+    </p>
+  );
+}
+
+/** Secondary checks, one plain line each (the Summary page has the full panel). */
+function MoreChecks({ x, findback, shadowR }: { x: MethodExtras | null; findback: Findback | null; shadowR: number | null }): JSX.Element | null {
+  const lines: string[] = [];
+  if (x?.documented?.nTop3 != null) lines.push(`${x.documented.nTop3} of ${x.documented.nSites} famous field sites reach a top 3.`);
+  const n = x?.nasadem;
+  const rs = n ? [n.shadowR, n.jumpR, n.slopeR].filter((v: number | null): v is number => v !== null) : [];
+  if (rs.length > 0) lines.push(`A second elevation map gives the same measurements (r ${Math.min(...rs).toFixed(2)} or better).`);
+  if (findback?.top1 != null) lines.push(`Walk test: a hidden copy of a route is found first ${Math.round(findback.top1 * 100)}% of the time.`);
+  if (shadowR !== null) lines.push(`Our shadows match NASA’s shadow map (r ${shadowR.toFixed(2)}).`);
+  if (lines.length === 0) return null;
+  return (
+    <details className="method ex-more">
+      <summary>More checks</summary>
+      <ul className="method-body ex-more-list">
+        {lines.map((l: string) => (
+          <li key={l}>{l}</li>
+        ))}
+      </ul>
+    </details>
   );
 }
 
@@ -530,16 +589,22 @@ const STEPS: Step[] = [
   {
     title: 'Compare terrain measurements',
     short: 'Compare',
-    body: (): string => 'Every square gets the Moon site’s numbers; the closest win. Ground brightness and slope direction now count too.',
+    body: (): string => 'We measure every Earth square the same way as the Moon site. The closest numbers win.',
     info: (c): ReactNode => (
-      <WhyHow
+      <>
+        <WhyHow
         why="danger lives in the extremes, so we compare the whole spread of each measure, not its average."
         how={`crater-bowl counts were tested and dropped: forests and farmland mimicked them${
           c.x?.shapeAucWithout != null && c.x.shapeAucWith != null
             ? ` (known-vs-decoy score ${c.x.shapeAucWithout.toFixed(2)} → ${c.x.shapeAucWith.toFixed(2)})`
             : ''
         }.`}
-      />
+        />
+        <p>
+          <strong>Terms:</strong> “steepest 5%” is the 95th percentile (P95) of the height change over 1 km, along tracks in 16 directions;
+          “steepest 1%” is P99. Ground brightness and slope direction count too. The 500 m line is illustrative; ispace has not published its own.
+        </p>
+      </>
     ),
   },
   {
@@ -557,16 +622,19 @@ const STEPS: Step[] = [
     ),
   },
   {
-    title: 'Prove it works',
+    title: 'Does it really work?',
     short: 'Check',
-    body: (): string => 'Known analogs beat decoys, famous field sites rank high, and a second elevation map agrees.',
+    body: (c): string =>
+      `If our method works, real Moon-training sites should rank near the top of ${
+        c.m ? nf.format(Math.round(c.m.screen.n_screened / 1000) * 1000) : 'all the'
+      } Earth squares, and farmland or forests near the bottom.`,
     info: (c): ReactNode => (
       <WhyHow
-        why="a working method should rank Moon-training sites above farmland and forest."
+        why="a working method should rank Moon-training sites above farmland and forest. Each dot is one site’s best rank among all screened squares."
         how={
           <>
             {c.x?.aucIndependent != null
-              ? `feature choices used the original analogs; ${c.x.nIndependent ?? ''} independent held-out sites score ${in100(c.x.aucIndependent)}. `
+              ? `feature choices used the original analogs; ${c.x.nIndependent ?? ''} independent held-out sites score ${Math.round(c.x.aucIndependent * 100)} in 100 (AUC ${c.x.aucIndependent.toFixed(2)}). `
               : ''}
             {c.x?.nasadem
               ? `The exact top 3 can change with the elevation dataset${c.x.nasadem.top3Overlap !== null ? ` (overlap ${c.x.nasadem.top3Overlap.toFixed(2)})` : ''}.`
@@ -664,8 +732,9 @@ export function Explainer(): JSX.Element {
   } else {
     visual = (
       <div className="ex-check">
-        <StripPlot method={m} />
-        {extras && <Scorecard x={extras} findback={findback} shadowR={shadowR} />}
+        <CheckRows method={m} />
+        <CheckResult x={extras} />
+        <MoreChecks x={extras} findback={findback} shadowR={shadowR} />
       </div>
     );
   }

@@ -1,0 +1,215 @@
+/* Story (home) page: hero, Apollo aside, closing call to action, and explainer steps 4 and 6.
+   Uses the tokens in styles.css only. */
+
+/* ---------- Hero: headline, one line on the cause, one line on Artemis ---------- */
+
+.story-hero-text {
+  gap: 20px;
+}
+
+.story-hero-text .story-cause {
+  font-size: var(--fs-h3);
+  line-height: 1.45;
+  color: var(--text-2);
+  max-width: 44ch;
+}
+
+.story-hero-text .story-artemis {
+  font-size: var(--fs-h3);
+  line-height: 1.45;
+  color: var(--text);
+  max-width: 44ch;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- Apollo quotes: secondary, under the mission cards ---------- */
+
+.apollo-small {
+  margin-top: 32px;
+}
+
+.apollo-small .apollo-h {
+  color: var(--text-3);
+}
+
+/* ---------- Closing call to action ---------- */
+
+.story-end {
+  margin-top: 48px;
+  padding: 24px 0 8px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  flex-wrap: wrap;
+}
+
+.story-end p {
+  color: var(--text-2);
+  font-size: var(--fs-label);
+}
+
+/* ---------- Explainer step 4: what a "big drop" is ---------- */
+
+.ex-drop {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+}
+
+.ex-drop-ground {
+  fill: var(--surface-3);
+}
+
+.ex-drop-line {
+  fill: none;
+  stroke: var(--text-3);
+  stroke-width: 1.5;
+}
+
+.ex-drop-bracket {
+  fill: none;
+  stroke: var(--text-2);
+  stroke-width: 1.5;
+}
+
+.ex-drop-guide {
+  stroke: var(--text-3);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.ex-drop-arrow {
+  fill: none;
+  stroke: var(--hz-rim);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ex-drop-label {
+  fill: var(--text-2);
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+.ex-drop-value {
+  fill: var(--text);
+  font-family: var(--font);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.ex-drop-note {
+  fill: var(--text-3);
+  font-family: var(--font);
+  font-size: 11px;
+}
+
+.ex-diff {
+  font-size: var(--fs-body);
+  color: var(--text-2);
+}
+
+.ex-diff strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.ex-diff-words {
+  color: var(--text);
+}
+
+/* ---------- Explainer step 6: real sites vs decoys ---------- */
+
+.ex-checkrows {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ex-checkrows .sp-row {
+  font-size: 14px;
+  fill: var(--text);
+}
+
+.sp-lane {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.sp-axis-arrow {
+  fill: none;
+  stroke: var(--text-3);
+  stroke-width: 1;
+}
+
+.sp-arrowhead {
+  fill: var(--text-3);
+}
+
+.sp-end {
+  fill: var(--text-2);
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+.ex-result {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ex-result strong {
+  font-size: var(--fs-h2);
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ex-result .faint {
+  font-size: var(--fs-label);
+}
+
+.ex-more {
+  margin-top: 0;
+}
+
+.ex-more-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.ex-more-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.ex-more-list li:first-child {
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .ex-finger-rows li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 6px;
+  }
+
+  .ex-finger-label {
+    grid-column: 1 / -1;
+  }
+
+  /* year labels collide when the 12 landers share a phone-width row */
+  .tally-year {
+    font-size: 10px;
+  }
+
+  .story-end .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

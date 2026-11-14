@@ -226,11 +226,15 @@ export function meetsTarget(v: number | undefined, t: ValidationTarget): boolean
 
 export const HERO = {
   headline: 'Since 2019, 12 robot landers tried to land on the Moon. Only 5 stayed upright.',
-  body: 'In four of the failures, the lander misjudged or couldn’t measure its height, and twice the Moon itself fooled it: a crater rim and long low-sun shadows. Even Apollo astronauts struggled to judge distance and slope in lunar light.',
-  problem:
-    'The problem: landers keep failing when terrain and low sunlight fool their navigation, and there is no systematic way to find places on Earth that reproduce a specific south-pole site’s dangers, at the right sun angle, to rehearse first.',
-  kicker:
-    'NASA’s next crews land at the south pole, where the Sun hovers just above the horizon and shadows stretch for miles. We find the places on Earth to rehearse it first.',
+  /** What went wrong, in one line (the three mission cards below carry the sources). */
+  cause: 'Crater rims and long low-sun shadows fooled their navigation; featureless ground did the same to NASA’s Ingenuity on Mars.',
+  /** Who we serve and how we help. */
+  artemis:
+    'NASA’s Artemis crews will land at the lunar south pole, where the Sun hovers at the horizon. We find the places on Earth — and the dates — to rehearse each danger first.',
+  /** The single call to action, at the bottom of the page. */
+  cta: 'Start: Moon danger profiles',
+  /** One sourced line beside the bottom call to action (NASA plan, October 2026). */
+  deadline: 'First crewed south-pole landing: Artemis IV, targeted for 2028.',
 } as const;
 
 export type LandingOutcome = 'upright' | 'crashed' | 'not_upright';
