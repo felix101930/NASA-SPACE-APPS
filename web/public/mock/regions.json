@@ -109,6 +109,7 @@
      "path": "moon/cabeus_b_peak_sh_el5_az270.png"
     }
    ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
    "hazards": {
     "shadow": {
      "score": 1,
@@ -163,7 +164,7 @@
    "lon": -10,
    "x_m": -14747,
    "y_m": 83632,
-   "coord_quality": "pgda_roi",
+   "coord_quality": "pgda_site_tile",
    "coord_source": "PGDA product 78 ROI shapefile (mock centroid)",
    "sun": {
     "el_min": 1.26,
@@ -241,6 +242,7 @@
      "path": "moon/haworth_sh_el5_az270.png"
     }
    ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
    "hazards": {
     "shadow": {
      "score": 0.942,
@@ -295,7 +297,7 @@
    "lon": 2,
    "x_m": 4235,
    "y_m": 121269,
-   "coord_quality": "pgda_roi",
+   "coord_quality": "pgda_site_tile",
    "coord_source": "PGDA product 78 ROI shapefile (mock centroid)",
    "sun": {
     "el_min": 2.46,
@@ -373,6 +375,7 @@
      "path": "moon/malapert_massif_sh_el5_az270.png"
     }
    ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
    "hazards": {
     "shadow": {
      "score": 0.839,
@@ -505,6 +508,7 @@
      "path": "moon/mons_mouton_plateau_sh_el5_az270.png"
     }
    ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
    "hazards": {
     "shadow": {
      "score": 0.4,
@@ -559,7 +563,7 @@
    "lon": 31,
    "x_m": 84398,
    "y_m": 140462,
-   "coord_quality": "pgda_roi",
+   "coord_quality": "pgda_site_tile",
    "coord_source": "PGDA product 78 ROI shapefile (mock centroid)",
    "sun": {
     "el_min": 3.86,
@@ -637,6 +641,7 @@
      "path": "moon/mons_mouton_sh_el5_az270.png"
     }
    ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
    "hazards": {
     "shadow": {
      "score": 0.788,
@@ -691,7 +696,7 @@
    "lon": 62,
    "x_m": 150053,
    "y_m": 79785,
-   "coord_quality": "pgda_roi",
+   "coord_quality": "pgda_site_tile",
    "coord_source": "PGDA product 78 ROI shapefile (mock centroid)",
    "sun": {
     "el_min": 4.06,
@@ -769,6 +774,7 @@
      "path": "moon/nobile_rim_1_sh_el5_az270.png"
     }
    ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
    "hazards": {
     "shadow": {
      "score": 0.866,
@@ -823,7 +829,7 @@
    "lon": 41,
    "x_m": 85584,
    "y_m": 98453,
-   "coord_quality": "pgda_roi",
+   "coord_quality": "pgda_site_tile",
    "coord_source": "PGDA product 78 ROI shapefile (mock centroid)",
    "sun": {
     "el_min": 2.76,
@@ -901,6 +907,7 @@
      "path": "moon/nobile_rim_2_sh_el5_az270.png"
     }
    ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
    "hazards": {
     "shadow": {
      "score": 0.773,
@@ -955,7 +962,7 @@
    "lon": -68,
    "x_m": -36551,
    "y_m": 14768,
-   "coord_quality": "pgda_roi",
+   "coord_quality": "pgda_site_tile",
    "coord_source": "PGDA product 78 ROI shapefile (mock centroid)",
    "sun": {
     "el_min": -0.24,
@@ -1033,6 +1040,7 @@
      "path": "moon/de_gerlache_rim_2_sh_el5_az270.png"
     }
    ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
    "hazards": {
     "shadow": {
      "score": 0.947,
@@ -1165,6 +1173,7 @@
      "path": "moon/slater_plain_sh_el5_az270.png"
     }
    ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
    "hazards": {
     "shadow": {
      "score": 0,

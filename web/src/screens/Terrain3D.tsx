@@ -237,7 +237,7 @@ function imageMaskTexture(img: HTMLImageElement, n: number): THREE.CanvasTexture
     const d = im.data;
     for (let i = 0; i < d.length; i += 4) {
       const v = d[i] * (d[i + 3] / 255); // treat transparent as 0 (lit)
-      const out = v >= 192 ? 0 : v >= 64 ? 110 : 255;
+      const out = v >= 192 ? 0 : v > 64 ? 110 : 255; // >=192 shadow, <=64 lit, else no data
       d[i] = out;
       d[i + 1] = out;
       d[i + 2] = out;
