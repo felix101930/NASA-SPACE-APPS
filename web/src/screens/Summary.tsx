@@ -1,19 +1,31 @@
 import { useEffect, useState, type JSX } from 'react';
-import { HAZARDS, ROW_NAME, distanceFit } from '../content';
-import { Fit, HazardGlyph } from '../components/Glyphs';
+import { HAZARDS, distanceFit } from '../content';
+import { FitGlyph, HazardGlyph } from '../components/Glyphs';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
 import { Why } from '../components/Term';
 import { InfoTip } from '../components/InfoTip';
 import { loadOptionalJson } from '../data/loader';
 import { useApp, type CoreData } from '../store';
-import { HAZARD_IDS, isObj, isTransectsFile, type HazardId, type Match, type Meta, type RankingRow } from '../types/contract';
+import {
+  HAZARD_IDS,
+  isObj,
+  isTransectsFile,
+  type EarthSite,
+  type HazardId,
+  type Light,
+  type Match,
+  type Meta,
+  type RankingRow,
+} from '../types/contract';
 import { CreditsPanel } from '../components/Credits';
 import { buildCredits, hasNasademCheck } from '../lib/credits';
 import { parseMethodExtras } from '../lib/methodExtras';
 import { parseBootstrap, parseWalkTest } from '../lib/validationExtras';
 import type { MethodNoteId } from '../lib/methodNotes';
-import { fmtM, fmtNum, fmtPct, fmtSpread, fmtStat } from '../lib/units';
+import { placeName } from '../lib/placeName';
+import { fmtNum, fmtPct, fmtStat } from '../lib/units';
 import '../styles/clarity.css';
+import '../styles/summary.css';
 
 /** The three limits we state up front (docs/method-decisions.md, "Limits we state up front"). */
 const LIMITS: readonly string[] = [
@@ -22,78 +34,110 @@ const LIMITS: readonly string[] = [
   'No Earth place reproduces 1/6 g gravity, vacuum or −200 °C nights.',
 ];
 
-/** For each hazard, the one measure whose Moon–Earth gap the "How close?" line reports. */
-const GAP_METRIC: Record<HazardId, { metric: string; label: string; fmt: (v: number) => string }> = {
-  rim: { metric: 'jump1km_p95_m', label: 'rim drop', fmt: (v: number): string => `~${fmtM(v)}` },
-  shadow: { metric: 'shadow_frac_el3', label: 'shadow', fmt: (v: number): string => `~${fmtNum(Math.max(1, v * 100), 0)}% of the ground` },
-  texture: { metric: 'empty_cell_frac_el3', label: 'blank ground', fmt: (v: number): string => `~${fmtNum(Math.max(1, v * 100), 0)}% of the ground` },
-};
+type Verdict = 'good' | 'partial' | 'none';
 
-/** A 0–1 share as a whole percentage. */
-function pct(v: number): string {
-  return `${Math.round(v * 100)}%`;
+/** Plain verdicts, on the same distance bands as distanceFit (green < 0.5, amber < 1.5, red beyond). */
+const VERDICT: Record<Light, Verdict> = { green: 'good', amber: 'partial', red: 'none' };
+const VERDICT_WORD: Record<Verdict, string> = {
+  good: 'Good stand-in',
+  partial: 'Partial stand-in',
+  none: 'No good stand-in found',
+};
+const VERDICT_FIT: Record<Verdict, Light> = { good: 'green', partial: 'amber', none: 'red' };
+
+/** Column labels and the noun used for each danger in the headline sentence. */
+const COL_LABEL: Record<HazardId, string> = { shadow: 'Shadow', rim: 'Big drops', texture: 'Camera texture' };
+const HAZARD_NOUN: Record<HazardId, string> = { shadow: 'low-sun shadows', rim: 'big drops', texture: 'camera texture' };
+
+/** "154 km NE of " at the start of a pipeline site name (same pattern as lib/placeName.ts). */
+const OFFSET = /^\d+\s*km\s+[NSEW]{1,3}\s+of\s+/i;
+/** Display-only short country names; the precise name stays in the tooltip. */
+const SHORT_COUNTRY: Record<string, string> = { "People's Republic of China": 'China' };
+
+interface Place {
+  /** "near Taltal, Chile" or a documented site's own name. */
+  short: string;
+  /** Precise name (with the distance and direction from the town), for the tooltip. */
+  title: string;
 }
 
-/** Each ranking cell's headline measure, shown as Moon value vs Earth value (no derived units to decode). */
-const CELL_GAP: Record<HazardId, { metric: string; text: (moon: number, earth: number) => string; what: string }> = {
-  shadow: {
-    metric: 'shadow_frac_el3',
-    text: (moon: number, earth: number): string => `Moon ${pct(moon)} · Earth ${pct(earth)} dark`,
-    what: 'share of the ground in shadow at a 3° sun, averaged over all sun directions',
-  },
-  rim: {
-    metric: 'jump1km_p95_m',
-    text: (moon: number, earth: number): string => `Moon ${Math.round(moon)} m · Earth ${Math.round(earth)} m drops`,
-    what: 'height change over 1 km, steepest 5% of 1 km stretches (the big drops)',
-  },
-  texture: {
-    metric: 'empty_cell_frac_el3',
-    text: (moon: number, earth: number): string => `Moon ${pct(moon)} · Earth ${pct(earth)} featureless`,
-    what: 'share of 1 km squares with nothing for a camera to track (3° sun)',
-  },
-};
+function shortPlace(site: EarthSite): Place {
+  const p = placeName(site);
+  const country = SHORT_COUNTRY[site.country] ?? site.country;
+  if (OFFSET.test(site.name)) return { short: `near ${site.name.replace(OFFSET, '')}, ${country}`, title: p.title };
+  // Documented site: its own name, without a trailing "(Country)" that repeats the country.
+  const base = site.name.replace(/\s*\(([^)]*)\)\s*$/, (whole: string, inner: string): string => (inner === site.country ? '' : whole));
+  return { short: base.endsWith(country) ? base : `${base}, ${country}`, title: p.title };
+}
 
-const TIMES_LINE = '× = how far off, compared with how much the Moon region varies within itself (under 0.5 = close)';
+interface Cell {
+  verdict: Verdict | null;
+  place: Place | null;
+}
 
-/** Real-unit gap of the region's #1 Earth match for this hazard, from matches.json lights; null when missing. */
-function cellGap(core: CoreData, row: RankingRow, h: HazardId): string | null {
+/** Verdict and Earth place of the region's #1 match for this danger. */
+function cellFor(core: CoreData, row: RankingRow, h: HazardId): Cell {
   // per_hazard_best_site is a pipeline extra (not in the core contract); fall back to the rank-1 match.
   const sites: unknown = 'per_hazard_best_site' in row ? row.per_hazard_best_site : null;
   const raw: unknown = isObj(sites) ? sites[h] : null;
-  const best = typeof raw === 'string' ? raw : null;
   const pool = core.matches.filter((m: Match): boolean => m.region_id === row.region_id && m.hazard === h);
-  const m = pool.find((x: Match): boolean => x.site_id === best) ?? pool.find((x: Match): boolean => x.rank === 1);
-  const l = m?.lights.find((x) => x.metric === CELL_GAP[h].metric);
-  if (!l) return null;
-  return Number.isFinite(l.moon) && Number.isFinite(l.earth) ? CELL_GAP[h].text(l.moon, l.earth) : null;
+  const m = pool.find((x: Match): boolean => x.site_id === raw) ?? pool.find((x: Match): boolean => x.rank === 1);
+  const siteId = typeof raw === 'string' ? raw : m?.site_id;
+  const site = siteId ? core.siteById.get(siteId) : undefined;
+  const fit = distanceFit(row.per_hazard_best_distance?.[h] ?? m?.distance);
+  return { verdict: fit ? VERDICT[fit] : null, place: site ? shortPlace(site) : null };
 }
 
-function median(xs: number[]): number | null {
-  if (!xs.length) return null;
-  const s = [...xs].sort((a: number, b: number): number => a - b);
-  const mid = Math.floor(s.length / 2);
-  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+interface GridRow {
+  id: string;
+  name: string;
+  cells: Record<HazardId, Cell>;
 }
 
-interface HowClose {
-  gaps: { hazard: HazardId; text: string }[];
-  nClose: number;
-  n: number;
+interface Tally {
+  good: number;
+  partial: number;
+  none: number;
+  total: number;
+  /** Regions where every danger is a good or partial stand-in. */
+  regionsCovered: number;
+  /** Region x danger pairs with no good stand-in, in ranking order. */
+  gaps: { region: string; hazard: HazardId }[];
 }
 
-/** Typical Moon–Earth gap of the #1 Earth match per region, one measure per hazard, plus how many #1s are close. */
-function howClose(matches: Match[]): HowClose {
-  const top = matches.filter((m: Match): boolean => m.rank === 1);
-  const gaps = (['rim', 'shadow', 'texture'] as HazardId[]).flatMap((h: HazardId): { hazard: HazardId; text: string }[] => {
-    const g = GAP_METRIC[h];
-    const diffs = top
-      .filter((m: Match): boolean => m.hazard === h)
-      .flatMap((m: Match): number[] => m.lights.filter((l) => l.metric === g.metric).map((l) => Math.abs(l.earth - l.moon)))
-      .filter((d: number): boolean => Number.isFinite(d));
-    const med = median(diffs);
-    return med === null ? [] : [{ hazard: h, text: `${g.label} ${g.fmt(med)}` }];
-  });
-  return { gaps, nClose: top.filter((m: Match): boolean => distanceFit(m.distance) === 'green').length, n: top.length };
+function tally(rows: GridRow[]): Tally {
+  const t: Tally = { good: 0, partial: 0, none: 0, total: 0, regionsCovered: 0, gaps: [] };
+  for (const r of rows) {
+    let covered = true;
+    for (const h of HAZARD_IDS) {
+      const v = r.cells[h].verdict;
+      if (!v) {
+        covered = false;
+        continue;
+      }
+      t[v] += 1;
+      t.total += 1;
+      if (v === 'none') {
+        covered = false;
+        t.gaps.push({ region: r.name, hazard: h });
+      }
+    }
+    if (covered) t.regionsCovered += 1;
+  }
+  return t;
+}
+
+function listJoin(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} or ${items[items.length - 1]}`;
+}
+
+/** One sentence from the data: how many regions are fully covered, and which danger has no stand-in. */
+function headline(t: Tally, nRegions: number): string {
+  const all = t.regionsCovered === nRegions;
+  const lead = `For ${all ? 'all' : t.regionsCovered} of ${nRegions} regions, every danger has a good or partial stand-in on Earth.`;
+  if (!t.gaps.length) return lead;
+  return `${lead} No good stand-in yet for ${listJoin(t.gaps.map((g: { region: string; hazard: HazardId }): string => `${g.region}’s ${HAZARD_NOUN[g.hazard]}`))}.`;
 }
 
 function Credits({ metas, nasadem }: { metas: { file: string; meta: Meta }[]; nasadem: boolean }): JSX.Element {
@@ -152,7 +196,12 @@ export function Summary(): JSX.Element {
   const easiest = ranking[0];
   const hardest = ranking[ranking.length - 1];
   const sample = core.summaryOrigin !== 'data';
-  const close = howClose(core.matches);
+  const rows: GridRow[] = ranking.map((r: RankingRow): GridRow => ({
+    id: r.region_id,
+    name: regionName(r.region_id),
+    cells: { shadow: cellFor(core, r, 'shadow'), rim: cellFor(core, r, 'rim'), texture: cellFor(core, r, 'texture') },
+  }));
+  const t = tally(rows);
   const extras = core.method ? parseMethodExtras(core.method.file) : null;
   const boot = parseBootstrap(v);
   const walkTop1 = parseWalkTest(v)?.top1;
@@ -206,64 +255,64 @@ export function Summary(): JSX.Element {
         each hazard.
       </p>
 
+      {t.total > 0 && <p className="sum-headline">{headline(t, rows.length)}</p>}
+
       <section className="panel" aria-labelledby="grid-h">
         <div className="panel-head">
-          <h2 id="grid-h">Best Earth match, region by danger</h2>
-          <span className="caption why-row">
-            Gap between the Moon region and its best Earth match
-            <InfoTip label="What do the gaps mean?" title="Reading a cell">
+          <div className="why-row">
+            <h2 id="grid-h">Where to rehearse each danger</h2>
+            <InfoTip label="What does ‘good stand-in’ mean?" title="Good stand-in">
               <p>
-                <strong>Shadow:</strong> {CELL_GAP.shadow.what}. <strong>Rim:</strong> {CELL_GAP.rim.what}. <strong>Texture:</strong>{' '}
-                {CELL_GAP.texture.what}.
-              </p>
-              <p>
-                Close / Partial / Far sums up every measure of that danger. Hover a cell for its × figure: {TIMES_LINE}.
+                Good stand-in = the Earth site’s measurements for that danger fall within the Moon site’s own natural variation. Exact numbers are
+                on each match’s page.
               </p>
             </InfoTip>
-          </span>
+          </div>
+          <span className="caption">Best Earth stand-in for each Moon region and danger.</span>
           {sample && <SampleChip what="This ranking" />}
         </div>
         <div className="table-scroll">
-          <table className="fit-grid">
+          <table className="fit-grid sv-grid">
             <thead>
               <tr>
-                <th className="r" scope="col">
-                  #
-                </th>
-                <th scope="col">Region</th>
+                <th scope="col">Region, easiest first</th>
                 {HAZARD_IDS.map((h: HazardId) => (
                   <th key={h} scope="col">
                     <span className="th-hz">
                       <HazardGlyph hazard={h} />
-                      {ROW_NAME[h]}
+                      {COL_LABEL[h]}
                     </span>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {ranking.map((r: RankingRow) => (
-                <tr key={r.region_id}>
-                  <td className="r fit-rank">{r.rank}</td>
-                  <th scope="row" className="fit-region" title={r.reason}>
-                    <span className="fit-region-name">{regionName(r.region_id)}</span>
+              {rows.map((r: GridRow, i: number) => (
+                <tr key={r.id}>
+                  <th scope="row" className="fit-region">
+                    <span className="fit-region-name">{r.name}</span>
+                    {i === 0 && <span className="caption">Easiest</span>}
+                    {i === rows.length - 1 && rows.length > 1 && <span className="caption">Hardest</span>}
                   </th>
                   {HAZARD_IDS.map((h: HazardId) => {
-                    const d = r.per_hazard_best_distance?.[h];
-                    const f = distanceFit(d);
-                    const gap = cellGap(core, r, h);
-                    const word = f ? (f === 'green' ? 'close' : f === 'amber' ? 'partial' : 'far') : 'no data';
+                    const c = r.cells[h];
+                    const word = c.verdict ? VERDICT_WORD[c.verdict] : 'No data';
+                    const where = c.place ? (c.verdict === 'none' ? `closest: ${c.place.short}` : c.place.short) : null;
                     return (
                       <td key={h}>
                         <button
                           type="button"
-                          className="fit-cell"
-                          title={`${HAZARDS[h].name}: best Earth match ${gap ?? 'gap not available'} (${CELL_GAP[h].what}). ${fmtSpread(d)} · ${TIMES_LINE}.`}
-                          aria-label={`${regionName(r.region_id)}, ${HAZARDS[h].name}: ${word}${gap ? `, ${gap}` : ''} (${fmtSpread(d)} spread). Open Earth matches.`}
-                          onClick={(): void => open(r.region_id, h)}
+                          className="fit-cell sv-cell"
+                          data-verdict={c.verdict ?? 'missing'}
+                          title={c.place ? c.place.title : undefined}
+                          aria-label={`${r.name}, ${HAZARDS[h].name}: ${word}${where ? `, ${where}` : ''}. Open Earth matches.`}
+                          onClick={(): void => open(r.id, h)}
                         >
-                          {f ? <Fit fit={f} /> : <span className="faint">—</span>}
-                          {gap && <span className="fit-dist">{gap}</span>}
+                          <span className="sv-verdict">
+                            {c.verdict ? <FitGlyph fit={VERDICT_FIT[c.verdict]} /> : null}
+                            {word}
+                          </span>
+                          {where && <span className="sv-place">{where}</span>}
                         </button>
                       </td>
                     );
@@ -273,22 +322,28 @@ export function Summary(): JSX.Element {
             </tbody>
           </table>
         </div>
-        {close.n > 0 && (
-          <div className="why-row sum-close">
-            <span>
-              <strong>How close?</strong> Typical gap of the #1 Earth match: {close.gaps.map((g) => g.text).join(', ')} · {close.nClose} of {close.n}{' '}
-              close
+        {t.total > 0 && (
+          <div className="why-row sv-counts">
+            <span className="sv-count">
+              <FitGlyph fit="green" />
+              Good stand-ins: {t.good} of {t.total}
             </span>
-          </div>
-        )}
-        {summary.patchiness && summary.patchiness.n_top1 > 0 && (
-          <div className="why-row sum-close sum-patch">
-            <span>
-              {summary.patchiness.n_similar_headline} of {summary.patchiness.n_top1} also vary about as much as their Moon site
+            <span className="sv-count">
+              <FitGlyph fit="amber" />
+              Partial: {t.partial}
             </span>
-            <InfoTip label="What does ‘vary as much’ mean?" title="Patchiness">
-              <p>We also check whether the Earth square varies across its 25 patches as much as the Moon site does.</p>
-            </InfoTip>
+            <span className="sv-count">
+              <FitGlyph fit="red" />
+              None: {t.none}
+            </span>
+            {summary.patchiness && summary.patchiness.n_top1 > 0 && (
+              <InfoTip label="Do the Earth sites vary like the Moon?" title="Patchiness" align="end">
+                <p>
+                  We also check whether each best Earth site varies across its 25 patches as much as its Moon site does:{' '}
+                  {summary.patchiness.n_similar_headline} of {summary.patchiness.n_top1} do. This is a second check, not part of the ranking.
+                </p>
+              </InfoTip>
+            )}
           </div>
         )}
       </section>

@@ -1,0 +1,83 @@
+/* Summary: the verdict grid (no numbers in cells), its headline and the verdict count line.
+   Uses the tokens in styles.css only; fit glyph colours come from .glyph-fit. */
+
+.sum-headline {
+  margin: -8px 0 24px;
+  max-width: 110ch;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  color: var(--text);
+  text-wrap: pretty;
+}
+
+.sum-problem + .sum-headline {
+  margin-top: -12px;
+}
+
+.panel-head .why-row h2 {
+  margin: 0;
+}
+
+.sv-grid thead th:first-child {
+  padding-left: 20px;
+}
+
+.sv-grid .fit-region {
+  padding-left: 20px !important;
+  min-width: 180px;
+}
+
+.sv-grid td {
+  min-width: 200px;
+}
+
+.sv-cell {
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.sv-cell:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: -2px;
+}
+
+.sv-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-label);
+  font-weight: 500;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.sv-cell[data-verdict='good'] .sv-verdict {
+  color: var(--text);
+}
+
+.sv-place {
+  padding-left: 22px;
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+.sv-cell[data-verdict='none'] .sv-place,
+.sv-cell[data-verdict='missing'] .sv-verdict {
+  color: var(--text-3);
+}
+
+.sv-counts {
+  gap: 8px 20px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-label);
+  color: var(--text-2);
+}
+
+.sv-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
