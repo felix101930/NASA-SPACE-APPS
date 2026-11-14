@@ -98,3 +98,21 @@ This file is the single source of truth. Change it here first, then update both 
 - **`walk/transects.json`:**
   `{ meta, "n": N, "points": 100, "items": [ {"i":0,"site_id":"EP001","x0":..,"y0":..,"x1":..,"y1":..,"lat0":..,"lon0":..,"lat1":..,"lon1":..,"length_m":2000,"climb_m":0,"max_slope_deg":0} ] }`
 - **Preset routes:** `walk/presets.json` is `[ {"region_id","name","moon_xy":[[x,y],...],"best":[{"i":..,"dtw":..}]} ]`.
+
+## `method.json` (powers the "How we find analogs" explainer)
+Written by the Earth stage. It may be absent; the web app then falls back to mock data.
+```json
+{ "meta": {...},
+  "screen": { "n_draws": 314104, "n_land": 88003, "n_pool": 30000, "n_screened": 4773,
+              "coverage_km2": 1070000, "coverage_pct_bare": 5.8, "seed": 0,
+              "strata": [ {"lat_band": "...", "relief_class": "low|mid|high", "n": 0} ] },
+  "funnel": [ {"stage": "sampled|dsm_safe|stage1_top|stage2|final_top3", "n": 0,
+               "known_pass": 0, "decoy_pass": 0} ],
+  "validation": { "known_median_pct": 4.7, "decoy_median_pct": 60.0, "auc": 0.80,
+                  "known": [ {"id": "EP001", "name": "...", "best_rank_pct": 0.0, "dsm_safe": true} ],
+                  "decoys": [ {"id": "EP115", "name": "...", "best_rank_pct": 0.0} ] },
+  "points": [ {"lat": 0, "lon": 0, "pass": true, "stage": "screened|shortlist|final", "best_dist": 0.0} ],
+  "example": { "region_id": "malapert_massif", "hazard": "rim", "site_id": "...",
+               "moon": {"metric": 0.0}, "earth": {"metric": 0.0} } }
+```
+- `points`: at most about 6,000 entries, with coordinates rounded to 0.01°.
