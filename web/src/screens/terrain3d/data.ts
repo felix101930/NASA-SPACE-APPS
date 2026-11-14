@@ -322,7 +322,7 @@ export function useMaskTexture(
   const [state, setState] = useState<MaskState>({ texture: null, note: '' });
   useEffect((): (() => void) | void => {
     if (!tile || mode !== 'precomputed') {
-      setState({ texture: null, note: '' });
+      setState((prev: MaskState): MaskState => (prev.texture === null && prev.note === '' ? prev : { texture: null, note: '' }));
       return;
     }
     let alive = true;
@@ -378,10 +378,11 @@ export function useCellTexture(enabled: boolean, cells: TextureCell[] | null, ti
     ctx.fillRect(0, 0, CELL_TEX, CELL_TEX);
     if (cells) {
       for (const cell of cells) {
+        // Only cells that are empty from at least half the sun directions; strength follows that share.
         const f = cell.empty_az_frac ?? 1;
-        if (f <= 0) continue;
+        if (f < 0.5) continue;
         const [c0, r0, c1, r1] = cell.bbox.px;
-        ctx.globalAlpha = 0.25 + 0.75 * f;
+        ctx.globalAlpha = 0.2 + 0.8 * ((f - 0.5) / 0.5);
         ctx.fillStyle = tint;
         ctx.fillRect(c0 * s, r0 * s, (c1 - c0) * s, (r1 - r0) * s);
       }

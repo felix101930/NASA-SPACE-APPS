@@ -1,463 +1,67 @@
-import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { SafeCanvas } from '../components/SafeCanvas';
-import { Line, OrbitControls } from '@react-three/drei';
-import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import * as THREE from 'three';
-import { loadImage, type Origin } from '../data/loader';
-import { loadTile, type LoadedTile } from '../data/tiles';
-import { computeShadowMask, mapToPixel, type Grid } from '../lib/terrain';
-import { HAZARDS } from '../content';
-import { matchesFor, useApp, useRegion, type CoreData, type ShadowMode } from '../store';
-import type { EarthSite, Match, Region, ShadowMask, TileRef } from '../types/contract';
-import { Loading } from '../components/Loading';
-import { TERRAIN_KM, terrainHeightAt as heightAt, useTerrainGeometry } from '../components/terrainGeometry';
-import { SunGlyph } from '../components/Glyphs';
-import { SampleChip, ScreenHead } from '../components/ScreenHead';
+import { useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
+import { HazardGlyph, SunGlyph } from '../components/Glyphs';
+import { SampleChip } from '../components/ScreenHead';
+import { TERRAIN_KM } from '../components/terrainGeometry';
+import { mapToPixel } from '../lib/terrain';
+import { matchesFor, useApp, useRegion, type CoreData } from '../store';
+import { HAZARD_IDS, type EarthSite, type HazardId, type LightRow, type Match, type Region, type RehearsalWindow, type ShadowMask } from '../types/contract';
+import { buildVerdict, compass, HAZARD_TAB, pct0, type Verdict } from './terrain3d/copy';
+import {
+  moonRimSegs,
+  useAnnotations,
+  useCellTexture,
+  useEarthRimSegs,
+  useMaskTexture,
+  useShadowShare,
+  useTile,
+  type RimSeg,
+  type ShadowShare,
+} from './terrain3d/data';
+import { EvidenceTable, NotesBoxes, WindowsList } from './terrain3d/Evidence';
+import { placeName, type PlaceName } from './terrain3d/places';
+import { Pane } from './terrain3d/Scene';
+import './terrain3d/terrain3d.css';
+
+const SUN_PRESETS: readonly number[] = [1.5, 3, 5];
+const RIM_COUNT = 3;
+const TEXTURE_TINT = '#D98CC4';
+const NO_MASKS: ShadowMask[] = [];
 
 // ------------------------------------------------------------------------------------------------
-// Camera sync between the two canvases (shared mutable state, not React state, to avoid re-renders)
+// Helpers
 // ------------------------------------------------------------------------------------------------
 
-const sync = { pos: new THREE.Vector3(0, 17, 19), target: new THREE.Vector3(0, 0, 0), version: 0, source: '' };
-
-function SyncedControls({ id }: { id: string }): JSX.Element {
-  const ref = useRef<OrbitControlsImpl>(null);
-  const camera = useThree((s) => s.camera);
-  const seen = useRef<number>(-1);
-  const applying = useRef<boolean>(false);
-  useFrame((): void => {
-    const c = ref.current;
-    if (!c || sync.version === seen.current) return;
-    seen.current = sync.version;
-    if (sync.source === id) return;
-    applying.current = true;
-    camera.position.copy(sync.pos);
-    c.target.copy(sync.target);
-    c.update();
-    applying.current = false;
-  });
-  return (
-    <OrbitControls
-      ref={ref}
-      makeDefault
-      enableDamping={false}
-      maxPolarAngle={Math.PI / 2.05}
-      minDistance={3}
-      maxDistance={60}
-      onChange={(): void => {
-        const c = ref.current;
-        if (!c || applying.current) return;
-        sync.pos.copy(camera.position);
-        sync.target.copy(c.target);
-        sync.version++;
-        sync.source = id;
-        seen.current = sync.version;
-      }}
-    />
-  );
+function sitePlace(site: EarthSite, match: Match | null): PlaceName {
+  const name = match && 'site_name' in match && typeof match.site_name === 'string' ? match.site_name : site.name;
+  return placeName(name, site.country, site.lat, site.lon);
 }
 
-// ------------------------------------------------------------------------------------------------
-// Terrain mesh
-// ------------------------------------------------------------------------------------------------
-
-const KM = TERRAIN_KM;
-
-function TerrainMesh({
-  tile,
-  exag,
-  map,
-  shadows,
-}: {
-  tile: LoadedTile;
-  exag: number;
-  map: THREE.Texture | null;
-  shadows: boolean;
-}): JSX.Element {
-  const geom = useTerrainGeometry(tile, exag);
-  return (
-    <mesh geometry={geom} castShadow={shadows} receiveShadow={shadows}>
-      <meshStandardMaterial key={map ? map.uuid : 'plain'} color="#c4beb3" roughness={0.97} metalness={0} map={map} />
-    </mesh>
-  );
+/** Grid azimuth of true north on a UTM Earth tile (pipeline extra; 0 when absent). */
+function trueNorthGridAz(site: EarthSite): number {
+  const t = site.tile;
+  return 'true_north_grid_az_deg' in t && typeof t.true_north_grid_az_deg === 'number' ? t.true_north_grid_az_deg : 0;
 }
 
-function PathLine({
-  tile,
-  exag,
-  pixels,
-  color,
-}: {
-  tile: LoadedTile;
-  exag: number;
-  pixels: [number, number][];
-  color: string;
-}): JSX.Element | null {
-  const pts = useMemo((): [number, number, number][] => {
-    const n = tile.filled.size;
-    const W = n * tile.filled.res * KM;
-    const out: [number, number, number][] = [];
-    for (let i = 0; i < pixels.length - 1; i++) {
-      const [c0, r0] = pixels[i];
-      const [c1, r1] = pixels[i + 1];
-      const steps = Math.max(2, Math.ceil(Math.hypot(c1 - c0, r1 - r0)));
-      for (let s = 0; s <= steps; s++) {
-        const c = c0 + ((c1 - c0) * s) / steps;
-        const r = r0 + ((r1 - r0) * s) / steps;
-        out.push([(c / (n - 1) - 0.5) * W, heightAt(tile, c, r, exag) + 0.04, (r / (n - 1) - 0.5) * W]);
-      }
-    }
-    return out;
-  }, [tile, exag, pixels]);
-  if (pts.length < 2) return null;
-  return <Line points={pts} color={color} lineWidth={4} />;
+/** A geographic sun azimuth at the Earth site, as an azimuth from the tile's top (grid +y). */
+function gridAzFor(site: EarthSite, geoAz: number): number {
+  return (((geoAz + trueNorthGridAz(site)) % 360) + 360) % 360;
 }
 
-function Sun({ el, az, shadows, extent }: { el: number; az: number; shadows: boolean; extent: number }): JSX.Element {
-  const light = useRef<THREE.DirectionalLight>(null);
-  const { scene } = useThree();
-  useEffect((): void => {
-    const l = light.current;
-    if (!l) return;
-    const e = (el * Math.PI) / 180;
-    const a = (az * Math.PI) / 180;
-    const dist = 40;
-    // azimuth clockwise from grid +y (north, = -z here); east = +x
-    l.position.set(Math.sin(a) * Math.cos(e) * dist, Math.sin(e) * dist, -Math.cos(a) * Math.cos(e) * dist);
-    l.target.position.set(0, 0, 0);
-    if (!l.target.parent) scene.add(l.target);
-    const half = extent * 0.72 + 0.3; // half-diagonal of the tile plus a margin: a tight frustum
-    const cam = l.shadow.camera;
-    cam.left = -half;
-    cam.right = half;
-    cam.top = half;
-    cam.bottom = -half;
-    cam.near = 1;
-    cam.far = dist * 2;
-    cam.updateProjectionMatrix();
-    l.shadow.needsUpdate = true;
-  }, [el, az, extent, scene]);
-  return (
-    <directionalLight
-      ref={light}
-      intensity={3.2}
-      castShadow={shadows}
-      shadow-mapSize-width={4096}
-      shadow-mapSize-height={4096}
-      shadow-bias={-0.0004}
-      shadow-normalBias={0.03}
-    />
-  );
+function siteMetric(site: EarthSite, key: string): number | null {
+  const v = site.metrics[key];
+  return typeof v === 'number' && Number.isFinite(v) ? v : null;
 }
 
-// ------------------------------------------------------------------------------------------------
-// Shadow-mask textures for the fallback mode
-// ------------------------------------------------------------------------------------------------
-
-function nearestMask(masks: ShadowMask[], el: number, az: number): ShadowMask | null {
-  let best: ShadowMask | null = null;
-  let bd = Infinity;
-  for (const m of masks) {
-    const daz = Math.abs(((m.az - az + 540) % 360) - 180);
-    const d = Math.abs(m.el - el) * 10 + daz / 10;
-    if (d < bd) {
-      bd = d;
-      best = m;
-    }
-  }
-  return best;
-}
-
-function maskToTexture(mask: Uint8Array, n: number): THREE.DataTexture {
-  const data = new Uint8Array(n * n * 4);
-  for (let r = 0; r < n; r++) {
-    const dr = n - 1 - r; // DataTexture row 0 is the bottom (v = 0)
-    for (let c = 0; c < n; c++) {
-      const v = mask[r * n + c] ? 0 : 255;
-      const o = (dr * n + c) * 4;
-      data[o] = v;
-      data[o + 1] = v;
-      data[o + 2] = v;
-      data[o + 3] = 255;
-    }
-  }
-  const t = new THREE.DataTexture(data, n, n, THREE.RGBAFormat);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.magFilter = THREE.LinearFilter;
-  t.needsUpdate = true;
-  return t;
-}
-
-/**
- * Pipeline mask PNGs are 8-bit grayscale: 255 = cast shadow, 0 = lit, 128 = no data.
- * Decoded into a shading texture: shadow -> black, lit -> white, no data -> mid grey.
- */
-function imageMaskTexture(img: HTMLImageElement, n: number): THREE.CanvasTexture {
-  const cv = document.createElement('canvas');
-  cv.width = n;
-  cv.height = n;
-  const ctx = cv.getContext('2d', { willReadFrequently: true });
-  if (ctx) {
-    ctx.drawImage(img, 0, 0, n, n);
-    const im = ctx.getImageData(0, 0, n, n);
-    const d = im.data;
-    for (let i = 0; i < d.length; i += 4) {
-      const v = d[i] * (d[i + 3] / 255); // treat transparent as 0 (lit)
-      const out = v >= 192 ? 0 : v > 64 ? 110 : 255; // >=192 shadow, <=64 lit, else no data
-      d[i] = out;
-      d[i + 1] = out;
-      d[i + 2] = out;
-      d[i + 3] = 255;
-    }
-    ctx.putImageData(im, 0, 0);
-  }
-  const t = new THREE.CanvasTexture(cv);
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
-
-interface MaskState {
-  texture: THREE.Texture | null;
-  note: string;
-}
-
-function useMaskTexture(tile: LoadedTile | null, mode: ShadowMode, el: number, az: number, masks: ShadowMask[], origin: Origin): MaskState {
-  const [state, setState] = useState<MaskState>({ texture: null, note: '' });
-  useEffect((): (() => void) | void => {
-    if (!tile || mode !== 'precomputed') {
-      setState({ texture: null, note: '' });
-      return;
-    }
-    let alive = true;
-    const pick = nearestMask(masks, el, az);
-    const fallbackToCpu = (): void => {
-      const t = setTimeout((): void => {
-        if (!alive) return;
-        const m = computeShadowMask(tile.filled, el, az, 400);
-        setState({ texture: maskToTexture(m, tile.filled.size), note: `in-browser ray-marched mask at ${el}° / ${az}°` });
-      }, 120);
-      cleanup.push((): void => clearTimeout(t));
-    };
-    const cleanup: (() => void)[] = [];
-    if (pick) {
-      loadImage(pick.path, origin)
-        .then((img: HTMLImageElement): void => {
-          if (alive)
-            setState({
-              texture: imageMaskTexture(img, tile.filled.size),
-              note: `pipeline mask, nearest to slider: sun ${pick.el}° / ${pick.az}° (grey = no data)`,
-            });
-        })
-        .catch((): void => fallbackToCpu());
-    } else {
-      fallbackToCpu();
-    }
-    return (): void => {
-      alive = false;
-      cleanup.forEach((f: () => void): void => f());
-    };
-  }, [tile, mode, el, az, masks, origin]);
-  useEffect((): (() => void) => (): void => state.texture?.dispose(), [state.texture]);
-  return state;
-}
-
-// ------------------------------------------------------------------------------------------------
-// Tile loading (cached in data/tiles)
-// ------------------------------------------------------------------------------------------------
-
-function useTile(ref: TileRef | null, origin: Origin): { tile: LoadedTile | null; error: string | null } {
-  const [tile, setTile] = useState<LoadedTile | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  useEffect((): (() => void) | void => {
-    if (!ref) return;
-    let alive = true;
-    setTile(null);
-    setError(null);
-    loadTile(ref, origin)
-      .then((t: LoadedTile): void => {
-        if (alive) setTile(t);
-      })
-      .catch((e: unknown): void => {
-        if (alive) setError(e instanceof Error ? e.message : String(e));
-      });
-    return (): void => {
-      alive = false;
-    };
-  }, [ref, origin]);
-  return { tile, error };
-}
-
-// ------------------------------------------------------------------------------------------------
-// Shadow share readout: same method on both worlds, true heights, computed in the browser
-// ------------------------------------------------------------------------------------------------
-
-const READOUT_STEP = 3; // 30 m tiles -> 90 m samples for the readout
-
-/** Block-mean downsample so the readout ray-march stays fast enough to follow a slider. */
-function downsample(g: Grid, f: number): Grid {
-  const n = Math.floor(g.size / f);
-  const out = new Float32Array(n * n);
-  for (let r = 0; r < n; r++) {
-    for (let c = 0; c < n; c++) {
-      let sum = 0;
-      for (let i = 0; i < f; i++) for (let j = 0; j < f; j++) sum += g.data[(r * f + i) * g.size + (c * f + j)];
-      out[r * n + c] = sum / (f * f);
-    }
-  }
-  return { data: out, size: n, res: g.res * f };
-}
-
-interface ShadowShare {
-  el: number;
-  az: number;
-  frac: number;
-}
-
-function useShadowShare(tile: LoadedTile | null, el: number, az: number): ShadowShare | null {
-  const small = useMemo((): Grid | null => (tile ? downsample(tile.filled, READOUT_STEP) : null), [tile]);
-  const [share, setShare] = useState<ShadowShare | null>(null);
-  const smallRef = useRef<Grid | null>(small);
-  const pending = useRef<{ el: number; az: number } | null>(null);
-  const timer = useRef<number | null>(null);
-  const last = useRef<number>(0);
-  smallRef.current = small;
-
-  useEffect((): void => {
-    setShare(null);
-  }, [small]);
-
-  useEffect((): void => {
-    if (!small) return;
-    pending.current = { el, az };
-    if (timer.current !== null) return;
-    const wait = Math.max(30, 140 - (performance.now() - last.current));
-    timer.current = window.setTimeout((): void => {
-      timer.current = null;
-      const p = pending.current;
-      const g = smallRef.current;
-      pending.current = null;
-      if (!p || !g) return;
-      last.current = performance.now();
-      const m = computeShadowMask(g, p.el, p.az, g.size);
-      let n = 0;
-      for (let i = 0; i < m.length; i++) n += m[i];
-      setShare({ el: p.el, az: p.az, frac: n / m.length });
-    }, wait);
-  }, [small, el, az]);
-
-  useEffect(
-    (): (() => void) => (): void => {
-      if (timer.current !== null) window.clearTimeout(timer.current);
-    },
-    [],
-  );
-  return share;
-}
-
-function pct(v: number): string {
-  return Number.isFinite(v) ? `${Math.round(v * 100)}%` : '—';
-}
-
-// ------------------------------------------------------------------------------------------------
-// One pane
-// ------------------------------------------------------------------------------------------------
-
-interface PaneProps {
-  id: string;
-  title: string;
-  world: string;
-  subtitle: string;
-  tile: LoadedTile | null;
-  error: string | null;
-  tileRef: TileRef;
-  origin: Origin;
-  masks: ShadowMask[];
-  path: ((tile: LoadedTile) => [number, number][]) | null;
-  share: ShadowShare | null;
-}
-
-function Pane({ id, title, world, subtitle, tile, error, tileRef, origin, masks, path, share }: PaneProps): JSX.Element {
-  const exag = useApp((s) => s.exaggeration);
-  const el = useApp((s) => s.sunEl);
-  const az = useApp((s) => s.sunAz);
-  const mode = useApp((s) => s.shadowMode);
-  const mask = useMaskTexture(tile, mode, el, az, masks, origin);
-  // Guard the shadow camera against a malformed tile reference (NaN bounds break the shadow map).
-  const rawExtent = tileRef.size * tileRef.res_m * KM;
-  const extent = Number.isFinite(rawExtent) && rawExtent > 0 ? rawExtent : 15;
-  const realtime = mode === 'realtime';
-  const pixels = useMemo((): [number, number][] | null => (tile && path ? path(tile) : null), [tile, path]);
-
-  return (
-    <div className="twin-pane">
-      {error ? (
-        <div className="loading">Could not load terrain: {error}</div>
-      ) : !tile ? (
-        <Loading label={`Loading ${title} terrain…`} />
-      ) : (
-        <SafeCanvas
-          name={`3D view (${world})`}
-          resetKey={tileRef.path}
-          shadows="percentage"
-          dpr={[1, 1.75]}
-          camera={{ position: [0, 17, 19], fov: 38, near: 0.05, far: 200 }}
-          gl={{ antialias: true }}
-        >
-          <color attach="background" args={['#1a1d23']} />
-          <hemisphereLight args={['#9aa3b5', '#000000', 0.06]} />
-          <Sun el={el} az={az} shadows={realtime} extent={extent} />
-          <TerrainMesh tile={tile} exag={exag} map={realtime ? null : mask.texture} shadows={realtime} />
-          {pixels && <PathLine tile={tile} exag={exag} pixels={pixels} color="#edeae4" />}
-          <SyncedControls id={id} />
-        </SafeCanvas>
-      )}
-      <div className="twin-label">
-        <span className="twin-tag">
-          <strong>{title}</strong> <span className="muted">{subtitle}</span>
-        </span>
-        {tile && (
-          <span className="twin-tag caption" title="Elevation range in the tile">
-            Relief {Math.round(tile.stats.max - tile.stats.min).toLocaleString('en-US')} m
-            {tile.nanCount > 0 ? ` · ${tile.nanCount} no-data px filled` : ''}
-          </span>
-        )}
-      </div>
-      <div className="twin-readout" aria-live="polite">
-        <span className="twin-readout-world">{world}</span>
-        <span className="twin-readout-big">{share ? pct(share.frac) : '…'}</span>
-        <span className="caption">in shadow at {(share?.el ?? el).toFixed(1)}° sun</span>
-      </div>
-      {!realtime && mask.note && <div className="twin-note caption">Shadows: {mask.note}</div>}
-    </div>
-  );
-}
-
-// ------------------------------------------------------------------------------------------------
-// Screen
-// ------------------------------------------------------------------------------------------------
-
-function siteOptions(core: CoreData, region: Region, hazardMatches: Match[]): { site: EarthSite; tag: string }[] {
-  const top = new Map<string, string>();
-  for (const h of ['shadow', 'rim', 'texture'] as const) {
-    for (const m of matchesFor(core, region.id, h)) {
-      if (!top.has(m.site_id)) top.set(m.site_id, `#${m.rank} ${HAZARDS[h].short}`);
-    }
-  }
-  hazardMatches.forEach((m: Match): void => {
-    top.set(m.site_id, `#${m.rank} ${HAZARDS[m.hazard].short}`);
-  });
-  const first = core.sites.filter((s: EarthSite): boolean => top.has(s.id)).map((s: EarthSite) => ({ site: s, tag: top.get(s.id) ?? '' }));
-  const rest = core.sites.filter((s: EarthSite): boolean => !top.has(s.id)).map((s: EarthSite) => ({ site: s, tag: '' }));
-  return [...first, ...rest];
+function nScreened(core: CoreData): number | null {
+  const n = core.method?.file.screen.n_screened;
+  return typeof n === 'number' && n > 0 ? n : null;
 }
 
 function useSunSweep(): { sweeping: boolean; start: () => void; stop: () => void } {
   const [sweeping, setSweeping] = useState<boolean>(false);
   useEffect((): (() => void) | void => {
     if (!sweeping) return;
-    const st = useApp.getState();
-    const startAz = st.sunAz;
+    const startAz = useApp.getState().sunAz;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) {
       // No continuous motion: step the sun round in 30° jumps instead.
@@ -475,7 +79,7 @@ function useSunSweep(): { sweeping: boolean; start: () => void; stop: () => void
     let raf = 0;
     const tick = (now: number): void => {
       const p = Math.min(1, (now - t0) / DUR);
-      const eased = 0.5 - 0.5 * Math.cos(Math.PI * p); // ease in and out of one full turn
+      const eased = 0.5 - 0.5 * Math.cos(Math.PI * p);
       const s2 = useApp.getState();
       s2.setSun(s2.sunEl, Math.round(((startAz + 360 * eased) % 360) * 10) / 10);
       if (p < 1) raf = requestAnimationFrame(tick);
@@ -487,12 +91,133 @@ function useSunSweep(): { sweeping: boolean; start: () => void; stop: () => void
   return { sweeping, start: (): void => setSweeping(true), stop: (): void => setSweeping(false) };
 }
 
+// ------------------------------------------------------------------------------------------------
+// Pickers
+// ------------------------------------------------------------------------------------------------
+
+interface SiteChoice {
+  site: EarthSite;
+  match: Match | null;
+  place: PlaceName;
+}
+
+function Pickers({
+  core,
+  region,
+  hazard,
+  choices,
+  extra,
+  selectedId,
+}: {
+  core: CoreData;
+  region: Region;
+  hazard: HazardId;
+  choices: SiteChoice[];
+  extra: SiteChoice | null;
+  selectedId: string | null;
+}): JSX.Element {
+  const setRegion = useApp((s) => s.setRegion);
+  const setHazard = useApp((s) => s.setHazard);
+  const setSite = useApp((s) => s.setSite);
+  const n = nScreened(core);
+  return (
+    <div className="t3-pickers panel">
+      <div className="t3-pick-row">
+        <label className="t3-pick">
+          <span className="t3-pick-label">Moon region</span>
+          <select className="select" value={region.id} onChange={(e): void => setRegion(e.target.value)}>
+            {core.regions.map((r: Region) => (
+              <option key={r.id} value={r.id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="t3-pick t3-pick-hazard">
+          <span className="t3-pick-label" id="t3-hz-label">
+            Danger
+          </span>
+          <div className="t3-hz-tabs" role="tablist" aria-labelledby="t3-hz-label">
+            {HAZARD_IDS.map((h: HazardId) => (
+              <button
+                key={h}
+                type="button"
+                role="tab"
+                className="t3-hz-tab"
+                data-hz={h}
+                aria-selected={h === hazard}
+                onClick={(): void => {
+                  if (h !== hazard) setHazard(h);
+                }}
+              >
+                <HazardGlyph hazard={h} />
+                <span>{HAZARD_TAB[h].name}</span>
+                <span className="t3-hz-mission">{HAZARD_TAB[h].mission}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="t3-pick t3-pick-earth">
+        <span className="t3-pick-label" id="t3-earth-label">
+          Earth stand-ins for this danger
+          <span className="t3-pick-hint">{n ? ` · best 3 of ${n.toLocaleString('en-US')} squares screened` : ' · best 3'}</span>
+        </span>
+        <div className="t3-chips" role="group" aria-labelledby="t3-earth-label">
+          {choices.length === 0 && <p className="t3-note-empty">No Earth matches for this region and danger in matches.json.</p>}
+          {choices.map((c: SiteChoice) => (
+            <button
+              key={c.site.id}
+              type="button"
+              className="t3-chip"
+              aria-pressed={c.site.id === selectedId}
+              title={c.place.title}
+              onClick={(): void => setSite(c.site.id)}
+            >
+              <span className="t3-chip-rank">#{c.match?.rank ?? '–'}</span>
+              <span className="t3-chip-text">
+                <span className="t3-chip-name">{c.place.label}</span>
+                <span className="t3-chip-sub">{c.place.sub ?? 'remote site · hover for exact spot'}</span>
+              </span>
+            </button>
+          ))}
+          {extra && (
+            <button type="button" className="t3-chip t3-chip-extra" aria-pressed title={extra.place.title}>
+              <span className="t3-chip-rank">Walk</span>
+              <span className="t3-chip-text">
+                <span className="t3-chip-name">{extra.place.label}</span>
+                <span className="t3-chip-sub">from your drawn walk, not a top-3 pick</span>
+              </span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------------------------------------
+// Screen
+// ------------------------------------------------------------------------------------------------
+
+function Readout({ big, small }: { big: ReactNode; small: ReactNode }): JSX.Element {
+  return (
+    <>
+      <span className="t3-readout-big">{big}</span>
+      <span className="t3-readout-small">{small}</span>
+    </>
+  );
+}
+
+function shareBig(s: ShadowShare | null): string {
+  return s ? `${pct0(s.frac)} dark` : '…';
+}
+
 export default function Terrain3D(): JSX.Element {
   const core = useApp((s) => s.core) as CoreData;
   const region = useRegion();
   const hazard = useApp((s) => s.hazard);
   const siteId = useApp((s) => s.siteId);
-  const setSite = useApp((s) => s.setSite);
   const exag = useApp((s) => s.exaggeration);
   const setExag = useApp((s) => s.setExaggeration);
   const el = useApp((s) => s.sunEl);
@@ -501,202 +226,350 @@ export default function Terrain3D(): JSX.Element {
   const mode = useApp((s) => s.shadowMode);
   const setMode = useApp((s) => s.setShadowMode);
   const walk = useApp((s) => s.walk);
-  const setRegion = useApp((s) => s.setRegion);
   const sweep = useSunSweep();
+  const [lift, setLift] = useState<boolean>(false);
+  const [activeWindow, setActiveWindow] = useState<{ key: string; el: number; az: number } | null>(null);
 
-  const hazardMatches = useMemo((): Match[] => (region ? matchesFor(core, region.id, hazard) : []), [core, region, hazard]);
-  // A remembered site id may come from another source (e.g. a real walk transect); fall back to this set.
-  const site =
-    (siteId ? core.siteById.get(siteId) : undefined) ??
-    (hazardMatches[0] ? core.siteById.get(hazardMatches[0].site_id) : undefined) ??
-    core.sites[0] ??
-    null;
-  const options = useMemo(() => (region ? siteOptions(core, region, hazardMatches) : []), [core, region, hazardMatches]);
+  // Deep links (Earth matches, Walk) set a site; if it is a pick for another danger in this region, follow it.
+  useEffect((): void => {
+    if (!region || !siteId) return;
+    if (matchesFor(core, region.id, hazard).some((m: Match): boolean => m.site_id === siteId)) return;
+    const other = HAZARD_IDS.find((h: HazardId): boolean => matchesFor(core, region.id, h).some((m: Match): boolean => m.site_id === siteId));
+    if (other) useApp.setState({ hazard: other });
+  }, [core, region, hazard, siteId]);
+
+  const choices = useMemo((): SiteChoice[] => {
+    if (!region) return [];
+    return matchesFor(core, region.id, hazard)
+      .slice(0, 3)
+      .flatMap((m: Match): SiteChoice[] => {
+        const site = core.siteById.get(m.site_id);
+        return site ? [{ site, match: m, place: sitePlace(site, m) }] : [];
+      });
+  }, [core, region, hazard]);
+
+  const inChoices = choices.find((c: SiteChoice): boolean => c.site.id === siteId) ?? null;
+  const walkSite = !inChoices && siteId ? (core.siteById.get(siteId) ?? null) : null;
+  const extra: SiteChoice | null = walkSite ? { site: walkSite, match: null, place: sitePlace(walkSite, null) } : null;
+  const current: SiteChoice | null = inChoices ?? extra ?? choices[0] ?? null;
+  const site = current?.site ?? null;
+  const match = current?.match ?? null;
 
   const moon = useTile(region?.tile ?? null, core.regionsOrigin);
   const earth = useTile(site?.tile ?? null, core.sitesOrigin);
+  const ann = useAnnotations(region, core.regionsOrigin);
   const moonShare = useShadowShare(moon.tile, el, az);
   const earthShare = useShadowShare(earth.tile, el, az);
+  const moonMask = useMaskTexture(moon.tile, mode, el, az, region?.shadow_masks ?? NO_MASKS, core.regionsOrigin);
+  const earthMask = useMaskTexture(earth.tile, mode, el, az, NO_MASKS, core.sitesOrigin);
+  const moonRim = useMemo((): RimSeg[] | null => (hazard === 'rim' ? moonRimSegs(ann, RIM_COUNT) : null), [hazard, ann]);
+  const earthRim = useEarthRimSegs(earth.tile, hazard === 'rim', RIM_COUNT);
+  const tileSize = region?.tile.size ?? 500;
+  const cellPx = ann?.texture ? ann.texture.cell_m / (ann.tile.res_m || 30) : 1000 / 30;
+  const moonCells = useCellTexture(hazard === 'texture', ann?.texture?.texture_empty_cells ?? null, tileSize, cellPx, TEXTURE_TINT);
+  const earthCells = useCellTexture(hazard === 'texture', null, site?.tile.size ?? 500, 1000 / (site?.tile.res_m ?? 30), TEXTURE_TINT);
 
-  const moonPath = useMemo((): ((t: LoadedTile) => [number, number][]) | null => {
+  const moonPath = useMemo((): [number, number][] | null => {
     if (!walk || !region || walk.regionId !== region.id) return null;
     const ref = region.tile;
-    return (): [number, number][] => walk.route.map(([x, y]: [number, number]) => mapToPixel(x, y, ref.origin_x, ref.origin_y, ref.res_m));
+    return walk.route.map(([x, y]: [number, number]): [number, number] => mapToPixel(x, y, ref.origin_x, ref.origin_y, ref.res_m));
   }, [walk, region]);
-  const earthPath = useMemo((): ((t: LoadedTile) => [number, number][]) | null => {
+  const earthPath = useMemo((): [number, number][] | null => {
     const it = walk?.bestItem;
     if (!it || !site || it.site_id !== site.id) return null;
     const ref = site.tile;
-    return (): [number, number][] => [
-      mapToPixel(it.x0, it.y0, ref.origin_x, ref.origin_y, ref.res_m),
-      mapToPixel(it.x1, it.y1, ref.origin_x, ref.origin_y, ref.res_m),
-    ];
+    return [mapToPixel(it.x0, it.y0, ref.origin_x, ref.origin_y, ref.res_m), mapToPixel(it.x1, it.y1, ref.origin_x, ref.origin_y, ref.res_m)];
   }, [walk, site]);
 
-  if (!region || !site) return <p>No region or site available.</p>;
+  if (!region || !site || !current) {
+    return (
+      <div className="t3">
+        <p className="t3-note-empty">No Moon region or Earth site is available in the loaded data.</p>
+      </div>
+    );
+  }
 
-  const result =
-    moonShare && earthShare
-      ? `Shadowed at ${el.toFixed(1)}° sun: Moon ${pct(moonShare.frac)} · Earth ${pct(earthShare.frac)}`
-      : `Measuring shadow at ${el.toFixed(1)}° sun…`;
+  const place = current.place;
+  const verdict: Verdict | null = match ? buildVerdict(match, place.label, region.name, nScreened(core)) : null;
+  const realtime = mode === 'realtime';
+  const extentOf = (size: number, res: number): number => {
+    const v = size * res * TERRAIN_KM;
+    return Number.isFinite(v) && v > 0 ? v : 15;
+  };
+
+  // Windows: geographic azimuth at the Earth site -> azimuth from the top of the (north-up) Earth tile.
+  const windows: RehearsalWindow[] = match?.windows ?? [];
+  const winKey = (i: number): string => `${site.id}:${match?.hazard ?? ''}:${i}`;
+  const activeIdx =
+    activeWindow && Math.abs(activeWindow.el - el) < 0.01 && Math.abs(activeWindow.az - az) < 0.01
+      ? windows.findIndex((_w: RehearsalWindow, i: number): boolean => winKey(i) === activeWindow.key)
+      : -1;
+  const pickWindow = (i: number): void => {
+    const w = windows[i];
+    if (!w) return;
+    sweep.stop();
+    const gAz = Math.round(gridAzFor(site, w.sun_az) * 10) / 10;
+    const gEl = Math.round(Math.min(30, Math.max(0.5, w.sun_el)) * 10) / 10;
+    setSun(gEl, gAz);
+    setActiveWindow({ key: winKey(i), el: gEl, az: gAz });
+  };
+  const activeW = activeIdx >= 0 ? windows[activeIdx] : null;
+
+  // Per-hazard readouts and captions.
+  const elTxt = `${el.toFixed(el % 1 ? 1 : 0)}°`;
+  const sunFrom = `from the ${compass(az)} of the tile`;
+  let moonReadout: ReactNode;
+  let earthReadout: ReactNode;
+  let earthNote: ReactNode = null;
+  let caption: ReactNode;
+  if (hazard === 'rim') {
+    const mTop = moonRim?.[0];
+    const eTop = earthRim?.[0];
+    moonReadout = <Readout big={mTop ? `${Math.round(mTop.absDh)} m` : ann ? '–' : '…'} small="biggest height change over 1 km" />;
+    earthReadout = <Readout big={eTop ? `${Math.round(eTop.absDh)} m` : '…'} small="biggest height change over 1 km" />;
+    caption = (
+      <>
+        <strong>Orange lines:</strong> the three biggest height changes over 1 km on each tile, found with the same scan (every point, 16
+        directions, picks at least 1.5 km apart). The dot marks the high end. A drop like this is what Hakuto-R’s software rejected as sensor
+        error.
+      </>
+    );
+  } else if (hazard === 'texture') {
+    const mEmpty = ann?.texture?.empty_frac ?? region.hazards.texture.metrics.empty_cell_frac_el3;
+    const lightE = match?.lights.find((l: LightRow): boolean => l.metric === 'empty_cell_frac_el3');
+    const eEmpty = lightE ? lightE.earth : siteMetric(site, 'empty_cell_frac_el3');
+    moonReadout = <Readout big={typeof mEmpty === 'number' ? pct0(mEmpty) : '–'} small="of 1 km squares featureless at a 3° sun" />;
+    earthReadout = <Readout big={eEmpty !== null ? pct0(eEmpty) : '–'} small="of 1 km squares featureless at a 3° sun" />;
+    earthNote = <>Pipeline figure. Which Earth squares are empty isn’t mapped yet, so only the 1 km grid is drawn here.</>;
+    caption = (
+      <>
+        <strong>Pink squares on the Moon:</strong> 1 km squares where a camera finds no landmark at a 3° sun from at least half of 8 sun
+        directions; stronger pink means empty from more of them. Too little surface texture is what left Ingenuity’s navigation with too little to work with.
+      </>
+    );
+  } else {
+    moonReadout = <Readout big={shareBig(moonShare)} small={`at a ${elTxt} sun`} />;
+    earthReadout = <Readout big={shareBig(earthShare)} small={`at the same ${elTxt} sun`} />;
+    caption = (
+      <>
+        <strong>
+          {moonShare ? `${pct0(moonShare.frac)} of ${region.name} is dark at a ${elTxt} sun` : `Measuring the shadow at a ${elTxt} sun…`}
+        </strong>
+        {moonShare ? ' — long low-sun shadows like these are a danger IM-2 faced. ' : ' '}
+        {earthShare ? `Under the same sun, ${pct0(earthShare.frac)} of ${place.label} is dark.` : ''}
+      </>
+    );
+  }
+  const darkNote =
+    hazard === 'shadow'
+      ? null
+      : moonShare
+        ? `Black ground is real shadow: at this ${elTxt} sun ${pct0(moonShare.frac)} of ${region.name} gets no direct light.`
+        : null;
 
   return (
-    <div>
-      <ScreenHead
-        kicker={`3D side by side · ${region.name} and ${site.name}`}
-        chips={core.setOrigin === 'mock' ? <SampleChip what="Earth sites" /> : null}
-        result={result}
-        methodLabel="What is the same in both views"
-        method={
-          <p>
-            Both tiles are 15 × 15 km on a 30 m grid, with the same grey material, the same vertical exaggeration and one sun at the same
-            elevation and azimuth. Drag either view; the other follows.
-          </p>
-        }
-      />
-
-      <div className="panel controls">
-        <div className="controls-row controls-terrain">
-          <label className="control">
-            <span className="field-label">Moon region</span>
-            <select className="select" value={region.id} onChange={(e): void => setRegion(e.target.value)}>
-              {core.regions.map((r: Region) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="control">
-            <span className="field-label">Earth site</span>
-            <select className="select" value={site.id} onChange={(e): void => setSite(e.target.value)}>
-              {options.map(({ site: s, tag }) => (
-                <option key={s.id} value={s.id}>
-                  {tag ? `${tag} · ` : ''}
-                  {s.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="control">
-            <label htmlFor="exag" className="field-label field-label-row">
-              <span>Vertical exaggeration</span>
-              <span className="field-value">{exag.toFixed(1)}×</span>
-            </label>
-            <input
-              id="exag"
-              className="range"
-              type="range"
-              min={1}
-              max={6}
-              step={0.5}
-              value={exag}
-              onChange={(e): void => setExag(Number(e.target.value))}
-            />
-          </div>
-          <div className="control control-fit">
-            <span className="field-label" id="shadow-mode-label">
-              Shadows
-            </span>
-            <div className="seg" role="group" aria-labelledby="shadow-mode-label">
-              <button type="button" aria-pressed={mode === 'realtime'} onClick={(): void => setMode('realtime')}>
-                Live
-              </button>
-              <button type="button" aria-pressed={mode === 'precomputed'} onClick={(): void => setMode('precomputed')}>
-                Masks
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="controls-row controls-sun">
-          <div className="control">
-            <label htmlFor="sunel" className="field-label field-label-row">
-              <span className="sun-label">
-                <SunGlyph /> Sun elevation
-              </span>
-              <span className="field-value">{el.toFixed(1)}°</span>
-            </label>
-            <input
-              id="sunel"
-              className="range range-sun"
-              type="range"
-              min={1}
-              max={30}
-              step={0.5}
-              value={el}
-              onChange={(e): void => setSun(Number(e.target.value), az)}
-            />
-          </div>
-          <div className="control">
-            <label htmlFor="sunaz" className="field-label field-label-row">
-              <span className="sun-label">
-                <SunGlyph /> Sun azimuth
-              </span>
-              <span className="field-value">{az.toFixed(0)}°</span>
-            </label>
-            <input
-              id="sunaz"
-              className="range range-sun"
-              type="range"
-              min={0}
-              max={359}
-              step={1}
-              value={Math.round(az) % 360}
-              onChange={(e): void => {
-                sweep.stop();
-                setSun(el, Number(e.target.value));
-              }}
-            />
-          </div>
-          <div className="control control-fit">
-            <button
-              type="button"
-              className="btn btn-primary btn-sweep"
-              aria-pressed={sweep.sweeping}
-              onClick={sweep.sweeping ? sweep.stop : sweep.start}
-            >
-              <SunGlyph />
-              {sweep.sweeping ? 'Stop the sweep' : 'Sweep the sun'}
-            </button>
-          </div>
-        </div>
+    <div className="t3">
+      <div className="t3-kicker">
+        <span>3D side by side</span>
+        {core.setOrigin === 'mock' && <SampleChip what="Earth sites" />}
       </div>
 
-      <div className="twin">
+      <Pickers core={core} region={region} hazard={hazard} choices={choices} extra={extra} selectedId={site.id} />
+
+      <div className="t3-verdict" data-hz={hazard}>
+        <HazardGlyph hazard={hazard} size={24} />
+        {verdict ? (
+          <h1>
+            {verdict.lead}: <span className="t3-verdict-stat">{verdict.stat}</span>
+            {verdict.rank && <span className="t3-verdict-rank"> — {verdict.rank}</span>}
+          </h1>
+        ) : (
+          <h1>
+            {place.label} came from your drawn walk. It isn’t one of the top-3 Earth picks for {region.name}, so there is no match to explain;
+            the 3D views still compare the terrain.
+          </h1>
+        )}
+      </div>
+
+      <div className="t3-sunbar">
+        <div className="t3-sunbar-main">
+          <span className="t3-pick-label" id="t3-sun-label">
+            <SunGlyph /> Moon-like low sun
+          </span>
+          <div className="t3-sun-presets" role="group" aria-labelledby="t3-sun-label">
+            {SUN_PRESETS.map((v: number) => (
+              <button
+                key={v}
+                type="button"
+                aria-pressed={Math.abs(el - v) < 0.01}
+                onClick={(): void => {
+                  setSun(v, az);
+                }}
+              >
+                {v}°
+              </button>
+            ))}
+          </div>
+          <button type="button" className="btn btn-primary t3-sweep" aria-pressed={sweep.sweeping} onClick={sweep.sweeping ? sweep.stop : sweep.start}>
+            <SunGlyph />
+            {sweep.sweeping ? 'Stop the sweep' : 'Sweep the sun'}
+          </button>
+          <span className="t3-sun-now">
+            Sun {elTxt} high, {sunFrom}
+          </span>
+        </div>
+        <details className="t3-more">
+          <summary>More options</summary>
+          <div className="t3-more-body">
+            <div className="t3-ctl">
+              <label htmlFor="t3-el" className="t3-ctl-label">
+                <span>
+                  <SunGlyph size={14} /> Sun height
+                </span>
+                <span className="t3-ctl-value">{el.toFixed(1)}°</span>
+              </label>
+              <input
+                id="t3-el"
+                className="range range-sun"
+                type="range"
+                min={0.5}
+                max={30}
+                step={0.5}
+                value={el}
+                onChange={(e): void => setSun(Number(e.target.value), az)}
+              />
+            </div>
+            <div className="t3-ctl">
+              <label htmlFor="t3-az" className="t3-ctl-label">
+                <span>
+                  <SunGlyph size={14} /> Sun direction (from tile top)
+                </span>
+                <span className="t3-ctl-value">{Math.round(az) % 360}°</span>
+              </label>
+              <input
+                id="t3-az"
+                className="range range-sun"
+                type="range"
+                min={0}
+                max={359}
+                step={1}
+                value={Math.round(az) % 360}
+                onChange={(e): void => {
+                  sweep.stop();
+                  setSun(el, Number(e.target.value));
+                }}
+              />
+            </div>
+            <div className="t3-ctl">
+              <label htmlFor="t3-exag" className="t3-ctl-label">
+                <span>Vertical exaggeration</span>
+                <span className="t3-ctl-value">{exag.toFixed(1)}×</span>
+              </label>
+              <input
+                id="t3-exag"
+                className="range"
+                type="range"
+                min={1}
+                max={6}
+                step={0.5}
+                value={exag}
+                onChange={(e): void => setExag(Number(e.target.value))}
+              />
+            </div>
+            <div className="t3-ctl">
+              <span className="t3-ctl-label" id="t3-mode-label">
+                Shadow drawing
+              </span>
+              <div className="seg" role="group" aria-labelledby="t3-mode-label">
+                <button type="button" aria-pressed={realtime} onClick={(): void => setMode('realtime')}>
+                  Live (graphics card)
+                </button>
+                <button type="button" aria-pressed={!realtime} onClick={(): void => setMode('precomputed')}>
+                  Reference masks
+                </button>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div className="t3-twin">
         <Pane
           id="moon"
-          title={region.name}
           world="Moon"
-          subtitle="LOLA"
+          name={region.name}
+          sub="NASA LOLA heights · 15 × 15 km"
+          upNote="up = map grid, not north"
           tile={moon.tile}
           error={moon.error}
-          tileRef={region.tile}
-          origin={core.regionsOrigin}
-          masks={region.shadow_masks}
+          extentKm={extentOf(region.tile.size, region.tile.res_m)}
+          exag={exag}
+          el={el}
+          az={az}
+          realtime={realtime}
+          lift={lift}
+          shadeMap={moonMask.texture}
+          cellMap={moonCells}
+          rim={moonRim}
           path={moonPath}
-          share={moonShare}
+          readout={moonReadout}
+          note={!realtime && moonMask.note ? `Shadows: ${moonMask.note}` : null}
         />
         <Pane
           id="earth"
-          title={site.name}
           world="Earth"
-          subtitle={site.country}
+          name={place.label}
+          nameTitle={place.title}
+          sub={`${place.sub ? `${place.sub} · ` : ''}30 m heights · 15 × 15 km`}
+          upNote="up = north"
           tile={earth.tile}
           error={earth.error}
-          tileRef={site.tile}
-          origin={core.sitesOrigin}
-          masks={[]}
+          extentKm={extentOf(site.tile.size, site.tile.res_m)}
+          exag={exag}
+          el={el}
+          az={az}
+          realtime={realtime}
+          lift={lift}
+          shadeMap={earthMask.texture}
+          cellMap={earthCells}
+          rim={hazard === 'rim' ? earthRim : null}
           path={earthPath}
-          share={earthShare}
+          readout={earthReadout}
+          note={earthNote ?? (!realtime && earthMask.note ? `Shadows: ${earthMask.note}` : null)}
         />
       </div>
-      <p className="footnote">
-        Azimuth is measured clockwise from the top of each tile; on Moon tiles the top is not geographic north. Live shadows are drawn by
-        your graphics card and can flicker or leave gaps when the sun is very low; switch to Masks for the reference picture. The shadow
-        percentages are worked out in your browser from true heights (90 m steps), so vertical exaggeration changes the picture, not the
-        numbers.
+
+      <div className="t3-caption">
+        <p>
+          {caption}
+          {darkNote ? <span className="t3-caption-dark"> {darkNote}</span> : null}
+        </p>
+        <label className="check t3-lift">
+          <input type="checkbox" checked={lift} onChange={(e): void => setLift(e.target.checked)} />
+          Show terrain in shadow
+        </label>
+      </div>
+      {activeW && (
+        <p className="t3-window-note">
+          <SunGlyph size={14} /> Lit with the sun of {activeW.start_utc.slice(0, 10)}: {activeW.sun_el.toFixed(1)}° high, from the{' '}
+          {compass(activeW.sun_az)} ({Math.round(activeW.sun_az)}° from north) — the sun direction as seen at the Earth site. The Moon view
+          uses the same direction measured from the top of its tile.
+        </p>
+      )}
+      <p className="t3-fine">
+        Same scale on both: 15 × 15 km, 30 m grid, the same vertical exaggeration and one sun. Drag either view; the other follows. The dark
+        percentages are worked out in your browser from true heights (90 m steps). Heights are drawn exaggerated, so the 3D sun is raised by
+        the same factor: shadows cover the same ground they would on the real terrain.
         {walk && walk.regionId === region.id ? ' The white line is your drawn walk.' : ''}
       </p>
+
+      {match && (
+        <>
+          <EvidenceTable match={match} regionName={region.name} placeLabel={place.label} />
+          <NotesBoxes match={match} />
+          <WindowsList windows={windows.slice(0, 6)} placeLabel={place.label} activeIndex={activeIdx >= 0 ? activeIdx : null} onPick={pickWindow} />
+        </>
+      )}
     </div>
   );
 }

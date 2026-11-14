@@ -182,7 +182,7 @@ export function WindowsList({
 }): JSX.Element {
   return (
     <section className="t3-section" aria-labelledby="t3-windows-h">
-      <div className="t3-section-head">
+      <div className="t3-section-head t3-section-head-col">
         <h2 id="t3-windows-h">When to go</h2>
         <p className="t3-section-sub">
           Times when the sun at {placeLabel} sits as low as it does at the lunar south pole. Pick one to light both views with that sun.
