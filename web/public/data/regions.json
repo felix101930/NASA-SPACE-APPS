@@ -1,0 +1,1382 @@
+{
+ "meta": {
+  "generated_utc": "2026-11-14T18:37:04Z",
+  "pipeline_version": "moon-0.1.0",
+  "sources": [
+   {
+    "name": "LOLA 20 m/px south-pole DEM (PGDA product 90), LDEM_80S_20MPP_ADJ + _ERR; LDEM_60S_240MPP_ADJ far field",
+    "url": "https://pgda.gsfc.nasa.gov/products/90",
+    "licence": "NASA data, public domain (US Government work); cite data paper",
+    "citation": "Barker, M.K. et al. (2023) A New View of the Lunar South Pole from the Lunar Orbiter Laser Altimeter (LOLA). PSJ 4:183, doi:10.3847/PSJ/acf3e1"
+   },
+   {
+    "name": "High-resolution LOLA topography for lunar south pole sites (PGDA product 78): site tile extents used for region centres",
+    "url": "https://pgda.gsfc.nasa.gov/products/78",
+    "licence": "NASA data, public domain (US Government work); cite data paper",
+    "citation": "Barker, M.K. et al. (2021) Improved LOLA elevation maps for south pole landing sites: error estimates and their impact on illumination conditions. PSS 203:105119, doi:10.1016/j.pss.2020.105119"
+   },
+   {
+    "name": "Lunar polar illumination, AVGVISIB_85S_060M_201608 (PGDA product 69), validation only",
+    "url": "https://pgda.gsfc.nasa.gov/products/69",
+    "licence": "NASA data, public domain (US Government work); cite data paper",
+    "citation": "Mazarico, E. et al. (2011) Illumination conditions of the lunar polar regions using LOLA topography. Icarus 211:1066-1081, doi:10.1016/j.icarus.2010.10.030"
+   },
+   {
+    "name": "NASA Artemis III candidate landing regions map (Oct 28 2024), traced region boxes",
+    "url": "https://www.nasa.gov/wp-content/uploads/2024/10/artemis-iii-landing-region-candidates.jpg",
+    "licence": "NASA media, not copyrighted (NASA/GSFC/ASU/JSC/AGDT credit)",
+    "citation": "NASA (2024) NASA Provides Update on Artemis III Moon Landing Regions, https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+   },
+   {
+    "name": "IAU/USGS Gazetteer of Planetary Nomenclature (feature centres, sanity checks)",
+    "url": "https://planetarynames.wr.usgs.gov/",
+    "licence": "USGS, public domain",
+    "citation": "Gazetteer of Planetary Nomenclature, IAU WGPSN / USGS Astrogeology Science Center"
+   }
+  ],
+  "score_method": "score = min-max over the 9 regions of the mean of oriented, min-max-normalised metrics (texture: low FAST density = high hazard); level = tercile of score"
+ },
+ "regions": [
+  {
+   "id": "cabeus_b_peak",
+   "name": "Peak near Cabeus B",
+   "lat": -83.64304,
+   "lon": -68.78086,
+   "x_m": -179880.0,
+   "y_m": 69840.0,
+   "coord_quality": "traced_approx",
+   "coord_source": "Approximate, traced from NASA map (https://www.nasa.gov/wp-content/uploads/2024/10/artemis-iii-landing-region-candidates.jpg; release https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/) georeferenced on PGDA-78 tiles",
+   "coord_method": "NASA box centre px (102.0,511.5) mapped through affine fit of 6 NASA boxes to PGDA-78 tile centres: 279 m/px, rotation -0.02 deg, RMS residual 0.11 km; pole star maps to (-0.3, -0.3) km.",
+   "sun": {
+    "el_min": 4.817,
+    "el_max": 7.897,
+    "note": "geometric, from latitude \u00b1 1.54\u00b0 declination"
+   },
+   "tile": {
+    "path": "moon/cabeus_b_peak.bin",
+    "size": 500,
+    "res_m": 30.0,
+    "crs": "+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m",
+    "origin_x": -187380.0,
+    "origin_y": 77340.0
+   },
+   "illumination": {
+    "pgda_avg_visibility": 0.3336,
+    "pgda_res_m": 120.0,
+    "pgda_url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608.TIF",
+    "ours_avg_visibility": 0.3122,
+    "note": "Use pgda_avg_visibility for long-term average illumination (Mazarico et al. 2011). Ours (point-sun, approximate sun path) runs ~2-3 pts darker; our shadow fractions at fixed elevations and the masks use the same method on both worlds."
+   },
+   "hillshade": "moon/cabeus_b_peak_hill.png",
+   "shadow_masks": [
+    {
+     "el": 1.0,
+     "az": 0,
+     "path": "moon/cabeus_b_peak_sh_el1_az000.png"
+    },
+    {
+     "el": 1.0,
+     "az": 90,
+     "path": "moon/cabeus_b_peak_sh_el1_az090.png"
+    },
+    {
+     "el": 1.0,
+     "az": 180,
+     "path": "moon/cabeus_b_peak_sh_el1_az180.png"
+    },
+    {
+     "el": 1.0,
+     "az": 270,
+     "path": "moon/cabeus_b_peak_sh_el1_az270.png"
+    },
+    {
+     "el": 3.0,
+     "az": 0,
+     "path": "moon/cabeus_b_peak_sh_el3_az000.png"
+    },
+    {
+     "el": 3.0,
+     "az": 90,
+     "path": "moon/cabeus_b_peak_sh_el3_az090.png"
+    },
+    {
+     "el": 3.0,
+     "az": 180,
+     "path": "moon/cabeus_b_peak_sh_el3_az180.png"
+    },
+    {
+     "el": 3.0,
+     "az": 270,
+     "path": "moon/cabeus_b_peak_sh_el3_az270.png"
+    },
+    {
+     "el": 5.0,
+     "az": 0,
+     "path": "moon/cabeus_b_peak_sh_el5_az000.png"
+    },
+    {
+     "el": 5.0,
+     "az": 90,
+     "path": "moon/cabeus_b_peak_sh_el5_az090.png"
+    },
+    {
+     "el": 5.0,
+     "az": 180,
+     "path": "moon/cabeus_b_peak_sh_el5_az180.png"
+    },
+    {
+     "el": 5.0,
+     "az": 270,
+     "path": "moon/cabeus_b_peak_sh_el5_az270.png"
+    }
+   ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
+   "hazards": {
+    "shadow": {
+     "score": 0.0,
+     "level": "low",
+     "metrics": {
+      "shadow_frac_el1": 0.524077,
+      "shadow_frac_el3": 0.481021,
+      "shadow_frac_el5": 0.438077,
+      "shadow_frac_timeweighted": 0.515828
+     }
+    },
+    "rim": {
+     "score": 0.6078,
+     "level": "high",
+     "metrics": {
+      "jump1km_p95_m": 420.372606,
+      "jump1km_p99_m": 472.511468,
+      "frac_track_over_500m": 0.001337
+     }
+    },
+    "texture": {
+     "score": 0.7059,
+     "level": "high",
+     "metrics": {
+      "fast_per_km2_el3": 8.471111,
+      "empty_cell_frac_el3": 0.398889
+     }
+    },
+    "slope": {
+     "metrics": {
+      "slope_p50_deg": 18.392096,
+      "slope_p90_deg": 25.163972,
+      "rms_dev_m": {
+       "60": 14.628846,
+       "120": 29.102958,
+       "240": 57.742546,
+       "480": 113.976302,
+       "960": 222.3745
+      }
+     }
+    }
+   },
+   "extras": {
+    "hurst": 0.98217,
+    "jump100m_p95_m": 43.227753,
+    "jump100m_p99_m": 48.754817,
+    "shadow_frac_el7": 0.393678,
+    "shadow_frac_timeweighted_all": 0.687804
+   },
+   "uncertainty": {
+    "dem_err_p50_m": 0.41,
+    "dem_err_p90_m": 1.169,
+    "notes": "LOLA LDEM_80S_20MPP_ADJ_ERR over the 15 km core at 20 m. Region centre approximate, traced from NASA map (\u00b1~0.5 km). Horizon: 72 az, 30 m near field (15 km buffer) + 240 m far field to 150 km, curvature on."
+   }
+  },
+  {
+   "id": "haworth",
+   "name": "Haworth",
+   "lat": -86.7648,
+   "lon": -22.77078,
+   "x_m": -37980.0,
+   "y_m": 90480.0,
+   "coord_quality": "pgda_site_tile",
+   "coord_source": "PGDA product 78 Haworth (Haworth) 5 m/px tile extent centre; https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Haworth/Haworth_final_adj_5mpp_surf.tif; https://pgda.gsfc.nasa.gov/products/78",
+   "coord_method": "Centre of PGDA-78 Haworth tile bounds [-52900,75600,-23100,105400] m (30 km square). NASA Oct-2024 box maps to within 0.04 km.",
+   "sun": {
+    "el_min": 1.695,
+    "el_max": 4.775,
+    "note": "geometric, from latitude \u00b1 1.54\u00b0 declination"
+   },
+   "tile": {
+    "path": "moon/haworth.bin",
+    "size": 500,
+    "res_m": 30.0,
+    "crs": "+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m",
+    "origin_x": -45480.0,
+    "origin_y": 97980.0
+   },
+   "illumination": {
+    "pgda_avg_visibility": 0.2627,
+    "pgda_res_m": 60.0,
+    "pgda_url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+    "ours_avg_visibility": 0.2321,
+    "note": "Use pgda_avg_visibility for long-term average illumination (Mazarico et al. 2011). Ours (point-sun, approximate sun path) runs ~2-3 pts darker; our shadow fractions at fixed elevations and the masks use the same method on both worlds."
+   },
+   "hillshade": "moon/haworth_hill.png",
+   "shadow_masks": [
+    {
+     "el": 1.0,
+     "az": 0,
+     "path": "moon/haworth_sh_el1_az000.png"
+    },
+    {
+     "el": 1.0,
+     "az": 90,
+     "path": "moon/haworth_sh_el1_az090.png"
+    },
+    {
+     "el": 1.0,
+     "az": 180,
+     "path": "moon/haworth_sh_el1_az180.png"
+    },
+    {
+     "el": 1.0,
+     "az": 270,
+     "path": "moon/haworth_sh_el1_az270.png"
+    },
+    {
+     "el": 3.0,
+     "az": 0,
+     "path": "moon/haworth_sh_el3_az000.png"
+    },
+    {
+     "el": 3.0,
+     "az": 90,
+     "path": "moon/haworth_sh_el3_az090.png"
+    },
+    {
+     "el": 3.0,
+     "az": 180,
+     "path": "moon/haworth_sh_el3_az180.png"
+    },
+    {
+     "el": 3.0,
+     "az": 270,
+     "path": "moon/haworth_sh_el3_az270.png"
+    },
+    {
+     "el": 5.0,
+     "az": 0,
+     "path": "moon/haworth_sh_el5_az000.png"
+    },
+    {
+     "el": 5.0,
+     "az": 90,
+     "path": "moon/haworth_sh_el5_az090.png"
+    },
+    {
+     "el": 5.0,
+     "az": 180,
+     "path": "moon/haworth_sh_el5_az180.png"
+    },
+    {
+     "el": 5.0,
+     "az": 270,
+     "path": "moon/haworth_sh_el5_az270.png"
+    }
+   ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
+   "hazards": {
+    "shadow": {
+     "score": 0.6172,
+     "level": "med",
+     "metrics": {
+      "shadow_frac_el1": 0.671081,
+      "shadow_frac_el3": 0.534784,
+      "shadow_frac_el5": 0.390927,
+      "shadow_frac_timeweighted": 0.66399
+     }
+    },
+    "rim": {
+     "score": 0.121,
+     "level": "low",
+     "metrics": {
+      "jump1km_p95_m": 231.567829,
+      "jump1km_p99_m": 309.642945,
+      "frac_track_over_500m": 0.0
+     }
+    },
+    "texture": {
+     "score": 0.2831,
+     "level": "low",
+     "metrics": {
+      "fast_per_km2_el3": 16.331111,
+      "empty_cell_frac_el3": 0.410556
+     }
+    },
+    "slope": {
+     "metrics": {
+      "slope_p50_deg": 8.354297,
+      "slope_p90_deg": 15.798507,
+      "rms_dev_m": {
+       "60": 7.577138,
+       "120": 14.86756,
+       "240": 29.057498,
+       "480": 56.644425,
+       "960": 109.040389
+      }
+     }
+    }
+   },
+   "extras": {
+    "hurst": 0.96239,
+    "jump100m_p95_m": 25.461173,
+    "jump100m_p99_m": 33.105077,
+    "shadow_frac_el7": 0.265646,
+    "shadow_frac_timeweighted_all": 0.767933
+   },
+   "uncertainty": {
+    "dem_err_p50_m": 0.179,
+    "dem_err_p90_m": 0.237,
+    "notes": "LOLA LDEM_80S_20MPP_ADJ_ERR over the 15 km core at 20 m. Region centre from PGDA-78 site tile (\u00b10.2 km vs NASA box). Horizon: 72 az, 30 m near field (15 km buffer) + 240 m far field to 150 km, curvature on."
+   }
+  },
+  {
+   "id": "malapert_massif",
+   "name": "Malapert Massif",
+   "lat": -85.99479,
+   "lon": -0.22635,
+   "x_m": -480.0,
+   "y_m": 121500.0,
+   "coord_quality": "pgda_site_tile",
+   "coord_source": "PGDA product 78 Site23 (Malapert massif) 5 m/px tile extent centre; https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site23/Site23_final_adj_5mpp_surf.tif; https://pgda.gsfc.nasa.gov/products/78",
+   "coord_method": "Centre of PGDA-78 Site23 tile bounds [-11000,111000,10000,132000] m (21 km square). NASA Oct-2024 box maps to within 0.10 km.",
+   "sun": {
+    "el_min": 2.465,
+    "el_max": 5.545,
+    "note": "geometric, from latitude \u00b1 1.54\u00b0 declination"
+   },
+   "tile": {
+    "path": "moon/malapert_massif.bin",
+    "size": 500,
+    "res_m": 30.0,
+    "crs": "+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m",
+    "origin_x": -7980.0,
+    "origin_y": 129000.0
+   },
+   "illumination": {
+    "pgda_avg_visibility": 0.3658,
+    "pgda_res_m": 60.0,
+    "pgda_url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+    "ours_avg_visibility": 0.3387,
+    "note": "Use pgda_avg_visibility for long-term average illumination (Mazarico et al. 2011). Ours (point-sun, approximate sun path) runs ~2-3 pts darker; our shadow fractions at fixed elevations and the masks use the same method on both worlds."
+   },
+   "hillshade": "moon/malapert_massif_hill.png",
+   "shadow_masks": [
+    {
+     "el": 1.0,
+     "az": 0,
+     "path": "moon/malapert_massif_sh_el1_az000.png"
+    },
+    {
+     "el": 1.0,
+     "az": 90,
+     "path": "moon/malapert_massif_sh_el1_az090.png"
+    },
+    {
+     "el": 1.0,
+     "az": 180,
+     "path": "moon/malapert_massif_sh_el1_az180.png"
+    },
+    {
+     "el": 1.0,
+     "az": 270,
+     "path": "moon/malapert_massif_sh_el1_az270.png"
+    },
+    {
+     "el": 3.0,
+     "az": 0,
+     "path": "moon/malapert_massif_sh_el3_az000.png"
+    },
+    {
+     "el": 3.0,
+     "az": 90,
+     "path": "moon/malapert_massif_sh_el3_az090.png"
+    },
+    {
+     "el": 3.0,
+     "az": 180,
+     "path": "moon/malapert_massif_sh_el3_az180.png"
+    },
+    {
+     "el": 3.0,
+     "az": 270,
+     "path": "moon/malapert_massif_sh_el3_az270.png"
+    },
+    {
+     "el": 5.0,
+     "az": 0,
+     "path": "moon/malapert_massif_sh_el5_az000.png"
+    },
+    {
+     "el": 5.0,
+     "az": 90,
+     "path": "moon/malapert_massif_sh_el5_az090.png"
+    },
+    {
+     "el": 5.0,
+     "az": 180,
+     "path": "moon/malapert_massif_sh_el5_az180.png"
+    },
+    {
+     "el": 5.0,
+     "az": 270,
+     "path": "moon/malapert_massif_sh_el5_az270.png"
+    }
+   ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
+   "hazards": {
+    "shadow": {
+     "score": 0.2377,
+     "level": "med",
+     "metrics": {
+      "shadow_frac_el1": 0.55662,
+      "shadow_frac_el3": 0.501348,
+      "shadow_frac_el5": 0.446212,
+      "shadow_frac_timeweighted": 0.550903
+     }
+    },
+    "rim": {
+     "score": 0.8543,
+     "level": "high",
+     "metrics": {
+      "jump1km_p95_m": 439.966919,
+      "jump1km_p99_m": 497.50554,
+      "frac_track_over_500m": 0.008952
+     }
+    },
+    "texture": {
+     "score": 0.573,
+     "level": "med",
+     "metrics": {
+      "fast_per_km2_el3": 12.285,
+      "empty_cell_frac_el3": 0.428889
+     }
+    },
+    "slope": {
+     "metrics": {
+      "slope_p50_deg": 18.431894,
+      "slope_p90_deg": 26.102173,
+      "rms_dev_m": {
+       "60": 14.665128,
+       "120": 29.205994,
+       "240": 58.104519,
+       "480": 115.368259,
+       "960": 227.857098
+      }
+     }
+    }
+   },
+   "extras": {
+    "hurst": 0.989725,
+    "jump100m_p95_m": 44.704781,
+    "jump100m_p99_m": 51.149015,
+    "shadow_frac_el7": 0.393556,
+    "shadow_frac_timeweighted_all": 0.661308
+   },
+   "uncertainty": {
+    "dem_err_p50_m": 0.189,
+    "dem_err_p90_m": 0.335,
+    "notes": "LOLA LDEM_80S_20MPP_ADJ_ERR over the 15 km core at 20 m. Region centre from PGDA-78 site tile (\u00b10.2 km vs NASA box). Horizon: 72 az, 30 m near field (15 km buffer) + 240 m far field to 150 km, curvature on."
+   }
+  },
+  {
+   "id": "mons_mouton_plateau",
+   "name": "Mons Mouton Plateau",
+   "lat": -84.33988,
+   "lon": 30.56905,
+   "x_m": 87360.0,
+   "y_m": 147900.0,
+   "coord_quality": "traced_approx",
+   "coord_source": "Approximate, traced from NASA map (https://www.nasa.gov/wp-content/uploads/2024/10/artemis-iii-landing-region-candidates.jpg; release https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/) georeferenced on PGDA-78 tiles",
+   "coord_method": "NASA box centre px (1059.8,231.8) mapped through affine fit of 6 NASA boxes to PGDA-78 tile centres: 279 m/px, rotation -0.02 deg, RMS residual 0.11 km; pole star maps to (-0.3, -0.3) km.",
+   "sun": {
+    "el_min": 4.12,
+    "el_max": 7.2,
+    "note": "geometric, from latitude \u00b1 1.54\u00b0 declination"
+   },
+   "tile": {
+    "path": "moon/mons_mouton_plateau.bin",
+    "size": 500,
+    "res_m": 30.0,
+    "crs": "+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m",
+    "origin_x": 79860.0,
+    "origin_y": 155400.0
+   },
+   "illumination": {
+    "pgda_avg_visibility": 0.3091,
+    "pgda_res_m": 120.0,
+    "pgda_url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608.TIF",
+    "ours_avg_visibility": 0.2805,
+    "note": "Use pgda_avg_visibility for long-term average illumination (Mazarico et al. 2011). Ours (point-sun, approximate sun path) runs ~2-3 pts darker; our shadow fractions at fixed elevations and the masks use the same method on both worlds."
+   },
+   "hillshade": "moon/mons_mouton_plateau_hill.png",
+   "shadow_masks": [
+    {
+     "el": 1.0,
+     "az": 0,
+     "path": "moon/mons_mouton_plateau_sh_el1_az000.png"
+    },
+    {
+     "el": 1.0,
+     "az": 90,
+     "path": "moon/mons_mouton_plateau_sh_el1_az090.png"
+    },
+    {
+     "el": 1.0,
+     "az": 180,
+     "path": "moon/mons_mouton_plateau_sh_el1_az180.png"
+    },
+    {
+     "el": 1.0,
+     "az": 270,
+     "path": "moon/mons_mouton_plateau_sh_el1_az270.png"
+    },
+    {
+     "el": 3.0,
+     "az": 0,
+     "path": "moon/mons_mouton_plateau_sh_el3_az000.png"
+    },
+    {
+     "el": 3.0,
+     "az": 90,
+     "path": "moon/mons_mouton_plateau_sh_el3_az090.png"
+    },
+    {
+     "el": 3.0,
+     "az": 180,
+     "path": "moon/mons_mouton_plateau_sh_el3_az180.png"
+    },
+    {
+     "el": 3.0,
+     "az": 270,
+     "path": "moon/mons_mouton_plateau_sh_el3_az270.png"
+    },
+    {
+     "el": 5.0,
+     "az": 0,
+     "path": "moon/mons_mouton_plateau_sh_el5_az000.png"
+    },
+    {
+     "el": 5.0,
+     "az": 90,
+     "path": "moon/mons_mouton_plateau_sh_el5_az090.png"
+    },
+    {
+     "el": 5.0,
+     "az": 180,
+     "path": "moon/mons_mouton_plateau_sh_el5_az180.png"
+    },
+    {
+     "el": 5.0,
+     "az": 270,
+     "path": "moon/mons_mouton_plateau_sh_el5_az270.png"
+    }
+   ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
+   "hazards": {
+    "shadow": {
+     "score": 0.4573,
+     "level": "med",
+     "metrics": {
+      "shadow_frac_el1": 0.767871,
+      "shadow_frac_el3": 0.566228,
+      "shadow_frac_el5": 0.355529,
+      "shadow_frac_timeweighted": 0.450166
+     }
+    },
+    "rim": {
+     "score": 0.0,
+     "level": "low",
+     "metrics": {
+      "jump1km_p95_m": 182.658083,
+      "jump1km_p99_m": 264.826441,
+      "frac_track_over_500m": 0.0
+     }
+    },
+    "texture": {
+     "score": 0.2092,
+     "level": "low",
+     "metrics": {
+      "fast_per_km2_el3": 13.381111,
+      "empty_cell_frac_el3": 0.327778
+     }
+    },
+    "slope": {
+     "metrics": {
+      "slope_p50_deg": 7.214793,
+      "slope_p90_deg": 13.416532,
+      "rms_dev_m": {
+       "60": 6.622483,
+       "120": 13.020501,
+       "240": 25.356544,
+       "480": 48.347492,
+       "960": 87.505117
+      }
+     }
+    }
+   },
+   "extras": {
+    "hurst": 0.93405,
+    "jump100m_p95_m": 21.853103,
+    "jump100m_p99_m": 31.508465,
+    "shadow_frac_el7": 0.211643,
+    "shadow_frac_timeweighted_all": 0.719531
+   },
+   "uncertainty": {
+    "dem_err_p50_m": 0.234,
+    "dem_err_p90_m": 0.602,
+    "notes": "LOLA LDEM_80S_20MPP_ADJ_ERR over the 15 km core at 20 m. Region centre approximate, traced from NASA map (\u00b1~0.5 km). Horizon: 72 az, 30 m near field (15 km buffer) + 240 m far field to 150 km, curvature on."
+   }
+  },
+  {
+   "id": "mons_mouton",
+   "name": "Mons Mouton",
+   "lat": -85.42567,
+   "lon": 31.74544,
+   "x_m": 73020.0,
+   "y_m": 118020.0,
+   "coord_quality": "pgda_site_tile",
+   "coord_source": "PGDA product 78 Site20 (Leibnitz beta plateau (Leibnitz Beta = former name of Mons Mouton)) 5 m/px tile extent centre; https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site20/Site20_final_adj_5mpp_surf.tif; https://pgda.gsfc.nasa.gov/products/78",
+   "coord_method": "Centre of PGDA-78 Site20 tile bounds [65000,110000,81000,126000] m (16 km square). NASA Oct-2024 box maps to within 0.19 km.",
+   "sun": {
+    "el_min": 3.034,
+    "el_max": 6.114,
+    "note": "geometric, from latitude \u00b1 1.54\u00b0 declination"
+   },
+   "tile": {
+    "path": "moon/mons_mouton.bin",
+    "size": 500,
+    "res_m": 30.0,
+    "crs": "+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m",
+    "origin_x": 65520.0,
+    "origin_y": 125520.0
+   },
+   "illumination": {
+    "pgda_avg_visibility": 0.2746,
+    "pgda_res_m": 60.0,
+    "pgda_url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+    "ours_avg_visibility": 0.2506,
+    "note": "Use pgda_avg_visibility for long-term average illumination (Mazarico et al. 2011). Ours (point-sun, approximate sun path) runs ~2-3 pts darker; our shadow fractions at fixed elevations and the masks use the same method on both worlds."
+   },
+   "hillshade": "moon/mons_mouton_hill.png",
+   "shadow_masks": [
+    {
+     "el": 1.0,
+     "az": 0,
+     "path": "moon/mons_mouton_sh_el1_az000.png"
+    },
+    {
+     "el": 1.0,
+     "az": 90,
+     "path": "moon/mons_mouton_sh_el1_az090.png"
+    },
+    {
+     "el": 1.0,
+     "az": 180,
+     "path": "moon/mons_mouton_sh_el1_az180.png"
+    },
+    {
+     "el": 1.0,
+     "az": 270,
+     "path": "moon/mons_mouton_sh_el1_az270.png"
+    },
+    {
+     "el": 3.0,
+     "az": 0,
+     "path": "moon/mons_mouton_sh_el3_az000.png"
+    },
+    {
+     "el": 3.0,
+     "az": 90,
+     "path": "moon/mons_mouton_sh_el3_az090.png"
+    },
+    {
+     "el": 3.0,
+     "az": 180,
+     "path": "moon/mons_mouton_sh_el3_az180.png"
+    },
+    {
+     "el": 3.0,
+     "az": 270,
+     "path": "moon/mons_mouton_sh_el3_az270.png"
+    },
+    {
+     "el": 5.0,
+     "az": 0,
+     "path": "moon/mons_mouton_sh_el5_az000.png"
+    },
+    {
+     "el": 5.0,
+     "az": 90,
+     "path": "moon/mons_mouton_sh_el5_az090.png"
+    },
+    {
+     "el": 5.0,
+     "az": 180,
+     "path": "moon/mons_mouton_sh_el5_az180.png"
+    },
+    {
+     "el": 5.0,
+     "az": 270,
+     "path": "moon/mons_mouton_sh_el5_az270.png"
+    }
+   ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
+   "hazards": {
+    "shadow": {
+     "score": 0.9568,
+     "level": "high",
+     "metrics": {
+      "shadow_frac_el1": 0.665376,
+      "shadow_frac_el3": 0.564976,
+      "shadow_frac_el5": 0.455288,
+      "shadow_frac_timeweighted": 0.67
+     }
+    },
+    "rim": {
+     "score": 0.431,
+     "level": "med",
+     "metrics": {
+      "jump1km_p95_m": 363.937933,
+      "jump1km_p99_m": 417.821737,
+      "frac_track_over_500m": 0.0
+     }
+    },
+    "texture": {
+     "score": 0.6106,
+     "level": "med",
+     "metrics": {
+      "fast_per_km2_el3": 11.212778,
+      "empty_cell_frac_el3": 0.420556
+     }
+    },
+    "slope": {
+     "metrics": {
+      "slope_p50_deg": 11.300954,
+      "slope_p90_deg": 22.127294,
+      "rms_dev_m": {
+       "60": 10.161902,
+       "120": 20.168256,
+       "240": 39.922256,
+       "480": 78.58438,
+       "960": 151.951765
+      }
+     }
+    }
+   },
+   "extras": {
+    "hurst": 0.97669,
+    "jump100m_p95_m": 37.099136,
+    "jump100m_p99_m": 43.035183,
+    "shadow_frac_el7": 0.346879,
+    "shadow_frac_timeweighted_all": 0.749448
+   },
+   "uncertainty": {
+    "dem_err_p50_m": 0.202,
+    "dem_err_p90_m": 0.444,
+    "notes": "LOLA LDEM_80S_20MPP_ADJ_ERR over the 15 km core at 20 m. Region centre from PGDA-78 site tile (\u00b10.2 km vs NASA box). Horizon: 72 az, 30 m near field (15 km buffer) + 240 m far field to 150 km, curvature on."
+   }
+  },
+  {
+   "id": "nobile_rim_1",
+   "name": "Nobile Rim 1",
+   "lat": -85.43862,
+   "lon": 37.37169,
+   "x_m": 84000.0,
+   "y_m": 109980.0,
+   "coord_quality": "pgda_site_tile",
+   "coord_source": "PGDA product 78 Site06 (Nobile rim 1) 5 m/px tile extent centre; https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site06/Site06_final_adj_5mpp_surf.tif; https://pgda.gsfc.nasa.gov/products/78",
+   "coord_method": "Centre of PGDA-78 Site06 tile bounds [74000,100000,94000,120000] m (20 km square). NASA Oct-2024 box maps to within 0.14 km.",
+   "sun": {
+    "el_min": 3.021,
+    "el_max": 6.101,
+    "note": "geometric, from latitude \u00b1 1.54\u00b0 declination"
+   },
+   "tile": {
+    "path": "moon/nobile_rim_1.bin",
+    "size": 500,
+    "res_m": 30.0,
+    "crs": "+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m",
+    "origin_x": 76500.0,
+    "origin_y": 117480.0
+   },
+   "illumination": {
+    "pgda_avg_visibility": 0.2972,
+    "pgda_res_m": 60.0,
+    "pgda_url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+    "ours_avg_visibility": 0.2758,
+    "note": "Use pgda_avg_visibility for long-term average illumination (Mazarico et al. 2011). Ours (point-sun, approximate sun path) runs ~2-3 pts darker; our shadow fractions at fixed elevations and the masks use the same method on both worlds."
+   },
+   "hillshade": "moon/nobile_rim_1_hill.png",
+   "shadow_masks": [
+    {
+     "el": 1.0,
+     "az": 0,
+     "path": "moon/nobile_rim_1_sh_el1_az000.png"
+    },
+    {
+     "el": 1.0,
+     "az": 90,
+     "path": "moon/nobile_rim_1_sh_el1_az090.png"
+    },
+    {
+     "el": 1.0,
+     "az": 180,
+     "path": "moon/nobile_rim_1_sh_el1_az180.png"
+    },
+    {
+     "el": 1.0,
+     "az": 270,
+     "path": "moon/nobile_rim_1_sh_el1_az270.png"
+    },
+    {
+     "el": 3.0,
+     "az": 0,
+     "path": "moon/nobile_rim_1_sh_el3_az000.png"
+    },
+    {
+     "el": 3.0,
+     "az": 90,
+     "path": "moon/nobile_rim_1_sh_el3_az090.png"
+    },
+    {
+     "el": 3.0,
+     "az": 180,
+     "path": "moon/nobile_rim_1_sh_el3_az180.png"
+    },
+    {
+     "el": 3.0,
+     "az": 270,
+     "path": "moon/nobile_rim_1_sh_el3_az270.png"
+    },
+    {
+     "el": 5.0,
+     "az": 0,
+     "path": "moon/nobile_rim_1_sh_el5_az000.png"
+    },
+    {
+     "el": 5.0,
+     "az": 90,
+     "path": "moon/nobile_rim_1_sh_el5_az090.png"
+    },
+    {
+     "el": 5.0,
+     "az": 180,
+     "path": "moon/nobile_rim_1_sh_el5_az180.png"
+    },
+    {
+     "el": 5.0,
+     "az": 270,
+     "path": "moon/nobile_rim_1_sh_el5_az270.png"
+    }
+   ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
+   "hazards": {
+    "shadow": {
+     "score": 0.9914,
+     "level": "high",
+     "metrics": {
+      "shadow_frac_el1": 0.643982,
+      "shadow_frac_el3": 0.559064,
+      "shadow_frac_el5": 0.474716,
+      "shadow_frac_timeweighted": 0.691804
+     }
+    },
+    "rim": {
+     "score": 1.0,
+     "level": "high",
+     "metrics": {
+      "jump1km_p95_m": 452.246291,
+      "jump1km_p99_m": 509.471594,
+      "frac_track_over_500m": 0.013571
+     }
+    },
+    "texture": {
+     "score": 0.8967,
+     "level": "high",
+     "metrics": {
+      "fast_per_km2_el3": 8.817222,
+      "empty_cell_frac_el3": 0.47
+     }
+    },
+    "slope": {
+     "metrics": {
+      "slope_p50_deg": 17.598142,
+      "slope_p90_deg": 26.408821,
+      "rms_dev_m": {
+       "60": 12.760384,
+       "120": 25.405019,
+       "240": 50.532353,
+       "480": 100.22784,
+       "960": 196.986224
+      }
+     }
+    }
+   },
+   "extras": {
+    "hurst": 0.98768,
+    "jump100m_p95_m": 45.670304,
+    "jump100m_p99_m": 51.987024,
+    "shadow_frac_el7": 0.400167,
+    "shadow_frac_timeweighted_all": 0.724199
+   },
+   "uncertainty": {
+    "dem_err_p50_m": 0.219,
+    "dem_err_p90_m": 0.555,
+    "notes": "LOLA LDEM_80S_20MPP_ADJ_ERR over the 15 km core at 20 m. Region centre from PGDA-78 site tile (\u00b10.2 km vs NASA box). Horizon: 72 az, 30 m near field (15 km buffer) + 240 m far field to 150 km, curvature on."
+   }
+  },
+  {
+   "id": "nobile_rim_2",
+   "name": "Nobile Rim 2",
+   "lat": -83.95379,
+   "lon": 58.83063,
+   "x_m": 157020.0,
+   "y_m": 94980.0,
+   "coord_quality": "pgda_site_tile",
+   "coord_source": "PGDA product 78 DM2 (Nobile rim 2) 5 m/px tile extent centre; https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/DM2/DM2_final_adj_5mpp_surf.tif; https://pgda.gsfc.nasa.gov/products/78",
+   "coord_method": "Centre of PGDA-78 DM2 tile bounds [147000,85000,167000,105000] m (20 km square). NASA Oct-2024 box maps to within 0.04 km.",
+   "sun": {
+    "el_min": 4.506,
+    "el_max": 7.586,
+    "note": "geometric, from latitude \u00b1 1.54\u00b0 declination"
+   },
+   "tile": {
+    "path": "moon/nobile_rim_2.bin",
+    "size": 500,
+    "res_m": 30.0,
+    "crs": "+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m",
+    "origin_x": 149520.0,
+    "origin_y": 102480.0
+   },
+   "illumination": {
+    "pgda_avg_visibility": 0.2947,
+    "pgda_res_m": 120.0,
+    "pgda_url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608.TIF",
+    "ours_avg_visibility": 0.2701,
+    "note": "Use pgda_avg_visibility for long-term average illumination (Mazarico et al. 2011). Ours (point-sun, approximate sun path) runs ~2-3 pts darker; our shadow fractions at fixed elevations and the masks use the same method on both worlds."
+   },
+   "hillshade": "moon/nobile_rim_2_hill.png",
+   "shadow_masks": [
+    {
+     "el": 1.0,
+     "az": 0,
+     "path": "moon/nobile_rim_2_sh_el1_az000.png"
+    },
+    {
+     "el": 1.0,
+     "az": 90,
+     "path": "moon/nobile_rim_2_sh_el1_az090.png"
+    },
+    {
+     "el": 1.0,
+     "az": 180,
+     "path": "moon/nobile_rim_2_sh_el1_az180.png"
+    },
+    {
+     "el": 1.0,
+     "az": 270,
+     "path": "moon/nobile_rim_2_sh_el1_az270.png"
+    },
+    {
+     "el": 3.0,
+     "az": 0,
+     "path": "moon/nobile_rim_2_sh_el3_az000.png"
+    },
+    {
+     "el": 3.0,
+     "az": 90,
+     "path": "moon/nobile_rim_2_sh_el3_az090.png"
+    },
+    {
+     "el": 3.0,
+     "az": 180,
+     "path": "moon/nobile_rim_2_sh_el3_az180.png"
+    },
+    {
+     "el": 3.0,
+     "az": 270,
+     "path": "moon/nobile_rim_2_sh_el3_az270.png"
+    },
+    {
+     "el": 5.0,
+     "az": 0,
+     "path": "moon/nobile_rim_2_sh_el5_az000.png"
+    },
+    {
+     "el": 5.0,
+     "az": 90,
+     "path": "moon/nobile_rim_2_sh_el5_az090.png"
+    },
+    {
+     "el": 5.0,
+     "az": 180,
+     "path": "moon/nobile_rim_2_sh_el5_az180.png"
+    },
+    {
+     "el": 5.0,
+     "az": 270,
+     "path": "moon/nobile_rim_2_sh_el5_az270.png"
+    }
+   ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
+   "hazards": {
+    "shadow": {
+     "score": 1.0,
+     "level": "high",
+     "metrics": {
+      "shadow_frac_el1": 0.772366,
+      "shadow_frac_el3": 0.601384,
+      "shadow_frac_el5": 0.459256,
+      "shadow_frac_timeweighted": 0.473817
+     }
+    },
+    "rim": {
+     "score": 0.279,
+     "level": "med",
+     "metrics": {
+      "jump1km_p95_m": 293.964068,
+      "jump1km_p99_m": 369.490974,
+      "frac_track_over_500m": 0.0
+     }
+    },
+    "texture": {
+     "score": 1.0,
+     "level": "high",
+     "metrics": {
+      "fast_per_km2_el3": 6.900556,
+      "empty_cell_frac_el3": 0.467222
+     }
+    },
+    "slope": {
+     "metrics": {
+      "slope_p50_deg": 10.844437,
+      "slope_p90_deg": 18.989185,
+      "rms_dev_m": {
+       "60": 9.286168,
+       "120": 18.431353,
+       "240": 36.439281,
+       "480": 71.313534,
+       "960": 135.909853
+      }
+     }
+    }
+   },
+   "extras": {
+    "hurst": 0.969486,
+    "jump100m_p95_m": 31.115708,
+    "jump100m_p99_m": 38.842349,
+    "shadow_frac_el7": 0.329944,
+    "shadow_frac_timeweighted_all": 0.729852
+   },
+   "uncertainty": {
+    "dem_err_p50_m": 0.404,
+    "dem_err_p90_m": 1.06,
+    "notes": "LOLA LDEM_80S_20MPP_ADJ_ERR over the 15 km core at 20 m. Region centre from PGDA-78 site tile (\u00b10.2 km vs NASA box). Horizon: 72 az, 30 m near field (15 km buffer) + 240 m far field to 150 km, curvature on."
+   }
+  },
+  {
+   "id": "de_gerlache_rim_2",
+   "name": "de Gerlache Rim 2",
+   "lat": -88.23086,
+   "lon": -64.63859,
+   "x_m": -48480.0,
+   "y_m": 22980.0,
+   "coord_quality": "pgda_site_tile",
+   "coord_source": "PGDA product 78 SL2 (de Gerlache rim (SL2; Site11 is the other 'de Gerlache rim' = Rim 1 position)) 5 m/px tile extent centre; https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/SL2/SL2_final_adj_5mpp_surf.tif; https://pgda.gsfc.nasa.gov/products/78",
+   "coord_method": "Centre of PGDA-78 SL2 tile bounds [-58500,13000,-38500,33000] m (20 km square). NASA Oct-2024 box maps to within 0.00 km.",
+   "sun": {
+    "el_min": 0.229,
+    "el_max": 3.309,
+    "note": "geometric, from latitude \u00b1 1.54\u00b0 declination"
+   },
+   "tile": {
+    "path": "moon/de_gerlache_rim_2.bin",
+    "size": 500,
+    "res_m": 30.0,
+    "crs": "+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m",
+    "origin_x": -55980.0,
+    "origin_y": 30480.0
+   },
+   "illumination": {
+    "pgda_avg_visibility": 0.3543,
+    "pgda_res_m": 60.0,
+    "pgda_url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+    "ours_avg_visibility": 0.3306,
+    "note": "Use pgda_avg_visibility for long-term average illumination (Mazarico et al. 2011). Ours (point-sun, approximate sun path) runs ~2-3 pts darker; our shadow fractions at fixed elevations and the masks use the same method on both worlds."
+   },
+   "hillshade": "moon/de_gerlache_rim_2_hill.png",
+   "shadow_masks": [
+    {
+     "el": 1.0,
+     "az": 0,
+     "path": "moon/de_gerlache_rim_2_sh_el1_az000.png"
+    },
+    {
+     "el": 1.0,
+     "az": 90,
+     "path": "moon/de_gerlache_rim_2_sh_el1_az090.png"
+    },
+    {
+     "el": 1.0,
+     "az": 180,
+     "path": "moon/de_gerlache_rim_2_sh_el1_az180.png"
+    },
+    {
+     "el": 1.0,
+     "az": 270,
+     "path": "moon/de_gerlache_rim_2_sh_el1_az270.png"
+    },
+    {
+     "el": 3.0,
+     "az": 0,
+     "path": "moon/de_gerlache_rim_2_sh_el3_az000.png"
+    },
+    {
+     "el": 3.0,
+     "az": 90,
+     "path": "moon/de_gerlache_rim_2_sh_el3_az090.png"
+    },
+    {
+     "el": 3.0,
+     "az": 180,
+     "path": "moon/de_gerlache_rim_2_sh_el3_az180.png"
+    },
+    {
+     "el": 3.0,
+     "az": 270,
+     "path": "moon/de_gerlache_rim_2_sh_el3_az270.png"
+    },
+    {
+     "el": 5.0,
+     "az": 0,
+     "path": "moon/de_gerlache_rim_2_sh_el5_az000.png"
+    },
+    {
+     "el": 5.0,
+     "az": 90,
+     "path": "moon/de_gerlache_rim_2_sh_el5_az090.png"
+    },
+    {
+     "el": 5.0,
+     "az": 180,
+     "path": "moon/de_gerlache_rim_2_sh_el5_az180.png"
+    },
+    {
+     "el": 5.0,
+     "az": 270,
+     "path": "moon/de_gerlache_rim_2_sh_el5_az270.png"
+    }
+   ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
+   "hazards": {
+    "shadow": {
+     "score": 0.0253,
+     "level": "low",
+     "metrics": {
+      "shadow_frac_el1": 0.61114,
+      "shadow_frac_el3": 0.498775,
+      "shadow_frac_el5": 0.430327,
+      "shadow_frac_timeweighted": 0.400521
+     }
+    },
+    "rim": {
+     "score": 0.2872,
+     "level": "med",
+     "metrics": {
+      "jump1km_p95_m": 295.547467,
+      "jump1km_p99_m": 374.122958,
+      "frac_track_over_500m": 0.0
+     }
+    },
+    "texture": {
+     "score": 0.539,
+     "level": "med",
+     "metrics": {
+      "fast_per_km2_el3": 11.565556,
+      "empty_cell_frac_el3": 0.403333
+     }
+    },
+    "slope": {
+     "metrics": {
+      "slope_p50_deg": 12.389275,
+      "slope_p90_deg": 19.142705,
+      "rms_dev_m": {
+       "60": 8.015117,
+       "120": 15.779491,
+       "240": 30.825818,
+       "480": 59.292993,
+       "960": 109.159801
+      }
+     }
+    }
+   },
+   "extras": {
+    "hurst": 0.944496,
+    "jump100m_p95_m": 31.60003,
+    "jump100m_p99_m": 39.718795,
+    "shadow_frac_el7": 0.363186,
+    "shadow_frac_timeweighted_all": 0.669415
+   },
+   "uncertainty": {
+    "dem_err_p50_m": 0.195,
+    "dem_err_p90_m": 0.377,
+    "notes": "LOLA LDEM_80S_20MPP_ADJ_ERR over the 15 km core at 20 m. Region centre from PGDA-78 site tile (\u00b10.2 km vs NASA box). Horizon: 72 az, 30 m near field (15 km buffer) + 240 m far field to 150 km, curvature on."
+   }
+  },
+  {
+   "id": "slater_plain",
+   "name": "Slater Plain",
+   "lat": -87.16448,
+   "lon": 125.63061,
+   "x_m": 69900.0,
+   "y_m": -50100.0,
+   "coord_quality": "traced_approx",
+   "coord_source": "Approximate, traced from NASA map (https://www.nasa.gov/wp-content/uploads/2024/10/artemis-iii-landing-region-candidates.jpg; release https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/) georeferenced on PGDA-78 tiles",
+   "coord_method": "NASA box centre px (997.5,940.5) mapped through affine fit of 6 NASA boxes to PGDA-78 tile centres: 279 m/px, rotation -0.02 deg, RMS residual 0.11 km; pole star maps to (-0.3, -0.3) km.",
+   "sun": {
+    "el_min": 1.296,
+    "el_max": 4.376,
+    "note": "geometric, from latitude \u00b1 1.54\u00b0 declination"
+   },
+   "tile": {
+    "path": "moon/slater_plain.bin",
+    "size": 500,
+    "res_m": 30.0,
+    "crs": "+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m",
+    "origin_x": 62400.0,
+    "origin_y": -42600.0
+   },
+   "illumination": {
+    "pgda_avg_visibility": 0.2584,
+    "pgda_res_m": 60.0,
+    "pgda_url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+    "ours_avg_visibility": 0.2346,
+    "note": "Use pgda_avg_visibility for long-term average illumination (Mazarico et al. 2011). Ours (point-sun, approximate sun path) runs ~2-3 pts darker; our shadow fractions at fixed elevations and the masks use the same method on both worlds."
+   },
+   "hillshade": "moon/slater_plain_hill.png",
+   "shadow_masks": [
+    {
+     "el": 1.0,
+     "az": 0,
+     "path": "moon/slater_plain_sh_el1_az000.png"
+    },
+    {
+     "el": 1.0,
+     "az": 90,
+     "path": "moon/slater_plain_sh_el1_az090.png"
+    },
+    {
+     "el": 1.0,
+     "az": 180,
+     "path": "moon/slater_plain_sh_el1_az180.png"
+    },
+    {
+     "el": 1.0,
+     "az": 270,
+     "path": "moon/slater_plain_sh_el1_az270.png"
+    },
+    {
+     "el": 3.0,
+     "az": 0,
+     "path": "moon/slater_plain_sh_el3_az000.png"
+    },
+    {
+     "el": 3.0,
+     "az": 90,
+     "path": "moon/slater_plain_sh_el3_az090.png"
+    },
+    {
+     "el": 3.0,
+     "az": 180,
+     "path": "moon/slater_plain_sh_el3_az180.png"
+    },
+    {
+     "el": 3.0,
+     "az": 270,
+     "path": "moon/slater_plain_sh_el3_az270.png"
+    },
+    {
+     "el": 5.0,
+     "az": 0,
+     "path": "moon/slater_plain_sh_el5_az000.png"
+    },
+    {
+     "el": 5.0,
+     "az": 90,
+     "path": "moon/slater_plain_sh_el5_az090.png"
+    },
+    {
+     "el": 5.0,
+     "az": 180,
+     "path": "moon/slater_plain_sh_el5_az180.png"
+    },
+    {
+     "el": 5.0,
+     "az": 270,
+     "path": "moon/slater_plain_sh_el5_az270.png"
+    }
+   ],
+   "shadow_mask_note": "PNG 255 = cast shadow, 0 = lit, 128 = no data; az clockwise from grid +y (tile up)",
+   "hazards": {
+    "shadow": {
+     "score": 0.1061,
+     "level": "low",
+     "metrics": {
+      "shadow_frac_el1": 0.691567,
+      "shadow_frac_el3": 0.49786,
+      "shadow_frac_el5": 0.324902,
+      "shadow_frac_timeweighted": 0.560379
+     }
+    },
+    "rim": {
+     "score": 0.0024,
+     "level": "low",
+     "metrics": {
+      "jump1km_p95_m": 191.225634,
+      "jump1km_p99_m": 258.639803,
+      "frac_track_over_500m": 0.0
+     }
+    },
+    "texture": {
+     "score": 0.0,
+     "level": "low",
+     "metrics": {
+      "fast_per_km2_el3": 14.796111,
+      "empty_cell_frac_el3": 0.285
+     }
+    },
+    "slope": {
+     "metrics": {
+      "slope_p50_deg": 7.088049,
+      "slope_p90_deg": 13.343093,
+      "rms_dev_m": {
+       "60": 6.323256,
+       "120": 12.411647,
+       "240": 24.253021,
+       "480": 46.815482,
+       "960": 87.273627
+      }
+     }
+    }
+   },
+   "extras": {
+    "hurst": 0.94889,
+    "jump100m_p95_m": 21.431449,
+    "jump100m_p99_m": 28.108045,
+    "shadow_frac_el7": 0.192019,
+    "shadow_frac_timeweighted_all": 0.765409
+   },
+   "uncertainty": {
+    "dem_err_p50_m": 0.202,
+    "dem_err_p90_m": 0.429,
+    "notes": "LOLA LDEM_80S_20MPP_ADJ_ERR over the 15 km core at 20 m. Region centre approximate, traced from NASA map (\u00b1~0.5 km). Horizon: 72 az, 30 m near field (15 km buffer) + 240 m far field to 150 km, curvature on."
+   }
+  }
+ ]
+}

@@ -27,7 +27,7 @@ This file is the single source of truth. Change it here first, then update both 
   "regions": [ {
     "id": "malapert_massif", "name": "Malapert Massif",
     "lat": -86.0, "lon": 0.0, "x_m": 0.0, "y_m": 0.0,
-    "coord_quality": "pgda_roi" | "traced_approx",
+    "coord_quality": "pgda_site_tile" | "traced_approx",
     "coord_source": "url or citation",
     "sun": { "el_min": -1.5, "el_max": 6.5, "note": "geometric, from latitude ± 1.54° declination" },
     "tile": { "path": "moon/malapert_massif.bin", "size": 500, "res_m": 30,
