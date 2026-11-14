@@ -146,6 +146,13 @@ def test_sun_path_moon() -> None:
     assert el2.max() == pytest.approx(4.0 + 1.54, abs=0.15)
     assert el2.min() == pytest.approx(-4.0 - 1.54, abs=0.15)
     assert np.all((az >= 0) & (az < 360))
+    # grid azimuth = geographic azimuth + lon (south-polar stereographic, lon_0 = 0)
+    el3, az3 = sun_path_moon(-86.0, 1024, lon_deg=30.0)
+    _, az_geo = sun_path_moon(-86.0, 1024)
+    np.testing.assert_allclose(el3, el2)
+    np.testing.assert_allclose(az3, (az_geo + 30.0) % 360.0)
+    # highest sun is toward geographic north (geo az ~ 0) -> grid az ~ lon
+    assert abs(((az3[np.argmax(el3)] - 30.0 + 180) % 360) - 180) < 1.0
 
 
 # ------------------------------------------------------------------------------------ rim
@@ -231,7 +238,7 @@ def test_compute_all_contract_keys() -> None:
     big = fractal(160, seed=5)
     core = (slice(30, 130), slice(30, 130))
     hz = horizon_map(big, RES, core, n_az=24, planet_radius_m=MOON_R)
-    m = compute_all(big[core], hz, RES, lat_deg=-86.0, n_sun_samples=256)
+    m = compute_all(big[core], hz, RES, lat_deg=-86.0, lon_deg=45.0, n_sun_samples=256)
     assert set(m) == set(CONTRACT_KEYS)
     assert set(m["rms_dev_m"]) == {"60", "120", "240", "480", "960"}
     assert 0.0 <= m["shadow_frac_el5"] <= m["shadow_frac_el3"] <= m["shadow_frac_el1"] <= 1.0

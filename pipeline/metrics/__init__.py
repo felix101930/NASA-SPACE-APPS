@@ -6,7 +6,7 @@ Typical use (one tile)::
     H = horizon_map(dem_buffered_30m, 30.0, core_slice, dem_far=far300, res_far=300.0,
                     near_origin_xy=(x0, y0), far_origin_xy=(fx0, fy0),
                     max_radius_m=100e3, planet_radius_m=MOON_R_M)
-    m = compute_all(dem_buffered_30m[core_slice], H, 30.0, lat_deg=-86.0)
+    m = compute_all(dem_buffered_30m[core_slice], H, 30.0, lat_deg=-86.0, lon_deg=lon)
 
 ``compute_all`` returns exactly the data-contract metric keys (flat), see ``CONTRACT_KEYS``;
 ``group_by_hazard`` reshapes them into the ``hazards`` block of ``regions.json``.
@@ -56,6 +56,7 @@ def compute_all(
     horizon: np.ndarray,
     res_m: float = 30.0,
     lat_deg: float | None = None,
+    lon_deg: float | None = None,
     el_series: Sequence[float] | np.ndarray | None = None,
     az_series: Sequence[float] | np.ndarray | None = None,
     weights: Sequence[float] | np.ndarray | None = None,
@@ -71,7 +72,10 @@ def compute_all(
     horizon : (n_az, H, W) from :func:`horizon_map` for exactly these pixels (computed on the
         buffered DEM + far field).
     res_m : pixel size of ``dem_core``.
-    lat_deg : Moon latitude -> sun directions from :func:`sun_path_moon` (uniform declination).
+    lat_deg, lon_deg : Moon latitude/longitude of the tile centre -> sun directions from
+        :func:`sun_path_moon` (uniform declination), converted to south-polar-stereographic grid
+        azimuth with ``lon_deg`` (grid_az = geo_az + lon). ``lon_deg=None`` leaves azimuths in the
+        geographic frame and logs a warning (only correct if grid north == geographic north).
     el_series, az_series, weights : explicit sun directions (deg, az clockwise from grid north)
         and optional time weights; used instead of ``lat_deg`` (e.g. Earth windows).
     min_sun_el : time samples with sun elevation below this are dropped from
@@ -96,7 +100,10 @@ def compute_all(
         el_s, az_s = np.asarray(el_series, float), np.asarray(az_series, float)
         w = None if weights is None else np.asarray(weights, float)
     elif lat_deg is not None:
-        el_s, az_s = sun_path_moon(lat_deg, n_sun_samples)
+        if lon_deg is None:
+            log.warning("compute_all: lat_deg without lon_deg; sun azimuths stay geographic, "
+                        "not grid (wrong frame on south-polar stereographic tiles)")
+        el_s, az_s = sun_path_moon(lat_deg, n_sun_samples, lon_deg=lon_deg)
         w = None
     else:
         el_s = az_s = w = None

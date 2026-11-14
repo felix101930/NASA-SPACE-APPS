@@ -354,7 +354,8 @@ def time_weighted_shadow_fraction(horizon: np.ndarray, el_series: np.ndarray, az
 
 def sun_path_moon(lat_deg: float, n_samples: int = 4096, n_dec: int = 16,
                   dec_max_deg: float = MOON_DECLINATION_MAX_DEG,
-                  dec_dist: str = "uniform") -> tuple[np.ndarray, np.ndarray]:
+                  dec_dist: str = "uniform",
+                  lon_deg: float | None = None) -> tuple[np.ndarray, np.ndarray]:
     """Approximate long-term sun directions (el, az in deg) seen from lunar latitude ``lat_deg``.
 
     Approximation: the sub-solar latitude (declination) is sampled over +/-``dec_max_deg``
@@ -364,9 +365,13 @@ def sun_path_moon(lat_deg: float, n_samples: int = 4096, n_dec: int = 16,
     periods over the 18.6-yr cycle). Sun at infinity, no parallax, no libration, spherical Moon:
     ``sin el = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H)``.
 
-    Azimuth is clockwise from local geographic north. For a time-weighted shadow fraction the
-    offset between geographic and grid north does not matter, because the hour angle is uniform
-    over 360 deg (a constant azimuth rotation leaves the sample distribution unchanged).
+    Azimuth frame: with ``lon_deg=None`` azimuth is clockwise from local geographic north. Pass
+    ``lon_deg`` to get **grid** azimuth for the south-polar stereographic grid (lon_0 = 0,
+    x = rho sin(lon), y = rho cos(lon)), where geographic north points along grid azimuth ``lon``:
+    ``grid_az = (geo_az + lon) % 360``. This matters: elevation and azimuth are both tied to the
+    hour angle (near the pole el ~ dec + colat cos H), so the sun is ~2*colat higher toward
+    geographic north than toward the pole, and a wrong azimuth frame puts the high sun on the
+    wrong slopes. Horizon maps are in grid azimuth, so pass ``lon_deg`` for Moon tiles.
 
     Returns arrays of length ``n_dec * ceil(n_samples / n_dec)``; all samples have equal weight.
     """
@@ -386,5 +391,7 @@ def sun_path_moon(lat_deg: float, n_samples: int = 4096, n_dec: int = 16,
     east = -np.cos(d) * np.sin(h)
     north = np.sin(d) * math.cos(phi) - np.cos(d) * np.cos(h) * math.sin(phi)
     el = np.degrees(np.arcsin(np.clip(up, -1.0, 1.0)))
-    az = np.degrees(np.arctan2(east, north)) % 360.0
-    return el.ravel(), az.ravel()
+    az = np.degrees(np.arctan2(east, north))
+    if lon_deg is not None:
+        az = az + float(lon_deg)
+    return el.ravel(), (az % 360.0).ravel()

@@ -70,7 +70,7 @@ def main() -> None:
         log.info("  shadow el=%d: near-only %.3f, with far field %.3f", el, (h_near > el).mean(), (h_far > el).mean())
 
     t = time.perf_counter()
-    m = compute_all(near[sl], h_far, res, lat_deg=-86.0)
+    m = compute_all(near[sl], h_far, res, lat_deg=-86.0, lon_deg=0.0)
     log.info("compute_all (time-weighted 2048 sun samples, rim, texture, roughness): %.2f s",
              time.perf_counter() - t)
     t = time.perf_counter()

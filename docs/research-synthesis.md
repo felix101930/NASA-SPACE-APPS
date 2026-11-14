@@ -218,7 +218,24 @@ The search is Moon-first, global and in two stages.
   - test search radii of 15, 30, 60, 100 and 150 km.
 - **Validation.** Compare against PGDA AVGVISIB (product 69). If our numbers disagree with it, trust PGDA and use its products directly for the Moon side.
 - **Earth windows** follow the same rule, with the far field from GLO-90 or downsampled GLO-30, and R_eff ≈ 7/6 × 6371 km.
-- **Status:** experiment in progress in `scratchpad/probe-buffer`.
+- **RESULT (2026-11-14): use a 150 km horizon search radius.**
+  - **Setup:** 20 m data out to 15 km, then the 160 m or 320 m overview, with curvature on.
+  - **Why not 15 km:** it makes the cores 5–7 pts too bright, and single sun azimuths are off by up to 34 pts. Beyond 150 km nothing changes.
+  - **Agreement with PGDA AVGVISIB at 150 km** (r = Pearson correlation, MAD = mean absolute difference):
+
+    | Site | r | MAD | Bias |
+    |---|---|---|---|
+    | Shackleton rim | 0.92 | 0.029 | −0.013 |
+    | de Gerlache rim | 0.96 | 0.030 | −0.028 |
+    | Malapert | 0.94 | 0.029 | −0.026 |
+
+  - **At a 15 km radius** r drops to 0.65–0.85.
+  - **Absolute bias:** our results are 1.3–2.9 pts darker than PGDA.
+  - **Which source to use:**
+    - Take long-term illumination and any absolute "% illuminated" claim from PGDA.
+    - Use our own computation for shadows at a specific sun position, for masks and for relative ranking.
+  - **Earth stage 2:** 150 km radius, capped at about 200 km, with R_eff = 7/6 × 6371 km. The stage-1 shadow proxy stays local and is labelled `shadow_frac_local_*`.
+  - **Scripts:** `scratchpad/probe-buffer`.
 
 ## Labelling and citation rules
 - **Region coordinates.** Label traced coordinates "approximate, traced from NASA map" and cite the NASA figure from the Oct 28, 2024 release.
