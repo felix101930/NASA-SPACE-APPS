@@ -129,7 +129,12 @@ async function loadDependentSet(): Promise<DependentSet> {
     loadJsonFrom('summary.json', isSummaryFile, 'data'),
     loadJsonFrom('method.json', isMethodFile, 'data'),
   ]);
-  if (sites && matches && summary && method) return { origin: 'data', sites, matches, summary, method };
+  // method.json (explainer numbers) is written last by the earth stage; it carries its own origin and only
+  // falls back to mock by itself, so a missing method.json never holds earth_sites/matches/summary on mock.
+  if (sites && matches && summary) {
+    const ownMethod = method ?? (await loadJsonFrom('method.json', isMethodFile, 'mock'));
+    return { origin: 'data', sites, matches, summary, method: ownMethod };
+  }
   const [mSites, mMatches, mSummary, mMethod] = await Promise.all([
     loadJsonFrom('earth_sites.json', isEarthSitesFile, 'mock'),
     loadJsonFrom('matches.json', isMatchesFile, 'mock'),
