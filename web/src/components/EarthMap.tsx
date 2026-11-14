@@ -20,7 +20,17 @@ export interface MapLine {
   coords: [number, number][]; // [lon, lat]
 }
 
-const STYLE = 'https://tiles.openfreemap.org/styles/positron';
+// OpenFreeMap's dark vector style keeps the basemap quiet so the pins carry the screen.
+const STYLE = 'https://tiles.openfreemap.org/styles/dark';
+
+/** Small paint overrides so the basemap sits on the app's own surface colours. */
+function tuneDarkStyle(map: MlMap): void {
+  if (map.getLayer('background')) map.setPaintProperty('background', 'background-color', '#121419');
+  if (map.getLayer('water')) map.setPaintProperty('water', 'fill-color', '#0b0d11');
+  for (const id of ['landcover_glacier', 'landcover_ice_shelf']) {
+    if (map.getLayer(id)) map.setPaintProperty(id, 'fill-color', '#181b21');
+  }
+}
 
 interface Props {
   points: MapPoint[];
@@ -55,13 +65,20 @@ export function EarthMap({ points, lines = [], onSelect, fitKey, maxZoom = 6 }: 
       return;
     }
     map.addControl(new NavigationControl({ showCompass: false }), 'top-right');
-    map.on('load', (): void => setReady(true));
+    map.on('load', (): void => {
+      tuneDarkStyle(map);
+      setReady(true);
+    });
     // Keep the canvas in step with its container (layout can change after first paint).
     const ro = new ResizeObserver((): void => {
       map.resize();
     });
     ro.observe(box.current);
     map.on('error', (): void => undefined);
+    // The dark style references a few pattern sprites it doesn't ship; give them a transparent pixel.
+    map.setMissingStyleImageResolver((id: string): void => {
+      if (!map.hasImage(id)) map.addImage(id, { width: 1, height: 1, data: new Uint8Array(4) });
+    });
     mapRef.current = map;
     return (): void => {
       ro.disconnect();
@@ -85,6 +102,7 @@ export function EarthMap({ points, lines = [], onSelect, fitKey, maxZoom = 6 }: 
       const el = document.createElement('button');
       el.className = 'pin';
       el.type = 'button';
+      if (p.active) el.setAttribute('aria-current', 'true');
       el.textContent = p.label;
       el.title = p.title;
       el.setAttribute('aria-label', p.title);
@@ -113,12 +131,12 @@ export function EarthMap({ points, lines = [], onSelect, fitKey, maxZoom = 6 }: 
     if (src) src.setData(data);
     else {
       map.addSource('paths', { type: 'geojson', data });
-      map.addLayer({ id: 'paths-casing', type: 'line', source: 'paths', paint: { 'line-color': '#1a1306', 'line-width': 7 } });
-      map.addLayer({ id: 'paths', type: 'line', source: 'paths', paint: { 'line-color': '#f3b54a', 'line-width': 4 } });
+      map.addLayer({ id: 'paths-casing', type: 'line', source: 'paths', paint: { 'line-color': '#0a0b0e', 'line-width': 7 } });
+      map.addLayer({ id: 'paths', type: 'line', source: 'paths', paint: { 'line-color': '#edeae4', 'line-width': 3.5 } });
     }
   }, [lines, ready]);
 
-  // fit
+  // fit to the pins (and lines) whenever the set changes, and once the style has loaded
   useEffect((): void => {
     const map = mapRef.current;
     if (!map) return;
@@ -131,9 +149,10 @@ export function EarthMap({ points, lines = [], onSelect, fitKey, maxZoom = 6 }: 
     coords.forEach((c: [number, number]): void => {
       b.extend(c);
     });
-    map.fitBounds(b, { padding: 70, maxZoom, duration: 700 });
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    map.fitBounds(b, { padding: 64, maxZoom, duration: ready && !reduce ? 600 : 0 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fitKey]);
+  }, [fitKey, ready]);
 
   return (
     <div ref={box} aria-label="Map of Earth sites" role="region">

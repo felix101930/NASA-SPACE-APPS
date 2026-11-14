@@ -213,6 +213,67 @@ export interface OverviewFile {
   note?: string;
 }
 
+/** method.json: powers the "How we find analogs" explainer (optional; mock fallback). */
+export type FunnelStage = 'sampled' | 'dsm_safe' | 'stage1_top' | 'stage2' | 'final_top3' | string;
+
+export interface MethodStratum {
+  lat_band: string;
+  relief_class: 'low' | 'mid' | 'high' | string;
+  n: number;
+}
+
+export interface MethodFunnelRow {
+  stage: FunnelStage;
+  n: number;
+  known_pass?: number;
+  decoy_pass?: number;
+}
+
+export interface MethodValSite {
+  id: string;
+  name: string;
+  best_rank_pct: number;
+  dsm_safe?: boolean;
+}
+
+export interface MethodPoint {
+  lat: number;
+  lon: number;
+  pass: boolean;
+  stage?: 'screened' | 'shortlist' | 'final' | string;
+  best_dist?: number;
+}
+
+export interface MethodFile {
+  meta: Meta;
+  screen: {
+    n_draws: number;
+    n_land: number;
+    n_pool: number;
+    n_screened: number;
+    coverage_km2: number;
+    coverage_pct_bare: number;
+    seed: number;
+    strata: MethodStratum[];
+  };
+  funnel: MethodFunnelRow[];
+  validation: {
+    known_median_pct: number;
+    decoy_median_pct: number;
+    auc: number;
+    known: MethodValSite[];
+    decoys: MethodValSite[];
+  };
+  points: MethodPoint[];
+  example: {
+    region_id: string;
+    hazard: HazardId | string;
+    site_id: string;
+    moon: Record<string, number>;
+    earth: Record<string, number>;
+  };
+}
+
 // ---------------------------------------------------------------------------------------------
 // Runtime guards
 // ---------------------------------------------------------------------------------------------
@@ -275,16 +336,7 @@ export function isRegionsFile(v: unknown): v is RegionsFile {
 }
 
 function isEarthSite(v: unknown): v is EarthSite {
-  return (
-    isObj(v) &&
-    isStr(v.id) &&
-    isStr(v.name) &&
-    isNum(v.lat) &&
-    isNum(v.lon) &&
-    isTileRef(v.tile) &&
-    isObj(v.metrics) &&
-    isObj(v.rock)
-  );
+  return isObj(v) && isStr(v.id) && isStr(v.name) && isNum(v.lat) && isNum(v.lon) && isTileRef(v.tile) && isObj(v.metrics) && isObj(v.rock);
 }
 
 export function isEarthSitesFile(v: unknown): v is EarthSitesFile {
@@ -335,12 +387,38 @@ export function isTransectsFile(v: unknown): v is TransectsFile {
 }
 
 export function isPresetsFile(v: unknown): v is PresetRoute[] {
-  return (
-    isArr(v) &&
-    v.every((p: unknown) => isObj(p) && isStr(p.region_id) && isStr(p.name) && isArr(p.moon_xy) && isArr(p.best))
-  );
+  return isArr(v) && v.every((p: unknown) => isObj(p) && isStr(p.region_id) && isStr(p.name) && isArr(p.moon_xy) && isArr(p.best));
 }
 
 export function isOverviewFile(v: unknown): v is OverviewFile {
   return isObj(v) && isStr(v.hillshade) && isArr(v.extent_m) && v.extent_m.length === 4 && v.extent_m.every(isNum);
+}
+
+export function isMethodFile(v: unknown): v is MethodFile {
+  if (
+    !isObj(v) ||
+    !isMeta(v.meta) ||
+    !isObj(v.screen) ||
+    !isArr(v.funnel) ||
+    !isObj(v.validation) ||
+    !isArr(v.points) ||
+    !isObj(v.example)
+  ) {
+    return false;
+  }
+  const val = v.validation;
+  const ex = v.example;
+  return (
+    isNum(v.screen.n_screened) &&
+    v.funnel.every((f: unknown) => isObj(f) && isStr(f.stage) && isNum(f.n)) &&
+    isArr(val.known) &&
+    isArr(val.decoys) &&
+    val.known.every((k: unknown) => isObj(k) && isStr(k.id) && isNum(k.best_rank_pct)) &&
+    val.decoys.every((k: unknown) => isObj(k) && isStr(k.id) && isNum(k.best_rank_pct)) &&
+    v.points.every((p: unknown) => isObj(p) && isNum(p.lat) && isNum(p.lon) && typeof p.pass === 'boolean') &&
+    isStr(ex.region_id) &&
+    isStr(ex.hazard) &&
+    isObj(ex.moon) &&
+    isObj(ex.earth)
+  );
 }

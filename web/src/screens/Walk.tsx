@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type JSX } from 'react';
-import { CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { loadFloat32, loadImage, loadJson, loadOptionalJson, type Origin } from '../data/loader';
 import { loadTile, type LoadedTile } from '../data/tiles';
 import { mapToPixel, pixelToMap, sampleProfile, type WalkProfile } from '../lib/terrain';
 import { EarthMap, type MapLine, type MapPoint } from '../components/EarthMap';
 import { Loading } from '../components/Loading';
+import { ScreenHead } from '../components/ScreenHead';
 import { useApp, useRegion, type CoreData } from '../store';
 import { isPresetsFile, isTransectsFile, type PresetRoute, type Region, type TransectItem, type TransectsFile } from '../types/contract';
 import type { QueryMsg, ResultRow, WorkerReply } from '../workers/dtw.worker';
@@ -48,9 +49,56 @@ function prefilter(items: TransectItem[], q: WalkProfile): { idx: number[]; note
       t.climb_m >= q.climb_m * 0.4 - 40 &&
       t.climb_m <= q.climb_m * 2.5 + 40,
   );
-  if (strict.length >= 25) return { idx: strict.map((t: TransectItem): number => t.i), note: `${strict.length} transects of ${cls / 1000} km with similar climb and steepest slope` };
-  if (sameLen.length >= 25) return { idx: sameLen.map((t: TransectItem): number => t.i), note: `${sameLen.length} transects of ${cls / 1000} km (slope/climb filter relaxed)` };
+  if (strict.length >= 25)
+    return {
+      idx: strict.map((t: TransectItem): number => t.i),
+      note: `${strict.length} transects of ${cls / 1000} km with similar climb and steepest slope`,
+    };
+  if (sameLen.length >= 25)
+    return {
+      idx: sameLen.map((t: TransectItem): number => t.i),
+      note: `${sameLen.length} transects of ${cls / 1000} km (slope/climb filter relaxed)`,
+    };
   return { idx: items.map((t: TransectItem): number => t.i), note: `all ${items.length} transects (filters relaxed)` };
+}
+
+/**
+ * Routes generated from the loaded Moon tile, used when the dataset has no preset routes for it
+ * (preset coordinates are only valid for tiles from the same source).
+ */
+function builtInPresets(tile: LoadedTile, regionId: string): PresetRoute[] {
+  const ref = tile.ref;
+  const span = ref.size * ref.res_m;
+  const cx = ref.origin_x + span / 2;
+  const cy = ref.origin_y - span / 2;
+  const out: PresetRoute[] = [];
+  const line = (az: number, len: number, fromCentre: boolean): [number, number][] => {
+    const a = (az * Math.PI) / 180;
+    const dx = Math.sin(a) * len;
+    const dy = Math.cos(a) * len;
+    return fromCentre
+      ? [
+          [cx, cy],
+          [cx + dx, cy + dy],
+        ]
+      : [
+          [cx - dx / 2, cy - dy / 2],
+          [cx + dx / 2, cy + dy / 2],
+        ];
+  };
+  // Steepest 2 km climb out of the centre, of 16 directions.
+  let best: { route: [number, number][]; climb: number } | null = null;
+  for (let k = 0; k < 16; k++) {
+    const route = line(k * 22.5, 2000, true);
+    const prof = sampleProfile(tile.raw, ref.origin_x, ref.origin_y, route, 50);
+    if (!prof || prof.hasNaN) continue;
+    const climb = prof.climb_m - prof.descent_m;
+    if (!best || climb > best.climb) best = { route, climb };
+  }
+  if (best) out.push({ region_id: regionId, name: 'Steepest climb · 2 km', moon_xy: best.route, best: [] });
+  out.push({ region_id: regionId, name: 'Straight across · 2 km', moon_xy: line(90, 2000, false), best: [] });
+  out.push({ region_id: regionId, name: 'Long traverse · 5 km', moon_xy: line(45, 5000, false), best: [] });
+  return out;
 }
 
 interface Found {
@@ -101,16 +149,16 @@ function DrawCanvas({
     };
     // scale bar: 1 km
     const kmPx = (1000 / (n * tile.ref.res_m)) * N;
-    ctx.fillStyle = 'rgba(5,6,8,0.75)';
+    ctx.fillStyle = 'rgba(10, 11, 14, 0.78)';
     ctx.fillRect(N - kmPx - 28, N - 34, kmPx + 20, 24);
-    ctx.fillStyle = '#ece7de';
+    ctx.fillStyle = '#edeae4';
     ctx.fillRect(N - kmPx - 18, N - 18, kmPx, 3);
-    ctx.font = '12px "IBM Plex Mono", monospace';
+    ctx.font = '12px "IBM Plex Sans", system-ui, sans-serif';
     ctx.fillText('1 km', N - kmPx - 18, N - 22);
     if (route.length === 0) return;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    ctx.strokeStyle = '#1a1306';
+    ctx.strokeStyle = '#0a0b0e';
     ctx.lineWidth = 7;
     ctx.beginPath();
     route.forEach((p: [number, number], i: number): void => {
@@ -119,15 +167,24 @@ function DrawCanvas({
       else ctx.lineTo(px, py);
     });
     ctx.stroke();
-    ctx.strokeStyle = '#f3b54a';
-    ctx.lineWidth = 3.5;
+    ctx.strokeStyle = '#edeae4';
+    ctx.lineWidth = 3;
     ctx.stroke();
     route.forEach((p: [number, number], i: number): void => {
       const [px, py] = toCanvas(p);
-      ctx.fillStyle = i === 0 ? '#5ad593' : '#f3b54a';
       ctx.beginPath();
-      ctx.arc(px, py, i === 0 ? 6 : 4.5, 0, Math.PI * 2);
+      ctx.arc(px, py, i === 0 ? 7 : 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#edeae4';
       ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#0a0b0e';
+      ctx.stroke();
+      if (i === 0) {
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#0a0b0e';
+        ctx.fill();
+      }
     });
   }, [img, route, tile]);
 
@@ -234,7 +291,17 @@ export default function Walk(): JSX.Element {
           const raw = Array.from(data.rows.subarray(row.i * P, (row.i + 1) * P));
           const slopes = row.reversed ? raw.reverse().map((v: number): number => -v) : raw;
           const shown: TransectItem = row.reversed
-            ? { ...item, x0: item.x1, y0: item.y1, x1: item.x0, y1: item.y0, lat0: item.lat1, lon0: item.lon1, lat1: item.lat0, lon1: item.lon0 }
+            ? {
+                ...item,
+                x0: item.x1,
+                y0: item.y1,
+                x1: item.x0,
+                y1: item.y0,
+                lat0: item.lat1,
+                lon0: item.lon1,
+                lat1: item.lat0,
+                lon1: item.lon0,
+              }
             : item;
           return [{ row, item: shown, slopes }];
         });
@@ -255,7 +322,11 @@ export default function Walk(): JSX.Element {
       };
       const w = workerRef.current;
       const fallback = (why: string): void => {
-        if (presetBest && presetBest.length) finish(presetBest.map((b) => ({ i: b.i, dtw: b.dtw, reversed: false })), `Precomputed preset matches (${why}).`);
+        if (presetBest && presetBest.length)
+          finish(
+            presetBest.map((b) => ({ i: b.i, dtw: b.dtw, reversed: false })),
+            `Precomputed preset matches (${why}).`,
+          );
         else {
           setBusy(false);
           setNote(`Search failed: ${why}`);
@@ -286,13 +357,41 @@ export default function Walk(): JSX.Element {
   );
 
   // Preset routes are in map metres of a specific DEM: only use them with tiles from the same source.
-  const presets = useMemo(
-    (): PresetRoute[] =>
-      data && region && data.presetsOrigin === core.regionsOrigin ? data.presets.filter((p: PresetRoute): boolean => p.region_id === region.id) : [],
-    [data, region, core.regionsOrigin],
+  const presets = useMemo((): PresetRoute[] => {
+    const fromFile =
+      data && region && data.presetsOrigin === core.regionsOrigin
+        ? data.presets.filter((p: PresetRoute): boolean => p.region_id === region.id)
+        : [];
+    if (fromFile.length > 0) return fromFile;
+    return tile && region && tile.ref === region.tile ? builtInPresets(tile, region.id) : [];
+  }, [data, region, core.regionsOrigin, tile]);
+  const [activePreset, setActivePreset] = useState<string | null>(null);
+
+  const runPreset = useCallback(
+    (p: PresetRoute): void => {
+      setActivePreset(p.name);
+      setRoute(p.moon_xy);
+      run(p.moon_xy, p.best.length ? p.best : null);
+    },
+    [run],
   );
+
+  // First visit to a region: run a preset (or the remembered route) so the screen opens with a result.
+  const autoRan = useRef<string | null>(null);
+  useEffect((): void => {
+    if (!data || !tile || !region || tile.ref !== region.tile || !workerRef.current) return;
+    if (autoRan.current === region.id || query || busy) return;
+    autoRan.current = region.id;
+    if (route.length >= 2) {
+      run(route, null);
+      return;
+    }
+    const first = presets[0];
+    if (route.length === 0 && first) runPreset(first);
+  }, [data, tile, region, presets, route, query, busy, run, runPreset]);
+
   const current = found[sel] ?? null;
-  const currentSite = current ? core.siteById.get(current.item.site_id) ?? null : null;
+  const currentSite = current ? (core.siteById.get(current.item.site_id) ?? null) : null;
 
   const chartData = useMemo(() => {
     if (!query) return [];
@@ -306,44 +405,104 @@ export default function Walk(): JSX.Element {
 
   const mapPoints = useMemo(
     (): MapPoint[] =>
-      current && currentSite ? [{ id: currentSite.id, lat: current.item.lat0, lon: current.item.lon0, label: '▶', title: `Start of the best path at ${currentSite.name}`, active: true }] : [],
+      current && currentSite
+        ? [
+            {
+              id: currentSite.id,
+              lat: current.item.lat0,
+              lon: current.item.lon0,
+              label: '▶',
+              title: `Start of the best path at ${currentSite.name}`,
+              active: true,
+            },
+          ]
+        : [],
     [current, currentSite],
   );
   const mapLines = useMemo(
-    (): MapLine[] => (current ? [{ id: 'best', coords: [[current.item.lon0, current.item.lat0], [current.item.lon1, current.item.lat1]] }] : []),
+    (): MapLine[] =>
+      current
+        ? [
+            {
+              id: 'best',
+              coords: [
+                [current.item.lon0, current.item.lat0],
+                [current.item.lon1, current.item.lat1],
+              ],
+            },
+          ]
+        : [],
     [current],
   );
 
   if (!region) return <p>No region selected.</p>;
 
-  const routeLen = route.reduce((acc: number, p: [number, number], i: number): number => (i ? acc + Math.hypot(p[0] - route[i - 1][0], p[1] - route[i - 1][1]) : 0), 0);
+  const routeLen = route.reduce(
+    (acc: number, p: [number, number], i: number): number => (i ? acc + Math.hypot(p[0] - route[i - 1][0], p[1] - route[i - 1][1]) : 0),
+    0,
+  );
+  const searchBlock =
+    route.length < 2 ? 'Place 2+ points' : routeLen < 200 ? 'Make the route at least 200 m' : !data ? 'Loading Earth transects…' : null;
+  const best = found[0] ?? null;
+  const bestSite = best ? (core.siteById.get(best.item.site_id) ?? null) : null;
+  const result = busy
+    ? 'Searching Earth transects for the same climb…'
+    : best && query
+      ? `${bestSite?.name ?? `Earth square ${best.item.site_id}`} walks most like this ${(query.length_m / 1000).toFixed(1)} km route: ${best.row.dtw.toFixed(1)}° average slope difference`
+      : query
+        ? 'No Earth transect matched this route'
+        : `Draw a moonwalk on ${region.name}; we find the Earth path that climbs the same way`;
+
+  const clearAll = (): void => {
+    setRoute([]);
+    setFound([]);
+    setQuery(null);
+    setNote('');
+    setActivePreset(null);
+  };
 
   return (
     <div>
-      <div className="screen-head">
-        <div>
-          <h1>Draw a moonwalk, find its twin on Earth</h1>
+      <ScreenHead
+        kicker="Astronaut walk"
+        result={result}
+        aside={
+          <label className="field">
+            <span className="field-label">Moon region</span>
+            <select className="select" value={region.id} onChange={(e): void => setRegion(e.target.value)}>
+              {core.regions.map((r: Region) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        }
+        method={
           <p>
-            Click on the terrain to lay out a route. We sample the elevation model along it, turn it into a slope profile
-            (100 points, uphill positive) and search Earth transects for the walk that climbs and descends the same way.
+            Click on the terrain to lay out a route. We sample the elevation model along it, turn it into a slope profile (100 points,
+            uphill positive) and search Earth transects for the walk that climbs and descends the same way, using dynamic time warping in a
+            background worker.
           </p>
-        </div>
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <span className="label">Region</span>
-          <select className="select" value={region.id} onChange={(e): void => setRegion(e.target.value)}>
-            {core.regions.map((r: Region) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+        }
+      />
 
       <div className="walk-layout">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className="walk-draw">
           <div className="draw-wrap">
-            {tile ? <DrawCanvas region={region} tile={tile} route={route} onAdd={(xy): void => setRoute((r) => [...r, xy])} /> : <Loading label="Loading Moon terrain…" />}
+            {tile ? (
+              <DrawCanvas
+                region={region}
+                tile={tile}
+                route={route}
+                onAdd={(xy): void => {
+                  setActivePreset(null);
+                  setRoute((r) => [...r, xy]);
+                }}
+              />
+            ) : (
+              <Loading label="Loading Moon terrain…" />
+            )}
             <div className="draw-hint">
               {route.length === 0
                 ? 'Click to place the start of the walk.'
@@ -352,81 +511,108 @@ export default function Walk(): JSX.Element {
                   : `${route.length} points · ${(routeLen / 1000).toFixed(2)} km. Add more points or search.`}
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-            <button className="btn btn-primary" disabled={route.length < 2 || routeLen < 200 || !data || busy} onClick={(): void => run(route, null)}>
+          <div className="toolbar">
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={searchBlock !== null || busy}
+              onClick={(): void => run(route, null)}
+            >
               {busy ? 'Searching…' : 'Find the Earth twin'}
             </button>
-            <button className="btn" disabled={route.length === 0} onClick={(): void => setRoute((r) => r.slice(0, -1))}>
+            <button type="button" className="btn" disabled={route.length === 0} onClick={(): void => setRoute((r) => r.slice(0, -1))}>
               Undo point
             </button>
-            <button
-              className="btn"
-              disabled={route.length === 0}
-              onClick={(): void => {
-                setRoute([]);
-                setFound([]);
-                setQuery(null);
-                setNote('');
-              }}
-            >
+            <button type="button" className="btn" disabled={route.length === 0} onClick={clearAll}>
               Clear
             </button>
-            {presets.length > 0 && (
-              <select
-                className="select"
-                value=""
-                aria-label="Load a preset route"
-                onChange={(e): void => {
-                  const p = presets[Number(e.target.value)];
-                  if (p) {
-                    setRoute(p.moon_xy);
-                    run(p.moon_xy, p.best);
-                  }
-                }}
-              >
-                <option value="">Or try a preset route…</option>
-                {presets.map((p: PresetRoute, i: number) => (
-                  <option key={p.name} value={i}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            )}
-            <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 14 }} title="Compare shape only, ignoring how steep overall">
-              <input type="checkbox" checked={znorm} onChange={(e): void => setZnorm(e.target.checked)} /> z-normalise
+            {searchBlock && !busy && <span className="caption">{searchBlock}</span>}
+            <label className="check" title="Compare shape only, ignoring how steep overall">
+              <input type="checkbox" checked={znorm} onChange={(e): void => setZnorm(e.target.checked)} /> Compare shape only
             </label>
           </div>
           {dataErr && <div className="error-box">Walk data unavailable: {dataErr}</div>}
         </div>
 
-        <div className="panel panel-pad" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="panel panel-pad walk-panel">
+          {presets.length > 0 && (
+            <div className="preset-row" role="group" aria-label="Preset routes">
+              <span className="field-label">Try a route</span>
+              <div className="preset-buttons">
+                {presets.map((p: PresetRoute) => (
+                  <button
+                    key={p.name}
+                    type="button"
+                    className="btn btn-sm"
+                    aria-pressed={activePreset === p.name}
+                    disabled={!data || busy}
+                    onClick={(): void => runPreset(p)}
+                  >
+                    {p.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {!query ? (
-            <div className="loading" style={{ minHeight: 320 }}>
-              <span>Draw a route (or pick a preset) and press “Find the Earth twin”.</span>
-              {!data && !dataErr && <span className="faint">Loading Earth transects…</span>}
+            <div className="empty">
+              <p>
+                {busy ? 'Searching…' : 'Pick a route above, or click on the terrain to draw your own, then press “Find the Earth twin”.'}
+              </p>
+              {!data && !dataErr && <p className="caption">Loading Earth transects…</p>}
             </div>
           ) : (
             <>
-              <div>
-                <div className="label">Slope along the walk (°, uphill positive)</div>
-                <div style={{ height: 260, marginTop: 8 }}>
+              <section>
+                <div className="chart-head">
+                  <h3>Slope along the walk</h3>
+                  <span className="chart-legend">
+                    <span className="legend-item">
+                      <span className="legend-line" aria-hidden="true" />
+                      Moon · {region.name}
+                    </span>
+                    {current && (
+                      <span className="legend-item">
+                        <span className="legend-line legend-line-dashed" aria-hidden="true" />
+                        Earth · {currentSite?.name ?? `sample square ${current.item.site_id}`}
+                      </span>
+                    )}
+                  </span>
+                </div>
+                <div className="chart-box">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartData} margin={{ top: 8, right: 12, bottom: 4, left: -8 }}>
-                      <CartesianGrid stroke="#2a303d" strokeDasharray="3 3" />
-                      <XAxis dataKey="pct" stroke="#8f8b84" tick={{ fontSize: 12 }} unit="%" />
-                      <YAxis stroke="#8f8b84" tick={{ fontSize: 12 }} unit="°" />
-                      <ReferenceLine y={0} stroke="#3a4252" />
+                      <CartesianGrid stroke="#2c3038" strokeDasharray="3 3" vertical={false} />
+                      <XAxis
+                        dataKey="pct"
+                        type="number"
+                        domain={[0, 100]}
+                        ticks={[0, 25, 50, 75, 100]}
+                        stroke="#8e8a83"
+                        tick={{ fontSize: 12 }}
+                        unit="%"
+                      />
+                      <YAxis stroke="#8e8a83" tick={{ fontSize: 12 }} unit="°" />
+                      <ReferenceLine y={0} stroke="#3d424c" />
                       <Tooltip
-                        contentStyle={{ background: '#161a23', border: '1px solid #3a4252', borderRadius: 6 }}
+                        contentStyle={{ background: '#1a1d23', border: '1px solid #3d424c', borderRadius: 6, color: '#edeae4' }}
                         labelFormatter={(v): string => `${String(v)}% along the walk`}
                       />
-                      <Legend wrapperStyle={{ fontSize: 13 }} />
-                      <Line type="monotone" dataKey="moon" name={`Moon · ${region.name}`} stroke="#f3b54a" strokeWidth={2.5} dot={false} isAnimationActive={false} />
+                      <Line
+                        type="monotone"
+                        dataKey="moon"
+                        name={`Moon · ${region.name}`}
+                        stroke="#edeae4"
+                        strokeWidth={2.5}
+                        dot={false}
+                        isAnimationActive={false}
+                      />
                       <Line
                         type="monotone"
                         dataKey="earth"
                         name={currentSite ? `Earth · ${currentSite.name}` : 'Earth'}
-                        stroke="#93a4ff"
+                        stroke="#b9b5ae"
+                        strokeDasharray="6 4"
                         strokeWidth={2}
                         dot={false}
                         isAnimationActive={false}
@@ -434,39 +620,42 @@ export default function Walk(): JSX.Element {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                <p className="faint" style={{ fontSize: 12.5 }}>
-                  Moon walk: {(query.length_m / 1000).toFixed(2)} km, climb {query.climb_m.toFixed(0)} m, steepest {query.max_slope_deg.toFixed(1)}°. {note}
+                <p className="caption">
+                  Degrees, uphill positive. Moon walk: {(query.length_m / 1000).toFixed(2)} km, climb {query.climb_m.toFixed(0)} m, steepest{' '}
+                  {query.max_slope_deg.toFixed(1)}°. {note}
                 </p>
-              </div>
+              </section>
 
               {found.length > 0 ? (
                 <>
-                  <table className="result-list">
+                  <table className="data-table result-list">
                     <thead>
                       <tr>
-                        <th>#</th>
+                        <th className="r">#</th>
                         <th>Earth site</th>
-                        <th>Length</th>
-                        <th>Climb</th>
-                        <th>Steepest</th>
-                        <th title="Mean absolute slope difference along the warped path">DTW, mean °</th>
+                        <th className="r">Length</th>
+                        <th className="r">Climb</th>
+                        <th className="r">Steepest</th>
+                        <th className="r" title="Mean absolute slope difference along the warped path">
+                          Avg slope diff.
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {found.map((f: Found, i: number) => {
-                        const s = core.siteById.get(f.item.site_id);
+                        const s2 = core.siteById.get(f.item.site_id);
                         return (
-                          <tr key={`${f.row.i}`} data-active={i === sel} style={{ cursor: 'pointer' }} onClick={(): void => setSel(i)}>
-                            <td className="num">{i + 1}</td>
+                          <tr key={`${f.row.i}`} data-active={i === sel} onClick={(): void => setSel(i)}>
+                            <td className="r">{i + 1}</td>
                             <td>
-                              <button className="btn btn-sm" style={{ background: 'none', border: 0, padding: 0, color: 'inherit', textAlign: 'left' }} onClick={(): void => setSel(i)}>
-                                {s?.name ?? f.item.site_id}
+                              <button type="button" className="row-btn" aria-pressed={i === sel} onClick={(): void => setSel(i)}>
+                                {s2?.name ?? f.item.site_id}
                               </button>
                             </td>
-                            <td className="num">{(f.item.length_m / 1000).toFixed(1)} km</td>
-                            <td className="num">{f.item.climb_m.toFixed(0)} m</td>
-                            <td className="num">{f.item.max_slope_deg.toFixed(1)}°</td>
-                            <td className="num">{f.row.dtw.toFixed(2)}</td>
+                            <td className="r">{(f.item.length_m / 1000).toFixed(1)} km</td>
+                            <td className="r">{f.item.climb_m.toFixed(0)} m</td>
+                            <td className="r">{f.item.max_slope_deg.toFixed(1)}°</td>
+                            <td className="r">{f.row.dtw.toFixed(2)}°</td>
                           </tr>
                         );
                       })}
@@ -475,9 +664,10 @@ export default function Walk(): JSX.Element {
                   <div className="mini-map">
                     <EarthMap points={mapPoints} lines={mapLines} fitKey={`${current?.row.i ?? 'none'}`} maxZoom={12} />
                   </div>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div className="card-actions">
                     <button
-                      className="btn btn-primary"
+                      type="button"
+                      className="btn"
                       disabled={!current}
                       onClick={(): void => {
                         if (!current) return;
@@ -488,9 +678,7 @@ export default function Walk(): JSX.Element {
                     >
                       Walk both in 3D →
                     </button>
-                    <span className="faint" style={{ fontSize: 12.5 }}>
-                      A profile match compares slopes only, not surface material, boulders or gravity.
-                    </span>
+                    <span className="caption">A profile match compares slopes only, not surface material, boulders or gravity.</span>
                   </div>
                 </>
               ) : (

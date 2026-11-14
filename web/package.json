@@ -8,7 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "mock": "node scripts/gen-mock.ts"
+    "mock": "node scripts/gen-mock.ts && node scripts/gen-mock-method.ts"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.3.0",

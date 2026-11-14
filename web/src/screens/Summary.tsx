@@ -1,14 +1,30 @@
 import { useEffect, useState, type JSX } from 'react';
-import { HAZARDS } from '../content';
-import { HZ_VAR } from '../components/DangerProfile';
+import { HAZARDS, ROW_NAME, VALIDATION_TARGETS, meetsTarget, type ValidationTarget } from '../content';
+import { Fit, HazardGlyph, VerdictGlyph } from '../components/Glyphs';
+import { SampleChip, ScreenHead } from '../components/ScreenHead';
 import { loadOptionalJson } from '../data/loader';
 import { useApp, type CoreData } from '../store';
-import { HAZARD_IDS, isTransectsFile, type HazardId, type Meta, type RankingRow, type Source } from '../types/contract';
+import { HAZARD_IDS, isTransectsFile, type HazardId, type Light, type Meta, type RankingRow, type Source } from '../types/contract';
 
-function distLight(d: number): { cls: string; word: string } {
-  if (d < 0.5) return { cls: 'light-green', word: 'close' };
-  if (d < 1.5) return { cls: 'light-amber', word: 'partial' };
-  return { cls: 'light-red', word: 'far' };
+/** Best-match distance (in Moon-spread units) to a fit class: under 0.5 close, over 1.5 far. */
+function distFit(d: number | undefined): Light | null {
+  if (typeof d !== 'number' || !Number.isFinite(d)) return null;
+  if (d < 0.5) return 'green';
+  if (d < 1.5) return 'amber';
+  return 'red';
+}
+
+/** Lifts dots that would overlap their neighbour onto a second row, so all nine stay visible. */
+function stackDots(entries: [string, number][]): { id: string; value: number; row: number }[] {
+  const sorted = [...entries].sort((a: [string, number], b: [string, number]): number => a[1] - b[1]);
+  let prev = -Infinity;
+  let prevRow = 1;
+  return sorted.map(([id, value]: [string, number]) => {
+    const row = value - prev < 0.025 && prevRow === 0 ? 1 : 0;
+    prev = value;
+    prevRow = row;
+    return { id, value, row };
+  });
 }
 
 function fmt(v: number | undefined, d: number = 2): string {
@@ -28,34 +44,100 @@ function Credits({ metas }: { metas: { file: string; meta: Meta }[] }): JSX.Elem
   const versions = Array.from(new Set(metas.map((m) => m.meta.pipeline_version))).join(', ');
   return (
     <section className="panel panel-pad credits" aria-labelledby="credits-h">
-      <h2 id="credits-h" style={{ fontSize: 18, marginBottom: 4 }}>
-        Data credits and licences
-      </h2>
-      <p className="faint" style={{ fontSize: 13, marginBottom: 12 }}>
+      <h2 id="credits-h">Data credits and licences</h2>
+      <p className="caption">
         Collected from the <code>meta.sources</code> block of every loaded file. Pipeline version: {versions || 'unknown'}.
       </p>
       <ul>
         {Array.from(seen.values()).map(({ s, files }) => (
           <li key={`${s.name}|${s.url}`}>
-            <strong style={{ color: 'var(--text)' }}>{s.url ? <a href={s.url} target="_blank" rel="noreferrer">{s.name}</a> : s.name}</strong>
+            <strong>
+              {s.url ? (
+                <a href={s.url} target="_blank" rel="noreferrer">
+                  {s.name}
+                </a>
+              ) : (
+                s.name
+              )}
+            </strong>
             {s.licence ? ` · ${s.licence}` : ''}
             {s.citation ? ` · ${s.citation}` : ''} <span className="faint">({files.join(', ')})</span>
           </li>
         ))}
         <li>
-          <strong style={{ color: 'var(--text)' }}>Basemap</strong> · OpenFreeMap (positron style), OpenMapTiles, © OpenStreetMap contributors (ODbL)
+          <strong>Basemap</strong> · OpenFreeMap (dark style), OpenMapTiles, © OpenStreetMap contributors (ODbL)
         </li>
         <li>
-          <strong style={{ color: 'var(--text)' }}>Failure accounts</strong> · ispace (26 May 2023); Intuitive Machines earnings call, May 2025, via The Register; NASA JPL (11 Dec 2024)
+          <strong>Failure accounts</strong> · ispace (26 May 2023); Intuitive Machines earnings call, May 2025, via The Register; NASA JPL
+          (11 Dec 2024)
         </li>
       </ul>
     </section>
   );
 }
 
+/** A 0–1 scale with the target zone shaded and this value marked. */
+function Band({ value, target }: { value: number | undefined; target: ValidationTarget }): JSX.Element {
+  const lo = target.min ?? 0;
+  const hi = target.max ?? 1;
+  const v = typeof value === 'number' && Number.isFinite(value) ? Math.min(Math.max(value, 0), 1) : null;
+  return (
+    <div className="band" aria-hidden="true">
+      <div className="band-track" />
+      <div className="band-target" style={{ left: `${lo * 100}%`, width: `${(hi - lo) * 100}%` }} />
+      {v !== null && <div className="band-marker" style={{ left: `${v * 100}%` }} />}
+      <span className="band-tick band-tick-0">0</span>
+      <span className="band-tick band-tick-1">1</span>
+    </div>
+  );
+}
+
+function Check({
+  title,
+  help,
+  value,
+  digits = 2,
+  target,
+  children,
+}: {
+  title: string;
+  help: string;
+  value: number | undefined;
+  digits?: number;
+  target: ValidationTarget;
+  children?: JSX.Element | null;
+}): JSX.Element {
+  const ok = meetsTarget(value, target);
+  return (
+    <div className="val-block">
+      <div className="val-head">
+        <div>
+          <h3>{title}</h3>
+          <p className="caption">{help}</p>
+        </div>
+        <span className="val-value">{fmt(value, digits)}</span>
+      </div>
+      <Band value={value} target={target} />
+      <p className="val-status">
+        {ok === null ? (
+          <span className="muted">Not available yet</span>
+        ) : (
+          <span className="val-verdict" data-ok={ok}>
+            <VerdictGlyph kind={ok ? 'pass' : 'fail'} />
+            {ok ? 'Meets target' : 'Below target'}
+          </span>
+        )}
+        <span className="caption">{target.text}</span>
+      </p>
+      {children}
+    </div>
+  );
+}
+
 export function Summary(): JSX.Element {
   const core = useApp((s) => s.core) as CoreData;
   const setRegion = useApp((s) => s.setRegion);
+  const setHazard = useApp((s) => s.setHazard);
   const setScreen = useApp((s) => s.setScreen);
   const [walkMeta, setWalkMeta] = useState<Meta | null>(null);
   useEffect((): void => {
@@ -71,130 +153,209 @@ export function Summary(): JSX.Element {
   if (!summary) {
     return (
       <div>
-        <div className="error-box">summary.json is not available yet from the pipeline or the mock set.</div>
+        <div className="error-box">summary.json is not available yet from the pipeline or the sample set.</div>
         <Credits metas={metas} />
       </div>
     );
   }
   const v = summary.validation;
   const ranking = [...summary.ranking].sort((a: RankingRow, b: RankingRow): number => a.rank - b.rank);
+  const easiest = ranking[0];
+  const hardest = ranking[ranking.length - 1];
+  const tests = v.synthetic_tests ?? [];
+  const testsPassed = tests.filter((t) => t.passed).length;
+  const checks: (boolean | null)[] = [
+    meetsTarget(v.shadow_vs_pgda?.pearson_r, VALIDATION_TARGETS.shadow_r),
+    meetsTarget(v.known_vs_decoy_auc, VALIDATION_TARGETS.decoy_auc),
+    meetsTarget(v.weight_stability_jaccard, VALIDATION_TARGETS.jaccard),
+    tests.length ? testsPassed === tests.length : null,
+  ];
+  const known = checks.filter((c): c is boolean => c !== null);
+  const passed = known.filter((c: boolean): boolean => c).length;
+  const aucs = Object.entries(v.classifier_two_sample?.per_region_auc ?? {});
+  const open = (regionId: string, h: HazardId): void => {
+    setRegion(regionId);
+    setHazard(h);
+    setScreen('region');
+  };
 
   return (
     <div>
-      <div className="screen-head">
-        <div>
-          <h1 style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-            Easiest to hardest to rehearse on Earth
-            {core.summaryOrigin === 'mock' && <span className="chip chip-warn" style={{ fontSize: 13 }}>Mock ranking</span>}
-          </h1>
+      <ScreenHead
+        kicker="Summary and validation"
+        chips={core.summaryOrigin === 'mock' ? <SampleChip what="Ranking and validation figures" /> : null}
+        result={
+          easiest && hardest
+            ? `${regionName(easiest.region_id)} is the easiest region to rehearse on Earth; ${regionName(hardest.region_id)} the hardest`
+            : 'No ranking yet'
+        }
+        method={
           <p>
-            Ranked by how close the best Earth match comes for each hazard. Distances are in units of the Moon region’s own
-            spread (interquartile range): under 0.5 is close, over 1.5 is far.
+            Regions are ranked by how close the best Earth match comes for each hazard. Distances are in units of the Moon region’s own
+            spread (interquartile range): under 0.5 is close, 0.5 to 1.5 partial, over 1.5 far.
           </p>
-        </div>
-      </div>
+        }
+      />
 
       <div className="summary-layout">
-        <section className="panel" aria-label="Region ranking">
-          {ranking.map((r: RankingRow) => (
-            <div className="rank-row" key={r.region_id}>
-              <span className="rank">{r.rank}</span>
-              <div>
-                <h3>
-                  <button
-                    className="btn btn-sm"
-                    style={{ background: 'none', border: 0, padding: 0, fontSize: 15, fontWeight: 600, textAlign: 'left' }}
-                    onClick={(): void => {
-                      setRegion(r.region_id);
-                      setScreen('region');
-                    }}
-                  >
-                    {regionName(r.region_id)}
-                  </button>
-                </h3>
-                <div className="dist-chips">
-                  {HAZARD_IDS.map((h: HazardId) => {
-                    const d = r.per_hazard_best_distance[h];
-                    const l = distLight(d);
-                    return (
-                      <span key={h} className="chip" title={`${HAZARDS[h].name}: best match ${fmt(d)} IQR away`}>
-                        <span className="hz-dot" style={{ background: HZ_VAR[h] }} aria-hidden="true" />
-                        {HAZARDS[h].short} <span className={`light ${l.cls}`} style={{ fontSize: 12 }}>{l.word}</span>
+        <section className="panel" aria-labelledby="grid-h">
+          <div className="panel-head">
+            <h2 id="grid-h">Best Earth match, region by hazard</h2>
+            <span className="caption">Easiest to hardest. Select a cell to open its Earth matches.</span>
+          </div>
+          <div className="table-scroll">
+            <table className="fit-grid">
+              <thead>
+                <tr>
+                  <th className="r" scope="col">
+                    #
+                  </th>
+                  <th scope="col">Region</th>
+                  {HAZARD_IDS.map((h: HazardId) => (
+                    <th key={h} scope="col">
+                      <span className="th-hz">
+                        <HazardGlyph hazard={h} />
+                        {ROW_NAME[h]}
                       </span>
-                    );
-                  })}
-                </div>
-              </div>
-              <p className="muted" style={{ fontSize: 14 }}>
-                {r.reason}
-              </p>
-            </div>
-          ))}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {ranking.map((r: RankingRow) => (
+                  <tr key={r.region_id}>
+                    <td className="r fit-rank">{r.rank}</td>
+                    <th scope="row" className="fit-region">
+                      <span className="fit-region-name">{regionName(r.region_id)}</span>
+                      <span className="caption">{r.reason}</span>
+                    </th>
+                    {HAZARD_IDS.map((h: HazardId) => {
+                      const d = r.per_hazard_best_distance?.[h];
+                      const f = distFit(d);
+                      return (
+                        <td key={h}>
+                          <button
+                            type="button"
+                            className="fit-cell"
+                            title={`${HAZARDS[h].name}: best match ${fmt(d)} spreads away`}
+                            aria-label={`${regionName(r.region_id)}, ${HAZARDS[h].name}: ${f ? (f === 'green' ? 'close' : f === 'amber' ? 'partial' : 'far') : 'no data'}. Open Earth matches.`}
+                            onClick={(): void => open(r.region_id, h)}
+                          >
+                            {f ? <Fit fit={f} /> : <span className="faint">—</span>}
+                            <span className="fit-dist">{fmt(d)}</span>
+                          </button>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section className="panel" aria-labelledby="val-h">
-          <div className="val-block">
-            <h2 id="val-h" style={{ fontSize: 18, display: 'flex', gap: 8, alignItems: 'center' }}>
-              Validation
-              {core.summaryOrigin === 'mock' && <span className="chip chip-warn">Mock values</span>}
-            </h2>
-            <p>How we check that the numbers mean what we say.</p>
+          <div className="panel-head">
+            <h2 id="val-h">Validation</h2>
+            <span className="val-summary">
+              {known.length ? `${passed} of ${known.length} checks meet their targets` : 'No checks available yet'}
+            </span>
           </div>
-          <div className="val-block">
-            <h3>Shadows vs NASA PGDA illumination maps</h3>
-            <p>{v.shadow_vs_pgda.note}</p>
+          <Check
+            title="Shadows vs NASA PGDA illumination"
+            help={v.shadow_vs_pgda?.note || 'Pearson correlation between our shadow fraction and PGDA’s.'}
+            value={v.shadow_vs_pgda?.pearson_r}
+            target={VALIDATION_TARGETS.shadow_r}
+          >
             <dl className="kv">
-              <dt>Pearson r</dt>
-              <dd>{fmt(v.shadow_vs_pgda.pearson_r)}</dd>
               <dt>Mean absolute error</dt>
-              <dd>{fmt(v.shadow_vs_pgda.mae, 3)}</dd>
+              <dd>{fmt(v.shadow_vs_pgda?.mae, 3)}</dd>
               <dt>Bias</dt>
-              <dd>{fmt(v.shadow_vs_pgda.bias, 3)}</dd>
+              <dd>{fmt(v.shadow_vs_pgda?.bias, 3)}</dd>
               <dt>Pixels compared</dt>
-              <dd>{v.shadow_vs_pgda.n_px.toLocaleString('en-US')}</dd>
+              <dd>{typeof v.shadow_vs_pgda?.n_px === 'number' ? v.shadow_vs_pgda.n_px.toLocaleString('en-US') : '—'}</dd>
             </dl>
-          </div>
+          </Check>
+          <Check
+            title="Known analogs rank above decoys"
+            help="Held-out analog sites should beat dune fields, farmland and forest (ROC-AUC)."
+            value={v.known_vs_decoy_auc}
+            target={VALIDATION_TARGETS.decoy_auc}
+          />
+          <Check
+            title="Top 3 stay put when weights move ±20%"
+            help="Overlap of each top-3 list under perturbed weights (Jaccard index)."
+            value={v.weight_stability_jaccard}
+            target={VALIDATION_TARGETS.jaccard}
+          />
           <div className="val-block">
-            <h3>Known analogs vs decoys</h3>
-            <p>Known analog sites held out from tuning should rank above decoys (deserts of dunes, farmland, forest).</p>
-            <dl className="kv">
-              <dt>ROC-AUC</dt>
-              <dd>{fmt(v.known_vs_decoy_auc)}</dd>
-              <dt>Top-3 stability under ±20% weights (Jaccard)</dt>
-              <dd>{fmt(v.weight_stability_jaccard)}</dd>
-            </dl>
-          </div>
-          <div className="val-block">
-            <h3>Can a classifier tell Moon from Earth tiles?</h3>
-            <p>Two-sample test: an AUC near 0.5 means the best Earth tiles are hard to tell apart from the Moon region.</p>
-            <dl className="kv">
-              {Object.entries(v.classifier_two_sample.per_region_auc).map(([k, auc]) => (
-                <div key={k} style={{ display: 'contents' }}>
-                  <dt>{regionName(k)}</dt>
-                  <dd>{fmt(auc)}</dd>
-                </div>
-              ))}
-            </dl>
-            {v.classifier_two_sample.top_features.length > 0 && (
-              <p className="faint" style={{ fontSize: 12.5, marginTop: 8 }}>
-                Most telling features: {v.classifier_two_sample.top_features.join(', ')}
-              </p>
-            )}
-          </div>
-          <div className="val-block">
-            <h3>Synthetic tests</h3>
-            <ul style={{ margin: 0, paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13.5 }}>
-              {v.synthetic_tests.map((t) => (
-                <li key={t.name} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                  <span className="num">{t.name}</span>
-                  <span className={`light ${t.passed ? 'light-green' : 'light-red'}`}>{t.passed ? 'passed' : 'failed'}</span>
+            <div className="val-head">
+              <div>
+                <h3>Synthetic tests</h3>
+                <p className="caption">Known-answer terrains run through the same code.</p>
+              </div>
+              <span className="val-value">
+                {testsPassed}/{tests.length}
+              </span>
+            </div>
+            <ul className="test-list">
+              {tests.map((t) => (
+                <li key={t.name}>
+                  <span>{t.name.replace(/_/g, ' ')}</span>
+                  <span className="val-verdict" data-ok={t.passed}>
+                    <VerdictGlyph kind={t.passed ? 'pass' : 'fail'} />
+                    {t.passed ? 'Passed' : 'Failed'}
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
+          {aucs.length > 0 && (
+            <div className="val-block">
+              <div className="val-head">
+                <div>
+                  <h3>Can a classifier tell Moon from Earth tiles?</h3>
+                  <p className="caption">
+                    Two-sample test per region. Near 0.5: hard to tell apart; near 1: easy. Shown for context, no target.
+                  </p>
+                </div>
+              </div>
+              <div
+                className="auc-strip"
+                role="img"
+                aria-label={`Classifier AUC per region, from ${fmt(Math.min(...aucs.map((a) => a[1])))} to ${fmt(Math.max(...aucs.map((a) => a[1])))}`}
+              >
+                <div className="band-track" />
+                {stackDots(aucs).map(({ id, value, row }) => (
+                  <span
+                    key={id}
+                    className="auc-dot"
+                    style={{ left: `${Math.min(Math.max((value - 0.5) / 0.5, 0), 1) * 100}%`, top: `${4 - row * 9}px` }}
+                    title={`${regionName(id)}: ${fmt(value)}`}
+                  />
+                ))}
+                <span className="band-tick band-tick-0">0.5</span>
+                <span className="band-tick band-tick-1">1</span>
+              </div>
+              <details className="method">
+                <summary>Per-region values</summary>
+                <dl className="kv method-body">
+                  {aucs.map(([k, auc]: [string, number]) => (
+                    <div key={k} className="kv-row">
+                      <dt>{regionName(k)}</dt>
+                      <dd>{fmt(auc)}</dd>
+                    </div>
+                  ))}
+                </dl>
+                {v.classifier_two_sample.top_features.length > 0 && (
+                  <p className="caption">Most telling features: {v.classifier_two_sample.top_features.join(', ')}</p>
+                )}
+              </details>
+            </div>
+          )}
           <div className="val-block">
             <h3>Where it fails</h3>
-            <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--text-2)', fontSize: 13.5, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <ul className="fails">
               {v.where_it_fails.map((w: string) => (
                 <li key={w}>{w}</li>
               ))}

@@ -1,15 +1,27 @@
 import { useCallback, useMemo, type JSX } from 'react';
-import { HAZARDS, LIGHT_LABEL, metricInfo } from '../content';
+import { HAZARDS, metricInfo } from '../content';
 import { EarthMap, type MapPoint } from '../components/EarthMap';
-import { CoordBadge, HZ_VAR } from '../components/DangerProfile';
+import { CoordBadge } from '../components/DangerProfile';
+import { Fit, FitGlyph, HazardGlyph, VerdictGlyph, type VerdictKind } from '../components/Glyphs';
+import { SampleChip, ScreenHead } from '../components/ScreenHead';
 import { localSolarTime } from '../lib/solar';
 import { matchesFor, useApp, useRegion, type CoreData } from '../store';
-import { HAZARD_IDS, type EarthSite, type HazardId, type Match, type RehearsalWindow } from '../types/contract';
+import { HAZARD_IDS, type EarthSite, type HazardId, type Light, type Match, type RehearsalWindow } from '../types/contract';
 
 const DAY_FMT = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
 
+const HAZARD_NOUN: Record<HazardId, string> = { shadow: 'shadow', rim: 'rim-jump', texture: 'texture' };
+
 function hhmmUTC(d: Date): string {
   return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+}
+
+function countFits(m: Match): Record<Light, number> {
+  const c: Record<Light, number> = { green: 0, amber: 0, red: 0 };
+  m.lights.forEach((l): void => {
+    if (l.light in c) c[l.light] += 1;
+  });
+  return c;
 }
 
 function WindowsTable({ windows, site }: { windows: RehearsalWindow[]; site: EarthSite }): JSX.Element {
@@ -17,13 +29,13 @@ function WindowsTable({ windows, site }: { windows: RehearsalWindow[]; site: Ear
     return <p className="muted">No matching low-sun window in the searched period (for example, polar night at this latitude).</p>;
   }
   return (
-    <table className="windows">
+    <table className="data-table">
       <thead>
         <tr>
           <th>Date (UTC)</th>
-          <th>UTC</th>
-          <th>Local solar time</th>
-          <th>Sun el / az</th>
+          <th className="r">UTC</th>
+          <th className="r">Local solar time</th>
+          <th className="r">Sun elevation / azimuth</th>
         </tr>
       </thead>
       <tbody>
@@ -32,14 +44,14 @@ function WindowsTable({ windows, site }: { windows: RehearsalWindow[]; site: Ear
           const e = new Date(w.end_utc);
           return (
             <tr key={w.start_utc}>
-              <td>{DAY_FMT.format(s)}</td>
-              <td>
+              <td className="mono">{DAY_FMT.format(s)}</td>
+              <td className="r mono">
                 {hhmmUTC(s)}–{hhmmUTC(e)}
               </td>
-              <td>
+              <td className="r">
                 {localSolarTime(s, site.lon)}–{localSolarTime(e, site.lon)}
               </td>
-              <td title={w.el_kind}>
+              <td className="r" title={w.el_kind}>
                 {w.sun_el.toFixed(1)}° / {w.sun_az.toFixed(0)}°
               </td>
             </tr>
@@ -47,6 +59,41 @@ function WindowsTable({ windows, site }: { windows: RehearsalWindow[]; site: Ear
         })}
       </tbody>
     </table>
+  );
+}
+
+function Verdict({ kind, title, items, empty }: { kind: VerdictKind; title: string; items: string[]; empty: string }): JSX.Element {
+  return (
+    <div className="verdict">
+      <h4>
+        <VerdictGlyph kind={kind} />
+        {title}
+      </h4>
+      {items.length ? (
+        <ul>
+          {items.map((t: string) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="caption">{empty}</p>
+      )}
+    </div>
+  );
+}
+
+function FitCounts({ match }: { match: Match }): JSX.Element {
+  const c = countFits(match);
+  const label = `${c.green} close, ${c.amber} partial, ${c.red} far of ${match.lights.length} metrics`;
+  return (
+    <span className="fit-counts" aria-label={label} title={label}>
+      {(['green', 'amber', 'red'] as Light[]).map((l: Light) => (
+        <span key={l} className="fit-count" data-fit={l} aria-hidden="true">
+          <FitGlyph fit={l} />
+          {c[l]}
+        </span>
+      ))}
+    </span>
   );
 }
 
@@ -63,83 +110,39 @@ function SiteCard({
   onToggle: () => void;
   onCompare: () => void;
 }): JSX.Element {
-  const greens = match.lights.filter((l) => l.light === 'green').length;
   return (
     <article className="site-card" data-active={active}>
-      <button className="site-card-head" onClick={onToggle} aria-expanded={active}>
+      <button type="button" className="site-card-head" onClick={onToggle} aria-expanded={active}>
         <span className="rank">{match.rank}</span>
-        <span>
-          <span style={{ display: 'block', fontWeight: 600, fontSize: 16 }}>{site.name}</span>
-          <span className="muted" style={{ fontSize: 13 }}>
+        <span className="site-card-title">
+          <span className="site-name">{site.name}</span>
+          <span className="caption">
             {site.country} · {site.category.replace(/_/g, ' ')} · {site.rock.lith}
             {site.rock.anorthosite ? ' · anorthosite' : ''}
           </span>
         </span>
-        <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          {site.known_analog && <span className="chip chip-ok">Known analog</span>}
-          {site.role === 'decoy' && <span className="chip chip-warn">Decoy (control)</span>}
-          <span className="chip num" title="Metrics within the Moon region's spread">
-            {greens}/{match.lights.length} close
-          </span>
+        <span className="site-card-tags">
+          {site.known_analog && <span className="chip">Known analog</span>}
+          {site.role === 'decoy' && <span className="chip chip-dashed">Decoy (control)</span>}
+          <FitCounts match={match} />
         </span>
       </button>
       {active && (
         <div className="site-card-body">
           <div className="verdicts">
-            <div className="verdict">
-              <h4>
-                <span aria-hidden="true">✅</span> Matches
-              </h4>
-              {match.matches_text.length ? (
-                <ul>
-                  {match.matches_text.map((t: string) => (
-                    <li key={t}>{t}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="faint" style={{ fontSize: 13 }}>
-                  No metric is within the Moon region’s spread.
-                </p>
-              )}
-            </div>
-            <div className="verdict">
-              <h4>
-                <span aria-hidden="true">⚠️</span> Doesn’t match
-              </h4>
-              {match.mismatches_text.length ? (
-                <ul>
-                  {match.mismatches_text.map((t: string) => (
-                    <li key={t}>{t}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="faint" style={{ fontSize: 13 }}>
-                  Every measured metric is close.
-                </p>
-              )}
-            </div>
-            <div className="verdict">
-              <h4>
-                <span aria-hidden="true">🚫</span> Can’t test here
-              </h4>
-              <ul>
-                {match.cannot_test.map((t: string) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
-            </div>
+            <Verdict kind="match" title="Matches" items={match.matches_text} empty="No metric is within the Moon region’s spread." />
+            <Verdict kind="mismatch" title="Doesn’t match" items={match.mismatches_text} empty="Every measured metric is close." />
+            <Verdict kind="cannot" title="Can’t test here" items={match.cannot_test} empty="Nothing listed." />
           </div>
 
-          <div>
-            <div className="label" style={{ marginBottom: 8 }}>
-              Metric by metric
-            </div>
-            <table className="lights">
+          <section>
+            <h4 className="section-label">Metric by metric</h4>
+            <table className="data-table">
               <thead>
                 <tr>
                   <th>Metric</th>
-                  <th>Moon (spread)</th>
-                  <th>This site</th>
+                  <th className="r">Moon (spread)</th>
+                  <th className="r">This site</th>
                   <th>Gap</th>
                   <th>Fit</th>
                 </tr>
@@ -150,36 +153,34 @@ function SiteCard({
                   return (
                     <tr key={l.metric}>
                       <td title={mi.help}>{mi.label}</td>
-                      <td className="num">
+                      <td className="r">
                         {mi.fmt(l.moon)}{' '}
                         <span className="faint">
                           ({mi.fmt(l.moon_iqr[0])}–{mi.fmt(l.moon_iqr[1])})
                         </span>
                       </td>
-                      <td className="num">{mi.fmt(l.earth)}</td>
-                      <td>{l.gap_text}</td>
+                      <td className="r">{mi.fmt(l.earth)}</td>
+                      <td className="muted">{l.gap_text}</td>
                       <td>
-                        <span className={`light light-${l.light}`}>{LIGHT_LABEL[l.light] ?? l.light}</span>
+                        <Fit fit={l.light} />
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-          </div>
+          </section>
 
-          <div>
-            <div className="label" style={{ marginBottom: 8 }}>
-              Rehearsal windows · when the sun here matches the Moon’s
-            </div>
+          <section>
+            <h4 className="section-label">Rehearsal windows: when the sun here matches the Moon’s</h4>
             <WindowsTable windows={match.windows} site={site} />
-          </div>
+          </section>
 
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary" onClick={onCompare}>
+          <div className="card-actions">
+            <button type="button" className="btn btn-primary" onClick={onCompare}>
               Compare terrain in 3D →
             </button>
-            <span className="faint" style={{ fontSize: 12.5 }}>
+            <span className="caption">
               Bare ground {(site.bare_frac * 100).toFixed(0)}% · {site.worldcover_note}
             </span>
           </div>
@@ -187,6 +188,12 @@ function SiteCard({
       )}
     </article>
   );
+}
+
+function resultLine(regionName: string, hazard: HazardId, best: Match | undefined, site: EarthSite | undefined): string {
+  if (!best || !site) return `No Earth match yet for ${regionName}, ${HAZARDS[hazard].name.toLowerCase()}.`;
+  const c = countFits(best);
+  return `${regionName} → ${site.name} reproduces ${c.green} of ${best.lights.length} ${HAZARD_NOUN[hazard]} metrics`;
 }
 
 export function RegionDetail(): JSX.Element {
@@ -207,7 +214,9 @@ export function RegionDetail(): JSX.Element {
     (): MapPoint[] =>
       list.flatMap((m: Match): MapPoint[] => {
         const s = core.siteById.get(m.site_id);
-        return s ? [{ id: s.id, lat: s.lat, lon: s.lon, label: String(m.rank), title: `#${m.rank} ${s.name}`, active: s.id === activeId }] : [];
+        return s
+          ? [{ id: s.id, lat: s.lat, lon: s.lon, label: String(m.rank), title: `#${m.rank} ${s.name}`, active: s.id === activeId }]
+          : [];
       }),
     [list, core, activeId],
   );
@@ -215,27 +224,40 @@ export function RegionDetail(): JSX.Element {
 
   if (!region) return <p>No region selected.</p>;
   const hz = HAZARDS[hazard];
+  const best = list[0];
 
   return (
     <div>
-      <div className="screen-head">
-        <div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-            <h1>{region.name}</h1>
+      <ScreenHead
+        kicker={`Earth matches · ${hz.name.toLowerCase()}`}
+        chips={
+          <>
             <CoordBadge region={region} />
-            {core.matchesOrigin === 'mock' && (
-              <span className="chip chip-warn" title="matches.json is the synthetic mock set; the pipeline output is not available yet">
-                Mock matches
-              </span>
-            )}
-          </div>
+            {core.matchesOrigin === 'mock' && <SampleChip what="Matches" />}
+          </>
+        }
+        result={resultLine(region.name, hazard, best, best ? core.siteById.get(best.site_id) : undefined)}
+        method={
           <p>
-            For each hazard, the three Earth sites whose terrain and light reproduce it most closely. Fits are shown metric
-            by metric; there is no overall “% Moon-like” score, on purpose.
+            For each hazard, the three Earth sites whose terrain and light reproduce it most closely. Each metric is compared with the Moon
+            region’s own spread (its interquartile range) and marked close, partial or far. There is no overall “% Moon-like” score, on
+            purpose.
           </p>
+        }
+      />
+
+      <div className="tabs-row">
+        <div className="tabs" role="tablist" aria-label="Hazard">
+          {HAZARD_IDS.map((h: HazardId) => (
+            <button key={h} type="button" role="tab" className="tab" aria-selected={h === hazard} onClick={(): void => setHazard(h)}>
+              <HazardGlyph hazard={h} />
+              {HAZARDS[h].name}
+              <span className="caption">{HAZARDS[h].mission}</span>
+            </button>
+          ))}
         </div>
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <span className="label">Region</span>
+        <label className="field field-inline">
+          <span className="field-label">Moon region</span>
           <select className="select" value={regionId} onChange={(e): void => setRegion(e.target.value)}>
             {core.regions.map((r) => (
               <option key={r.id} value={r.id}>
@@ -246,27 +268,15 @@ export function RegionDetail(): JSX.Element {
         </label>
       </div>
 
-      <div className="tabs" role="tablist" aria-label="Hazard">
-        {HAZARD_IDS.map((h: HazardId) => (
-          <button key={h} role="tab" className="tab" aria-selected={h === hazard} onClick={(): void => setHazard(h)}>
-            <span className="hz-dot" style={{ background: HZ_VAR[h] }} aria-hidden="true" />
-            {HAZARDS[h].name}
-            <span className="faint" style={{ fontSize: 12 }}>
-              {HAZARDS[h].mission}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      <p className="muted" style={{ marginBottom: 16 }}>
-        <strong style={{ color: 'var(--text)' }}>Lesson from {hz.mission}:</strong> {hz.lesson}
+      <p className="lesson">
+        <strong>Lesson from {hz.mission}:</strong> {hz.lesson}
       </p>
 
       <div className="region-layout" role="tabpanel">
         <div className="map-box">
           <EarthMap points={points} onSelect={onSelect} fitKey={`${regionId}:${hazard}`} />
         </div>
-        <div>
+        <div className="site-list">
           {list.length === 0 && <p className="muted">No matches for this region and hazard in matches.json.</p>}
           {list.map((m: Match) => {
             const site = core.siteById.get(m.site_id);

@@ -1,13 +1,7 @@
-import { lazy, Suspense, useEffect, type JSX } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState, type JSX } from 'react';
 import { loadJson, loadOptionalJson, onMockUsed } from './data/loader';
 import { buildCore, SCREENS, useApp, type ScreenId } from './store';
-import {
-  isEarthSitesFile,
-  isMatchesFile,
-  isOverviewFile,
-  isRegionsFile,
-  isSummaryFile,
-} from './types/contract';
+import { isEarthSitesFile, isMatchesFile, isOverviewFile, isRegionsFile, isSummaryFile } from './types/contract';
 import { Loading } from './components/Loading';
 import { Story } from './screens/Story';
 import { MoonOverview } from './screens/MoonOverview';
@@ -17,6 +11,68 @@ import { Summary } from './screens/Summary';
 // Heavy screens (three.js, worker) load on demand.
 const Terrain3D = lazy(() => import('./screens/Terrain3D'));
 const Walk = lazy(() => import('./screens/Walk'));
+
+/** Groups mock file paths: JSON files by name, tiles and images by folder with a count. */
+function groupMock(files: string[]): string[] {
+  const json = files.filter((f: string): boolean => f.endsWith('.json')).sort();
+  const folders = new Map<string, number>();
+  for (const f of files) {
+    if (f.endsWith('.json')) continue;
+    const dir = f.includes('/') ? f.slice(0, f.lastIndexOf('/') + 1) : './';
+    folders.set(dir, (folders.get(dir) ?? 0) + 1);
+  }
+  const rest = Array.from(folders.entries())
+    .sort((a: [string, number], b: [string, number]): number => a[0].localeCompare(b[0]))
+    .map(([dir, n]: [string, number]): string => `${dir} · ${n} ${n === 1 ? 'file' : 'files'}`);
+  return [...json, ...rest];
+}
+
+function SampleDataChip({ files }: { files: string[] }): JSX.Element {
+  const [open, setOpen] = useState<boolean>(false);
+  const wrap = useRef<HTMLDivElement>(null);
+  useEffect((): (() => void) | void => {
+    if (!open) return;
+    const onDown = (e: PointerEvent): void => {
+      if (wrap.current && e.target instanceof Node && !wrap.current.contains(e.target)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return (): void => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+  const rows = groupMock(files);
+  return (
+    <div className="sample-wrap" ref={wrap}>
+      <button
+        type="button"
+        className="chip chip-sample chip-button"
+        aria-expanded={open}
+        aria-controls="sample-pop"
+        onClick={(): void => setOpen((o: boolean): boolean => !o)}
+      >
+        Sample data
+      </button>
+      {open && (
+        <div id="sample-pop" className="popover" role="dialog" aria-label="Files using sample data">
+          <p className="popover-title">Some screens use the synthetic sample set</p>
+          <p className="popover-text">The pipeline has not written these files yet, so the app falls back to web/public/mock/:</p>
+          <ul className="popover-list">
+            {rows.map((r: string) => (
+              <li key={r} className="mono">
+                {r}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function TopBar(): JSX.Element {
   const screen = useApp((s) => s.screen);
@@ -30,29 +86,14 @@ function TopBar(): JSX.Element {
       </button>
       <nav className="stepper" aria-label="Story steps">
         {SCREENS.map((s, i) => (
-          <button
-            key={s.id}
-            className="step"
-            aria-current={screen === s.id ? 'step' : undefined}
-            onClick={(): void => setScreen(s.id)}
-          >
+          <button key={s.id} className="step" aria-current={screen === s.id ? 'step' : undefined} onClick={(): void => setScreen(s.id)}>
             <span className="step-n">{i + 1}</span>
             <span className="step-label">{s.label}</span>
             <span className="step-short">{s.short}</span>
           </button>
         ))}
       </nav>
-      <div className="topbar-right">
-        {mockFiles.length > 0 && (
-          <span
-            className="mock-badge"
-            title={`Synthetic mock files in use (pipeline output missing):\n${mockFiles.join('\n')}`}
-            aria-label={`Mock data in use for ${mockFiles.length} files`}
-          >
-            MOCK DATA · {mockFiles.length}
-          </span>
-        )}
-      </div>
+      <div className="topbar-right">{mockFiles.length > 0 && <SampleDataChip files={mockFiles} />}</div>
     </header>
   );
 }
@@ -122,8 +163,8 @@ export function App(): JSX.Element {
         {needsData && loadError ? (
           <div className="error-box" role="alert">
             <strong>Could not load the pipeline outputs.</strong>
-            <p style={{ marginTop: 6 }}>{loadError}</p>
-            <p style={{ marginTop: 6 }}>Run the pipeline (writes web/public/data/) or `npm run mock` (writes web/public/mock/), then reload.</p>
+            <p>{loadError}</p>
+            <p>Run the pipeline (writes web/public/data/) or `npm run mock` (writes web/public/mock/), then reload.</p>
           </div>
         ) : needsData && !core ? (
           <Loading label="Loading danger profiles and Earth matches…" />
