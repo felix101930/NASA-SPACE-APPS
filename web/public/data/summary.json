@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_utc": "2026-11-14T19:51:56Z",
+  "generated_utc": "2026-11-14T19:54:31Z",
   "pipeline_version": "match-0.1.0",
   "sources": [
    {
@@ -78,14 +78,14 @@
   },
   "ranking_method": "rehearsability = 1 / (1 + mean best distance + 0.5 × Σ max(0, best distance − 1.0)) over the 3 hazards; distance 1 ≈ one Moon-region IQR off",
   "runtimes": {
-   "moon_ref_s": 0.0,
-   "earth_feats_s": 0.0,
-   "matching_s": 0.5,
-   "windows_s": 0.0,
-   "weight_stability_s": 0.3,
-   "classifier_s": 0.0,
-   "synthetic_tests_s": 0.0,
-   "total_s": 0.8
+   "moon_ref_s": 8.8,
+   "earth_feats_s": 7.5,
+   "matching_s": 0.0,
+   "windows_s": 32.9,
+   "weight_stability_s": 0.2,
+   "classifier_s": 25.9,
+   "synthetic_tests_s": 0.8,
+   "total_s": 76.3
   }
  },
  "ranking": [
@@ -267,10 +267,9 @@
    "recomputed_stage1_auc_original13": 0.803,
    "recomputed_stage1_n": {
     "known": 13,
-    "decoy": 9,
-    "heldout_documented": 0
+    "decoy": 9
    },
-   "recomputed_stage1_auc_with_heldout_documented": 0.803,
+   "heldout_documented_note": "7 held-out documented analogs exist but none has a stage-1 rank yet; AUC uses the original 13 only",
    "source": "recomputed here from data/interim/earth/stage1_ranking.json best ranks (original 13 known analogs vs decoys); method.json/screen_report.json not yet written",
    "final_30m_auc": null,
    "final_30m_n": {
@@ -278,7 +277,7 @@
     "decoy": 0
    },
    "final_30m_note": "no decoys in the current earth_sites.json snapshot; final-stage AUC not computable",
-   "positive_set": "original 13 hand-listed known analogs (role heldout_positive) + held-out documented analogs (split=holdout) where reported"
+   "positive_set": "original 13 hand-listed known analogs (role heldout_positive)"
   },
   "weight_stability_jaccard": 0.911,
   "weight_stability_detail": {

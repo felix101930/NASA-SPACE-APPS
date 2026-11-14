@@ -130,10 +130,14 @@ def known_vs_decoy(val_ranks: dict) -> tuple[float | None, dict]:
         detail["recomputed_stage1_auc_original13"] = _auc(kn, de)
         detail["recomputed_stage1_n"] = {"known": len(kn), "decoy": len(de)}
         ext = _heldout_documented_ids()
-        if ext:
+        n_ext = sum(1 for i in ext if best.get(i))
+        if n_ext:
             kx = kn + [best[i] for i in ext if best.get(i)]
             detail["recomputed_stage1_auc_with_heldout_documented"] = _auc(kx, de)
-            detail["recomputed_stage1_n"]["heldout_documented"] = sum(1 for i in ext if best.get(i))
+            detail["recomputed_stage1_n"]["heldout_documented"] = n_ext
+        elif ext:
+            detail["heldout_documented_note"] = (f"{len(ext)} held-out documented analogs exist but none has a "
+                                                 "stage-1 rank yet; AUC uses the original 13 only")
         if src_auc is None:
             src_auc = detail["recomputed_stage1_auc_original13"]
             detail["source"] = ("recomputed here from data/interim/earth/stage1_ranking.json best ranks "

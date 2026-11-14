@@ -336,6 +336,19 @@ def make_lights(moon: dict, site: dict, hazard: str) -> list[dict]:
     return lights
 
 
+def clean_lith(lith: str | None) -> str | None:
+    """Readable lithology from Macrostrat strings like 'major:: {schist},minor:: {psammite, pelite}'."""
+    import re
+    if not lith:
+        return None
+    t = str(lith)
+    m = re.search(r"major::\s*\{([^}]*)\}", t)
+    if m:
+        t = m.group(1)
+    t = re.sub(r"[{}]|\w+::", "", t).strip(" ,;")
+    return t.lower() or None
+
+
 def make_texts(moon: dict, site: dict, feat: dict | None, hazard: str, lights: list[dict]) -> tuple[list[str], list[str]]:
     good, bad = [], []
     for li in lights:
@@ -354,10 +367,11 @@ def make_texts(moon: dict, site: dict, feat: dict | None, hazard: str, lights: l
     elif site.get("bare_frac") is not None and site.get("dsm_safe") is not False:
         good.append(f"Mostly open ground ({site.get('worldcover_note') or f'bare {100 * site['bare_frac']:.0f}%'})")
     rock = site.get("rock") or {}
+    lith = clean_lith(rock.get("lith"))
     if rock.get("anorthosite"):
         good.append("Anorthosite bedrock, like the lunar highlands")
-    elif rock.get("lith"):
-        bad.append(f"Rock is {rock['lith'].lower()} (Macrostrat), not the anorthosite of the lunar highlands: "
+    elif lith:
+        bad.append(f"Rock is {lith} (Macrostrat), not the anorthosite of the lunar highlands: "
                    "colour, brightness and grain differ")
     else:
         bad.append("Rock type unknown here; the Moon south pole is anorthosite highland")
