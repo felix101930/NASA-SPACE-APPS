@@ -148,3 +148,10 @@ __all__ = [
     "slope_deg", "sun_path_moon", "sun_visible_fraction", "texture_stats",
     "time_weighted_shadow_fraction", "time_weighted_visibility", "to_grid",
 ]
+
+# Extra features (shape + brightness); appended, see docs/features-extra.md.
+from .shape import SHAPE_HAZARD_KEYS, quantile_distance, shape_features, w1_quantiles  # noqa: E402
+from .brightness import (  # noqa: E402
+    brightness_distance, brightness_rank_feature, earth_brightness, earth_brightness_batch, earth_reference,
+    moon_brightness, moon_reference,
+)

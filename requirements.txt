@@ -12,3 +12,4 @@ requests
 pytest
 py-eodms-rapi
 pyshp
+pyhdf
