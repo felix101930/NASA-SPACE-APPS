@@ -297,4 +297,13 @@ def walk_findback() -> dict | None:
         log.warning("findback.json unreadable (%s); walk_findback omitted", exc)
         return None
     out = {k: _find_key(d, k) for k in ("winner", "top1", "top5", "n_routes")}
+    # findback.json keeps top1/top5 per matcher; report the winner's scores plus the app-default DTW for contrast.
+    matchers = d.get("matchers") if isinstance(d, dict) else None
+    if isinstance(matchers, list):
+        by_name = {m.get("name"): m for m in matchers if isinstance(m, dict)}
+        win = by_name.get(out.get("winner"))
+        if win is not None:
+            out["top1"], out["top5"] = win.get("top1"), win.get("top5")
+        if "dtw_slope" in by_name:
+            out["dtw_top1"] = by_name["dtw_slope"].get("top1")
     return out if any(v is not None for v in out.values()) else None

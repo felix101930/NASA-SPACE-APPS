@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_utc": "2026-11-14T20:01:18Z",
+  "generated_utc": "2026-11-14T20:01:43Z",
   "pipeline_version": "match-0.1.0",
   "sources": [
    {
@@ -88,10 +88,10 @@
    "earth_feats_s": 0.0,
    "matching_s": 1.3,
    "windows_s": 0.0,
-   "weight_stability_s": 2.1,
+   "weight_stability_s": 2.6,
    "classifier_s": 0.0,
    "synthetic_tests_s": 0.0,
-   "total_s": 3.5
+   "total_s": 4.0
   }
  },
  "ranking": [
@@ -860,9 +860,10 @@
   },
   "walk_findback": {
    "winner": "euclid_height_slope",
-   "top1": null,
-   "top5": null,
-   "n_routes": 300
+   "top1": 0.7733,
+   "top5": 0.8633,
+   "n_routes": 300,
+   "dtw_top1": 0.39
   }
  },
  "notes": {
