@@ -1,7 +1,18 @@
 import { lazy, Suspense, useEffect, useRef, useState, type JSX } from 'react';
-import { loadJson, loadOptionalJson, onMockUsed } from './data/loader';
+import { loadJson, loadJsonFrom, loadOptionalJson, onMockUsed, type Loaded, type Origin } from './data/loader';
 import { buildCore, SCREENS, useApp, type ScreenId } from './store';
-import { isEarthSitesFile, isMatchesFile, isOverviewFile, isRegionsFile, isSummaryFile } from './types/contract';
+import {
+  isEarthSitesFile,
+  isMatchesFile,
+  isMethodFile,
+  isOverviewFile,
+  isRegionsFile,
+  isSummaryFile,
+  type EarthSitesFile,
+  type MatchesFile,
+  type MethodFile,
+  type SummaryFile,
+} from './types/contract';
 import { Loading } from './components/Loading';
 import { Story } from './screens/Story';
 import { MoonOverview } from './screens/MoonOverview';
@@ -11,6 +22,7 @@ import { Summary } from './screens/Summary';
 // Heavy screens (three.js, worker) load on demand.
 const Terrain3D = lazy(() => import('./screens/Terrain3D'));
 const Walk = lazy(() => import('./screens/Walk'));
+const AlbertaCalgary = lazy(() => import('./screens/AlbertaCalgary'));
 
 /** Groups mock file paths: JSON files by name, tiles and images by folder with a count. */
 function groupMock(files: string[]): string[] {
@@ -80,9 +92,9 @@ function TopBar(): JSX.Element {
   const mockFiles = useApp((s) => s.mockFiles);
   return (
     <header className="topbar">
-      <button className="brand" onClick={(): void => setScreen('story')} aria-label="Rehearse the Landing, back to start">
+      <button className="brand" onClick={(): void => setScreen('story')} aria-label="Moon on Earth, back to start">
         <span className="brand-mark" aria-hidden="true" />
-        <span className="brand-text">Rehearse the Landing</span>
+        <span className="brand-text">Moon on Earth</span>
       </button>
       <nav className="stepper" aria-label="Story steps">
         {SCREENS.map((s, i) => (
@@ -96,6 +108,38 @@ function TopBar(): JSX.Element {
       <div className="topbar-right">{mockFiles.length > 0 && <SampleDataChip files={mockFiles} />}</div>
     </header>
   );
+}
+
+interface DependentSet {
+  origin: Origin;
+  sites: Loaded<EarthSitesFile>;
+  matches: Loaded<MatchesFile>;
+  summary: Loaded<SummaryFile> | null;
+  method: Loaded<MethodFile> | null;
+}
+
+/**
+ * earth_sites, matches, summary and method join on site and region ids, so they must come from the same place.
+ * Use data/ only when all four exist there; until the pipeline has written every one of them, use mock/ for all.
+ */
+async function loadDependentSet(): Promise<DependentSet> {
+  const [sites, matches, summary, method] = await Promise.all([
+    loadJsonFrom('earth_sites.json', isEarthSitesFile, 'data'),
+    loadJsonFrom('matches.json', isMatchesFile, 'data'),
+    loadJsonFrom('summary.json', isSummaryFile, 'data'),
+    loadJsonFrom('method.json', isMethodFile, 'data'),
+  ]);
+  if (sites && matches && summary && method) return { origin: 'data', sites, matches, summary, method };
+  const [mSites, mMatches, mSummary, mMethod] = await Promise.all([
+    loadJsonFrom('earth_sites.json', isEarthSitesFile, 'mock'),
+    loadJsonFrom('matches.json', isMatchesFile, 'mock'),
+    loadJsonFrom('summary.json', isSummaryFile, 'mock'),
+    loadJsonFrom('method.json', isMethodFile, 'mock'),
+  ]);
+  if (!mSites || !mMatches) {
+    throw new Error('earth_sites.json and matches.json are missing from both data/ and mock/ (run the pipeline or `npm run mock`).');
+  }
+  return { origin: 'mock', sites: mSites, matches: mMatches, summary: mSummary, method: mMethod };
 }
 
 function ScreenSwitch({ screen }: { screen: ScreenId }): JSX.Element {
@@ -112,6 +156,8 @@ function ScreenSwitch({ screen }: { screen: ScreenId }): JSX.Element {
       return <Walk />;
     case 'summary':
       return <Summary />;
+    case 'alberta':
+      return <AlbertaCalgary />;
   }
 }
 
@@ -125,14 +171,14 @@ export function App(): JSX.Element {
     let cancelled = false;
     (async (): Promise<void> => {
       try {
-        const [regions, sites, matches, summary, overview] = await Promise.all([
+        const [regions, overview, set] = await Promise.all([
           loadJson('regions.json', isRegionsFile),
-          loadJson('earth_sites.json', isEarthSitesFile),
-          loadJson('matches.json', isMatchesFile),
-          loadOptionalJson('summary.json', isSummaryFile),
           loadOptionalJson('overview.json', isOverviewFile),
+          loadDependentSet(),
         ]);
-        if (!cancelled) useApp.getState().setCore(buildCore(regions, sites, matches, summary, overview));
+        if (!cancelled) {
+          useApp.getState().setCore(buildCore(regions, set.sites, set.matches, set.summary, overview, set.method, set.origin));
+        }
       } catch (e: unknown) {
         if (!cancelled) useApp.getState().setLoadError(e instanceof Error ? e.message : String(e));
       }
@@ -175,8 +221,11 @@ export function App(): JSX.Element {
         )}
       </main>
       <footer className="footer">
-        <span>NASA Space Apps 2026 · Earth analogs for the Artemis south-pole candidate regions</span>
-        <span>Moon: LOLA / PGDA · Earth: Copernicus GLO-30, ESA WorldCover, Macrostrat · Maps © OpenStreetMap, OpenFreeMap</span>
+        <span>Moon on Earth · NASA Space Apps 2026 · Earth analogs for the Artemis south-pole candidate regions</span>
+        <span>
+          Moon: LOLA / PGDA · Earth: Copernicus GLO-30, ESA WorldCover, Macrostrat · Calgary: City of Calgary Open Data, Equity Index 2024,
+          NRCan HRDEM · Maps © OpenStreetMap, OpenFreeMap
+        </span>
       </footer>
     </div>
   );

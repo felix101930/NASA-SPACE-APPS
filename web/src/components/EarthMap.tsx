@@ -21,10 +21,17 @@ export interface MapLine {
 }
 
 // OpenFreeMap's dark vector style keeps the basemap quiet so the pins carry the screen.
-const STYLE = 'https://tiles.openfreemap.org/styles/dark';
+export const DARK_STYLE = 'https://tiles.openfreemap.org/styles/dark';
 
 /** Small paint overrides so the basemap sits on the app's own surface colours. */
-function tuneDarkStyle(map: MlMap): void {
+/** The dark style references a few pattern sprites it doesn't ship; give them a transparent pixel. */
+export function resolveMissingImages(map: MlMap): void {
+  map.setMissingStyleImageResolver((id: string): void => {
+    if (!map.hasImage(id)) map.addImage(id, { width: 1, height: 1, data: new Uint8Array(4) });
+  });
+}
+
+export function tuneDarkStyle(map: MlMap): void {
   if (map.getLayer('background')) map.setPaintProperty('background', 'background-color', '#121419');
   if (map.getLayer('water')) map.setPaintProperty('water', 'fill-color', '#0b0d11');
   for (const id of ['landcover_glacier', 'landcover_ice_shelf']) {
@@ -54,7 +61,7 @@ export function EarthMap({ points, lines = [], onSelect, fitKey, maxZoom = 6 }: 
     try {
       map = new MlMap({
         container: box.current,
-        style: STYLE,
+        style: DARK_STYLE,
         center: [0, 20],
         zoom: 1.2,
         attributionControl: { compact: true },
@@ -76,9 +83,7 @@ export function EarthMap({ points, lines = [], onSelect, fitKey, maxZoom = 6 }: 
     ro.observe(box.current);
     map.on('error', (): void => undefined);
     // The dark style references a few pattern sprites it doesn't ship; give them a transparent pixel.
-    map.setMissingStyleImageResolver((id: string): void => {
-      if (!map.hasImage(id)) map.addImage(id, { width: 1, height: 1, data: new Uint8Array(4) });
-    });
+    resolveMissingImages(map);
     mapRef.current = map;
     return (): void => {
       ro.disconnect();

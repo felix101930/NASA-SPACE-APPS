@@ -1,0 +1,1112 @@
+{
+ "meta": {
+  "generated_utc": "2026-11-14T19:51:56Z",
+  "pipeline_version": "match-0.1.0",
+  "sources": [
+   {
+    "name": "LOLA 20 m/px south-pole DEM (PGDA product 90), LDEM_80S_20MPP_ADJ + _ERR; LDEM_60S_240MPP_ADJ far field",
+    "url": "https://pgda.gsfc.nasa.gov/products/90",
+    "licence": "NASA data, public domain (US Government work); cite data paper",
+    "citation": "Barker, M.K. et al. (2023) A New View of the Lunar South Pole from the Lunar Orbiter Laser Altimeter (LOLA). PSJ 4:183, doi:10.3847/PSJ/acf3e1"
+   },
+   {
+    "name": "High-resolution LOLA topography for lunar south pole sites (PGDA product 78): site tile extents used for region centres",
+    "url": "https://pgda.gsfc.nasa.gov/products/78",
+    "licence": "NASA data, public domain (US Government work); cite data paper",
+    "citation": "Barker, M.K. et al. (2021) Improved LOLA elevation maps for south pole landing sites: error estimates and their impact on illumination conditions. PSS 203:105119, doi:10.1016/j.pss.2020.105119"
+   },
+   {
+    "name": "Lunar polar illumination, AVGVISIB_85S_060M_201608 (PGDA product 69), validation only",
+    "url": "https://pgda.gsfc.nasa.gov/products/69",
+    "licence": "NASA data, public domain (US Government work); cite data paper",
+    "citation": "Mazarico, E. et al. (2011) Illumination conditions of the lunar polar regions using LOLA topography. Icarus 211:1066-1081, doi:10.1016/j.icarus.2010.10.030"
+   },
+   {
+    "name": "NASA Artemis III candidate landing regions map (Oct 28 2024), traced region boxes",
+    "url": "https://www.nasa.gov/wp-content/uploads/2024/10/artemis-iii-landing-region-candidates.jpg",
+    "licence": "NASA media, not copyrighted (NASA/GSFC/ASU/JSC/AGDT credit)",
+    "citation": "NASA (2024) NASA Provides Update on Artemis III Moon Landing Regions, https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+   },
+   {
+    "name": "IAU/USGS Gazetteer of Planetary Nomenclature (feature centres, sanity checks)",
+    "url": "https://planetarynames.wr.usgs.gov/",
+    "licence": "USGS, public domain",
+    "citation": "Gazetteer of Planetary Nomenclature, IAU WGPSN / USGS Astrogeology Science Center"
+   },
+   {
+    "name": "Copernicus DEM GLO-30 / GLO-90",
+    "url": "https://registry.opendata.aws/copernicus-dem/",
+    "licence": "Copernicus DEM licence (free, attribution required)",
+    "citation": "© DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+   },
+   {
+    "name": "ESA WorldCover 10 m 2021 v200",
+    "url": "https://esa-worldcover.org/",
+    "licence": "CC-BY 4.0",
+    "citation": "Zanaga, D., Van De Kerchove, R., Daems, D., De Keersmaecker, W., Brockmann, C., Kirches, G., Wevers, J., Cartus, O., Santoro, M., Fritz, S., Lesiv, M., Herold, M., Tsendbazar, N.E., Xu, P., Ramoino, F., Arino, O. (2022). ESA WorldCover 10 m 2021 v200. https://doi.org/10.5281/zenodo.7254221"
+   },
+   {
+    "name": "Macrostrat geologic map units",
+    "url": "https://macrostrat.org/api/v2/geologic_units/map",
+    "licence": "CC-BY 4.0",
+    "citation": "Peters, S.E., Husson, J.M., Czaplewski, J. (2018). Macrostrat: a platform for geological data integration and deep-time Earth crust research. G-cubed 19. https://doi.org/10.1029/2018GC007467"
+   },
+   {
+    "name": "NASA GIBS HLS S30 (imagery basemap)",
+    "url": "https://nasa-gibs.github.io/gibs-api-docs/",
+    "licence": "NASA open data",
+    "citation": "Imagery courtesy of NASA Global Imagery Browse Services (GIBS), HLS Sentinel-2 surface reflectance."
+   },
+   {
+    "name": "Astropy (get_sun, AltAz refraction)",
+    "url": "https://www.astropy.org/",
+    "licence": "BSD-3-Clause",
+    "citation": "Astropy Collaboration (2022), ApJ 935:167, doi:10.3847/1538-4357/ac7c74"
+   },
+   {
+    "name": "Classifier two-sample test",
+    "url": "https://arxiv.org/abs/1610.06545",
+    "licence": "n/a (method)",
+    "citation": "Lopez-Paz, D., Oquab, M. (2017). Revisiting Classifier Two-Sample Tests. ICLR 2017."
+   }
+  ],
+  "earth_sites_snapshot": {
+   "generated_utc": "2026-11-14T19:06:48Z",
+   "pipeline_version": "earth-0.2",
+   "partial": true,
+   "sig": "2f279d5cf8fd266c"
+  },
+  "ranking_method": "rehearsability = 1 / (1 + mean best distance + 0.5 × Σ max(0, best distance − 1.0)) over the 3 hazards; distance 1 ≈ one Moon-region IQR off",
+  "runtimes": {
+   "moon_ref_s": 0.0,
+   "earth_feats_s": 0.0,
+   "matching_s": 0.5,
+   "windows_s": 0.0,
+   "weight_stability_s": 0.3,
+   "classifier_s": 0.0,
+   "synthetic_tests_s": 0.0,
+   "total_s": 0.8
+  }
+ },
+ "ranking": [
+  {
+   "region_id": "slater_plain",
+   "rank": 1,
+   "region_name": "Slater Plain",
+   "rehearsability": 0.7862,
+   "per_hazard_best_distance": {
+    "shadow": 0.1859,
+    "rim": 0.372,
+    "texture": 0.2578
+   },
+   "per_hazard_best_site": {
+    "shadow": "S00241",
+    "rim": "S01056",
+    "texture": "S00241"
+   },
+   "weakest_hazard": "rim",
+   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: Screen window S01056, 0.37 Moon-IQRs off)."
+  },
+  {
+   "region_id": "mons_mouton_plateau",
+   "rank": 2,
+   "region_name": "Mons Mouton Plateau",
+   "rehearsability": 0.7717,
+   "per_hazard_best_distance": {
+    "shadow": 0.2333,
+    "rim": 0.5147,
+    "texture": 0.1396
+   },
+   "per_hazard_best_site": {
+    "shadow": "S00255",
+    "rim": "S01056",
+    "texture": "S01100"
+   },
+   "weakest_hazard": "rim",
+   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: Screen window S01056, 0.51 Moon-IQRs off)."
+  },
+  {
+   "region_id": "nobile_rim_2",
+   "rank": 3,
+   "region_name": "Nobile Rim 2",
+   "rehearsability": 0.7468,
+   "per_hazard_best_distance": {
+    "shadow": 0.2333,
+    "rim": 0.541,
+    "texture": 0.2428
+   },
+   "per_hazard_best_site": {
+    "shadow": "S00356",
+    "rim": "S00241",
+    "texture": "S01095"
+   },
+   "weakest_hazard": "rim",
+   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: Screen window S00241, 0.54 Moon-IQRs off)."
+  },
+  {
+   "region_id": "haworth",
+   "rank": 4,
+   "region_name": "Haworth",
+   "rehearsability": 0.7016,
+   "per_hazard_best_distance": {
+    "shadow": 0.4481,
+    "rim": 0.4275,
+    "texture": 0.4004
+   },
+   "per_hazard_best_site": {
+    "shadow": "S00241",
+    "rim": "S00356",
+    "texture": "S01100"
+   },
+   "weakest_hazard": "shadow",
+   "reason": "All three hazards have a close Earth match; the weakest is low-sun shadows (best: Screen window S00241, 0.45 Moon-IQRs off)."
+  },
+  {
+   "region_id": "mons_mouton",
+   "rank": 5,
+   "region_name": "Mons Mouton",
+   "rehearsability": 0.6969,
+   "per_hazard_best_distance": {
+    "shadow": 0.3311,
+    "rim": 0.6954,
+    "texture": 0.2783
+   },
+   "per_hazard_best_site": {
+    "shadow": "S00356",
+    "rim": "S01026",
+    "texture": "S01158"
+   },
+   "weakest_hazard": "rim",
+   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: Screen window S01026, 0.70 Moon-IQRs off)."
+  },
+  {
+   "region_id": "nobile_rim_1",
+   "rank": 6,
+   "region_name": "Nobile Rim 1",
+   "rehearsability": 0.6897,
+   "per_hazard_best_distance": {
+    "shadow": 0.5795,
+    "rim": 0.6402,
+    "texture": 0.1298
+   },
+   "per_hazard_best_site": {
+    "shadow": "S00356",
+    "rim": "S01191",
+    "texture": "S01095"
+   },
+   "weakest_hazard": "rim",
+   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: Screen window S01191, 0.64 Moon-IQRs off)."
+  },
+  {
+   "region_id": "de_gerlache_rim_2",
+   "rank": 7,
+   "region_name": "de Gerlache Rim 2",
+   "rehearsability": 0.6351,
+   "per_hazard_best_distance": {
+    "shadow": 0.9581,
+    "rim": 0.368,
+    "texture": 0.3977
+   },
+   "per_hazard_best_site": {
+    "shadow": "S00241",
+    "rim": "S00239",
+    "texture": "S01158"
+   },
+   "weakest_hazard": "shadow",
+   "reason": "All three hazards have a close Earth match; the weakest is low-sun shadows (best: Screen window S00241, 0.96 Moon-IQRs off)."
+  },
+  {
+   "region_id": "malapert_massif",
+   "rank": 8,
+   "region_name": "Malapert Massif",
+   "rehearsability": 0.5404,
+   "per_hazard_best_distance": {
+    "shadow": 1.2778,
+    "rim": 0.6662,
+    "texture": 0.191
+   },
+   "per_hazard_best_site": {
+    "shadow": "S00241",
+    "rim": "S01152",
+    "texture": "S00239"
+   },
+   "weakest_hazard": "shadow",
+   "reason": "No close Earth match for low-sun shadows; weakest is low-sun shadows (best: Screen window S00241, 1.28 Moon-IQRs off)."
+  },
+  {
+   "region_id": "cabeus_b_peak",
+   "rank": 9,
+   "region_name": "Peak near Cabeus B",
+   "rehearsability": 0.339,
+   "per_hazard_best_distance": {
+    "shadow": 2.5641,
+    "rim": 0.6875,
+    "texture": 0.2521
+   },
+   "per_hazard_best_site": {
+    "shadow": "S00241",
+    "rim": "S01026",
+    "texture": "S00366"
+   },
+   "weakest_hazard": "shadow",
+   "reason": "No close Earth match for low-sun shadows; weakest is low-sun shadows (best: Screen window S00241, 2.56 Moon-IQRs off)."
+  }
+ ],
+ "validation": {
+  "shadow_vs_pgda": {
+   "pearson_r": 0.9794,
+   "mae": 0.0273,
+   "bias": -0.0251,
+   "n_px": 375000,
+   "region_mean_pearson_r": 0.9977,
+   "n_regions": 6,
+   "note": "Pixelwise at 60 m over the 15 km cores of regions inside 85-90S; ours = mean solar-disk visibility over an approximate 18.6-yr sun path (declination 1.54°·sin(phase), 11 520 directions, solar disk 0.27°) from LOLA 20 m (PGDA 90) horizons; PGDA = AVGVISIB_85S_060M_201608 (Mazarico et al. 2011, hourly 18.6 yr, older LOLA DEM). bias = ours − PGDA (visibility, 0..1)."
+  },
+  "known_vs_decoy_auc": 0.803,
+  "known_vs_decoy_detail": {
+   "recomputed_stage1_auc_original13": 0.803,
+   "recomputed_stage1_n": {
+    "known": 13,
+    "decoy": 9,
+    "heldout_documented": 0
+   },
+   "recomputed_stage1_auc_with_heldout_documented": 0.803,
+   "source": "recomputed here from data/interim/earth/stage1_ranking.json best ranks (original 13 known analogs vs decoys); method.json/screen_report.json not yet written",
+   "final_30m_auc": null,
+   "final_30m_n": {
+    "known": 13,
+    "decoy": 0
+   },
+   "final_30m_note": "no decoys in the current earth_sites.json snapshot; final-stage AUC not computable",
+   "positive_set": "original 13 hand-listed known analogs (role heldout_positive) + held-out documented analogs (split=holdout) where reported"
+  },
+  "weight_stability_jaccard": 0.911,
+  "weight_stability_detail": {
+   "mean": 0.911,
+   "n_draws": 200,
+   "jitter": "±20%",
+   "seed": 20261115,
+   "least_stable": [
+    {
+     "search": "nobile_rim_2|rim",
+     "jaccard": 0.688
+    },
+    {
+     "search": "mons_mouton|shadow",
+     "jaccard": 0.767
+    },
+    {
+     "search": "malapert_massif|rim",
+     "jaccard": 0.772
+    }
+   ]
+  },
+  "classifier_two_sample": {
+   "per_region_auc": {
+    "cabeus_b_peak": 0.986,
+    "haworth": 0.931,
+    "malapert_massif": 0.974,
+    "mons_mouton_plateau": 0.929,
+    "mons_mouton": 0.935,
+    "nobile_rim_1": 0.956,
+    "nobile_rim_2": 0.922,
+    "de_gerlache_rim_2": 0.968,
+    "slater_plain": 0.964
+   },
+   "top_features": [
+    {
+     "feature": "curvature_std_per_km",
+     "importance": 0.0944
+    },
+    {
+     "feature": "roughness_m",
+     "importance": 0.0458
+    },
+    {
+     "feature": "slope_p90_deg",
+     "importance": 0.0448
+    },
+    {
+     "feature": "jump1km_p95_m",
+     "importance": 0.0421
+    },
+    {
+     "feature": "relief_m",
+     "importance": 0.0342
+    },
+    {
+     "feature": "slope_mean_deg",
+     "importance": 0.0058
+    }
+   ],
+   "per_pair": [
+    {
+     "region_id": "cabeus_b_peak",
+     "hazard": "shadow",
+     "site_id": "S00241",
+     "auc": 0.99,
+     "lr_auc": 0.966,
+     "rf_auc": 0.99,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "cabeus_b_peak",
+     "hazard": "rim",
+     "site_id": "S01026",
+     "auc": 0.982,
+     "lr_auc": 0.956,
+     "rf_auc": 0.982,
+     "top_feature": "roughness_m"
+    },
+    {
+     "region_id": "cabeus_b_peak",
+     "hazard": "texture",
+     "site_id": "S00366",
+     "auc": 0.985,
+     "lr_auc": 0.985,
+     "rf_auc": 0.981,
+     "top_feature": "jump1km_p95_m"
+    },
+    {
+     "region_id": "haworth",
+     "hazard": "shadow",
+     "site_id": "S00241",
+     "auc": 0.936,
+     "lr_auc": 0.696,
+     "rf_auc": 0.936,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "haworth",
+     "hazard": "rim",
+     "site_id": "S00356",
+     "auc": 0.916,
+     "lr_auc": 0.832,
+     "rf_auc": 0.916,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "haworth",
+     "hazard": "texture",
+     "site_id": "S01100",
+     "auc": 0.941,
+     "lr_auc": 0.873,
+     "rf_auc": 0.941,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "malapert_massif",
+     "hazard": "shadow",
+     "site_id": "S00241",
+     "auc": 0.971,
+     "lr_auc": 0.906,
+     "rf_auc": 0.971,
+     "top_feature": "relief_m"
+    },
+    {
+     "region_id": "malapert_massif",
+     "hazard": "rim",
+     "site_id": "S01152",
+     "auc": 0.991,
+     "lr_auc": 0.984,
+     "rf_auc": 0.991,
+     "top_feature": "roughness_m"
+    },
+    {
+     "region_id": "malapert_massif",
+     "hazard": "texture",
+     "site_id": "S00239",
+     "auc": 0.96,
+     "lr_auc": 0.939,
+     "rf_auc": 0.96,
+     "top_feature": "roughness_m"
+    },
+    {
+     "region_id": "mons_mouton_plateau",
+     "hazard": "shadow",
+     "site_id": "S00255",
+     "auc": 0.922,
+     "lr_auc": 0.922,
+     "rf_auc": 0.893,
+     "top_feature": "slope_p90_deg"
+    },
+    {
+     "region_id": "mons_mouton_plateau",
+     "hazard": "rim",
+     "site_id": "S01056",
+     "auc": 0.931,
+     "lr_auc": 0.904,
+     "rf_auc": 0.931,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "mons_mouton_plateau",
+     "hazard": "texture",
+     "site_id": "S01100",
+     "auc": 0.934,
+     "lr_auc": 0.88,
+     "rf_auc": 0.934,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "mons_mouton",
+     "hazard": "shadow",
+     "site_id": "S00356",
+     "auc": 0.887,
+     "lr_auc": 0.865,
+     "rf_auc": 0.887,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "mons_mouton",
+     "hazard": "rim",
+     "site_id": "S01026",
+     "auc": 0.921,
+     "lr_auc": 0.826,
+     "rf_auc": 0.921,
+     "top_feature": "roughness_m"
+    },
+    {
+     "region_id": "mons_mouton",
+     "hazard": "texture",
+     "site_id": "S01158",
+     "auc": 0.996,
+     "lr_auc": 0.996,
+     "rf_auc": 0.986,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "nobile_rim_1",
+     "hazard": "shadow",
+     "site_id": "S00356",
+     "auc": 0.946,
+     "lr_auc": 0.927,
+     "rf_auc": 0.946,
+     "top_feature": "jump1km_p95_m"
+    },
+    {
+     "region_id": "nobile_rim_1",
+     "hazard": "rim",
+     "site_id": "S01191",
+     "auc": 1.0,
+     "lr_auc": 1.0,
+     "rf_auc": 0.999,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "nobile_rim_1",
+     "hazard": "texture",
+     "site_id": "S01095",
+     "auc": 0.923,
+     "lr_auc": 0.923,
+     "rf_auc": 0.923,
+     "top_feature": "slope_p90_deg"
+    },
+    {
+     "region_id": "nobile_rim_2",
+     "hazard": "shadow",
+     "site_id": "S00356",
+     "auc": 0.899,
+     "lr_auc": 0.885,
+     "rf_auc": 0.899,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "nobile_rim_2",
+     "hazard": "rim",
+     "site_id": "S00241",
+     "auc": 0.987,
+     "lr_auc": 0.92,
+     "rf_auc": 0.987,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "nobile_rim_2",
+     "hazard": "texture",
+     "site_id": "S01095",
+     "auc": 0.881,
+     "lr_auc": 0.842,
+     "rf_auc": 0.881,
+     "top_feature": "roughness_m"
+    },
+    {
+     "region_id": "de_gerlache_rim_2",
+     "hazard": "shadow",
+     "site_id": "S00241",
+     "auc": 0.966,
+     "lr_auc": 0.881,
+     "rf_auc": 0.966,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "de_gerlache_rim_2",
+     "hazard": "rim",
+     "site_id": "S00239",
+     "auc": 0.942,
+     "lr_auc": 0.918,
+     "rf_auc": 0.942,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "de_gerlache_rim_2",
+     "hazard": "texture",
+     "site_id": "S01158",
+     "auc": 0.996,
+     "lr_auc": 0.996,
+     "rf_auc": 0.99,
+     "top_feature": "slope_p90_deg"
+    },
+    {
+     "region_id": "slater_plain",
+     "hazard": "shadow",
+     "site_id": "S00241",
+     "auc": 0.964,
+     "lr_auc": 0.721,
+     "rf_auc": 0.964,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "slater_plain",
+     "hazard": "rim",
+     "site_id": "S01056",
+     "auc": 0.963,
+     "lr_auc": 0.962,
+     "rf_auc": 0.963,
+     "top_feature": "roughness_m"
+    },
+    {
+     "region_id": "slater_plain",
+     "hazard": "texture",
+     "site_id": "S00241",
+     "auc": 0.964,
+     "lr_auc": 0.721,
+     "rf_auc": 0.964,
+     "top_feature": "curvature_std_per_km"
+    }
+   ],
+   "mean_auc": 0.952,
+   "method": "Lopez-Paz & Oquab (2017) classifier two-sample test on 1 km sub-tiles of the 30 m tiles (each region vs its top-1 Earth site per hazard); logistic regression and a 100-tree depth-4 random forest; StratifiedGroupKFold(6) grouped by 5 km block; reported AUC = the better of the two (out-of-fold); importance = permutation drop in AUC on held-out folds. 0.5 = indistinguishable, 1.0 = trivially separable.",
+   "features": [
+    "slope_mean_deg",
+    "slope_p90_deg",
+    "relief_m",
+    "roughness_m",
+    "jump1km_p95_m",
+    "curvature_std_per_km"
+   ]
+  },
+  "synthetic_tests": [
+   {
+    "name": "test_flat_plane_no_shadow[None]",
+    "passed": true
+   },
+   {
+    "name": "test_flat_plane_no_shadow[1737400.0]",
+    "passed": true
+   },
+   {
+    "name": "test_tilted_plane_flips_at_slope",
+    "passed": true
+   },
+   {
+    "name": "test_cylindrical_pit_analytic[10.0]",
+    "passed": true
+   },
+   {
+    "name": "test_cylindrical_pit_analytic[20.0]",
+    "passed": true
+   },
+   {
+    "name": "test_curvature_hides_distant_wall",
+    "passed": true
+   },
+   {
+    "name": "test_far_field_georeferencing_matches_single_grid",
+    "passed": true
+   },
+   {
+    "name": "test_disk_and_time_weighted",
+    "passed": true
+   },
+   {
+    "name": "test_sun_path_moon",
+    "passed": true
+   },
+   {
+    "name": "test_step_edge_rim_jump",
+    "passed": true
+   },
+   {
+    "name": "test_fast_flat_vs_random",
+    "passed": true
+   },
+   {
+    "name": "test_hillshade_cast_shadow_dark",
+    "passed": true
+   },
+   {
+    "name": "test_roughness_plane_and_fractal",
+    "passed": true
+   },
+   {
+    "name": "test_resample_preserves_mean",
+    "passed": true
+   },
+   {
+    "name": "test_profile_linear_ramp",
+    "passed": true
+   },
+   {
+    "name": "test_compute_all_contract_keys",
+    "passed": true
+   }
+  ],
+  "where_it_fails": [
+   "Boulders smaller than ~30 m are invisible: both worlds are compared on a 30 m grid",
+   "Earth skylight fills shadows; lunar shadows are pitch black, so shadow contrast is understated on Earth",
+   "Vegetation and buildings sit inside the Copernicus surface model; we mask them with ESA WorldCover (DSM-safe filter) but low shrubs and grass remain",
+   "Atmospheric refraction near the horizon: windows with the sun below 1° are refraction-sensitive (a few tenths of a degree can shift them by minutes)",
+   "Low sun lasts minutes on Earth but days on the Moon, so rehearsal windows are short",
+   "The Earth search covers only ~5–6% of the planet's bare land (a seeded sample of 15 km windows), so better analogs may exist unsampled",
+   "Metrics describe terrain shape and lighting geometry only, not regolith, rock strength or dust"
+  ],
+  "earth_coverage_pct_bare": "5–6",
+  "earth_coverage_source": "data/interim/earth/screen_draw_stats.json coverage.pct_of_bare_land_range",
+  "heldout_ranks": {
+   "EP001": {
+    "role": "heldout_positive",
+    "name": "Haughton impact crater (Devon Is.)",
+    "best_rank": 8,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 4.052,
+    "n_pool": 49
+   },
+   "EP002": {
+    "role": "heldout_positive",
+    "name": "Meteor (Barringer) Crater",
+    "best_rank": 25,
+    "best_search": "haworth|rim",
+    "best_distance": 1.4261,
+    "n_pool": 49
+   },
+   "EP003": {
+    "role": "heldout_positive",
+    "name": "Mistastin crater",
+    "best_rank": 2,
+    "best_search": "haworth|texture",
+    "best_distance": 0.4058,
+    "n_pool": 49
+   },
+   "EP004": {
+    "role": "heldout_positive",
+    "name": "Death Valley (Badwater Basin)",
+    "best_rank": 5,
+    "best_search": "nobile_rim_1|rim",
+    "best_distance": 0.9394,
+    "n_pool": 49
+   },
+   "EP005": {
+    "role": "heldout_positive",
+    "name": "Craters of the Moon NM",
+    "best_rank": 2,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 3.3574,
+    "n_pool": 49
+   },
+   "EP007": {
+    "role": "heldout_positive",
+    "name": "McMurdo Dry Valleys (Taylor Valley)",
+    "best_rank": 20,
+    "best_search": "nobile_rim_1|rim",
+    "best_distance": 1.6779,
+    "n_pool": 49
+   },
+   "EP008": {
+    "role": "heldout_positive",
+    "name": "Atacama (Salar de Atacama)",
+    "best_rank": 25,
+    "best_search": "malapert_massif|shadow",
+    "best_distance": 3.1582,
+    "n_pool": 49
+   },
+   "EP009": {
+    "role": "heldout_positive",
+    "name": "Sudbury Basin",
+    "best_rank": 14,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 5.2164,
+    "n_pool": 49
+   },
+   "EP010": {
+    "role": "heldout_positive",
+    "name": "Pinacate Peaks / Gran Desierto",
+    "best_rank": 1,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 1.9492,
+    "n_pool": 49
+   },
+   "EP011": {
+    "role": "heldout_positive",
+    "name": "Askja caldera",
+    "best_rank": 2,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 3.0384,
+    "n_pool": 49
+   },
+   "EP012": {
+    "role": "heldout_positive",
+    "name": "Kilauea summit (Hawai'i)",
+    "best_rank": 9,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 4.2826,
+    "n_pool": 49
+   },
+   "EP013": {
+    "role": "heldout_positive",
+    "name": "Sunset Crater / Cinder Lake",
+    "best_rank": 2,
+    "best_search": "mons_mouton_plateau|rim",
+    "best_distance": 0.787,
+    "n_pool": 49
+   },
+   "EP014": {
+    "role": "heldout_positive",
+    "name": "Kilbourne Hole",
+    "best_rank": 24,
+    "best_search": "haworth|texture",
+    "best_distance": 0.9662,
+    "n_pool": 49
+   }
+  }
+ },
+ "notes": {
+  "novelty_rule": "Each region x hazard top 3 must be >= 50 km from each other and >= 50 km from every catalogued analog site (every row with coordinates in data/literature_analogs.csv plus the known_analog rows of data/earth_candidates.csv). Greedy pick down the ranked list; if fewer than 3 qualify, the search keeps what qualifies and reports novelty_shortfall (rule never relaxed).",
+  "novelty_shortfall_searches": [],
+  "best_documented": {
+   "cabeus_b_peak|shadow": {
+    "site_id": "EP010",
+    "name": "Pinacate Peaks / Gran Desierto",
+    "country": "Mexico",
+    "lat": 31.77,
+    "lon": -113.49,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 1.9492,
+    "would_rank": 1,
+    "n_pool": 49
+   },
+   "cabeus_b_peak|rim": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 1.0414,
+    "would_rank": 15,
+    "n_pool": 49
+   },
+   "cabeus_b_peak|texture": {
+    "site_id": "EP013",
+    "name": "Sunset Crater / Cinder Lake",
+    "country": "USA",
+    "lat": 35.3644,
+    "lon": -111.5036,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.9949,
+    "would_rank": 14,
+    "n_pool": 49
+   },
+   "haworth|shadow": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.5598,
+    "would_rank": 3,
+    "n_pool": 49
+   },
+   "haworth|rim": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.5261,
+    "would_rank": 4,
+    "n_pool": 49
+   },
+   "haworth|texture": {
+    "site_id": "EP003",
+    "name": "Mistastin crater",
+    "country": "Canada",
+    "lat": 55.8833,
+    "lon": -63.3,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.4058,
+    "would_rank": 2,
+    "n_pool": 49
+   },
+   "malapert_massif|shadow": {
+    "site_id": "EP010",
+    "name": "Pinacate Peaks / Gran Desierto",
+    "country": "Mexico",
+    "lat": 31.77,
+    "lon": -113.49,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 1.115,
+    "would_rank": 1,
+    "n_pool": 49
+   },
+   "malapert_massif|rim": {
+    "site_id": "EP004",
+    "name": "Death Valley (Badwater Basin)",
+    "country": "USA",
+    "lat": 36.2503,
+    "lon": -116.8258,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 1.1759,
+    "would_rank": 7,
+    "n_pool": 49
+   },
+   "malapert_massif|texture": {
+    "site_id": "EP003",
+    "name": "Mistastin crater",
+    "country": "Canada",
+    "lat": 55.8833,
+    "lon": -63.3,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.5221,
+    "would_rank": 12,
+    "n_pool": 49
+   },
+   "mons_mouton_plateau|shadow": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.2903,
+    "would_rank": 3,
+    "n_pool": 49
+   },
+   "mons_mouton_plateau|rim": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.7478,
+    "would_rank": 2,
+    "n_pool": 49
+   },
+   "mons_mouton_plateau|texture": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.3326,
+    "would_rank": 7,
+    "n_pool": 49
+   },
+   "mons_mouton|shadow": {
+    "site_id": "EP013",
+    "name": "Sunset Crater / Cinder Lake",
+    "country": "USA",
+    "lat": 35.3644,
+    "lon": -111.5036,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.5883,
+    "would_rank": 7,
+    "n_pool": 49
+   },
+   "mons_mouton|rim": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.8936,
+    "would_rank": 11,
+    "n_pool": 49
+   },
+   "mons_mouton|texture": {
+    "site_id": "EP005",
+    "name": "Craters of the Moon NM",
+    "country": "USA",
+    "lat": 43.4617,
+    "lon": -113.5627,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.7331,
+    "would_rank": 15,
+    "n_pool": 49
+   },
+   "nobile_rim_1|shadow": {
+    "site_id": "EP013",
+    "name": "Sunset Crater / Cinder Lake",
+    "country": "USA",
+    "lat": 35.3644,
+    "lon": -111.5036,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.8105,
+    "would_rank": 8,
+    "n_pool": 49
+   },
+   "nobile_rim_1|rim": {
+    "site_id": "EP004",
+    "name": "Death Valley (Badwater Basin)",
+    "country": "USA",
+    "lat": 36.2503,
+    "lon": -116.8258,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.9394,
+    "would_rank": 5,
+    "n_pool": 49
+   },
+   "nobile_rim_1|texture": {
+    "site_id": "EP013",
+    "name": "Sunset Crater / Cinder Lake",
+    "country": "USA",
+    "lat": 35.3644,
+    "lon": -111.5036,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.4788,
+    "would_rank": 9,
+    "n_pool": 49
+   },
+   "nobile_rim_2|shadow": {
+    "site_id": "EP013",
+    "name": "Sunset Crater / Cinder Lake",
+    "country": "USA",
+    "lat": 35.3644,
+    "lon": -111.5036,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.3428,
+    "would_rank": 5,
+    "n_pool": 49
+   },
+   "nobile_rim_2|rim": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.7627,
+    "would_rank": 11,
+    "n_pool": 49
+   },
+   "nobile_rim_2|texture": {
+    "site_id": "EP013",
+    "name": "Sunset Crater / Cinder Lake",
+    "country": "USA",
+    "lat": 35.3644,
+    "lon": -111.5036,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.9323,
+    "would_rank": 17,
+    "n_pool": 49
+   },
+   "de_gerlache_rim_2|shadow": {
+    "site_id": "EP010",
+    "name": "Pinacate Peaks / Gran Desierto",
+    "country": "Mexico",
+    "lat": 31.77,
+    "lon": -113.49,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 1.3324,
+    "would_rank": 2,
+    "n_pool": 49
+   },
+   "de_gerlache_rim_2|rim": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.7193,
+    "would_rank": 15,
+    "n_pool": 49
+   },
+   "de_gerlache_rim_2|texture": {
+    "site_id": "EP003",
+    "name": "Mistastin crater",
+    "country": "Canada",
+    "lat": 55.8833,
+    "lon": -63.3,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 1.1246,
+    "would_rank": 13,
+    "n_pool": 49
+   },
+   "slater_plain|shadow": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.3056,
+    "would_rank": 3,
+    "n_pool": 49
+   },
+   "slater_plain|rim": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.5731,
+    "would_rank": 2,
+    "n_pool": 49
+   },
+   "slater_plain|texture": {
+    "site_id": "EP011",
+    "name": "Askja caldera",
+    "country": "Iceland",
+    "lat": 65.033,
+    "lon": -16.783,
+    "role": "heldout_positive",
+    "selected_by": "validation",
+    "distance": 0.4529,
+    "would_rank": 7,
+    "n_pool": 49
+   }
+  }
+ }
+}

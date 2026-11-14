@@ -30,6 +30,13 @@
 
   --error: #ff6b6b;
 
+  /* Calgary Equity Index 2024, access to amenities: higher = greater need (map uses the same values) */
+  --need-1: #1d2b2c;
+  --need-2: #21403f;
+  --need-3: #2a5c56;
+  --need-4: #357f73;
+  --need-5: #45a593;
+
   --fs-caption: 12px;
   --fs-label: 14px;
   --fs-body: 16px;
@@ -487,6 +494,10 @@ code {
   font-size: var(--fs-h3);
 }
 
+.panel-head .chip {
+  align-self: flex-start;
+}
+
 .panel-actions,
 .card-actions {
   display: flex;
@@ -829,9 +840,21 @@ code {
 }
 
 .story-hero p {
-  font-size: var(--fs-h3);
+  font-size: var(--fs-body);
   color: var(--text-2);
-  max-width: 62ch;
+  max-width: 68ch;
+}
+
+.story-hero .story-lead {
+  font-size: var(--fs-h2);
+  line-height: 1.3;
+  color: var(--text);
+  max-width: none;
+}
+
+.section-title {
+  font-size: var(--fs-h2);
+  margin-bottom: 16px;
 }
 
 .failures {
@@ -1909,6 +1932,14 @@ code {
   max-width: 52ch;
 }
 
+.val-value-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex: none;
+}
+
 .val-value {
   font-size: var(--fs-h2);
   font-weight: 600;
@@ -2503,6 +2534,270 @@ code {
   stroke-dasharray: 3 3;
 }
 
+/* ---------- Alberta & Calgary ---------- */
+
+.ab-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 11fr) minmax(380px, 9fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.geo-map-box {
+  position: sticky;
+  top: calc(var(--header-h) + 16px);
+  height: calc(100vh - var(--header-h) - 260px);
+  min-height: 420px;
+  max-height: 820px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+}
+
+.geo-map {
+  width: 100%;
+  height: 100%;
+}
+
+.ab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.ab-panel section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ab-panel .tabs {
+  margin-bottom: 4px;
+}
+
+.fail-bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--fs-label);
+}
+
+.fail-bars li {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 56px;
+  gap: 12px;
+  align-items: center;
+  color: var(--text-2);
+}
+
+.fail-bar {
+  height: 8px;
+  border-radius: 2px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.fail-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--text-3);
+  transform-origin: left center;
+}
+
+.ab-best {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ab-best-head {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.ab-thumb {
+  flex: none;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.ab-best-name {
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+  margin: 2px 0 6px;
+}
+
+.ab-rank {
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ab-rank .muted {
+  font-size: var(--fs-label);
+  font-weight: 400;
+}
+
+.ab-park {
+  white-space: normal;
+  align-self: flex-start;
+  border-radius: var(--radius-sm);
+}
+
+.ab-note {
+  font-size: var(--fs-label);
+  color: var(--text-2);
+  padding: 12px 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+.ab-purpose {
+  font-size: var(--fs-body);
+  color: var(--text);
+}
+
+.ab-legend,
+.need-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 12px;
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+  align-items: center;
+}
+
+.ramp-key {
+  width: 36px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #edeae4, #b9b5ae, #6f6b64);
+}
+
+.swatch-key {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.swatch-fail {
+  background: #2c3038;
+}
+
+.swatch-park {
+  border: 1.5px dashed var(--text-2);
+}
+
+.pin-key {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--text);
+  color: var(--bg);
+}
+
+.pin-key-dashed,
+.pin.pin-dashed {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1.5px dashed var(--text-2);
+}
+
+.cg-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.cg-controls .select {
+  min-width: 0;
+}
+
+.cg-match {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.cg-stop {
+  font-size: var(--fs-label);
+}
+
+.need-scale {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.need-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.need-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex: none;
+  box-shadow: inset 0 0 0 1px rgba(237, 234, 228, 0.15);
+}
+
+.need-swatch[data-need='Lowest'] {
+  background: var(--need-1);
+}
+
+.need-swatch[data-need='Low'] {
+  background: var(--need-2);
+}
+
+.need-swatch[data-need='Moderate'] {
+  background: var(--need-3);
+}
+
+.need-swatch[data-need='High'] {
+  background: var(--need-4);
+}
+
+.need-swatch[data-need='Highest'] {
+  background: var(--need-5);
+}
+
+.maplibregl-popup-content {
+  background: var(--surface-2) !important;
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm) !important;
+  font-family: var(--font);
+  font-size: var(--fs-label);
+  padding: 10px 28px 10px 12px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: var(--surface-2) !important;
+  border-bottom-color: var(--surface-2) !important;
+}
+
+.maplibregl-popup-close-button {
+  color: var(--text-2);
+  font-size: 18px;
+}
+
 /* MapLibre controls on the dark basemap */
 .maplibregl-ctrl-group {
   background: var(--surface-2) !important;
@@ -2577,6 +2872,15 @@ code {
   }
   .twin {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .ab-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .geo-map-box {
+    position: relative;
+    top: 0;
+    height: 420px;
+    min-height: 0;
   }
   .ex-body {
     grid-template-columns: minmax(0, 1fr);

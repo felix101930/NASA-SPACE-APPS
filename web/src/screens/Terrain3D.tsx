@@ -12,7 +12,7 @@ import type { EarthSite, Match, Region, ShadowMask, TileRef } from '../types/con
 import { Loading } from '../components/Loading';
 import { TERRAIN_KM, terrainHeightAt as heightAt, useTerrainGeometry } from '../components/terrainGeometry';
 import { SunGlyph } from '../components/Glyphs';
-import { ScreenHead } from '../components/ScreenHead';
+import { SampleChip, ScreenHead } from '../components/ScreenHead';
 
 // ------------------------------------------------------------------------------------------------
 // Camera sync between the two canvases (shared mutable state, not React state, to avoid re-renders)
@@ -500,8 +500,12 @@ export default function Terrain3D(): JSX.Element {
   const sweep = useSunSweep();
 
   const hazardMatches = useMemo((): Match[] => (region ? matchesFor(core, region.id, hazard) : []), [core, region, hazard]);
-  const effectiveSiteId = siteId ?? hazardMatches[0]?.site_id ?? core.sites[0]?.id ?? null;
-  const site = effectiveSiteId ? (core.siteById.get(effectiveSiteId) ?? null) : null;
+  // A remembered site id may come from another source (e.g. a real walk transect); fall back to this set.
+  const site =
+    (siteId ? core.siteById.get(siteId) : undefined) ??
+    (hazardMatches[0] ? core.siteById.get(hazardMatches[0].site_id) : undefined) ??
+    core.sites[0] ??
+    null;
   const options = useMemo(() => (region ? siteOptions(core, region, hazardMatches) : []), [core, region, hazardMatches]);
 
   const moon = useTile(region?.tile ?? null, core.regionsOrigin);
@@ -535,6 +539,7 @@ export default function Terrain3D(): JSX.Element {
     <div>
       <ScreenHead
         kicker={`3D side by side · ${region.name} and ${site.name}`}
+        chips={core.setOrigin === 'mock' ? <SampleChip what="Earth sites" /> : null}
         result={result}
         methodLabel="What is the same in both views"
         method={

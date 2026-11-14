@@ -15,7 +15,8 @@ export interface LoadedTile {
 const cache = new Map<string, Promise<LoadedTile>>();
 
 export function loadTile(ref: TileRef, prefer: Origin): Promise<LoadedTile> {
-  const key = ref.path;
+  // Real and sample tiles can share a path, so the cache key includes the preferred origin.
+  const key = `${prefer}:${ref.path}`;
   const hit = cache.get(key);
   if (hit) return hit;
   const p = loadFloat32(ref.path, ref.size * ref.size, prefer).then((l: { value: Float32Array }): LoadedTile => {

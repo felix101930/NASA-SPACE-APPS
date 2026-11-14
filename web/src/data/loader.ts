@@ -74,6 +74,23 @@ export async function loadJson<T>(path: string, guard: (v: unknown) => v is T, p
   throw new DataError(problems.join('; '));
 }
 
+/** Loads a JSON file from exactly one origin (no fallback). Null when missing or off-contract. */
+export async function loadJsonFrom<T>(path: string, guard: (v: unknown) => v is T, origin: Origin): Promise<Loaded<T> | null> {
+  const res = await fetchOk(assetUrl(path, origin));
+  if (!res) return null;
+  try {
+    const json: unknown = await res.json();
+    if (!guard(json)) {
+      console.info(`[data] ${origin}/${path} does not match the data contract; ignoring it.`);
+      return null;
+    }
+    if (origin === 'mock') noteMock(path);
+    return { value: json, origin };
+  } catch {
+    return null;
+  }
+}
+
 export async function loadOptionalJson<T>(path: string, guard: (v: unknown) => v is T): Promise<Loaded<T> | null> {
   try {
     return await loadJson(path, guard);

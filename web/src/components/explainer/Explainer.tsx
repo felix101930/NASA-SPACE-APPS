@@ -1,10 +1,9 @@
 // "How we find Earth analogs": six plain-language steps, one big visual each.
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type JSX } from 'react';
-import { loadOptionalJson, type Loaded } from '../../data/loader';
 import { loadTile, type LoadedTile } from '../../data/tiles';
 import { metricInfo } from '../../content';
 import { useApp } from '../../store';
-import { isMethodFile, type MethodFile, type MethodFunnelRow, type MethodPoint, type MethodValSite } from '../../types/contract';
+import { type MethodFile, type MethodFunnelRow, type MethodPoint, type MethodValSite } from '../../types/contract';
 import { HazardGlyph, type HazardKey } from '../Glyphs';
 import { Loading } from '../Loading';
 import type { Overlay } from './MoonTile3D';
@@ -397,21 +396,12 @@ export function Explainer(): JSX.Element {
   const [step, setStep] = useState<number>(0);
   const [overlay, setOverlay] = useState<Overlay>('slope');
   const [userPicked, setUserPicked] = useState<boolean>(false);
-  const [method, setMethod] = useState<Loaded<MethodFile> | null>(null);
-  const [methodState, setMethodState] = useState<'loading' | 'ready' | 'missing'>('loading');
   const core = useApp((s) => s.core);
+  // method.json belongs to the dependent set loaded with the core data (same origin as earth_sites/matches).
+  const method = core?.method ?? null;
+  const methodState: 'loading' | 'ready' | 'missing' = !core ? 'loading' : method ? 'ready' : 'missing';
 
-  useEffect((): void => {
-    if (!near) return;
-    loadOptionalJson('method.json', isMethodFile)
-      .then((m): void => {
-        setMethod(m);
-        setMethodState(m ? 'ready' : 'missing');
-      })
-      .catch((): void => setMethodState('missing'));
-  }, [near]);
-
-  const m = method?.value ?? null;
+  const m = method?.file ?? null;
   const ex = useExampleTile(m?.example.region_id ?? null);
 
   // Cycle the step-1 overlays until the visitor picks one (not with reduced motion).

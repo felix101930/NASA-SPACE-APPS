@@ -6,6 +6,7 @@ import type {
   Match,
   MatchesFile,
   Meta,
+  MethodFile,
   OverviewFile,
   Region,
   RegionsFile,
@@ -14,7 +15,7 @@ import type {
 } from './types/contract';
 import type { Origin } from './data/loader';
 
-export type ScreenId = 'story' | 'moon' | 'region' | 'terrain' | 'walk' | 'summary';
+export type ScreenId = 'story' | 'moon' | 'region' | 'terrain' | 'walk' | 'summary' | 'alberta';
 
 export const SCREENS: { id: ScreenId; label: string; short: string }[] = [
   { id: 'story', label: 'Why it matters', short: 'Failures' },
@@ -23,6 +24,7 @@ export const SCREENS: { id: ScreenId; label: string; short: string }[] = [
   { id: 'terrain', label: '3D side by side', short: '3D' },
   { id: 'walk', label: 'Astronaut walk', short: 'Walk' },
   { id: 'summary', label: 'Summary & validation', short: 'Summary' },
+  { id: 'alberta', label: 'Alberta & Calgary', short: 'Alberta' },
 ];
 
 export interface CoreData {
@@ -35,6 +37,12 @@ export interface CoreData {
   matchesOrigin: Origin;
   summary: SummaryFile | null;
   summaryOrigin: Origin | null;
+  method: { file: MethodFile; origin: Origin } | null;
+  /**
+   * Origin shared by the dependent set {earth_sites, matches, summary, method}. A real file is never joined
+   * with a sample one: the set is 'data' only when every member exists in data/, otherwise all come from mock/.
+   */
+  setOrigin: Origin;
   overview: { file: OverviewFile; origin: Origin } | null;
   metas: { file: string; meta: Meta }[];
 }
@@ -45,6 +53,8 @@ export function buildCore(
   matches: { value: MatchesFile; origin: Origin },
   summary: { value: SummaryFile; origin: Origin } | null,
   overview: { value: OverviewFile; origin: Origin } | null,
+  method: { value: MethodFile; origin: Origin } | null,
+  setOrigin: Origin,
 ): CoreData {
   const metas: { file: string; meta: Meta }[] = [
     { file: 'regions.json', meta: regions.value.meta },
@@ -62,6 +72,8 @@ export function buildCore(
     matchesOrigin: matches.origin,
     summary: summary?.value ?? null,
     summaryOrigin: summary?.origin ?? null,
+    method: method ? { file: method.value, origin: method.origin } : null,
+    setOrigin,
     overview: overview ? { file: overview.value, origin: overview.origin } : null,
     metas,
   };

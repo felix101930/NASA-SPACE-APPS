@@ -1,13 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type JSX } from 'react';
-import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { loadFloat32, loadImage, loadJson, loadOptionalJson, type Origin } from '../data/loader';
+import { loadFloat32, loadImage, loadJson, loadJsonFrom, loadOptionalJson, type Origin } from '../data/loader';
 import { loadTile, type LoadedTile } from '../data/tiles';
 import { mapToPixel, pixelToMap, sampleProfile, type WalkProfile } from '../lib/terrain';
 import { EarthMap, type MapLine, type MapPoint } from '../components/EarthMap';
 import { Loading } from '../components/Loading';
-import { ScreenHead } from '../components/ScreenHead';
+import { SlopeChart } from '../components/SlopeChart';
+import { SampleChip, ScreenHead } from '../components/ScreenHead';
 import { useApp, useRegion, type CoreData } from '../store';
-import { isPresetsFile, isTransectsFile, type PresetRoute, type Region, type TransectItem, type TransectsFile } from '../types/contract';
+import {
+  isEarthSitesFile,
+  isPresetsFile,
+  isTransectsFile,
+  type EarthSite,
+  type PresetRoute,
+  type Region,
+  type TransectItem,
+  type TransectsFile,
+} from '../types/contract';
 import type { QueryMsg, ResultRow, WorkerReply } from '../workers/dtw.worker';
 
 interface WalkData {
@@ -15,6 +24,9 @@ interface WalkData {
   rows: Float32Array;
   presets: PresetRoute[];
   presetsOrigin: Origin | null;
+  transectsOrigin: Origin;
+  /** Site names from earth_sites.json of the SAME origin as the transects (never a real/sample mix). */
+  siteNames: Map<string, string>;
 }
 
 let walkDataPromise: Promise<WalkData> | null = null;
@@ -25,7 +37,16 @@ function loadWalkData(): Promise<WalkData> {
       const t = await loadJson('walk/transects.json', isTransectsFile);
       const rows = await loadFloat32('walk/transects.bin', t.value.n * t.value.points, t.origin);
       const presets = await loadOptionalJson('walk/presets.json', isPresetsFile);
-      return { transects: t.value, rows: rows.value, presets: presets?.value ?? [], presetsOrigin: presets?.origin ?? null };
+      const sites = await loadJsonFrom('earth_sites.json', isEarthSitesFile, t.origin);
+      const siteNames = new Map((sites?.value.sites ?? []).map((st: EarthSite): [string, string] => [st.id, st.name]));
+      return {
+        transects: t.value,
+        rows: rows.value,
+        presets: presets?.value ?? [],
+        presetsOrigin: presets?.origin ?? null,
+        transectsOrigin: t.origin,
+        siteNames,
+      };
     })();
     walkDataPromise.catch((): void => {
       walkDataPromise = null;
@@ -391,17 +412,10 @@ export default function Walk(): JSX.Element {
   }, [data, tile, region, presets, route, query, busy, run, runPreset]);
 
   const current = found[sel] ?? null;
-  const currentSite = current ? (core.siteById.get(current.item.site_id) ?? null) : null;
-
-  const chartData = useMemo(() => {
-    if (!query) return [];
-    const n = query.slopes.length;
-    return query.slopes.map((v: number, i: number) => ({
-      pct: Math.round((i / (n - 1)) * 100),
-      moon: Number(v.toFixed(2)),
-      earth: current ? Number((current.slopes[i] ?? NaN).toFixed(2)) : null,
-    }));
-  }, [query, current]);
+  const siteName = (id: string): string => data?.siteNames.get(id) ?? `Earth square ${id}`;
+  const currentSite = current ? { id: current.item.site_id, name: siteName(current.item.site_id) } : null;
+  // The 3D view joins with the core site set; only offer it when this square is in that set (same origin).
+  const in3d = current ? core.setOrigin === data?.transectsOrigin && core.siteById.has(current.item.site_id) : false;
 
   const mapPoints = useMemo(
     (): MapPoint[] =>
@@ -444,7 +458,7 @@ export default function Walk(): JSX.Element {
   const searchBlock =
     route.length < 2 ? 'Place 2+ points' : routeLen < 200 ? 'Make the route at least 200 m' : !data ? 'Loading Earth transects…' : null;
   const best = found[0] ?? null;
-  const bestSite = best ? (core.siteById.get(best.item.site_id) ?? null) : null;
+  const bestSite = best ? { name: siteName(best.item.site_id) } : null;
   const result = busy
     ? 'Searching Earth transects for the same climb…'
     : best && query
@@ -465,6 +479,7 @@ export default function Walk(): JSX.Element {
     <div>
       <ScreenHead
         kicker="Astronaut walk"
+        chips={data?.transectsOrigin === 'mock' ? <SampleChip what="Earth transects" /> : null}
         result={result}
         aside={
           <label className="field">
@@ -564,62 +579,13 @@ export default function Walk(): JSX.Element {
           ) : (
             <>
               <section>
-                <div className="chart-head">
-                  <h3>Slope along the walk</h3>
-                  <span className="chart-legend">
-                    <span className="legend-item">
-                      <span className="legend-line" aria-hidden="true" />
-                      Moon · {region.name}
-                    </span>
-                    {current && (
-                      <span className="legend-item">
-                        <span className="legend-line legend-line-dashed" aria-hidden="true" />
-                        Earth · {currentSite?.name ?? `sample square ${current.item.site_id}`}
-                      </span>
-                    )}
-                  </span>
-                </div>
-                <div className="chart-box">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chartData} margin={{ top: 8, right: 12, bottom: 4, left: -8 }}>
-                      <CartesianGrid stroke="#2c3038" strokeDasharray="3 3" vertical={false} />
-                      <XAxis
-                        dataKey="pct"
-                        type="number"
-                        domain={[0, 100]}
-                        ticks={[0, 25, 50, 75, 100]}
-                        stroke="#8e8a83"
-                        tick={{ fontSize: 12 }}
-                        unit="%"
-                      />
-                      <YAxis stroke="#8e8a83" tick={{ fontSize: 12 }} unit="°" />
-                      <ReferenceLine y={0} stroke="#3d424c" />
-                      <Tooltip
-                        contentStyle={{ background: '#1a1d23', border: '1px solid #3d424c', borderRadius: 6, color: '#edeae4' }}
-                        labelFormatter={(v): string => `${String(v)}% along the walk`}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="moon"
-                        name={`Moon · ${region.name}`}
-                        stroke="#edeae4"
-                        strokeWidth={2.5}
-                        dot={false}
-                        isAnimationActive={false}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="earth"
-                        name={currentSite ? `Earth · ${currentSite.name}` : 'Earth'}
-                        stroke="#b9b5ae"
-                        strokeDasharray="6 4"
-                        strokeWidth={2}
-                        dot={false}
-                        isAnimationActive={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+                <SlopeChart
+                  title="Slope along the walk"
+                  moon={query.slopes}
+                  earth={current ? current.slopes : null}
+                  moonLabel={`Moon · ${region.name}`}
+                  earthLabel={current ? `Earth · ${currentSite?.name ?? ''}` : null}
+                />
                 <p className="caption">
                   Degrees, uphill positive. Moon walk: {(query.length_m / 1000).toFixed(2)} km, climb {query.climb_m.toFixed(0)} m, steepest{' '}
                   {query.max_slope_deg.toFixed(1)}°. {note}
@@ -643,7 +609,7 @@ export default function Walk(): JSX.Element {
                     </thead>
                     <tbody>
                       {found.map((f: Found, i: number) => {
-                        const s2 = core.siteById.get(f.item.site_id);
+                        const s2 = { name: siteName(f.item.site_id) };
                         return (
                           <tr key={`${f.row.i}`} data-active={i === sel} onClick={(): void => setSel(i)}>
                             <td className="r">{i + 1}</td>
@@ -668,9 +634,9 @@ export default function Walk(): JSX.Element {
                     <button
                       type="button"
                       className="btn"
-                      disabled={!current}
+                      disabled={!current || !in3d}
                       onClick={(): void => {
-                        if (!current) return;
+                        if (!current || !in3d) return;
                         if (walk) setWalk({ ...walk, bestItem: current.item, bestSlopes: current.slopes });
                         setSite(current.item.site_id);
                         setScreen('terrain');
@@ -678,7 +644,10 @@ export default function Walk(): JSX.Element {
                     >
                       Walk both in 3D →
                     </button>
-                    <span className="caption">A profile match compares slopes only, not surface material, boulders or gravity.</span>
+                    <span className="caption">
+                      {!in3d && current ? 'This Earth square isn’t in the loaded site set yet, so it can’t open in 3D. ' : ''}A profile
+                      match compares slopes only, not surface material, boulders or gravity.
+                    </span>
                   </div>
                 </>
               ) : (

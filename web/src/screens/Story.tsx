@@ -115,25 +115,22 @@ export function Story(): JSX.Element {
   return (
     <div>
       <section className="story-hero">
-        <h1>
-          Three landings. Three ways the ground <em>fooled the machine.</em>
-        </h1>
+        <h1>Moon on Earth</h1>
+        <p className="story-lead">Finding Earth places that stand in for the Moon’s south pole.</p>
         <p>
-          Each failure below came from terrain and light, not from a broken engine. We turn each one into a measurable hazard, profile
-          NASA’s nine candidate regions near the lunar south pole, and find places on Earth where a crew and a lander can meet the same
-          hazard first.
+          We profile NASA’s nine candidate regions near the lunar south pole for the terrain and light that matter: steep ground, long
+          low-sun shadows, sudden height jumps and smooth ground a camera can’t track. Then we search Earth for places with the same
+          fingerprint, so crews and machines can rehearse there first.
         </p>
         <p>
           <button
             type="button"
             className="link-btn"
             onClick={(): void =>
-              document
-                .getElementById('how-we-find-analogs')
-                ?.scrollIntoView({
-                  behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-                  block: 'start',
-                })
+              document.getElementById('how-we-find-analogs')?.scrollIntoView({
+                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+                block: 'start',
+              })
             }
           >
             How we find analogs ↓
@@ -141,7 +138,8 @@ export function Story(): JSX.Element {
         </p>
       </section>
 
-      <section className="failures" aria-label="Three landing failures">
+      <h2 className="section-title">Why these four: three missions the ground fooled</h2>
+      <section className="failures" aria-label="Three missions fooled by terrain and light">
         {FAILURES.map((f) => (
           <FailureCard key={f.mission} f={f} />
         ))}

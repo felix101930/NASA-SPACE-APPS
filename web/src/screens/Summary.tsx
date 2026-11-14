@@ -1,4 +1,4 @@
-import { useEffect, useState, type JSX } from 'react';
+import { useEffect, useState, type JSX, type ReactNode } from 'react';
 import { HAZARDS, ROW_NAME, VALIDATION_TARGETS, meetsTarget, type ValidationTarget } from '../content';
 import { Fit, HazardGlyph, VerdictGlyph } from '../components/Glyphs';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
@@ -92,14 +92,26 @@ function Band({ value, target }: { value: number | undefined; target: Validation
   );
 }
 
+/** A validation figure. Sample values look real, so they always carry the chip right beside the number. */
+function ValueWithChip({ sample, children }: { sample: boolean; children: ReactNode }): JSX.Element {
+  return (
+    <span className="val-value-wrap">
+      <span className="val-value">{children}</span>
+      {sample && <SampleChip what="This figure and the others on this panel" />}
+    </span>
+  );
+}
+
 function Check({
   title,
   help,
   value,
   digits = 2,
   target,
+  sample,
   children,
 }: {
+  sample: boolean;
   title: string;
   help: string;
   value: number | undefined;
@@ -115,7 +127,7 @@ function Check({
           <h3>{title}</h3>
           <p className="caption">{help}</p>
         </div>
-        <span className="val-value">{fmt(value, digits)}</span>
+        <ValueWithChip sample={sample}>{fmt(value, digits)}</ValueWithChip>
       </div>
       <Band value={value} target={target} />
       <p className="val-status">
@@ -172,6 +184,7 @@ export function Summary(): JSX.Element {
   ];
   const known = checks.filter((c): c is boolean => c !== null);
   const passed = known.filter((c: boolean): boolean => c).length;
+  const sample = core.summaryOrigin !== 'data';
   const aucs = Object.entries(v.classifier_two_sample?.per_region_auc ?? {});
   const open = (regionId: string, h: HazardId): void => {
     setRegion(regionId);
@@ -202,6 +215,7 @@ export function Summary(): JSX.Element {
           <div className="panel-head">
             <h2 id="grid-h">Best Earth match, region by hazard</h2>
             <span className="caption">Easiest to hardest. Select a cell to open its Earth matches.</span>
+            {sample && <SampleChip what="This ranking" />}
           </div>
           <div className="table-scroll">
             <table className="fit-grid">
@@ -259,6 +273,7 @@ export function Summary(): JSX.Element {
             <h2 id="val-h">Validation</h2>
             <span className="val-summary">
               {known.length ? `${passed} of ${known.length} checks meet their targets` : 'No checks available yet'}
+              {sample ? ' (sample values, not results)' : ''}
             </span>
           </div>
           <Check
@@ -266,6 +281,7 @@ export function Summary(): JSX.Element {
             help={v.shadow_vs_pgda?.note || 'Pearson correlation between our shadow fraction and PGDA’s.'}
             value={v.shadow_vs_pgda?.pearson_r}
             target={VALIDATION_TARGETS.shadow_r}
+            sample={sample}
           >
             <dl className="kv">
               <dt>Mean absolute error</dt>
@@ -281,12 +297,14 @@ export function Summary(): JSX.Element {
             help="Held-out analog sites should beat dune fields, farmland and forest (ROC-AUC)."
             value={v.known_vs_decoy_auc}
             target={VALIDATION_TARGETS.decoy_auc}
+            sample={sample}
           />
           <Check
             title="Top 3 stay put when weights move ±20%"
             help="Overlap of each top-3 list under perturbed weights (Jaccard index)."
             value={v.weight_stability_jaccard}
             target={VALIDATION_TARGETS.jaccard}
+            sample={sample}
           />
           <div className="val-block">
             <div className="val-head">
@@ -294,9 +312,9 @@ export function Summary(): JSX.Element {
                 <h3>Synthetic tests</h3>
                 <p className="caption">Known-answer terrains run through the same code.</p>
               </div>
-              <span className="val-value">
+              <ValueWithChip sample={sample}>
                 {testsPassed}/{tests.length}
-              </span>
+              </ValueWithChip>
             </div>
             <ul className="test-list">
               {tests.map((t) => (
@@ -319,6 +337,7 @@ export function Summary(): JSX.Element {
                     Two-sample test per region. Near 0.5: hard to tell apart; near 1: easy. Shown for context, no target.
                   </p>
                 </div>
+                {sample && <SampleChip what="These values" />}
               </div>
               <div
                 className="auc-strip"
