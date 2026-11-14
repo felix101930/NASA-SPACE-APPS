@@ -83,7 +83,8 @@ export type ShadowMode = 'realtime' | 'precomputed';
 
 export interface WalkResultRow {
   i: number;
-  dtw: number;
+  /** Matcher distance (smaller = closer). */
+  dist: number;
 }
 
 export interface WalkState {

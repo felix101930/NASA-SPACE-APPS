@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type JSX } from 'react';
-import { loadFloat32, loadImage, loadJson, loadJsonFrom, loadOptionalJson, type Origin } from '../data/loader';
+import { loadFloat32, loadImage, loadJson, loadJsonFrom, type Origin } from '../data/loader';
 import { loadTile, type LoadedTile } from '../data/tiles';
 import { mapToPixel, pixelToMap, sampleProfile, type WalkProfile } from '../lib/terrain';
 import { EarthMap, type MapLine, type MapPoint } from '../components/EarthMap';
@@ -8,6 +8,7 @@ import { SlopeChart } from '../components/SlopeChart';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
 import { useApp, useRegion, type CoreData } from '../store';
 import {
+  isObj,
   isEarthSitesFile,
   isPresetsFile,
   isTransectsFile,
@@ -17,7 +18,10 @@ import {
   type TransectItem,
   type TransectsFile,
 } from '../types/contract';
-import type { QueryMsg, ResultRow, WorkerReply } from '../workers/dtw.worker';
+import type { InitMsg, QueryMsg, ResultRow, WorkerReply } from '../workers/dtw.worker';
+import { heightsFromSlopes, netRise } from '../lib/match';
+
+const nf = new Intl.NumberFormat('en-US');
 
 interface WalkData {
   transects: TransectsFile;
@@ -25,6 +29,12 @@ interface WalkData {
   presets: PresetRoute[];
   presetsOrigin: Origin | null;
   transectsOrigin: Origin;
+  /** Walk length (m) per row, indexed by row. */
+  lengths: Float64Array;
+  /** Descent (m) per row, from the stored climb and the net rise of the integrated profile. */
+  descents: Float64Array;
+  /** Find-back test top-1 rate of the height + slope matcher (findback.json), if available. */
+  findbackTop1: number | null;
   /** Site names from earth_sites.json of the SAME origin as the transects (never a real/sample mix). */
   siteNames: Map<string, string>;
 }
@@ -36,10 +46,34 @@ function loadWalkData(): Promise<WalkData> {
     walkDataPromise = (async (): Promise<WalkData> => {
       const t = await loadJson('walk/transects.json', isTransectsFile);
       const rows = await loadFloat32('walk/transects.bin', t.value.n * t.value.points, t.origin);
-      const presets = await loadOptionalJson('walk/presets.json', isPresetsFile);
-      const sites = await loadJsonFrom('earth_sites.json', isEarthSitesFile, t.origin);
-      const siteNames = new Map((sites?.value.sites ?? []).map((st: EarthSite): [string, string] => [st.id, st.name]));
+      const presets = await loadJsonFrom('walk/presets.json', isPresetsFile, t.origin); // same origin as the transects only
+      // Place names: the transects' own `sites` lookup first, else earth_sites.json of the SAME origin.
+      const siteNames = new Map<string, string>();
+      if (t.value.sites) {
+        for (const [id, st] of Object.entries(t.value.sites)) siteNames.set(id, st.country ? `${st.name}, ${st.country}` : st.name);
+      } else {
+        const sites = await loadJsonFrom('earth_sites.json', isEarthSitesFile, t.origin);
+        (sites?.value.sites ?? []).forEach((st: EarthSite): void => {
+          siteNames.set(st.id, st.name);
+        });
+      }
+      const P = t.value.points;
+      const n = t.value.n;
+      const lengths = new Float64Array(n);
+      const descents = new Float64Array(n);
+      const h = new Float64Array(P);
+      for (const it of t.value.items) {
+        if (it.i < 0 || it.i >= n) continue;
+        lengths[it.i] = it.length_m;
+        heightsFromSlopes(rows.value.subarray(it.i * P, (it.i + 1) * P), it.length_m, h);
+        descents[it.i] = Math.max(0, it.climb_m - netRise(h));
+      }
+      const fb = await loadJsonFrom('walk/findback.json', isFindback, t.origin);
+      const winner = fb?.value.matchers.find((m) => m.name === 'euclid_height_slope');
       return {
+        lengths,
+        descents,
+        findbackTop1: typeof winner?.top1 === 'number' ? winner.top1 : null,
         transects: t.value,
         rows: rows.value,
         presets: presets?.value ?? [],
@@ -55,8 +89,20 @@ function loadWalkData(): Promise<WalkData> {
   return walkDataPromise;
 }
 
-/** Prefilter on summary stats before DTW: same length class, similar max slope and climb. */
-function prefilter(items: TransectItem[], q: WalkProfile): { idx: number[]; note: string } {
+interface FindbackFile {
+  matchers: { name: string; top1: number; top5?: number }[];
+}
+
+function isFindback(v: unknown): v is FindbackFile {
+  if (!isObj(v) || !Array.isArray(v.matchers)) return false;
+  return v.matchers.every((m: unknown): boolean => isObj(m) && typeof m.name === 'string' && typeof m.top1 === 'number');
+}
+
+/**
+ * Prefilter for the (slower) DTW option: same length class, similar steepest slope and climb. Climb is
+ * checked in BOTH walking directions (a twin walked backwards climbs what the stored walk descends).
+ */
+function prefilter(items: TransectItem[], descents: Float64Array, q: WalkProfile): { idx: number[]; note: string } {
   const classes = Array.from(new Set(items.map((t: TransectItem): number => t.length_m))).sort((a: number, b: number): number => a - b);
   const cls = classes.reduce(
     (best: number, c: number): number => (Math.abs(Math.log(c / q.length_m)) < Math.abs(Math.log(best / q.length_m)) ? c : best),
@@ -67,8 +113,7 @@ function prefilter(items: TransectItem[], q: WalkProfile): { idx: number[]; note
     (t: TransectItem): boolean =>
       t.max_slope_deg >= q.max_slope_deg * 0.5 - 6 &&
       t.max_slope_deg <= q.max_slope_deg * 1.7 + 6 &&
-      t.climb_m >= q.climb_m * 0.4 - 40 &&
-      t.climb_m <= q.climb_m * 2.5 + 40,
+      [t.climb_m, descents[t.i] ?? t.climb_m].some((c: number): boolean => c >= q.climb_m * 0.4 - 40 && c <= q.climb_m * 2.5 + 40),
   );
   if (strict.length >= 25)
     return {
@@ -126,6 +171,15 @@ interface Found {
   row: ResultRow;
   item: TransectItem;
   slopes: number[];
+  /** RMS differences to the Moon walk, in the matched direction. */
+  rmsHeight: number;
+  rmsSlope: number;
+}
+
+function rmsDiff(a: ArrayLike<number>, b: ArrayLike<number>): number {
+  let s = 0;
+  for (let k = 0; k < a.length; k++) s += (a[k] - b[k]) ** 2;
+  return Math.sqrt(s / Math.max(a.length, 1));
 }
 
 function DrawCanvas({
@@ -240,7 +294,7 @@ export default function Walk(): JSX.Element {
   const [dataErr, setDataErr] = useState<string | null>(null);
   const [tile, setTile] = useState<LoadedTile | null>(null);
   const [route, setRoute] = useState<[number, number][]>(walk && region && walk.regionId === region.id ? walk.route : []);
-  const [znorm, setZnorm] = useState<boolean>(false);
+  const [stretch, setStretch] = useState<boolean>(false);
   const [busy, setBusy] = useState<boolean>(false);
   const [found, setFound] = useState<Found[]>([]);
   const [sel, setSel] = useState<number>(0);
@@ -285,7 +339,8 @@ export default function Walk(): JSX.Element {
     if (!data) return;
     const w = new Worker(new URL('../workers/dtw.worker.ts', import.meta.url), { type: 'module' });
     const copy = data.rows.slice().buffer;
-    w.postMessage({ type: 'init', bin: copy, points: data.transects.points }, [copy]);
+    const init: InitMsg = { type: 'init', bin: copy, points: data.transects.points, lengths: data.lengths };
+    w.postMessage(init, [copy]);
     workerRef.current = w;
     return (): void => {
       w.terminate();
@@ -303,8 +358,8 @@ export default function Walk(): JSX.Element {
         return;
       }
       setQuery(prof);
-      const { idx, note: fnote } = prefilter(data.transects.items, prof);
       const P = data.transects.points;
+      const qh = heightsFromSlopes(prof.slopes, prof.length_m);
       const toFound = (rows: ResultRow[]): Found[] =>
         rows.flatMap((row: ResultRow): Found[] => {
           const item = data.transects.items[row.i];
@@ -324,7 +379,8 @@ export default function Walk(): JSX.Element {
                 lon1: item.lon0,
               }
             : item;
-          return [{ row, item: shown, slopes }];
+          const eh = heightsFromSlopes(slopes, item.length_m);
+          return [{ row, item: shown, slopes, rmsHeight: rmsDiff(qh, eh), rmsSlope: rmsDiff(prof.slopes, slopes) }];
         });
       const finish = (rows: ResultRow[], msg: string): void => {
         const f = toFound(rows);
@@ -336,7 +392,7 @@ export default function Walk(): JSX.Element {
           regionId: region.id,
           route: pts,
           moonSlopes: prof.slopes,
-          results: rows.map((r: ResultRow) => ({ i: r.i, dtw: r.dtw })),
+          results: rows.map((r: ResultRow) => ({ i: r.i, dist: r.dist })),
           bestSlopes: f[0]?.slopes ?? null,
           bestItem: f[0]?.item ?? null,
         });
@@ -345,7 +401,7 @@ export default function Walk(): JSX.Element {
       const fallback = (why: string): void => {
         if (presetBest && presetBest.length)
           finish(
-            presetBest.map((b) => ({ i: b.i, dtw: b.dtw, reversed: false })),
+            presetBest.map((b) => ({ i: b.i, dist: b.dtw, reversed: false })),
             `Precomputed preset matches (${why}).`,
           );
         else {
@@ -357,6 +413,8 @@ export default function Walk(): JSX.Element {
         fallback('search worker unavailable');
         return;
       }
+      // Height + slope scans every row (fast); the DTW option keeps the orientation-aware prefilter.
+      const pre = stretch ? prefilter(data.transects.items, data.descents, prof) : null;
       setBusy(true);
       const id = ++reqId.current;
       const onMsg = (ev: MessageEvent<WorkerReply>): void => {
@@ -368,13 +426,27 @@ export default function Walk(): JSX.Element {
         }
         if (m.type !== 'result' || m.id !== id) return;
         w.removeEventListener('message', onMsg);
-        finish(m.results, `Searched ${fnote} with banded DTW (Sakoe-Chiba 10%${znorm ? ', z-normalised' : ''}) in ${m.ms.toFixed(0)} ms.`);
+        finish(
+          m.results,
+          stretch
+            ? `Searched ${pre?.note ?? `${m.searched} transects`} with banded DTW (Sakoe-Chiba 10%), both directions, in ${m.ms.toFixed(0)} ms.`
+            : `Searched all ${nf.format(m.searched)} Earth transects in both directions in ${m.ms.toFixed(0)} ms.`,
+        );
       };
       w.addEventListener('message', onMsg);
-      const msg: QueryMsg = { type: 'query', id, query: prof.slopes, candidates: idx, band: 0.1, znorm, topK: 5 };
+      const msg: QueryMsg = {
+        type: 'query',
+        id,
+        matcher: stretch ? 'dtw' : 'height_slope',
+        query: prof.slopes,
+        lengthM: prof.length_m,
+        candidates: pre ? pre.idx : null,
+        band: 0.1,
+        topK: 5,
+      };
       w.postMessage(msg);
     },
-    [data, tile, region, znorm, setWalk],
+    [data, tile, region, stretch, setWalk],
   );
 
   // Preset routes are in map metres of a specific DEM: only use them with tiles from the same source.
@@ -462,10 +534,15 @@ export default function Walk(): JSX.Element {
   const result = busy
     ? 'Searching Earth transects for the same climb…'
     : best && query
-      ? `${bestSite?.name ?? `Earth square ${best.item.site_id}`} walks most like this ${(query.length_m / 1000).toFixed(1)} km route: ${best.row.dtw.toFixed(1)}° average slope difference`
+      ? `${bestSite?.name ?? `Earth square ${best.item.site_id}`} walks most like this ${(query.length_m / 1000).toFixed(1)} km route: heights within ${best.rmsHeight.toFixed(0)} m and slopes within ${best.rmsSlope.toFixed(1)}° (RMS)`
       : query
         ? 'No Earth transect matched this route'
         : `Draw a moonwalk on ${region.name}; we find the Earth path that climbs the same way`;
+
+  const matchCopy =
+    data?.findbackTop1 != null
+      ? `Matched on the shape of the climb and the slope; in a hidden-copy test the matcher found the Moon route first ${Math.round(data.findbackTop1 * 100)}% of the time`
+      : 'Matched on the shape of the climb and the slope';
 
   const clearAll = (): void => {
     setRoute([]);
@@ -495,9 +572,9 @@ export default function Walk(): JSX.Element {
         }
         method={
           <p>
-            Click on the terrain to lay out a route. We sample the elevation model along it, turn it into a slope profile (100 points,
-            uphill positive) and search Earth transects for the walk that climbs and descends the same way, using dynamic time warping in a
-            background worker.
+            Click on the terrain to lay out a route. We sample the elevation model along it into a 100-point profile and compare it with
+            every Earth transect, in both walking directions. {matchCopy}. “Tolerate stretched routes” switches to dynamic time warping,
+            which is slower and less accurate unless a route is clearly stretched.
           </p>
         }
       />
@@ -542,8 +619,12 @@ export default function Walk(): JSX.Element {
               Clear
             </button>
             {searchBlock && !busy && <span className="caption">{searchBlock}</span>}
-            <label className="check" title="Compare shape only, ignoring how steep overall">
-              <input type="checkbox" checked={znorm} onChange={(e): void => setZnorm(e.target.checked)} /> Compare shape only
+            <label
+              className="check"
+              title="Uses dynamic time warping, which lets hills sit slightly out of place. Slower, and less accurate when routes are not stretched."
+            >
+              <input type="checkbox" checked={stretch} onChange={(e): void => setStretch(e.target.checked)} /> Tolerate stretched routes
+              (slower)
             </label>
           </div>
           {dataErr && <div className="error-box">Walk data unavailable: {dataErr}</div>}
@@ -602,8 +683,11 @@ export default function Walk(): JSX.Element {
                         <th className="r">Length</th>
                         <th className="r">Climb</th>
                         <th className="r">Steepest</th>
-                        <th className="r" title="Mean absolute slope difference along the warped path">
-                          Avg slope diff.
+                        <th className="r" title="RMS difference in relative height along the walk, in the matched direction">
+                          Height diff.
+                        </th>
+                        <th className="r" title="RMS difference in slope along the walk, in the matched direction">
+                          Slope diff.
                         </th>
                       </tr>
                     </thead>
@@ -619,9 +703,12 @@ export default function Walk(): JSX.Element {
                               </button>
                             </td>
                             <td className="r">{(f.item.length_m / 1000).toFixed(1)} km</td>
-                            <td className="r">{f.item.climb_m.toFixed(0)} m</td>
+                            <td className="r">
+                              {(f.row.reversed ? (data?.descents[f.row.i] ?? f.item.climb_m) : f.item.climb_m).toFixed(0)} m
+                            </td>
                             <td className="r">{f.item.max_slope_deg.toFixed(1)}°</td>
-                            <td className="r">{f.row.dtw.toFixed(2)}°</td>
+                            <td className="r">{f.rmsHeight.toFixed(0)} m</td>
+                            <td className="r">{f.rmsSlope.toFixed(1)}°</td>
                           </tr>
                         );
                       })}
@@ -645,8 +732,8 @@ export default function Walk(): JSX.Element {
                       Walk both in 3D →
                     </button>
                     <span className="caption">
-                      {!in3d && current ? 'This Earth square isn’t in the loaded site set yet, so it can’t open in 3D. ' : ''}A profile
-                      match compares slopes only, not surface material, boulders or gravity.
+                      {!in3d && current ? 'This Earth square isn’t in the loaded site set yet, so it can’t open in 3D. ' : ''}
+                      {matchCopy}. It compares terrain shape only, not surface material, boulders or gravity.
                     </span>
                   </div>
                 </>

@@ -186,11 +186,22 @@ export interface TransectItem {
   max_slope_deg: number;
 }
 
+export interface TransectSite {
+  name: string;
+  country?: string;
+  lat?: number;
+  lon?: number;
+  dsm_safe?: boolean;
+  bare_frac?: number;
+}
+
 export interface TransectsFile {
   meta: Meta;
   n: number;
   points: number;
   items: TransectItem[];
+  /** Place lookup for every site_id in items (newer files). */
+  sites?: Record<string, TransectSite>;
 }
 
 export interface PresetBest {

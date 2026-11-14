@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState, type JSX } from 'react';
-import { loadJson, loadJsonFrom, loadOptionalJson, onMockUsed, type Loaded, type Origin } from './data/loader';
+import { loadJson, loadJsonFrom, onMockUsed, type Loaded, type Origin } from './data/loader';
 import { buildCore, SCREENS, useApp, type ScreenId } from './store';
 import {
   isEarthSitesFile,
@@ -176,11 +176,9 @@ export function App(): JSX.Element {
     let cancelled = false;
     (async (): Promise<void> => {
       try {
-        const [regions, overview, set] = await Promise.all([
-          loadJson('regions.json', isRegionsFile),
-          loadOptionalJson('overview.json', isOverviewFile),
-          loadDependentSet(),
-        ]);
+        const [regions, set] = await Promise.all([loadJson('regions.json', isRegionsFile), loadDependentSet()]);
+        // The backdrop only makes sense with regions from the same source.
+        const overview = await loadJsonFrom('overview.json', isOverviewFile, regions.origin);
         if (!cancelled) {
           useApp.getState().setCore(buildCore(regions, set.sites, set.matches, set.summary, overview, set.method, set.origin));
         }
