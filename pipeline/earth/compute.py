@@ -214,7 +214,8 @@ def write_earth_sites(sites: list[dict], results: dict[str, dict], extra_meta: d
                 "source_url": s.get("source_url"), "source_title": s.get("source_title"),
                 "verified": s.get("verified"), "split": s.get("split"), "dup_of": s.get("dup_of")}
                if s.get("selected_by") == "documented" else {}),
-            **({"name_source": s.get("name_source")} if s.get("name_source") else {}),
+            **({"name_source": s.get("name_source"), "admin1": s.get("admin1"),
+                "region_label": s.get("region_label")} if s.get("name_source") else {}),
             "shape": _shape30(s["id"]),
             **({"nasadem": (r.get("nasadem") or {"available": False})} if "nasadem" in r else {}),
         })

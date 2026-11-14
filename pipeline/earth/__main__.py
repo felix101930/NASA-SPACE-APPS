@@ -21,16 +21,18 @@ STAGE2_SITES = INTERIM / "stage2_sites.json"
 
 def stage2_site_list() -> list[dict]:
     from pipeline.earth import rank_stage1, screen
-    from pipeline.earth.naming import nearest_place
+    from pipeline.earth.naming import site_label
     from pipeline.earth.pool import load_documented, load_validation
     rk = json.loads(rank_stage1.RANK_JSON.read_text()) if rank_stage1.RANK_JSON.exists() else rank_stage1.rank()
     rows = {r["id"]: r for r in screen.load_fingerprints()}
     sites = []
     for sid, hits in sorted(rk["selected"].items()):
         r = rows[sid]
-        nm = nearest_place(r["lat"], r["lon"])
+        nm = site_label(r["lat"], r["lon"])
         sites.append({"id": sid, "lat": r["lat"], "lon": r["lon"], "role": "candidate", "selected_by": "global_screen",
-                      "name": nm["name"], "country": nm["country"], "name_source": "GeoNames nearest populated place",
+                      "name": nm["name"], "country": nm["country"], "admin1": nm.get("admin1"),
+                      "region_label": nm.get("region_label"),
+                      "name_source": "GeoNames nearest populated place; country/admin-1 by Natural Earth point-in-polygon",
                       "category": "global_screen", "stratum": r.get("stratum"),
                       "stage1_rank": rk["best_rank"].get(sid), "stage1_best": rk["best_search"].get(sid),
                       "stage1_hits": hits})
@@ -225,9 +227,10 @@ def cmd_report(args) -> dict:
         from pipeline.earth import nasadem_check as _nc
         if nd and not any(x.get("name", "").startswith("NASADEM") for x in doc["meta"]["sources"]):
             doc["meta"]["sources"].append(_nc.SOURCE)
-        from pipeline.earth.naming import SOURCE as GEON
-        if not any(x.get("name") == GEON["name"] for x in doc["meta"]["sources"]):
-            doc["meta"]["sources"].append(GEON)
+        from pipeline.earth.naming import NE_SOURCE, SOURCE as GEON
+        for src in (GEON, NE_SOURCE):
+            if not any(x.get("name") == src["name"] for x in doc["meta"]["sources"]):
+                doc["meta"]["sources"].append(src)
         compute.EARTH_SITES_JSON.write_text(json.dumps(compute._clean(doc), separators=(",", ":")))
     table = {}
     for name, f in (("strict_bare>=0.6", fn_strict), ("dsm_safe", fn)):

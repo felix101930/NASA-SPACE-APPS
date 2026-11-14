@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_utc": "2026-11-14T21:13:27Z",
+  "generated_utc": "2026-11-14T21:55:05Z",
   "pipeline_version": "match-0.1.0",
   "sources": [
    {
@@ -58,10 +58,22 @@
     "citation": "Imagery courtesy of NASA Global Imagery Browse Services (GIBS), HLS Sentinel-2 surface reflectance."
    },
    {
+    "name": "NASADEM Merged DEM Global 1 arc second V001 (NASADEM_HGT)",
+    "url": "https://doi.org/10.5067/MEaSUREs/NASADEM/NASADEM_HGT.001",
+    "licence": "NASA open data (no restrictions)",
+    "citation": "NASA JPL (2020). NASADEM Merged DEM Global 1 arc second V001. NASA EOSDIS Land Processes DAAC. doi:10.5067/MEaSUREs/NASADEM/NASADEM_HGT.001"
+   },
+   {
     "name": "GeoNames cities1000",
     "url": "https://download.geonames.org/export/dump/",
     "licence": "CC-BY 4.0",
     "citation": "GeoNames geographical database (geonames.org), CC-BY 4.0"
+   },
+   {
+    "name": "Natural Earth 1:10m admin-0 / admin-1",
+    "url": "https://www.naturalearthdata.com/",
+    "licence": "public domain",
+    "citation": "Made with Natural Earth. Free vector and raster map data."
    },
    {
     "name": "Astropy (get_sun, AltAz refraction)",
@@ -77,21 +89,21 @@
    }
   ],
   "earth_sites_snapshot": {
-   "generated_utc": "2026-11-14T19:54:50Z",
+   "generated_utc": "2026-11-14T21:31:13Z",
    "pipeline_version": "earth-0.2",
    "partial": false,
-   "sig": "9d99bc590ba72fe6"
+   "sig": "de036406acd172f7"
   },
   "ranking_method": "rehearsability = 1 / (1 + mean best distance + 0.5 × Σ max(0, best distance − 0.5)) over the 3 hazards; distance 1 ≈ one Moon-region IQR off",
   "runtimes": {
-   "moon_ref_s": 0.0,
-   "earth_feats_s": 0.0,
-   "matching_s": 1.2,
-   "windows_s": 0.0,
-   "weight_stability_s": 2.6,
-   "classifier_s": 0.0,
-   "synthetic_tests_s": 0.0,
-   "total_s": 4.0
+   "moon_ref_s": 5.9,
+   "earth_feats_s": 30.4,
+   "matching_s": 0.2,
+   "windows_s": 38.6,
+   "weight_stability_s": 0.9,
+   "classifier_s": 26.3,
+   "synthetic_tests_s": 0.8,
+   "total_s": 103.2
   }
  },
  "ranking": [
@@ -99,163 +111,163 @@
    "region_id": "slater_plain",
    "rank": 1,
    "region_name": "Slater Plain",
-   "rehearsability": 0.8156,
+   "rehearsability": 0.8244,
    "per_hazard_best_distance": {
-    "shadow": 0.1859,
-    "rim": 0.372,
-    "texture": 0.1204
+    "shadow": 0.1319,
+    "rim": 0.4338,
+    "texture": 0.0731
    },
    "per_hazard_best_site": {
-    "shadow": "S00241",
-    "rim": "S01056",
-    "texture": "S01222"
+    "shadow": "R00115",
+    "rim": "R00184",
+    "texture": "R00160"
    },
    "weakest_hazard": "rim",
-   "reason": "All three dangers have a close Earth match; the weakest is rim height jumps (best: 84 km SE of Pica, Chile, 0.37 × the Moon region's normal variation away)."
+   "reason": "All three dangers have a close Earth match; the weakest is rim height jumps (best: 11 km NW of Sancos, Peru, 0.43 × the Moon region's normal variation away)."
   },
   {
    "region_id": "nobile_rim_2",
    "rank": 2,
    "region_name": "Nobile Rim 2",
-   "rehearsability": 0.7797,
+   "rehearsability": 0.797,
    "per_hazard_best_distance": {
-    "shadow": 0.192,
-    "rim": 0.5276,
-    "texture": 0.0864
+    "shadow": 0.218,
+    "rim": 0.4476,
+    "texture": 0.0987
    },
    "per_hazard_best_site": {
-    "shadow": "S04053",
-    "rim": "S04078",
-    "texture": "S04676"
+    "shadow": "R00112",
+    "rim": "R00213",
+    "texture": "R00164"
    },
    "weakest_hazard": "rim",
-   "reason": "Close Earth matches for low-sun shadows and camera-navigation texture; only a partial match for rim height jumps (best: 289 km E of Kamenskoye, Russia, 0.53 × the Moon region's normal variation away)."
-  },
-  {
-   "region_id": "mons_mouton_plateau",
-   "rank": 3,
-   "region_name": "Mons Mouton Plateau",
-   "rehearsability": 0.7762,
-   "per_hazard_best_distance": {
-    "shadow": 0.1887,
-    "rim": 0.5147,
-    "texture": 0.1396
-   },
-   "per_hazard_best_site": {
-    "shadow": "S03644",
-    "rim": "S01056",
-    "texture": "S01100"
-   },
-   "weakest_hazard": "rim",
-   "reason": "Close Earth matches for low-sun shadows and camera-navigation texture; only a partial match for rim height jumps (best: 84 km SE of Pica, Chile, 0.51 × the Moon region's normal variation away)."
+   "reason": "All three dangers have a close Earth match; the weakest is rim height jumps (best: 40 km NW of Las Mojarras, Argentina, 0.45 × the Moon region's normal variation away)."
   },
   {
    "region_id": "haworth",
-   "rank": 4,
+   "rank": 3,
    "region_name": "Haworth",
-   "rehearsability": 0.7508,
+   "rehearsability": 0.767,
    "per_hazard_best_distance": {
-    "shadow": 0.4481,
-    "rim": 0.4222,
-    "texture": 0.1253
+    "shadow": 0.3211,
+    "rim": 0.3898,
+    "texture": 0.2003
    },
    "per_hazard_best_site": {
-    "shadow": "S00241",
-    "rim": "S04010",
-    "texture": "S03631"
+    "shadow": "R00023",
+    "rim": "R00070",
+    "texture": "R00020"
    },
-   "weakest_hazard": "shadow",
-   "reason": "All three dangers have a close Earth match; the weakest is low-sun shadows (best: 48 km NW of Mosgiel, New Zealand, 0.45 × the Moon region's normal variation away)."
+   "weakest_hazard": "rim",
+   "reason": "All three dangers have a close Earth match; the weakest is rim height jumps (best: 161 km S of Pond Inlet, Canada, 0.39 × the Moon region's normal variation away)."
   },
   {
    "region_id": "nobile_rim_1",
-   "rank": 5,
+   "rank": 4,
    "region_name": "Nobile Rim 1",
-   "rehearsability": 0.7203,
+   "rehearsability": 0.7592,
    "per_hazard_best_distance": {
-    "shadow": 0.5371,
-    "rim": 0.4932,
-    "texture": 0.0789
+    "shadow": 0.4096,
+    "rim": 0.4406,
+    "texture": 0.1015
    },
    "per_hazard_best_site": {
-    "shadow": "S03018",
-    "rim": "S01417",
-    "texture": "S01331"
+    "shadow": "R00027",
+    "rim": "R00048",
+    "texture": "EP080"
+   },
+   "weakest_hazard": "rim",
+   "reason": "All three dangers have a close Earth match; the weakest is rim height jumps (best: 76 km NW of Rodeo, Argentina, 0.44 × the Moon region's normal variation away)."
+  },
+  {
+   "region_id": "de_gerlache_rim_2",
+   "rank": 5,
+   "region_name": "de Gerlache Rim 2",
+   "rehearsability": 0.7308,
+   "per_hazard_best_distance": {
+    "shadow": 0.4775,
+    "rim": 0.3183,
+    "texture": 0.3094
+   },
+   "per_hazard_best_site": {
+    "shadow": "R00030",
+    "rim": "R00174",
+    "texture": "EP084"
    },
    "weakest_hazard": "shadow",
-   "reason": "Close Earth matches for rim height jumps and camera-navigation texture; only a partial match for low-sun shadows (best: 18 km SW of Bustamante, Mexico, 0.54 × the Moon region's normal variation away)."
+   "reason": "All three dangers have a close Earth match; the weakest is low-sun shadows (best: 114 km SW of Mangnai Zhen, People's Republic of China, 0.48 × the Moon region's normal variation away)."
   },
   {
    "region_id": "mons_mouton",
    "rank": 6,
    "region_name": "Mons Mouton",
-   "rehearsability": 0.7091,
+   "rehearsability": 0.7202,
    "per_hazard_best_distance": {
-    "shadow": 0.3311,
-    "rim": 0.6343,
-    "texture": 0.0638
+    "shadow": 0.1973,
+    "rim": 0.6283,
+    "texture": 0.1473
    },
    "per_hazard_best_site": {
-    "shadow": "S00356",
-    "rim": "S02302",
-    "texture": "S02247"
+    "shadow": "R00021",
+    "rim": "R00103",
+    "texture": "R00149"
    },
    "weakest_hazard": "rim",
-   "reason": "Close Earth matches for low-sun shadows and camera-navigation texture; only a partial match for rim height jumps (best: 18 km SE of Deder, Ethiopia, 0.63 × the Moon region's normal variation away)."
+   "reason": "Close Earth matches for low-sun shadows and camera-navigation texture; only a partial match for rim height jumps (best: 159 km E of Talnakh, Russia, 0.63 × the Moon region's normal variation away)."
   },
   {
-   "region_id": "de_gerlache_rim_2",
+   "region_id": "mons_mouton_plateau",
    "rank": 7,
-   "region_name": "de Gerlache Rim 2",
-   "rehearsability": 0.6024,
+   "region_name": "Mons Mouton Plateau",
+   "rehearsability": 0.7116,
    "per_hazard_best_distance": {
-    "shadow": 0.8748,
-    "rim": 0.3252,
-    "texture": 0.2175
+    "shadow": 0.1511,
+    "rim": 0.673,
+    "texture": 0.1322
    },
    "per_hazard_best_site": {
-    "shadow": "S01264",
-    "rim": "S02247",
-    "texture": "S02247"
+    "shadow": "R00100",
+    "rim": "R00233",
+    "texture": "R00025"
    },
-   "weakest_hazard": "shadow",
-   "reason": "Close Earth matches for rim height jumps and camera-navigation texture; only a partial match for low-sun shadows (best: 30 km W of Calama, Chile, 0.87 × the Moon region's normal variation away)."
+   "weakest_hazard": "rim",
+   "reason": "Close Earth matches for low-sun shadows and camera-navigation texture; only a partial match for rim height jumps (best: 57 km E of Mo i Rana, Norway, 0.67 × the Moon region's normal variation away)."
   },
   {
    "region_id": "malapert_massif",
    "rank": 8,
    "region_name": "Malapert Massif",
-   "rehearsability": 0.5187,
+   "rehearsability": 0.5515,
    "per_hazard_best_distance": {
-    "shadow": 1.1212,
+    "shadow": 0.9972,
     "rim": 0.5341,
-    "texture": 0.1455
+    "texture": 0.1119
    },
    "per_hazard_best_site": {
-    "shadow": "S03582",
-    "rim": "S02310",
-    "texture": "S02247"
+    "shadow": "R00007",
+    "rim": "R00199",
+    "texture": "R00189"
    },
    "weakest_hazard": "shadow",
-   "reason": "Close Earth match for camera-navigation texture; only a partial match for low-sun shadows and rim height jumps; weakest is low-sun shadows (best: 109 km SE of Bor-Udzuur, Mongolia, 1.12 × the Moon region's normal variation away)."
+   "reason": "Close Earth match for camera-navigation texture; only a partial match for low-sun shadows and rim height jumps; weakest is low-sun shadows (best: 154 km NE of Taltal, Chile, 1.00 × the Moon region's normal variation away)."
   },
   {
    "region_id": "cabeus_b_peak",
    "rank": 9,
    "region_name": "Peak near Cabeus B",
-   "rehearsability": 0.3418,
+   "rehearsability": 0.3629,
    "per_hazard_best_distance": {
-    "shadow": 2.3014,
-    "rim": 0.5436,
-    "texture": 0.1651
+    "shadow": 2.1691,
+    "rim": 0.5128,
+    "texture": 0.0627
    },
    "per_hazard_best_site": {
-    "shadow": "S03582",
-    "rim": "S01992",
-    "texture": "S04188"
+    "shadow": "R00030",
+    "rim": "R00050",
+    "texture": "R00038"
    },
    "weakest_hazard": "shadow",
-   "reason": "Close Earth match for camera-navigation texture; only a partial match for rim height jumps; only a far match for low-sun shadows; weakest is low-sun shadows (best: 109 km SE of Bor-Udzuur, Mongolia, 2.30 × the Moon region's normal variation away)."
+   "reason": "Close Earth match for camera-navigation texture; only a partial match for rim height jumps; only a far match for low-sun shadows; weakest is low-sun shadows (best: 114 km SW of Mangnai Zhen, People's Republic of China, 2.17 × the Moon region's normal variation away)."
   }
  ],
  "validation": {
@@ -268,13 +280,13 @@
    "n_regions": 6,
    "note": "Pixelwise at 60 m over the 15 km cores of regions inside 85-90S; ours = mean solar-disk visibility over an approximate 18.6-yr sun path (declination 1.54°·sin(phase), 11 520 directions, solar disk 0.27°) from LOLA 20 m (PGDA 90) horizons; PGDA = AVGVISIB_85S_060M_201608 (Mazarico et al. 2011, hourly 18.6 yr, older LOLA DEM). bias = ours − PGDA (visibility, 0..1)."
   },
-  "known_vs_decoy_auc": 0.803,
+  "known_vs_decoy_auc": 0.795,
   "known_vs_decoy_detail": {
    "source": "method.json validation.auc (stage-1 best rank)",
-   "known_median_pct": 4.66,
-   "decoy_median_pct": 60.3,
-   "screen_report_auc_original13": 0.803,
-   "screen_report_auc_with_heldout_documented": 0.803,
+   "known_median_pct": 11.24,
+   "decoy_median_pct": 68.03,
+   "screen_report_auc_original13": 0.795,
+   "screen_report_auc_with_heldout_documented": 0.822,
    "recomputed_stage1_auc_original13": 0.795,
    "recomputed_stage1_n": {
     "known": 13,
@@ -282,318 +294,318 @@
     "heldout_documented": 7
    },
    "recomputed_stage1_auc_with_heldout_documented": 0.822,
-   "final_30m_auc": 0.726,
+   "final_30m_auc": 0.737,
    "final_30m_n": {
-    "known": 13,
+    "known": 33,
     "decoy": 9
    },
    "positive_set": "original 13 hand-listed known analogs (role heldout_positive) + held-out documented analogs (split=holdout) where reported"
   },
-  "weight_stability_jaccard": 0.9095,
+  "weight_stability_jaccard": 0.8813,
   "weight_stability_detail": {
-   "mean": 0.9095,
+   "mean": 0.8813,
    "n_draws": 200,
    "jitter": "±20%",
    "seed": 20261115,
    "least_stable": [
     {
-     "search": "nobile_rim_2|rim",
-     "jaccard": 0.578
+     "search": "de_gerlache_rim_2|rim",
+     "jaccard": 0.617
     },
     {
-     "search": "malapert_massif|texture",
-     "jaccard": 0.723
+     "search": "de_gerlache_rim_2|texture",
+     "jaccard": 0.621
     },
     {
-     "search": "haworth|texture",
-     "jaccard": 0.745
+     "search": "cabeus_b_peak|rim",
+     "jaccard": 0.698
     }
    ]
   },
   "classifier_two_sample": {
    "per_region_auc": {
-    "cabeus_b_peak": 0.998,
+    "cabeus_b_peak": 0.982,
     "haworth": 0.956,
-    "malapert_massif": 0.998,
-    "mons_mouton_plateau": 0.913,
-    "mons_mouton": 0.953,
-    "nobile_rim_1": 0.967,
-    "nobile_rim_2": 0.92,
-    "de_gerlache_rim_2": 0.994,
-    "slater_plain": 0.953
+    "malapert_massif": 0.988,
+    "mons_mouton_plateau": 0.86,
+    "mons_mouton": 0.951,
+    "nobile_rim_1": 0.953,
+    "nobile_rim_2": 0.96,
+    "de_gerlache_rim_2": 0.966,
+    "slater_plain": 0.988
    },
    "top_features": [
     {
      "feature": "curvature_std_per_km",
-     "importance": 0.1208
+     "importance": 0.1554
     },
     {
      "feature": "slope_p90_deg",
-     "importance": 0.0559
+     "importance": 0.0548
     },
     {
      "feature": "roughness_m",
-     "importance": 0.0247
-    },
-    {
-     "feature": "jump1km_p95_m",
-     "importance": 0.0199
+     "importance": 0.0425
     },
     {
      "feature": "relief_m",
-     "importance": 0.0169
+     "importance": 0.0327
+    },
+    {
+     "feature": "jump1km_p95_m",
+     "importance": 0.0231
     },
     {
      "feature": "slope_mean_deg",
-     "importance": 0.009
+     "importance": 0.0202
     }
    ],
    "per_pair": [
     {
      "region_id": "cabeus_b_peak",
      "hazard": "shadow",
-     "site_id": "S03582",
-     "auc": 1.0,
-     "lr_auc": 0.997,
-     "rf_auc": 1.0,
+     "site_id": "R00030",
+     "auc": 0.999,
+     "lr_auc": 0.987,
+     "rf_auc": 0.999,
      "top_feature": "jump1km_p95_m"
     },
     {
      "region_id": "cabeus_b_peak",
      "hazard": "rim",
-     "site_id": "S01992",
-     "auc": 1.0,
-     "lr_auc": 1.0,
-     "rf_auc": 1.0,
+     "site_id": "R00050",
+     "auc": 0.996,
+     "lr_auc": 0.996,
+     "rf_auc": 0.994,
      "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "cabeus_b_peak",
      "hazard": "texture",
-     "site_id": "S04188",
-     "auc": 0.995,
-     "lr_auc": 0.995,
-     "rf_auc": 0.993,
+     "site_id": "R00038",
+     "auc": 0.952,
+     "lr_auc": 0.952,
+     "rf_auc": 0.937,
      "top_feature": "slope_p90_deg"
     },
     {
      "region_id": "haworth",
      "hazard": "shadow",
-     "site_id": "S00241",
+     "site_id": "R00023",
+     "auc": 0.983,
+     "lr_auc": 0.95,
+     "rf_auc": 0.983,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "haworth",
+     "hazard": "rim",
+     "site_id": "R00070",
+     "auc": 0.949,
+     "lr_auc": 0.931,
+     "rf_auc": 0.949,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "haworth",
+     "hazard": "texture",
+     "site_id": "R00020",
      "auc": 0.936,
-     "lr_auc": 0.696,
+     "lr_auc": 0.846,
      "rf_auc": 0.936,
      "top_feature": "curvature_std_per_km"
     },
     {
-     "region_id": "haworth",
-     "hazard": "rim",
-     "site_id": "S04010",
-     "auc": 0.934,
-     "lr_auc": 0.93,
-     "rf_auc": 0.934,
-     "top_feature": "curvature_std_per_km"
+     "region_id": "malapert_massif",
+     "hazard": "shadow",
+     "site_id": "R00007",
+     "auc": 0.966,
+     "lr_auc": 0.917,
+     "rf_auc": 0.966,
+     "top_feature": "jump1km_p95_m"
     },
     {
-     "region_id": "haworth",
-     "hazard": "texture",
-     "site_id": "S03631",
+     "region_id": "malapert_massif",
+     "hazard": "rim",
+     "site_id": "R00199",
      "auc": 0.998,
-     "lr_auc": 0.92,
+     "lr_auc": 0.998,
+     "rf_auc": 0.998,
+     "top_feature": "roughness_m"
+    },
+    {
+     "region_id": "malapert_massif",
+     "hazard": "texture",
+     "site_id": "R00189",
+     "auc": 1.0,
+     "lr_auc": 1.0,
      "rf_auc": 0.998,
      "top_feature": "curvature_std_per_km"
     },
     {
-     "region_id": "malapert_massif",
+     "region_id": "mons_mouton_plateau",
      "hazard": "shadow",
-     "site_id": "S03582",
-     "auc": 0.997,
-     "lr_auc": 0.976,
+     "site_id": "R00100",
+     "auc": 0.939,
+     "lr_auc": 0.939,
+     "rf_auc": 0.889,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "mons_mouton_plateau",
+     "hazard": "rim",
+     "site_id": "R00233",
+     "auc": 0.808,
+     "lr_auc": 0.808,
+     "rf_auc": 0.795,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "mons_mouton_plateau",
+     "hazard": "texture",
+     "site_id": "R00025",
+     "auc": 0.834,
+     "lr_auc": 0.684,
+     "rf_auc": 0.834,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "mons_mouton",
+     "hazard": "shadow",
+     "site_id": "R00021",
+     "auc": 0.947,
+     "lr_auc": 0.849,
+     "rf_auc": 0.947,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "mons_mouton",
+     "hazard": "rim",
+     "site_id": "R00103",
+     "auc": 0.906,
+     "lr_auc": 0.906,
+     "rf_auc": 0.852,
+     "top_feature": "slope_p90_deg"
+    },
+    {
+     "region_id": "mons_mouton",
+     "hazard": "texture",
+     "site_id": "R00149",
+     "auc": 1.0,
+     "lr_auc": 1.0,
      "rf_auc": 0.997,
      "top_feature": "curvature_std_per_km"
     },
     {
-     "region_id": "malapert_massif",
+     "region_id": "nobile_rim_1",
+     "hazard": "shadow",
+     "site_id": "R00027",
+     "auc": 0.978,
+     "lr_auc": 0.915,
+     "rf_auc": 0.978,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "nobile_rim_1",
      "hazard": "rim",
-     "site_id": "S02310",
-     "auc": 0.998,
-     "lr_auc": 0.998,
-     "rf_auc": 0.998,
+     "site_id": "R00048",
+     "auc": 0.986,
+     "lr_auc": 0.968,
+     "rf_auc": 0.986,
      "top_feature": "roughness_m"
     },
     {
-     "region_id": "malapert_massif",
-     "hazard": "texture",
-     "site_id": "S02247",
-     "auc": 0.999,
-     "lr_auc": 0.999,
-     "rf_auc": 0.998,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
-     "region_id": "mons_mouton_plateau",
-     "hazard": "shadow",
-     "site_id": "S03644",
-     "auc": 0.875,
-     "lr_auc": 0.744,
-     "rf_auc": 0.875,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
-     "region_id": "mons_mouton_plateau",
-     "hazard": "rim",
-     "site_id": "S01056",
-     "auc": 0.931,
-     "lr_auc": 0.904,
-     "rf_auc": 0.931,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
-     "region_id": "mons_mouton_plateau",
-     "hazard": "texture",
-     "site_id": "S01100",
-     "auc": 0.934,
-     "lr_auc": 0.88,
-     "rf_auc": 0.934,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
-     "region_id": "mons_mouton",
-     "hazard": "shadow",
-     "site_id": "S00356",
-     "auc": 0.887,
-     "lr_auc": 0.865,
-     "rf_auc": 0.887,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
-     "region_id": "mons_mouton",
-     "hazard": "rim",
-     "site_id": "S02302",
-     "auc": 0.974,
-     "lr_auc": 0.974,
-     "rf_auc": 0.962,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
-     "region_id": "mons_mouton",
-     "hazard": "texture",
-     "site_id": "S02247",
-     "auc": 0.997,
-     "lr_auc": 0.997,
-     "rf_auc": 0.996,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
      "region_id": "nobile_rim_1",
-     "hazard": "shadow",
-     "site_id": "S03018",
-     "auc": 0.968,
-     "lr_auc": 0.927,
-     "rf_auc": 0.968,
+     "hazard": "texture",
+     "site_id": "EP080",
+     "auc": 0.895,
+     "lr_auc": 0.8,
+     "rf_auc": 0.895,
      "top_feature": "curvature_std_per_km"
     },
     {
-     "region_id": "nobile_rim_1",
+     "region_id": "nobile_rim_2",
+     "hazard": "shadow",
+     "site_id": "R00112",
+     "auc": 0.936,
+     "lr_auc": 0.923,
+     "rf_auc": 0.936,
+     "top_feature": "roughness_m"
+    },
+    {
+     "region_id": "nobile_rim_2",
      "hazard": "rim",
-     "site_id": "S01417",
-     "auc": 0.984,
-     "lr_auc": 0.984,
+     "site_id": "R00213",
+     "auc": 0.97,
+     "lr_auc": 0.968,
+     "rf_auc": 0.97,
+     "top_feature": "curvature_std_per_km"
+    },
+    {
+     "region_id": "nobile_rim_2",
+     "hazard": "texture",
+     "site_id": "R00164",
+     "auc": 0.975,
+     "lr_auc": 0.926,
      "rf_auc": 0.975,
-     "top_feature": "slope_p90_deg"
-    },
-    {
-     "region_id": "nobile_rim_1",
-     "hazard": "texture",
-     "site_id": "S01331",
-     "auc": 0.949,
-     "lr_auc": 0.908,
-     "rf_auc": 0.949,
      "top_feature": "roughness_m"
-    },
-    {
-     "region_id": "nobile_rim_2",
-     "hazard": "shadow",
-     "site_id": "S04053",
-     "auc": 0.861,
-     "lr_auc": 0.815,
-     "rf_auc": 0.861,
-     "top_feature": "slope_p90_deg"
-    },
-    {
-     "region_id": "nobile_rim_2",
-     "hazard": "rim",
-     "site_id": "S04078",
-     "auc": 0.998,
-     "lr_auc": 0.998,
-     "rf_auc": 0.993,
-     "top_feature": "curvature_std_per_km"
-    },
-    {
-     "region_id": "nobile_rim_2",
-     "hazard": "texture",
-     "site_id": "S04676",
-     "auc": 0.901,
-     "lr_auc": 0.901,
-     "rf_auc": 0.892,
-     "top_feature": "slope_p90_deg"
     },
     {
      "region_id": "de_gerlache_rim_2",
      "hazard": "shadow",
-     "site_id": "S01264",
+     "site_id": "R00030",
      "auc": 0.986,
-     "lr_auc": 0.947,
+     "lr_auc": 0.915,
      "rf_auc": 0.986,
      "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "de_gerlache_rim_2",
      "hazard": "rim",
-     "site_id": "S02247",
-     "auc": 0.998,
-     "lr_auc": 0.998,
-     "rf_auc": 0.996,
+     "site_id": "R00174",
+     "auc": 0.922,
+     "lr_auc": 0.912,
+     "rf_auc": 0.922,
      "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "de_gerlache_rim_2",
      "hazard": "texture",
-     "site_id": "S02247",
-     "auc": 0.998,
-     "lr_auc": 0.998,
-     "rf_auc": 0.996,
-     "top_feature": "curvature_std_per_km"
+     "site_id": "EP084",
+     "auc": 0.989,
+     "lr_auc": 0.978,
+     "rf_auc": 0.989,
+     "top_feature": "jump1km_p95_m"
     },
     {
      "region_id": "slater_plain",
      "hazard": "shadow",
-     "site_id": "S00241",
-     "auc": 0.964,
-     "lr_auc": 0.721,
-     "rf_auc": 0.964,
+     "site_id": "R00115",
+     "auc": 0.987,
+     "lr_auc": 0.987,
+     "rf_auc": 0.974,
      "top_feature": "curvature_std_per_km"
     },
     {
      "region_id": "slater_plain",
      "hazard": "rim",
-     "site_id": "S01056",
-     "auc": 0.963,
-     "lr_auc": 0.962,
-     "rf_auc": 0.963,
-     "top_feature": "roughness_m"
+     "site_id": "R00184",
+     "auc": 0.987,
+     "lr_auc": 0.986,
+     "rf_auc": 0.987,
+     "top_feature": "slope_p90_deg"
     },
     {
      "region_id": "slater_plain",
      "hazard": "texture",
-     "site_id": "S01222",
-     "auc": 0.933,
-     "lr_auc": 0.886,
-     "rf_auc": 0.933,
+     "site_id": "R00160",
+     "auc": 0.99,
+     "lr_auc": 0.987,
+     "rf_auc": 0.99,
      "top_feature": "curvature_std_per_km"
     }
    ],
-   "mean_auc": 0.961,
+   "mean_auc": 0.956,
    "method": "Lopez-Paz & Oquab (2017) classifier two-sample test on 1 km sub-tiles of the 30 m tiles (each region vs its top-1 Earth site per hazard); logistic regression and a 100-tree depth-4 random forest; StratifiedGroupKFold(6) grouped by 5 km block; reported AUC = the better of the two (out-of-fold); importance = permutation drop in AUC on held-out folds. 0.5 = indistinguishable, 1.0 = trivially separable.",
    "features": [
     "slope_mean_deg",
@@ -676,99 +688,99 @@
    "Vegetation and buildings sit inside the Copernicus surface model (elevation data that includes trees and buildings); we mask them with ESA WorldCover but low shrubs and grass remain",
    "Atmospheric refraction near the horizon: windows with the sun below 1° are refraction-sensitive (a few tenths of a degree can shift them by minutes)",
    "Low sun lasts minutes on Earth but days on the Moon, so rehearsal windows are short",
-   "The Earth search covers only ~5.8% of the planet's bare land (a seeded sample of 15 km windows), so better analogs may exist unsampled",
+   "The Earth search covers only ~14.61% of the planet's bare land (a seeded sample of 15 km windows), so better analogs may exist unsampled",
    "Metrics describe terrain shape and lighting geometry only, not regolith, rock strength or dust"
   ],
-  "earth_coverage_pct_bare": "5.8",
+  "earth_coverage_pct_bare": "14.61",
   "earth_coverage_source": "method.json screen.coverage_pct_bare",
   "heldout_ranks": {
    "EP001": {
     "role": "heldout_positive",
     "name": "Haughton impact crater (Devon Is.)",
-    "best_rank": 29,
+    "best_rank": 39,
     "best_search": "slater_plain|shadow",
-    "best_distance": 0.4596,
-    "n_pool": 188
+    "best_distance": 0.4661,
+    "n_pool": 229
    },
    "EP002": {
     "role": "heldout_positive",
     "name": "Meteor (Barringer) Crater",
-    "best_rank": 109,
+    "best_rank": 149,
     "best_search": "slater_plain|rim",
     "best_distance": 1.7378,
-    "n_pool": 188
+    "n_pool": 229
    },
    "EP003": {
     "role": "heldout_positive",
     "name": "Mistastin crater",
-    "best_rank": 7,
+    "best_rank": 9,
     "best_search": "haworth|texture",
-    "best_distance": 0.4058,
-    "n_pool": 188
+    "best_distance": 0.4077,
+    "n_pool": 229
    },
    "EP004": {
     "role": "heldout_positive",
     "name": "Death Valley (Badwater Basin)",
-    "best_rank": 23,
+    "best_rank": 24,
     "best_search": "nobile_rim_1|rim",
     "best_distance": 0.9394,
-    "n_pool": 188
+    "n_pool": 229
    },
    "EP005": {
     "role": "heldout_positive",
     "name": "Craters of the Moon NM",
-    "best_rank": 7,
+    "best_rank": 17,
     "best_search": "slater_plain|shadow",
-    "best_distance": 0.3237,
-    "n_pool": 188
+    "best_distance": 0.3254,
+    "n_pool": 229
    },
    "EP007": {
     "role": "heldout_positive",
     "name": "McMurdo Dry Valleys (Taylor Valley)",
-    "best_rank": 85,
+    "best_rank": 101,
     "best_search": "nobile_rim_1|rim",
     "best_distance": 1.6779,
-    "n_pool": 188
+    "n_pool": 229
    },
    "EP008": {
     "role": "heldout_positive",
     "name": "Atacama (Salar de Atacama)",
-    "best_rank": 103,
+    "best_rank": 135,
     "best_search": "malapert_massif|shadow",
-    "best_distance": 3.1582,
-    "n_pool": 188
+    "best_distance": 3.1515,
+    "n_pool": 229
    },
    "EP009": {
     "role": "heldout_positive",
     "name": "Sudbury Basin",
-    "best_rank": 59,
+    "best_rank": 85,
     "best_search": "cabeus_b_peak|shadow",
-    "best_distance": 5.2164,
-    "n_pool": 188
+    "best_distance": 5.2125,
+    "n_pool": 229
    },
    "EP010": {
     "role": "heldout_positive",
     "name": "Pinacate Peaks / Gran Desierto",
     "best_rank": 1,
     "best_search": "cabeus_b_peak|shadow",
-    "best_distance": 1.9492,
-    "n_pool": 188
+    "best_distance": 1.9491,
+    "n_pool": 229
    },
    "EP011": {
     "role": "heldout_positive",
     "name": "Askja caldera",
-    "best_rank": 4,
-    "best_search": "cabeus_b_peak|shadow",
-    "best_distance": 3.0384,
-    "n_pool": 188
+    "best_rank": 8,
+    "best_search": "haworth|rim",
+    "best_distance": 0.5261,
+    "n_pool": 229
    },
    "EP012": {
     "role": "heldout_positive",
     "name": "Kilauea summit (Hawai'i)",
-    "best_rank": 37,
+    "best_rank": 49,
     "best_search": "cabeus_b_peak|shadow",
-    "best_distance": 4.2826,
-    "n_pool": 188
+    "best_distance": 4.2854,
+    "n_pool": 229
    },
    "EP013": {
     "role": "heldout_positive",
@@ -776,95 +788,255 @@
     "best_rank": 11,
     "best_search": "mons_mouton_plateau|rim",
     "best_distance": 0.787,
-    "n_pool": 188
+    "n_pool": 229
    },
    "EP014": {
     "role": "heldout_positive",
     "name": "Kilbourne Hole",
-    "best_rank": 84,
+    "best_rank": 107,
     "best_search": "slater_plain|texture",
-    "best_distance": 0.7129,
-    "n_pool": 188
+    "best_distance": 0.7237,
+    "n_pool": 229
    },
    "EP117": {
     "role": "decoy",
     "name": "Champaign IL farmland",
-    "best_rank": 130,
+    "best_rank": 167,
     "best_search": "slater_plain|rim",
     "best_distance": 1.9794,
-    "n_pool": 188
+    "n_pool": 229
    },
    "EP118": {
     "role": "decoy",
     "name": "Saskatoon farmland",
-    "best_rank": 114,
+    "best_rank": 153,
     "best_search": "slater_plain|rim",
     "best_distance": 1.7893,
-    "n_pool": 188
+    "n_pool": 229
    },
    "EP119": {
     "role": "decoy",
     "name": "Black Forest",
-    "best_rank": 16,
+    "best_rank": 18,
     "best_search": "mons_mouton_plateau|rim",
     "best_distance": 0.8193,
-    "n_pool": 188
+    "n_pool": 229
    },
    "EP121": {
     "role": "decoy",
     "name": "Houston",
-    "best_rank": 132,
+    "best_rank": 167,
     "best_search": "cabeus_b_peak|shadow",
-    "best_distance": 8.4276,
-    "n_pool": 188
+    "best_distance": 8.4352,
+    "n_pool": 229
    },
    "EP122": {
     "role": "decoy",
     "name": "Tokyo",
-    "best_rank": 75,
+    "best_rank": 103,
     "best_search": "cabeus_b_peak|shadow",
-    "best_distance": 5.8802,
-    "n_pool": 188
+    "best_distance": 5.8801,
+    "n_pool": 229
    },
    "EP123": {
     "role": "decoy",
     "name": "Salinas Valley",
-    "best_rank": 16,
+    "best_rank": 23,
     "best_search": "haworth|texture",
-    "best_distance": 0.5276,
-    "n_pool": 188
+    "best_distance": 0.5274,
+    "n_pool": 229
    },
    "EP124": {
     "role": "decoy",
     "name": "Po Valley",
-    "best_rank": 135,
+    "best_rank": 172,
     "best_search": "slater_plain|rim",
     "best_distance": 2.019,
-    "n_pool": 188
+    "n_pool": 229
    },
    "EP125": {
     "role": "decoy",
     "name": "Congo rainforest",
-    "best_rank": 58,
+    "best_rank": 78,
     "best_search": "cabeus_b_peak|shadow",
-    "best_distance": 5.1125,
-    "n_pool": 188
+    "best_distance": 5.1204,
+    "n_pool": 229
    },
    "EP126": {
     "role": "decoy",
     "name": "Palouse",
-    "best_rank": 27,
+    "best_rank": 37,
     "best_search": "slater_plain|shadow",
-    "best_distance": 0.4454,
-    "n_pool": 188
+    "best_distance": 0.4451,
+    "n_pool": 229
+   },
+   "LA001": {
+    "role": "heldout_positive",
+    "name": "Meteor Crater (Barringer)",
+    "best_rank": 149,
+    "best_search": "slater_plain|rim",
+    "best_distance": 1.74,
+    "n_pool": 229
+   },
+   "LA003": {
+    "role": "heldout_positive",
+    "name": "S P Crater (JETT3 site)",
+    "best_rank": 51,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 4.3395,
+    "n_pool": 229
+   },
+   "LA004": {
+    "role": "heldout_positive",
+    "name": "San Francisco Volcanic Field (JETT5)",
+    "best_rank": 14,
+    "best_search": "haworth|texture",
+    "best_distance": 0.4348,
+    "n_pool": 229
+   },
+   "LA006": {
+    "role": "heldout_positive",
+    "name": "Sunset Crater / Bonito Lava Flow",
+    "best_rank": 11,
+    "best_search": "mons_mouton_plateau|rim",
+    "best_distance": 0.7834,
+    "n_pool": 229
+   },
+   "LA007": {
+    "role": "heldout_positive",
+    "name": "Merriam Crater",
+    "best_rank": 78,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 5.0651,
+    "n_pool": 229
+   },
+   "LA008": {
+    "role": "heldout_positive",
+    "name": "Hopi Buttes volcanic field",
+    "best_rank": 53,
+    "best_search": "slater_plain|shadow",
+    "best_distance": 0.5736,
+    "n_pool": 229
+   },
+   "LA010": {
+    "role": "heldout_positive",
+    "name": "Kilbourne Hole",
+    "best_rank": 102,
+    "best_search": "slater_plain|texture",
+    "best_distance": 0.7125,
+    "n_pool": 229
+   },
+   "LA016": {
+    "role": "heldout_positive",
+    "name": "Ubehebe Crater",
+    "best_rank": 27,
+    "best_search": "mons_mouton_plateau|rim",
+    "best_distance": 0.8772,
+    "n_pool": 229
+   },
+   "LA020": {
+    "role": "heldout_positive",
+    "name": "Death Valley (LVS helicopter test)",
+    "best_rank": 27,
+    "best_search": "nobile_rim_1|rim",
+    "best_distance": 1.0489,
+    "n_pool": 229
+   },
+   "LA021": {
+    "role": "heldout_positive",
+    "name": "Craters of the Moon National Monument",
+    "best_rank": 17,
+    "best_search": "slater_plain|shadow",
+    "best_distance": 0.3259,
+    "n_pool": 229
+   },
+   "LA024": {
+    "role": "heldout_positive",
+    "name": "Kilauea (Hawaii)",
+    "best_rank": 49,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 4.2784,
+    "n_pool": 229
+   },
+   "LA025": {
+    "role": "heldout_positive",
+    "name": "Mauna Kea (RESOLVE/PISCES ISRU test)",
+    "best_rank": 1,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 1.4869,
+    "n_pool": 229
+   },
+   "LA027": {
+    "role": "heldout_positive",
+    "name": "Sudbury Basin",
+    "best_rank": 85,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 5.2105,
+    "n_pool": 229
+   },
+   "LA028": {
+    "role": "heldout_positive",
+    "name": "Mistastin (Kamestastin) impact structure",
+    "best_rank": 12,
+    "best_search": "haworth|texture",
+    "best_distance": 0.4119,
+    "n_pool": 229
+   },
+   "LA030": {
+    "role": "heldout_positive",
+    "name": "Haughton impact structure (Devon Island)",
+    "best_rank": 39,
+    "best_search": "slater_plain|shadow",
+    "best_distance": 0.4623,
+    "n_pool": 229
+   },
+   "LA033": {
+    "role": "heldout_positive",
+    "name": "Pinacate volcanic field",
+    "best_rank": 1,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 1.9491,
+    "n_pool": 229
+   },
+   "LA034": {
+    "role": "heldout_positive",
+    "name": "Askja caldera (Iceland)",
+    "best_rank": 8,
+    "best_search": "haworth|rim",
+    "best_distance": 0.5261,
+    "n_pool": 229
+   },
+   "LA035": {
+    "role": "heldout_positive",
+    "name": "Vatnajokull NP northern highlands (Artemis II)",
+    "best_rank": 153,
+    "best_search": "slater_plain|rim",
+    "best_distance": 1.7883,
+    "n_pool": 229
+   },
+   "LA040": {
+    "role": "heldout_positive",
+    "name": "Mount Etna (ROBEX 2017 / ARCHES 2022)",
+    "best_rank": 1,
+    "best_search": "cabeus_b_peak|shadow",
+    "best_distance": 1.8217,
+    "n_pool": 229
+   },
+   "LA043": {
+    "role": "heldout_positive",
+    "name": "Challakere / Chitradurga (ISRO)",
+    "best_rank": 184,
+    "best_search": "mons_mouton_plateau|rim",
+    "best_distance": 2.6176,
+    "n_pool": 229
    }
   },
   "walk_findback": {
    "winner": "euclid_height_slope",
-   "top1": 0.7733,
-   "top5": 0.8633,
+   "top1": 0.7667,
+   "top5": 0.85,
    "n_routes": 300,
-   "dtw_top1": 0.39
+   "dtw_top1": 0.3833
   }
  },
  "notes": {
@@ -872,40 +1044,40 @@
   "novelty_shortfall_searches": [],
   "best_documented": {
    "cabeus_b_peak|shadow": {
-    "site_id": "EP010",
-    "name": "Pinacate Peaks / Gran Desierto",
-    "country": "Mexico",
-    "lat": 31.77,
-    "lon": -113.49,
+    "site_id": "LA025",
+    "name": "Mauna Kea (RESOLVE/PISCES ISRU test)",
+    "country": "USA",
+    "lat": 19.82056,
+    "lon": -155.46806,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 1.9492,
+    "selected_by": "documented",
+    "distance": 1.4869,
     "would_rank": 1,
-    "n_pool": 188
+    "n_pool": 229
    },
    "cabeus_b_peak|rim": {
-    "site_id": "EP011",
-    "name": "Askja caldera",
-    "country": "Iceland",
-    "lat": 65.033,
-    "lon": -16.783,
+    "site_id": "LA040",
+    "name": "Mount Etna (ROBEX 2017 / ARCHES 2022)",
+    "country": "Italy",
+    "lat": 37.755,
+    "lon": 14.995,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 1.0414,
-    "would_rank": 64,
-    "n_pool": 188
+    "selected_by": "documented",
+    "distance": 0.6069,
+    "would_rank": 7,
+    "n_pool": 229
    },
    "cabeus_b_peak|texture": {
-    "site_id": "EP013",
-    "name": "Sunset Crater / Cinder Lake",
-    "country": "USA",
-    "lat": 35.3644,
-    "lon": -111.5036,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.9949,
-    "would_rank": 87,
-    "n_pool": 188
+    "site_id": "LA038",
+    "name": "Lofoten anorthosite (PANGAEA)",
+    "country": "Norway",
+    "lat": 68.33333,
+    "lon": 14.66667,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.3102,
+    "would_rank": 17,
+    "n_pool": 229
    },
    "haworth|shadow": {
     "site_id": "EP011",
@@ -915,69 +1087,69 @@
     "lon": -16.783,
     "role": "heldout_positive",
     "selected_by": "validation",
-    "distance": 0.5598,
-    "would_rank": 9,
-    "n_pool": 188
+    "distance": 0.5596,
+    "would_rank": 23,
+    "n_pool": 229
    },
    "haworth|rim": {
-    "site_id": "EP011",
-    "name": "Askja caldera",
-    "country": "Iceland",
-    "lat": 65.033,
-    "lon": -16.783,
+    "site_id": "LA025",
+    "name": "Mauna Kea (RESOLVE/PISCES ISRU test)",
+    "country": "USA",
+    "lat": 19.82056,
+    "lon": -155.46806,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.5261,
-    "would_rank": 8,
-    "n_pool": 188
+    "selected_by": "documented",
+    "distance": 0.4791,
+    "would_rank": 5,
+    "n_pool": 229
    },
    "haworth|texture": {
-    "site_id": "EP003",
-    "name": "Mistastin crater",
-    "country": "Canada",
-    "lat": 55.8833,
-    "lon": -63.3,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.4058,
+    "site_id": "LA013",
+    "name": "Valles Caldera",
+    "country": "USA",
+    "lat": 35.9,
+    "lon": -106.53333,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.3732,
     "would_rank": 7,
-    "n_pool": 188
+    "n_pool": 229
    },
    "malapert_massif|shadow": {
-    "site_id": "EP010",
-    "name": "Pinacate Peaks / Gran Desierto",
-    "country": "Mexico",
-    "lat": 31.77,
-    "lon": -113.49,
+    "site_id": "LA025",
+    "name": "Mauna Kea (RESOLVE/PISCES ISRU test)",
+    "country": "USA",
+    "lat": 19.82056,
+    "lon": -155.46806,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 1.115,
+    "selected_by": "documented",
+    "distance": 0.7176,
     "would_rank": 1,
-    "n_pool": 188
+    "n_pool": 229
    },
    "malapert_massif|rim": {
-    "site_id": "EP004",
-    "name": "Death Valley (Badwater Basin)",
-    "country": "USA",
-    "lat": 36.2503,
-    "lon": -116.8258,
+    "site_id": "LA040",
+    "name": "Mount Etna (ROBEX 2017 / ARCHES 2022)",
+    "country": "Italy",
+    "lat": 37.755,
+    "lon": 14.995,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 1.1759,
-    "would_rank": 36,
-    "n_pool": 188
+    "selected_by": "documented",
+    "distance": 0.8489,
+    "would_rank": 14,
+    "n_pool": 229
    },
    "malapert_massif|texture": {
-    "site_id": "EP003",
-    "name": "Mistastin crater",
-    "country": "Canada",
-    "lat": 55.8833,
-    "lon": -63.3,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.5221,
-    "would_rank": 51,
-    "n_pool": 188
+    "site_id": "LA039",
+    "name": "Bletterbach Canyon (Dolomites)",
+    "country": "Italy",
+    "lat": 46.35783,
+    "lon": 11.43419,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.1535,
+    "would_rank": 3,
+    "n_pool": 229
    },
    "mons_mouton_plateau|shadow": {
     "site_id": "EP011",
@@ -987,177 +1159,177 @@
     "lon": -16.783,
     "role": "heldout_positive",
     "selected_by": "validation",
-    "distance": 0.2903,
-    "would_rank": 13,
-    "n_pool": 188
+    "distance": 0.2901,
+    "would_rank": 11,
+    "n_pool": 229
    },
    "mons_mouton_plateau|rim": {
-    "site_id": "EP011",
-    "name": "Askja caldera",
-    "country": "Iceland",
-    "lat": 65.033,
-    "lon": -16.783,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.7478,
-    "would_rank": 4,
-    "n_pool": 188
+    "site_id": "LA018",
+    "name": "Coso volcanic field",
+    "country": "USA",
+    "lat": 36.0333,
+    "lon": -117.817,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.6648,
+    "would_rank": 1,
+    "n_pool": 229
    },
    "mons_mouton_plateau|texture": {
-    "site_id": "EP011",
-    "name": "Askja caldera",
-    "country": "Iceland",
-    "lat": 65.033,
-    "lon": -16.783,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.3326,
-    "would_rank": 17,
-    "n_pool": 188
+    "site_id": "LA013",
+    "name": "Valles Caldera",
+    "country": "USA",
+    "lat": 35.9,
+    "lon": -106.53333,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.2313,
+    "would_rank": 8,
+    "n_pool": 229
    },
    "mons_mouton|shadow": {
-    "site_id": "EP013",
-    "name": "Sunset Crater / Cinder Lake",
+    "site_id": "LA004",
+    "name": "San Francisco Volcanic Field (JETT5)",
     "country": "USA",
-    "lat": 35.3644,
-    "lon": -111.5036,
+    "lat": 35.347,
+    "lon": -111.678,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.5883,
-    "would_rank": 36,
-    "n_pool": 188
+    "selected_by": "documented",
+    "distance": 0.4459,
+    "would_rank": 24,
+    "n_pool": 229
    },
    "mons_mouton|rim": {
-    "site_id": "EP011",
-    "name": "Askja caldera",
-    "country": "Iceland",
-    "lat": 65.033,
-    "lon": -16.783,
+    "site_id": "LA025",
+    "name": "Mauna Kea (RESOLVE/PISCES ISRU test)",
+    "country": "USA",
+    "lat": 19.82056,
+    "lon": -155.46806,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.8936,
-    "would_rank": 44,
-    "n_pool": 188
+    "selected_by": "documented",
+    "distance": 0.6274,
+    "would_rank": 1,
+    "n_pool": 229
    },
    "mons_mouton|texture": {
-    "site_id": "EP005",
-    "name": "Craters of the Moon NM",
+    "site_id": "LA018",
+    "name": "Coso volcanic field",
     "country": "USA",
-    "lat": 43.4617,
-    "lon": -113.5627,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.7331,
-    "would_rank": 98,
-    "n_pool": 188
+    "lat": 36.0333,
+    "lon": -117.817,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.2226,
+    "would_rank": 6,
+    "n_pool": 229
    },
    "nobile_rim_1|shadow": {
-    "site_id": "EP013",
-    "name": "Sunset Crater / Cinder Lake",
-    "country": "USA",
-    "lat": 35.3644,
-    "lon": -111.5036,
+    "site_id": "LA040",
+    "name": "Mount Etna (ROBEX 2017 / ARCHES 2022)",
+    "country": "Italy",
+    "lat": 37.755,
+    "lon": 14.995,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.8105,
-    "would_rank": 26,
-    "n_pool": 188
+    "selected_by": "documented",
+    "distance": 0.605,
+    "would_rank": 16,
+    "n_pool": 229
    },
    "nobile_rim_1|rim": {
-    "site_id": "EP004",
-    "name": "Death Valley (Badwater Basin)",
-    "country": "USA",
-    "lat": 36.2503,
-    "lon": -116.8258,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.9394,
-    "would_rank": 23,
-    "n_pool": 188
+    "site_id": "LA039",
+    "name": "Bletterbach Canyon (Dolomites)",
+    "country": "Italy",
+    "lat": 46.35783,
+    "lon": 11.43419,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.767,
+    "would_rank": 17,
+    "n_pool": 229
    },
    "nobile_rim_1|texture": {
-    "site_id": "EP013",
-    "name": "Sunset Crater / Cinder Lake",
+    "site_id": "LA018",
+    "name": "Coso volcanic field",
     "country": "USA",
-    "lat": 35.3644,
-    "lon": -111.5036,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.4788,
-    "would_rank": 66,
-    "n_pool": 188
+    "lat": 36.0333,
+    "lon": -117.817,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.1348,
+    "would_rank": 4,
+    "n_pool": 229
    },
    "nobile_rim_2|shadow": {
-    "site_id": "EP013",
-    "name": "Sunset Crater / Cinder Lake",
+    "site_id": "LA006",
+    "name": "Sunset Crater / Bonito Lava Flow",
     "country": "USA",
-    "lat": 35.3644,
-    "lon": -111.5036,
+    "lat": 35.36444,
+    "lon": -111.50361,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.3428,
-    "would_rank": 16,
-    "n_pool": 188
+    "selected_by": "documented",
+    "distance": 0.3412,
+    "would_rank": 20,
+    "n_pool": 229
    },
    "nobile_rim_2|rim": {
-    "site_id": "EP011",
-    "name": "Askja caldera",
-    "country": "Iceland",
-    "lat": 65.033,
-    "lon": -16.783,
+    "site_id": "LA025",
+    "name": "Mauna Kea (RESOLVE/PISCES ISRU test)",
+    "country": "USA",
+    "lat": 19.82056,
+    "lon": -155.46806,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.7627,
-    "would_rank": 40,
-    "n_pool": 188
+    "selected_by": "documented",
+    "distance": 0.4001,
+    "would_rank": 1,
+    "n_pool": 229
    },
    "nobile_rim_2|texture": {
-    "site_id": "EP013",
-    "name": "Sunset Crater / Cinder Lake",
+    "site_id": "LA017",
+    "name": "Mono Craters",
     "country": "USA",
-    "lat": 35.3644,
-    "lon": -111.5036,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.9323,
-    "would_rank": 88,
-    "n_pool": 188
+    "lat": 37.88333,
+    "lon": -119.0,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.2889,
+    "would_rank": 19,
+    "n_pool": 229
    },
    "de_gerlache_rim_2|shadow": {
-    "site_id": "EP010",
-    "name": "Pinacate Peaks / Gran Desierto",
-    "country": "Mexico",
-    "lat": 31.77,
-    "lon": -113.49,
+    "site_id": "LA025",
+    "name": "Mauna Kea (RESOLVE/PISCES ISRU test)",
+    "country": "USA",
+    "lat": 19.82056,
+    "lon": -155.46806,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 1.3324,
-    "would_rank": 7,
-    "n_pool": 188
+    "selected_by": "documented",
+    "distance": 1.0748,
+    "would_rank": 11,
+    "n_pool": 229
    },
    "de_gerlache_rim_2|rim": {
-    "site_id": "EP011",
-    "name": "Askja caldera",
-    "country": "Iceland",
-    "lat": 65.033,
-    "lon": -16.783,
+    "site_id": "LA025",
+    "name": "Mauna Kea (RESOLVE/PISCES ISRU test)",
+    "country": "USA",
+    "lat": 19.82056,
+    "lon": -155.46806,
     "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.7193,
-    "would_rank": 46,
-    "n_pool": 188
+    "selected_by": "documented",
+    "distance": 0.3566,
+    "would_rank": 8,
+    "n_pool": 229
    },
    "de_gerlache_rim_2|texture": {
-    "site_id": "EP003",
-    "name": "Mistastin crater",
-    "country": "Canada",
-    "lat": 55.8833,
-    "lon": -63.3,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 1.1246,
-    "would_rank": 81,
-    "n_pool": 188
+    "site_id": "LA018",
+    "name": "Coso volcanic field",
+    "country": "USA",
+    "lat": 36.0333,
+    "lon": -117.817,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.5079,
+    "would_rank": 19,
+    "n_pool": 229
    },
    "slater_plain|shadow": {
     "site_id": "EP011",
@@ -1167,33 +1339,33 @@
     "lon": -16.783,
     "role": "heldout_positive",
     "selected_by": "validation",
-    "distance": 0.3056,
-    "would_rank": 4,
-    "n_pool": 188
+    "distance": 0.3054,
+    "would_rank": 14,
+    "n_pool": 229
    },
    "slater_plain|rim": {
-    "site_id": "EP011",
-    "name": "Askja caldera",
-    "country": "Iceland",
-    "lat": 65.033,
-    "lon": -16.783,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.5731,
-    "would_rank": 6,
-    "n_pool": 188
+    "site_id": "LA018",
+    "name": "Coso volcanic field",
+    "country": "USA",
+    "lat": 36.0333,
+    "lon": -117.817,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.563,
+    "would_rank": 9,
+    "n_pool": 229
    },
    "slater_plain|texture": {
-    "site_id": "EP011",
-    "name": "Askja caldera",
-    "country": "Iceland",
-    "lat": 65.033,
-    "lon": -16.783,
-    "role": "heldout_positive",
-    "selected_by": "validation",
-    "distance": 0.4529,
-    "would_rank": 26,
-    "n_pool": 188
+    "site_id": "LA013",
+    "name": "Valles Caldera",
+    "country": "USA",
+    "lat": 35.9,
+    "lon": -106.53333,
+    "role": "seed",
+    "selected_by": "documented",
+    "distance": 0.2666,
+    "would_rank": 9,
+    "n_pool": 229
    }
   }
  }

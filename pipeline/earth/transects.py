@@ -130,7 +130,7 @@ def build(site_ids: list[str], site_meta: dict[str, dict] | None = None) -> dict
                        "lat": round(float(info["lat"]), 5), "lon": round(float(info["lon"]), 5),
                        "dsm_safe": bool(W.dsm_safe_shares(info.get("worldcover", {}))),
                        "bare_frac": round(float(info.get("bare_frac") or 0), 3),
-                       "selected_by": sm.get("selected_by")}
+                       "selected_by": sm.get("selected_by"), "region_label": sm.get("region_label")}
     doc = {"meta": md, "n": int(arr.shape[0]), "points": POINTS, "sites": lookup, "items": items}
     (WEB_WALK / "transects.json").write_text(json.dumps(doc, separators=(",", ":")))
     sz = ((WEB_WALK / "transects.bin").stat().st_size + (WEB_WALK / "transects.json").stat().st_size) / 1e6

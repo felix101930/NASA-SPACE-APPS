@@ -1,12 +1,12 @@
 {
  "meta": {
-  "generated_utc": "2026-11-14T19:59:43Z",
+  "generated_utc": "2026-11-14T21:53:22Z",
   "pipeline_version": "walkval-0.1",
   "seed": 2026,
   "earth_library": {
-   "generated_utc": "2026-11-14T19:54:57Z",
+   "generated_utc": "2026-11-14T21:31:21Z",
    "pipeline_version": "earth-0.2",
-   "n": 22000,
+   "n": 21845,
    "points": 100
   },
   "moon_regions": [
@@ -74,49 +74,49 @@
   {
    "name": "dtw_slope",
    "description": "Banded DTW (Sakoe-Chiba 10%) on signed slope - the browser's default search",
-   "top1": 0.39,
-   "top5": 0.6033,
+   "top1": 0.3833,
+   "top5": 0.5733,
    "median_rank": 3.0,
-   "ms_per_query": 1096.34,
-   "rows_searched": 22000
+   "ms_per_query": 297.4,
+   "rows_searched": 21845
   },
   {
    "name": "dtw_slope_znorm",
    "description": "Banded DTW 10% on z-normalised slope - the browser's 'Compare shape only' option",
-   "top1": 0.1333,
-   "top5": 0.21,
-   "median_rank": 113.5,
-   "ms_per_query": 980.7,
-   "rows_searched": 22000
+   "top1": 0.12,
+   "top5": 0.2,
+   "median_rank": 112.5,
+   "ms_per_query": 294.6,
+   "rows_searched": 21845
   },
   {
    "name": "euclid_slope",
    "description": "Euclidean (RMS) on signed slope, no warping",
-   "top1": 0.57,
-   "top5": 0.7367,
+   "top1": 0.5433,
+   "top5": 0.6967,
    "median_rank": 1.0,
-   "ms_per_query": 3.83,
-   "rows_searched": 22000
+   "ms_per_query": 1.41,
+   "rows_searched": 21845
   },
   {
    "name": "euclid_height_slope",
    "description": "Euclidean on relative height + slope, each channel standardised by the library spread",
-   "top1": 0.7733,
-   "top5": 0.8633,
+   "top1": 0.7667,
+   "top5": 0.85,
    "median_rank": 1.0,
-   "ms_per_query": 8.1,
-   "rows_searched": 22000
+   "ms_per_query": 3.31,
+   "rows_searched": 21845
   },
   {
    "name": "dtw_app",
    "description": "The browser pipeline: Walk.tsx prefilter (nearest length class + climb/steepest-slope window), then banded DTW 10% on slope",
-   "top1": 0.3867,
-   "top5": 0.47,
-   "median_rank": 10.0,
-   "ms_per_query": 149.21,
-   "rows_searched": 2979,
+   "top1": 0.36,
+   "top5": 0.4633,
+   "median_rank": 12.5,
+   "ms_per_query": 40.92,
+   "rows_searched": 3033,
    "needle_filtered_out": 0.3367,
-   "median_candidates": 2842
+   "median_candidates": 2918
   }
  ],
  "winner": "euclid_height_slope",
@@ -127,33 +127,33 @@
    "matchers": {
     "dtw_slope": {
      "n": 103,
-     "top1": 0.1748,
-     "top5": 0.3398,
-     "median_rank": 26.0
+     "top1": 0.1553,
+     "top5": 0.2913,
+     "median_rank": 41.0
     },
     "dtw_slope_znorm": {
      "n": 103,
      "top1": 0.0583,
-     "top5": 0.1165,
-     "median_rank": 737.0
+     "top5": 0.0971,
+     "median_rank": 746.0
     },
     "euclid_slope": {
      "n": 103,
-     "top1": 0.2524,
-     "top5": 0.466,
-     "median_rank": 6.0
+     "top1": 0.2136,
+     "top5": 0.3592,
+     "median_rank": 12.0
     },
     "euclid_height_slope": {
      "n": 103,
-     "top1": 0.466,
-     "top5": 0.6408,
+     "top1": 0.4272,
+     "top5": 0.6214,
      "median_rank": 2.0
     },
     "dtw_app": {
      "n": 103,
-     "top1": 0.2136,
-     "top5": 0.2718,
-     "median_rank": 116.0,
+     "top1": 0.1553,
+     "top5": 0.2913,
+     "median_rank": 129.0,
      "filtered_out": 0.3204
     }
    }
@@ -165,32 +165,32 @@
     "dtw_slope": {
      "n": 103,
      "top1": 0.3495,
-     "top5": 0.6117,
+     "top5": 0.5631,
      "median_rank": 3.0
     },
     "dtw_slope_znorm": {
      "n": 103,
-     "top1": 0.0971,
-     "top5": 0.165,
-     "median_rank": 133.0
+     "top1": 0.0874,
+     "top5": 0.1553,
+     "median_rank": 141.0
     },
     "euclid_slope": {
      "n": 103,
-     "top1": 0.5922,
-     "top5": 0.7961,
+     "top1": 0.5825,
+     "top5": 0.7864,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
      "n": 103,
-     "top1": 0.8835,
-     "top5": 0.9709,
+     "top1": 0.9126,
+     "top5": 0.9515,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 103,
-     "top1": 0.3495,
-     "top5": 0.5049,
-     "median_rank": 5.0,
+     "top1": 0.3398,
+     "top5": 0.466,
+     "median_rank": 8.0,
      "filtered_out": 0.3495
     }
    }
@@ -202,30 +202,30 @@
     "dtw_slope": {
      "n": 94,
      "top1": 0.6702,
-     "top5": 0.883,
+     "top5": 0.8936,
      "median_rank": 1.0
     },
     "dtw_slope_znorm": {
      "n": 94,
-     "top1": 0.2553,
+     "top1": 0.2234,
      "top5": 0.3617,
      "median_rank": 15.5
     },
     "euclid_slope": {
      "n": 94,
-     "top1": 0.8936,
+     "top1": 0.8617,
      "top5": 0.9681,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
      "n": 94,
-     "top1": 0.9894,
+     "top1": 0.9787,
      "top5": 0.9894,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 94,
-     "top1": 0.617,
+     "top1": 0.6064,
      "top5": 0.6489,
      "median_rank": 1.0,
      "filtered_out": 0.3404
@@ -241,19 +241,19 @@
     "dtw_slope": {
      "n": 34,
      "top1": 0.6176,
-     "top5": 0.8529,
+     "top5": 0.7647,
      "median_rank": 1.0
     },
     "dtw_slope_znorm": {
      "n": 34,
-     "top1": 0.2059,
+     "top1": 0.1765,
      "top5": 0.3529,
-     "median_rank": 26.5
+     "median_rank": 30.0
     },
     "euclid_slope": {
      "n": 34,
-     "top1": 0.7059,
-     "top5": 0.9118,
+     "top1": 0.6471,
+     "top5": 0.8235,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
@@ -264,8 +264,8 @@
     },
     "dtw_app": {
      "n": 34,
-     "top1": 0.4412,
-     "top5": 0.5,
+     "top1": 0.3824,
+     "top5": 0.4706,
      "median_rank": null,
      "filtered_out": 0.5
     }
@@ -277,31 +277,31 @@
    "matchers": {
     "dtw_slope": {
      "n": 34,
-     "top1": 0.2647,
-     "top5": 0.5,
-     "median_rank": 5.5
+     "top1": 0.3235,
+     "top5": 0.4706,
+     "median_rank": 7.5
     },
     "dtw_slope_znorm": {
      "n": 34,
-     "top1": 0.1176,
+     "top1": 0.0882,
      "top5": 0.1471,
-     "median_rank": 73.0
+     "median_rank": 64.5
     },
     "euclid_slope": {
      "n": 34,
      "top1": 0.5,
      "top5": 0.6471,
-     "median_rank": 1.5
+     "median_rank": 2.0
     },
     "euclid_height_slope": {
      "n": 34,
      "top1": 0.6471,
-     "top5": 0.7353,
+     "top5": 0.7647,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 34,
-     "top1": 0.4118,
+     "top1": 0.3824,
      "top5": 0.5294,
      "median_rank": 4.0,
      "filtered_out": 0.2353
@@ -314,20 +314,20 @@
    "matchers": {
     "dtw_slope": {
      "n": 34,
-     "top1": 0.6765,
-     "top5": 0.8824,
+     "top1": 0.5882,
+     "top5": 0.7941,
      "median_rank": 1.0
     },
     "dtw_slope_znorm": {
      "n": 34,
      "top1": 0.2353,
      "top5": 0.3235,
-     "median_rank": 42.5
+     "median_rank": 47.5
     },
     "euclid_slope": {
      "n": 34,
-     "top1": 0.7059,
-     "top5": 0.8529,
+     "top1": 0.6765,
+     "top5": 0.7941,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
@@ -338,9 +338,9 @@
     },
     "dtw_app": {
      "n": 34,
-     "top1": 0.4706,
-     "top5": 0.5,
-     "median_rank": 4.5,
+     "top1": 0.4412,
+     "top5": 0.5294,
+     "median_rank": 4.0,
      "filtered_out": 0.3824
     }
    }
@@ -351,33 +351,33 @@
    "matchers": {
     "dtw_slope": {
      "n": 33,
-     "top1": 0.2424,
-     "top5": 0.5152,
+     "top1": 0.303,
+     "top5": 0.5455,
      "median_rank": 5.0
     },
     "dtw_slope_znorm": {
      "n": 33,
-     "top1": 0.0606,
-     "top5": 0.1515,
-     "median_rank": 124.0
+     "top1": 0.0303,
+     "top5": 0.0606,
+     "median_rank": 137.0
     },
     "euclid_slope": {
      "n": 33,
-     "top1": 0.6061,
+     "top1": 0.5455,
      "top5": 0.7273,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
      "n": 33,
      "top1": 0.7576,
-     "top5": 0.8485,
+     "top5": 0.7576,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 33,
-     "top1": 0.3939,
-     "top5": 0.4848,
-     "median_rank": 7.0,
+     "top1": 0.3333,
+     "top5": 0.4545,
+     "median_rank": 9.0,
      "filtered_out": 0.2424
     }
    }
@@ -389,19 +389,19 @@
     "dtw_slope": {
      "n": 33,
      "top1": 0.3636,
-     "top5": 0.5758,
+     "top5": 0.6061,
      "median_rank": 3.0
     },
     "dtw_slope_znorm": {
      "n": 33,
      "top1": 0.1515,
-     "top5": 0.2121,
-     "median_rank": 107.0
+     "top5": 0.2424,
+     "median_rank": 100.0
     },
     "euclid_slope": {
      "n": 33,
-     "top1": 0.6061,
-     "top5": 0.7273,
+     "top1": 0.5758,
+     "top5": 0.6667,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
@@ -412,9 +412,9 @@
     },
     "dtw_app": {
      "n": 33,
-     "top1": 0.303,
+     "top1": 0.3333,
      "top5": 0.3939,
-     "median_rank": 16.0,
+     "median_rank": 17.0,
      "filtered_out": 0.3333
     }
    }
@@ -425,33 +425,33 @@
    "matchers": {
     "dtw_slope": {
      "n": 33,
-     "top1": 0.4545,
+     "top1": 0.5152,
      "top5": 0.6667,
-     "median_rank": 2.0
+     "median_rank": 1.0
     },
     "dtw_slope_znorm": {
      "n": 33,
-     "top1": 0.1818,
-     "top5": 0.2121,
-     "median_rank": 60.0
+     "top1": 0.1515,
+     "top5": 0.1818,
+     "median_rank": 62.0
     },
     "euclid_slope": {
      "n": 33,
-     "top1": 0.6364,
+     "top1": 0.5455,
      "top5": 0.7273,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
      "n": 33,
-     "top1": 0.8182,
-     "top5": 0.9394,
+     "top1": 0.8485,
+     "top5": 0.9697,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 33,
-     "top1": 0.4242,
-     "top5": 0.4848,
-     "median_rank": 6.0,
+     "top1": 0.4545,
+     "top5": 0.5152,
+     "median_rank": 4.0,
      "filtered_out": 0.3939
     }
    }
@@ -462,25 +462,25 @@
    "matchers": {
     "dtw_slope": {
      "n": 33,
-     "top1": 0.303,
-     "top5": 0.4545,
+     "top1": 0.2424,
+     "top5": 0.3939,
      "median_rank": 8.0
     },
     "dtw_slope_znorm": {
      "n": 33,
-     "top1": 0.0606,
+     "top1": 0.1212,
      "top5": 0.1818,
-     "median_rank": 243.0
+     "median_rank": 216.0
     },
     "euclid_slope": {
      "n": 33,
-     "top1": 0.5455,
-     "top5": 0.7273,
-     "median_rank": 1.0
+     "top1": 0.4848,
+     "top5": 0.6667,
+     "median_rank": 2.0
     },
     "euclid_height_slope": {
      "n": 33,
-     "top1": 0.8182,
+     "top1": 0.7576,
      "top5": 0.8788,
      "median_rank": 1.0
     },
@@ -499,33 +499,33 @@
    "matchers": {
     "dtw_slope": {
      "n": 33,
-     "top1": 0.3333,
-     "top5": 0.6061,
-     "median_rank": 3.0
+     "top1": 0.303,
+     "top5": 0.5758,
+     "median_rank": 4.0
     },
     "dtw_slope_znorm": {
      "n": 33,
-     "top1": 0.1515,
-     "top5": 0.1818,
-     "median_rank": 212.0
+     "top1": 0.1212,
+     "top5": 0.2121,
+     "median_rank": 229.0
     },
     "euclid_slope": {
      "n": 33,
-     "top1": 0.5455,
-     "top5": 0.7879,
+     "top1": 0.5758,
+     "top5": 0.697,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
      "n": 33,
      "top1": 0.8182,
-     "top5": 0.9091,
+     "top5": 0.8485,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 33,
-     "top1": 0.2727,
-     "top5": 0.3636,
-     "median_rank": 93.0,
+     "top1": 0.2121,
+     "top5": 0.3333,
+     "median_rank": 75.0,
      "filtered_out": 0.4242
     }
    }
@@ -536,33 +536,33 @@
    "matchers": {
     "dtw_slope": {
      "n": 33,
-     "top1": 0.2424,
-     "top5": 0.3636,
-     "median_rank": 21.0
+     "top1": 0.1818,
+     "top5": 0.3333,
+     "median_rank": 29.0
     },
     "dtw_slope_znorm": {
      "n": 33,
-     "top1": 0.0303,
-     "top5": 0.1212,
-     "median_rank": 731.0
+     "top1": 0.0,
+     "top5": 0.0909,
+     "median_rank": 756.0
     },
     "euclid_slope": {
      "n": 33,
-     "top1": 0.2727,
+     "top1": 0.3333,
      "top5": 0.5152,
-     "median_rank": 4.0
+     "median_rank": 5.0
     },
     "euclid_height_slope": {
      "n": 33,
-     "top1": 0.6061,
-     "top5": 0.6667,
+     "top1": 0.5758,
+     "top5": 0.6364,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 33,
-     "top1": 0.3636,
-     "top5": 0.4242,
-     "median_rank": 33.0,
+     "top1": 0.303,
+     "top5": 0.3939,
+     "median_rank": 45.0,
      "filtered_out": 0.2424
     }
    }
@@ -575,33 +575,33 @@
    "matchers": {
     "dtw_slope": {
      "n": 150,
-     "top1": 0.34,
-     "top5": 0.5867,
-     "median_rank": 3.0
+     "top1": 0.3133,
+     "top5": 0.5467,
+     "median_rank": 4.0
     },
     "dtw_slope_znorm": {
      "n": 150,
-     "top1": 0.08,
-     "top5": 0.1533,
-     "median_rank": 224.0
+     "top1": 0.06,
+     "top5": 0.14,
+     "median_rank": 237.5
     },
     "euclid_slope": {
      "n": 150,
-     "top1": 0.54,
-     "top5": 0.7333,
-     "median_rank": 1.0
+     "top1": 0.48,
+     "top5": 0.6933,
+     "median_rank": 2.0
     },
     "euclid_height_slope": {
      "n": 150,
      "top1": 0.7933,
-     "top5": 0.88,
+     "top5": 0.8667,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 150,
-     "top1": 0.3333,
-     "top5": 0.42,
-     "median_rank": 65.5,
+     "top1": 0.3133,
+     "top5": 0.4133,
+     "median_rank": 56.0,
      "filtered_out": 0.4067
     }
    }
@@ -612,33 +612,33 @@
    "matchers": {
     "dtw_slope": {
      "n": 150,
-     "top1": 0.44,
-     "top5": 0.62,
+     "top1": 0.4533,
+     "top5": 0.6,
      "median_rank": 2.0
     },
     "dtw_slope_znorm": {
      "n": 150,
-     "top1": 0.1867,
-     "top5": 0.2667,
-     "median_rank": 65.5
+     "top1": 0.18,
+     "top5": 0.26,
+     "median_rank": 70.5
     },
     "euclid_slope": {
      "n": 150,
-     "top1": 0.6,
-     "top5": 0.74,
+     "top1": 0.6067,
+     "top5": 0.7,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
      "n": 150,
-     "top1": 0.7533,
-     "top5": 0.8467,
+     "top1": 0.74,
+     "top5": 0.8333,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 150,
-     "top1": 0.44,
-     "top5": 0.52,
-     "median_rank": 3.5,
+     "top1": 0.4067,
+     "top5": 0.5133,
+     "median_rank": 4.0,
      "filtered_out": 0.2667
     }
    }
@@ -651,32 +651,32 @@
    "matchers": {
     "dtw_slope": {
      "n": 150,
-     "top1": 0.36,
-     "top5": 0.58,
-     "median_rank": 3.5
+     "top1": 0.3667,
+     "top5": 0.54,
+     "median_rank": 4.0
     },
     "dtw_slope_znorm": {
      "n": 150,
      "top1": 0.1067,
-     "top5": 0.1733,
-     "median_rank": 123.5
+     "top5": 0.1667,
+     "median_rank": 141.5
     },
     "euclid_slope": {
      "n": 150,
-     "top1": 0.5467,
-     "top5": 0.7267,
+     "top1": 0.5067,
+     "top5": 0.6867,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
      "n": 150,
      "top1": 0.78,
-     "top5": 0.86,
+     "top5": 0.84,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 150,
-     "top1": 0.5533,
-     "top5": 0.6867,
+     "top1": 0.5267,
+     "top5": 0.6733,
      "median_rank": 1.0,
      "filtered_out": 0.06
     }
@@ -688,31 +688,31 @@
    "matchers": {
     "dtw_slope": {
      "n": 150,
-     "top1": 0.42,
-     "top5": 0.6267,
-     "median_rank": 2.0
+     "top1": 0.4,
+     "top5": 0.6067,
+     "median_rank": 3.0
     },
     "dtw_slope_znorm": {
      "n": 150,
-     "top1": 0.16,
-     "top5": 0.2467,
-     "median_rank": 101.5
+     "top1": 0.1333,
+     "top5": 0.2333,
+     "median_rank": 102.5
     },
     "euclid_slope": {
      "n": 150,
-     "top1": 0.5933,
-     "top5": 0.7467,
+     "top1": 0.58,
+     "top5": 0.7067,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
      "n": 150,
-     "top1": 0.7667,
-     "top5": 0.8667,
+     "top1": 0.7533,
+     "top5": 0.86,
      "median_rank": 1.0
     },
     "dtw_app": {
      "n": 150,
-     "top1": 0.22,
+     "top1": 0.1933,
      "top5": 0.2533,
      "median_rank": null,
      "filtered_out": 0.6133
@@ -726,28 +726,28 @@
    "stretch": 0.0,
    "matchers": {
     "dtw_slope": {
-     "top1": 0.8533,
-     "top5": 0.9367,
+     "top1": 0.87,
+     "top5": 0.92,
      "median_rank": 1.0
     },
     "dtw_slope_znorm": {
-     "top1": 0.6933,
-     "top5": 0.7867,
+     "top1": 0.68,
+     "top5": 0.78,
      "median_rank": 1.0
     },
     "euclid_slope": {
-     "top1": 0.94,
+     "top1": 0.95,
      "top5": 0.9733,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
      "top1": 0.97,
-     "top5": 0.9833,
+     "top5": 0.9767,
      "median_rank": 1.0
     },
     "dtw_app": {
-     "top1": 0.6267,
-     "top5": 0.6533,
+     "top1": 0.6233,
+     "top5": 0.6467,
      "median_rank": 1.0,
      "filtered_out": 0.3033
     }
@@ -758,27 +758,27 @@
    "stretch": 0.05,
    "matchers": {
     "dtw_slope": {
-     "top1": 0.8667,
-     "top5": 0.94,
+     "top1": 0.8567,
+     "top5": 0.9467,
      "median_rank": 1.0
     },
     "dtw_slope_znorm": {
      "top1": 0.5833,
-     "top5": 0.7367,
+     "top5": 0.7233,
      "median_rank": 1.0
     },
     "euclid_slope": {
-     "top1": 0.92,
-     "top5": 0.9633,
+     "top1": 0.9067,
+     "top5": 0.96,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
-     "top1": 0.9633,
-     "top5": 0.9767,
+     "top1": 0.9533,
+     "top5": 0.9733,
      "median_rank": 1.0
     },
     "dtw_app": {
-     "top1": 0.5933,
+     "top1": 0.5967,
      "top5": 0.63,
      "median_rank": 1.0,
      "filtered_out": 0.3367
@@ -790,28 +790,28 @@
    "stretch": 0.1,
    "matchers": {
     "dtw_slope": {
-     "top1": 0.82,
+     "top1": 0.7933,
      "top5": 0.9533,
      "median_rank": 1.0
     },
     "dtw_slope_znorm": {
-     "top1": 0.4867,
+     "top1": 0.4967,
      "top5": 0.6267,
      "median_rank": 2.0
     },
     "euclid_slope": {
-     "top1": 0.7,
-     "top5": 0.9167,
+     "top1": 0.6833,
+     "top5": 0.8933,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
-     "top1": 0.88,
-     "top5": 0.9633,
+     "top1": 0.91,
+     "top5": 0.9567,
      "median_rank": 1.0
     },
     "dtw_app": {
-     "top1": 0.5567,
-     "top5": 0.6,
+     "top1": 0.5633,
+     "top5": 0.5933,
      "median_rank": 1.0,
      "filtered_out": 0.38
     }
@@ -822,29 +822,29 @@
    "stretch": 0.0,
    "matchers": {
     "dtw_slope": {
-     "top1": 0.3733,
-     "top5": 0.5867,
-     "median_rank": 3.0
+     "top1": 0.3767,
+     "top5": 0.5467,
+     "median_rank": 3.5
     },
     "dtw_slope_znorm": {
-     "top1": 0.1433,
-     "top5": 0.2433,
-     "median_rank": 117.0
+     "top1": 0.14,
+     "top5": 0.22,
+     "median_rank": 117.5
     },
     "euclid_slope": {
-     "top1": 0.6467,
-     "top5": 0.7567,
+     "top1": 0.64,
+     "top5": 0.7433,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
-     "top1": 0.7933,
-     "top5": 0.8633,
+     "top1": 0.79,
+     "top5": 0.8533,
      "median_rank": 1.0
     },
     "dtw_app": {
-     "top1": 0.3967,
-     "top5": 0.49,
-     "median_rank": 7.5,
+     "top1": 0.3633,
+     "top5": 0.4833,
+     "median_rank": 8.5,
      "filtered_out": 0.3033
     }
    }
@@ -854,29 +854,29 @@
    "stretch": 0.05,
    "matchers": {
     "dtw_slope": {
-     "top1": 0.39,
-     "top5": 0.6033,
+     "top1": 0.3833,
+     "top5": 0.5733,
      "median_rank": 3.0
     },
     "dtw_slope_znorm": {
-     "top1": 0.1333,
-     "top5": 0.21,
-     "median_rank": 113.5
+     "top1": 0.12,
+     "top5": 0.2,
+     "median_rank": 112.5
     },
     "euclid_slope": {
-     "top1": 0.57,
-     "top5": 0.7367,
+     "top1": 0.5433,
+     "top5": 0.6967,
      "median_rank": 1.0
     },
     "euclid_height_slope": {
-     "top1": 0.7733,
-     "top5": 0.8633,
+     "top1": 0.7667,
+     "top5": 0.85,
      "median_rank": 1.0
     },
     "dtw_app": {
-     "top1": 0.3867,
-     "top5": 0.47,
-     "median_rank": 10.0,
+     "top1": 0.36,
+     "top5": 0.4633,
+     "median_rank": 12.5,
      "filtered_out": 0.3367
     }
    }
@@ -886,29 +886,29 @@
    "stretch": 0.1,
    "matchers": {
     "dtw_slope": {
-     "top1": 0.3567,
-     "top5": 0.5967,
-     "median_rank": 3.0
+     "top1": 0.3467,
+     "top5": 0.57,
+     "median_rank": 3.5
     },
     "dtw_slope_znorm": {
-     "top1": 0.0933,
-     "top5": 0.1767,
-     "median_rank": 145.5
+     "top1": 0.09,
+     "top5": 0.1667,
+     "median_rank": 142.5
     },
     "euclid_slope": {
-     "top1": 0.3633,
-     "top5": 0.5967,
+     "top1": 0.3667,
+     "top5": 0.5467,
      "median_rank": 3.0
     },
     "euclid_height_slope": {
-     "top1": 0.7067,
-     "top5": 0.8367,
+     "top1": 0.7033,
+     "top5": 0.81,
      "median_rank": 1.0
     },
     "dtw_app": {
-     "top1": 0.3633,
-     "top5": 0.4367,
-     "median_rank": 21.5,
+     "top1": 0.32,
+     "top5": 0.4267,
+     "median_rank": 21.0,
      "filtered_out": 0.3833
     }
    }
@@ -918,29 +918,29 @@
    "stretch": 0.0,
    "matchers": {
     "dtw_slope": {
-     "top1": 0.0133,
-     "top5": 0.0433,
-     "median_rank": 587.0
+     "top1": 0.02,
+     "top5": 0.0467,
+     "median_rank": 621.5
     },
     "dtw_slope_znorm": {
-     "top1": 0.0,
-     "top5": 0.0,
-     "median_rank": 2959.5
+     "top1": 0.0033,
+     "top5": 0.0067,
+     "median_rank": 3045.0
     },
     "euclid_slope": {
-     "top1": 0.09,
-     "top5": 0.1633,
-     "median_rank": 261.0
+     "top1": 0.0933,
+     "top5": 0.1467,
+     "median_rank": 365.0
     },
     "euclid_height_slope": {
-     "top1": 0.3433,
-     "top5": 0.4533,
-     "median_rank": 12.0
+     "top1": 0.32,
+     "top5": 0.4233,
+     "median_rank": 17.0
     },
     "dtw_app": {
-     "top1": 0.04,
-     "top5": 0.0967,
-     "median_rank": 2016.0,
+     "top1": 0.0367,
+     "top5": 0.0733,
+     "median_rank": 1984.0,
      "filtered_out": 0.4567
     }
    }
@@ -950,29 +950,29 @@
    "stretch": 0.05,
    "matchers": {
     "dtw_slope": {
-     "top1": 0.02,
+     "top1": 0.0167,
      "top5": 0.05,
-     "median_rank": 450.5
+     "median_rank": 567.5
     },
     "dtw_slope_znorm": {
-     "top1": 0.0,
-     "top5": 0.0067,
-     "median_rank": 3075.5
+     "top1": 0.0067,
+     "top5": 0.0133,
+     "median_rank": 3098.0
     },
     "euclid_slope": {
-     "top1": 0.08,
-     "top5": 0.1467,
-     "median_rank": 224.5
+     "top1": 0.0767,
+     "top5": 0.14,
+     "median_rank": 323.0
     },
     "euclid_height_slope": {
-     "top1": 0.3367,
-     "top5": 0.4533,
-     "median_rank": 12.0
+     "top1": 0.3067,
+     "top5": 0.42,
+     "median_rank": 16.5
     },
     "dtw_app": {
-     "top1": 0.05,
-     "top5": 0.1167,
-     "median_rank": 2703.5,
+     "top1": 0.0467,
+     "top5": 0.0967,
+     "median_rank": 2591.5,
      "filtered_out": 0.4633
     }
    }
@@ -982,29 +982,29 @@
    "stretch": 0.1,
    "matchers": {
     "dtw_slope": {
-     "top1": 0.01,
-     "top5": 0.0533,
-     "median_rank": 351.5
+     "top1": 0.0133,
+     "top5": 0.04,
+     "median_rank": 420.5
     },
     "dtw_slope_znorm": {
      "top1": 0.0,
-     "top5": 0.0,
-     "median_rank": 2891.0
+     "top5": 0.0033,
+     "median_rank": 2985.5
     },
     "euclid_slope": {
      "top1": 0.0367,
-     "top5": 0.1233,
-     "median_rank": 229.5
+     "top5": 0.1067,
+     "median_rank": 304.0
     },
     "euclid_height_slope": {
-     "top1": 0.29,
-     "top5": 0.43,
-     "median_rank": 16.0
+     "top1": 0.2967,
+     "top5": 0.4,
+     "median_rank": 23.5
     },
     "dtw_app": {
-     "top1": 0.05,
-     "top5": 0.1133,
-     "median_rank": 4047.0,
+     "top1": 0.04,
+     "top5": 0.09,
+     "median_rank": 3859.0,
      "filtered_out": 0.4867
     }
    }
@@ -1014,42 +1014,42 @@
   "note": "Best real Earth transect for each clean Moon route (needle excluded). Earth heights are rebuilt by integrating the stored slopes (transects.bin has no heights), so height RMSE includes a small reconstruction error, shown below for the Moon routes themselves.",
   "app_pipeline": {
    "height_rmse_m": {
-    "median": 22.08,
-    "p10": 6.67,
-    "p90": 59.56
+    "median": 20.82,
+    "p10": 6.82,
+    "p90": 65.1
    },
    "max_slope_diff_deg": {
-    "median": 1.78,
+    "median": 2.0,
     "p10": 0.33,
-    "p90": 5.84
+    "p90": 5.15
    },
-   "share_max_slope_within_5deg": 0.8667,
+   "share_max_slope_within_5deg": 0.89,
    "match_distance": {
-    "median": 1.51,
-    "p10": 0.9,
-    "p90": 2.77
+    "median": 1.45,
+    "p10": 0.84,
+    "p90": 2.73
    },
    "share_earth_length_within_50pct": 0.9433
   },
   "winner_full_library": {
    "matcher": "euclid_height_slope",
    "height_rmse_m": {
-    "median": 12.63,
-    "p10": 4.84,
-    "p90": 26.95
+    "median": 12.44,
+    "p10": 4.93,
+    "p90": 29.29
    },
    "max_slope_diff_deg": {
-    "median": 2.27,
-    "p10": 0.44,
-    "p90": 6.66
+    "median": 2.19,
+    "p10": 0.29,
+    "p90": 5.59
    },
-   "share_max_slope_within_5deg": 0.8067,
+   "share_max_slope_within_5deg": 0.8567,
    "match_distance": {
-    "median": 0.25,
+    "median": 0.24,
     "p10": 0.13,
-    "p90": 0.43
+    "p90": 0.42
    },
-   "share_earth_length_within_50pct": 0.9233
+   "share_earth_length_within_50pct": 0.9
   },
   "height_reconstruction_rmse_m": {
    "median": 0.2,
