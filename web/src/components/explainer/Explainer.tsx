@@ -1,7 +1,11 @@
 // "How we find Earth analogs": six plain-language steps, one big visual each.
-import { lazy, Suspense, useEffect, useMemo, useRef, useState, type JSX } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type JSX, type ReactNode } from 'react';
 import { loadTile, type LoadedTile } from '../../data/tiles';
-import { metricInfo } from '../../content';
+import { loadJsonFrom, type Loaded } from '../../data/loader';
+import { listWords, metricInfo, NEW_PLACE_MIN_KM } from '../../content';
+import { parseMethodExtras, type DocumentedSite, type MethodExtras } from '../../lib/methodExtras';
+import { isFindbackRaw, parseFindback, type Findback } from '../../screens/walk/findback';
+import { InfoTip } from '../InfoTip';
 import { avgShadowAt } from '../../lib/shadow';
 import { placeName } from '../../lib/placeName';
 import { useApp } from '../../store';
@@ -95,7 +99,19 @@ function OverlayButtons({ overlay, onPick }: { overlay: Overlay; onPick: (o: Ove
 // Steps 2–3: world dots
 // ------------------------------------------------------------------------------------------------
 
-function WorldDots({ points, phase, active }: { points: MethodPoint[]; phase: 'sample' | 'filter'; active: boolean }): JSX.Element {
+function WorldDots({
+  points,
+  phase,
+  active,
+  screened,
+  coveragePct,
+}: {
+  points: MethodPoint[];
+  phase: 'sample' | 'filter';
+  active: boolean;
+  screened: number;
+  coveragePct: number | null;
+}): JSX.Element {
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [w, setW] = useState<number>(800);
@@ -174,7 +190,6 @@ function WorldDots({ points, phase, active }: { points: MethodPoint[]; phase: 's
     return (): void => cancelAnimationFrame(raf);
   }, [points, phase, active, w, h]);
 
-  const kept = points.filter((p: MethodPoint): boolean => p.pass).length;
   return (
     <div ref={wrap} className="ex-world">
       <canvas
@@ -182,25 +197,34 @@ function WorldDots({ points, phase, active }: { points: MethodPoint[]; phase: 's
         role="img"
         aria-label={
           phase === 'sample'
-            ? `World map with ${nf.format(points.length)} sampled squares`
-            : `World map: ${nf.format(kept)} bare squares kept, ${nf.format(points.length - kept)} thrown out`
+            ? `World map of sampled squares: ${nf.format(screened)} screened, sampled from bare land`
+            : 'World map: squares on bare ground kept, the rest thrown out'
         }
       />
       <div className="ex-world-legend">
         {phase === 'sample' ? (
-          <span className="legend-item">
-            <span className="dot-key" aria-hidden="true" />
-            {nf.format(points.length)} sample squares
-          </span>
+          <>
+            <span className="ex-stat">
+              <strong>{nf.format(screened)}</strong> squares screened
+            </span>
+            {coveragePct !== null && (
+              <span className="ex-stat">
+                <strong>{coveragePct.toFixed(1)}%</strong> of bare land covered
+              </span>
+            )}
+            <span className="ex-stat">
+              <strong>2</strong> rounds
+            </span>
+          </>
         ) : (
           <>
             <span className="legend-item">
               <span className="dot-key" aria-hidden="true" />
-              {nf.format(kept)} kept
+              Kept: bare ground
             </span>
             <span className="legend-item">
               <span className="dot-key dot-key-dim" aria-hidden="true" />
-              {nf.format(points.length - kept)} thrown out
+              Thrown out
             </span>
           </>
         )}
@@ -254,7 +278,10 @@ function Fingerprint({ method, siteName, regionName }: { method: MethodFile; sit
           );
         })}
       </ul>
-      <p className="caption">Each metric is compared on its own. There is no single “% Moon-like” score.</p>
+      <p className="ex-also">
+        <span className="ex-chip">+ ground brightness</span>
+        <span className="ex-chip">+ slope direction</span>
+      </p>
     </div>
   );
 }
@@ -264,14 +291,23 @@ function Fingerprint({ method, siteName, regionName }: { method: MethodFile; sit
 // ------------------------------------------------------------------------------------------------
 
 const STAGE_LABEL: Record<string, string> = {
-  sampled: 'Bare-land squares sampled',
-  dsm_safe: 'No trees, cities, farms or ice',
-  stage1_top: 'Shortlist from the quick comparison',
-  stage2: 'Checked in detail',
-  final_top3: 'Top 3 for each danger and region',
+  sampled: 'Random points on land',
+  dsm_safe: 'Bare ground to choose from',
+  screened: 'Squares measured, two rounds',
+  stage1_top: 'Shortlist after zooming in',
+  stage2: 'Checked in detail at 30 m',
+  final_top3: 'Places in a top 3',
 };
 
-function Funnel({ rows }: { rows: MethodFunnelRow[] }): JSX.Element {
+/** The funnel rows plus the screened count (method.json keeps it in `screen`), placed by size. */
+function withScreened(rows: MethodFunnelRow[], screened: number): MethodFunnelRow[] {
+  if (rows.some((r: MethodFunnelRow): boolean => r.stage === 'screened')) return rows;
+  const i = rows.findIndex((r: MethodFunnelRow): boolean => r.n < screened);
+  if (i <= 0) return rows;
+  return [...rows.slice(0, i), { stage: 'screened', n: screened }, ...rows.slice(i)];
+}
+
+function Funnel({ rows, moved }: { rows: MethodFunnelRow[]; moved: MethodExtras['refine'] }): JSX.Element {
   const max = Math.max(...rows.map((r: MethodFunnelRow): number => r.n), 1);
   const on = useEntered();
   return (
@@ -285,7 +321,10 @@ function Funnel({ rows }: { rows: MethodFunnelRow[] }): JSX.Element {
             />
           </span>
           <span className="ex-funnel-n">{nf.format(r.n)}</span>
-          <span className="ex-funnel-label">{STAGE_LABEL[r.stage] ?? r.stage.replace(/_/g, ' ')}</span>
+          <span className="ex-funnel-label">
+            {STAGE_LABEL[r.stage] ?? r.stage.replace(/_/g, ' ')}
+            {r.stage === 'stage1_top' && moved && <span className="faint"> · {nf.format(moved.nMoved)} moves</span>}
+          </span>
         </li>
       ))}
     </ol>
@@ -337,11 +376,69 @@ function StripPlot({ method }: { method: MethodFile }): JSX.Element {
         {v.known.map((s: MethodValSite, i: number) => dot(s, i, 'known'))}
         {v.decoys.map((s: MethodValSite, i: number) => dot(s, i, 'decoys'))}
       </svg>
-      <p className="caption">
-        Where each site’s best match ranks among all Earth squares; left is better. Lines mark the middle site of each group. A known site
-        beats a decoy <span title={`ROC-AUC ${v.auc.toFixed(2)}`}>{Math.round(v.auc * 100)} times in 100</span> (50 would be a coin flip).
-      </p>
+      <p className="caption">Best rank among all Earth squares; left is better. Dashed lines mark each group’s middle.</p>
     </div>
+  );
+}
+
+function in100(v: number): string {
+  return `${Math.round(v * 100)} in 100`;
+}
+
+function Scorecard({ x, findback, shadowR }: { x: MethodExtras; findback: Findback | null; shadowR: number | null }): JSX.Element {
+  const firsts = x.documented?.sites.filter((s: DocumentedSite): boolean => s.rank === 1).map((s: DocumentedSite): string => s.name.replace(/ volcanic field$/i, '')) ?? [];
+  const n = x.nasadem;
+  const rs = n ? [n.shadowR, n.jumpR, n.slopeR].filter((v: number | null): v is number => v !== null) : [];
+  return (
+    <dl className="ex-score">
+      {(x.aucIndependent ?? x.aucOriginal) !== null && (
+        <div>
+          <dt>Known analog beats a decoy</dt>
+          <dd>
+            <strong>{in100(x.aucIndependent ?? x.aucOriginal ?? 0)}</strong>
+            <span className="faint">{x.aucIndependent !== null ? 'new, held-out sites' : 'original set'}</span>
+          </dd>
+        </div>
+      )}
+      {x.documented && (
+        <div>
+          <dt>Famous field sites</dt>
+          <dd>
+            <strong>
+              {x.documented.nTop3 !== null ? `${x.documented.nTop3} of ${x.documented.nSites} reach a top 3` : `${x.documented.nSites} compared`}
+            </strong>
+            {firsts.length > 0 && <span className="faint">{listWords(firsts.slice(0, 4))} rank 1st in some searches</span>}
+          </dd>
+        </div>
+      )}
+      {rs.length > 0 && (
+        <div>
+          <dt>Second elevation map agrees</dt>
+          <dd>
+            <strong>r {rs.map((v: number): string => v.toFixed(2)).join(' · ')}</strong>
+            <span className="faint">shadow · jump · slope; exact top 3 can change</span>
+          </dd>
+        </div>
+      )}
+      {findback?.top1 != null && (
+        <div>
+          <dt>Walk test: hidden copy found first</dt>
+          <dd>
+            <strong>{Math.round(findback.top1 * 100)}%</strong>
+            <span className="faint">{findback.nRoutes ? `${nf.format(findback.nRoutes)} routes` : ''}</span>
+          </dd>
+        </div>
+      )}
+      {shadowR !== null && (
+        <div>
+          <dt>Shadows vs NASA’s map</dt>
+          <dd>
+            <strong>r {shadowR.toFixed(2)}</strong>
+            <span className="faint">pixel by pixel</span>
+          </dd>
+        </div>
+      )}
+    </dl>
   );
 }
 
@@ -349,46 +446,135 @@ function StripPlot({ method }: { method: MethodFile }): JSX.Element {
 // The explainer
 // ------------------------------------------------------------------------------------------------
 
+interface StepCtx {
+  m: MethodFile | null;
+  x: MethodExtras | null;
+  nRegions: number | null;
+  findback: Findback | null;
+  shadowR: number | null;
+}
+
 interface Step {
   title: string;
   short: string;
-  body: (m: MethodFile | null) => string;
+  /** One short sentence, about 20 words at most. Numbers belong in the visual. */
+  body: (c: StepCtx) => string;
+  /** Everything else, behind the "i" button. */
+  info: (c: StepCtx) => ReactNode;
+}
+
+/** Two short lines per info box: why the choice fits the problem, and how accurate it is (docs/method-decisions.md). */
+function WhyHow({ why, how }: { why: ReactNode; how: ReactNode }): JSX.Element {
+  return (
+    <>
+      <p>
+        <strong>Why it fits:</strong> {why}
+      </p>
+      <p>
+        <strong>How accurate:</strong> {how}
+      </p>
+    </>
+  );
+}
+
+function funnelRow(m: MethodFile | null, stage: string): MethodFunnelRow | undefined {
+  return m?.funnel.find((r: MethodFunnelRow): boolean => r.stage === stage);
 }
 
 const STEPS: Step[] = [
   {
     title: 'Turn a Moon site into numbers',
     short: 'Measure',
-    body: (): string =>
-      'We measure 3 dangers that hurt real landers (long shadows from a low sun, sudden drops at crater rims, and smooth ground a camera can’t track) plus slope for walking.',
+    body: (c): string =>
+      `3 dangers plus slope, measured in each of NASA’s ${c.nRegions ?? 'candidate'} regions. Region locations checked against USGS official boundaries.`,
+    info: (c): ReactNode => (
+      <WhyHow
+        why="these are the dangers that fooled real landers; slope matters for walking and touchdown."
+        how={`all ${c.nRegions ?? ''} regions lie within 0.2 km of the USGS official extents; Moon heights are good to ±0.3–0.5 m.`}
+      />
+    ),
   },
   {
     title: 'Sample bare land across Earth',
     short: 'Sample',
-    body: (m): string =>
-      `We pick ${m ? nf.format(m.screen.n_screened) : 'thousands of'} squares of 15 × 15 km at random, spread across latitudes and terrain types.`,
+    body: (): string => 'Two rounds: first spread across all latitudes and terrain types, then focused near the best hits.',
+    info: (c): ReactNode => (
+      <WhyHow
+        why="measuring every 15 km square on Earth isn’t feasible, so we sample, then look harder near the best hits."
+        how={
+          c.m
+            ? `it’s a sample: ${nf.format(c.m.screen.n_screened)} squares from bare land, not all of Earth. The map shows a subset.`
+            : 'it’s a sample from bare land, not all of Earth.'
+        }
+      />
+    ),
   },
   {
-    title: 'Throw out trees, cities, farms and ice',
+    title: 'Keep only bare ground',
     short: 'Filter',
     body: (): string =>
-      'Our elevation data sees treetops and rooftops, so those squares would fake the terrain. Only bare ground stays in.',
+      'Keep ground where the elevation data sees the real surface — no forests, cities, farmland, water or ice (low scrub is fine).',
+    info: (c): ReactNode => {
+      const a = funnelRow(c.m, 'sampled');
+      const b = funnelRow(c.m, 'dsm_safe');
+      const known = a?.known_pass != null && b?.known_pass != null ? `${b.known_pass} of ${a.known_pass} known analogs pass` : null;
+      const decoys = a?.decoy_pass != null && b?.decoy_pass === 0 ? `all ${a.decoy_pass} decoys fail` : null;
+      return (
+        <WhyHow
+          why="Earth elevation data includes treetops and roofs, which fake the terrain."
+          how={known || decoys ? `${[known, decoys].filter(Boolean).join('; ')}.` : 'checked against known analogs and decoys.'}
+        />
+      );
+    },
   },
   {
     title: 'Compare terrain measurements',
     short: 'Compare',
-    body: (): string => 'Every square gets the same numbers as the Moon site. The closer the numbers, the better the match.',
+    body: (): string => 'Every square gets the Moon site’s numbers; the closest win. Ground brightness and slope direction now count too.',
+    info: (c): ReactNode => (
+      <WhyHow
+        why="danger lives in the extremes, so we compare the whole spread of each measure, not its average."
+        how={`crater-bowl counts were tested and dropped: forests and farmland mimicked them${
+          c.x?.shapeAucWithout != null && c.x.shapeAucWith != null
+            ? ` (known-vs-decoy score ${c.x.shapeAucWithout.toFixed(2)} → ${c.x.shapeAucWith.toFixed(2)})`
+            : ''
+        }.`}
+      />
+    ),
   },
   {
-    title: 'Shortlist, then check in detail',
+    title: 'Zoom in, then check in detail',
     short: 'Shortlist',
     body: (): string =>
-      'A quick comparison narrows thousands of squares to a shortlist. The shortlist gets the full, slower check, and we keep the top 3 for each danger.',
+      `Top squares shift a few km to their best spot. Results are at least ${NEW_PLACE_MIN_KM} km from any known analog: new places.`,
+    info: (c): ReactNode => (
+      <WhyHow
+        why={`a few km can line a square up with the terrain much better; the ${NEW_PLACE_MIN_KM} km rule keeps results new.`}
+        how={`the shortlist is re-measured with 30 m data before the top 3 are chosen${
+          c.x?.refine ? ` (${nf.format(c.x.refine.nMoved)} moves)` : ''
+        }.`}
+      />
+    ),
   },
   {
     title: 'Prove it works',
     short: 'Check',
-    body: (): string => 'Known Moon-training sites rank near the top; farmland and forest don’t.',
+    body: (): string => 'Known analogs beat decoys, famous field sites rank high, and a second elevation map agrees.',
+    info: (c): ReactNode => (
+      <WhyHow
+        why="a working method should rank Moon-training sites above farmland and forest."
+        how={
+          <>
+            {c.x?.aucIndependent != null
+              ? `feature choices used the original analogs; ${c.x.nIndependent ?? ''} independent held-out sites score ${in100(c.x.aucIndependent)}. `
+              : ''}
+            {c.x?.nasadem
+              ? `The exact top 3 can change with the elevation dataset${c.x.nasadem.top3Overlap !== null ? ` (overlap ${c.x.nasadem.top3Overlap.toFixed(2)})` : ''}.`
+              : ''}
+          </>
+        }
+      />
+    ),
   },
 ];
 
@@ -405,6 +591,23 @@ export function Explainer(): JSX.Element {
 
   const m = method?.file ?? null;
   const ex = useExampleTile(m?.example.region_id ?? null);
+  const extras = useMemo((): MethodExtras | null => (m ? parseMethodExtras(m) : null), [m]);
+  const shadowR = core?.summary?.validation?.shadow_vs_pgda?.pearson_r ?? null;
+  const [findback, setFindback] = useState<Findback | null>(null);
+  const methodOrigin = method?.origin ?? null;
+  useEffect((): (() => void) | void => {
+    if (!near || !methodOrigin) return;
+    let alive = true;
+    loadJsonFrom('walk/findback.json', isFindbackRaw, methodOrigin)
+      .then((fb: Loaded<Record<string, unknown>> | null): void => {
+        if (alive && fb) setFindback(parseFindback(fb.value));
+      })
+      .catch((): void => undefined);
+    return (): void => {
+      alive = false;
+    };
+  }, [near, methodOrigin]);
+  const ctx: StepCtx = { m, x: extras, nRegions: core?.regions.length ?? null, findback, shadowR };
 
   // Cycle the step-1 overlays until the visitor picks one (not with reduced motion).
   useEffect((): (() => void) | void => {
@@ -426,7 +629,6 @@ export function Explainer(): JSX.Element {
   }, [m, core]);
 
   const s = STEPS[step];
-  const needsMethod = step > 0;
 
   let visual: JSX.Element;
   if (step === 0) {
@@ -446,13 +648,26 @@ export function Explainer(): JSX.Element {
         <p className="muted ex-missing">method.json is not available yet.</p>
       );
   } else if (step === 1 || step === 2) {
-    visual = <WorldDots points={m.points} phase={step === 1 ? 'sample' : 'filter'} active={near} />;
+    visual = (
+      <WorldDots
+        points={m.points}
+        phase={step === 1 ? 'sample' : 'filter'}
+        active={near}
+        screened={m.screen.n_screened}
+        coveragePct={extras?.coveragePctBare ?? null}
+      />
+    );
   } else if (step === 3) {
     visual = <Fingerprint method={m} siteName={siteName} regionName={regionName} />;
   } else if (step === 4) {
-    visual = <Funnel rows={m.funnel} />;
+    visual = <Funnel rows={withScreened(m.funnel, m.screen.n_screened)} moved={extras?.refine ?? null} />;
   } else {
-    visual = <StripPlot method={m} />;
+    visual = (
+      <div className="ex-check">
+        <StripPlot method={m} />
+        {extras && <Scorecard x={extras} findback={findback} shadowR={shadowR} />}
+      </div>
+    );
   }
 
   return (
@@ -482,7 +697,12 @@ export function Explainer(): JSX.Element {
             Step {step + 1} of {STEPS.length}
           </p>
           <h3 className="ex-title">{s.title}</h3>
-          <p className="ex-copy">{s.body(m)}</p>
+          <div className="ex-copy-row">
+            <p className="ex-copy">{s.body(ctx)}</p>
+            <InfoTip label={`More about step ${step + 1}: ${s.short}`} title={s.title} align="end">
+              {s.info(ctx)}
+            </InfoTip>
+          </div>
           {step === 0 && (
             <OverlayButtons
               overlay={overlay}
@@ -491,12 +711,6 @@ export function Explainer(): JSX.Element {
                 setOverlay(o);
               }}
             />
-          )}
-          {needsMethod && m && step === 1 && (
-            <p className="caption">
-              From {nf.format(m.screen.n_draws)} random points, {nf.format(m.screen.n_land)} fell on land. The final sample covers{' '}
-              {nf.format(m.screen.coverage_km2)} km².
-            </p>
           )}
           <div className="ex-nav">
             <button type="button" className="btn" disabled={step === 0} onClick={(): void => setStep(step - 1)}>

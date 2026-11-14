@@ -105,6 +105,8 @@ export interface FailureStory {
   mission: string;
   year: string;
   hazard: HazardId;
+  /** 6–10 word front-of-card summary; the full fact-checked sentence is `body`. */
+  summary: string;
   body: string;
   sourceLabel: string;
   sourceUrl: string;
@@ -116,6 +118,7 @@ export const FAILURES: FailureStory[] = [
     mission: 'Hakuto-R Mission 1',
     year: '2023',
     hazard: 'rim',
+    summary: 'Its software rejected a real crater-rim drop as sensor error.',
     body: 'Hakuto-R crossed a crater-rim cliff about 3 km high. Its software rejected the sudden altitude jump as a sensor error and estimated it was on the surface while still about 5 km up.',
     sourceLabel: 'ispace, 26 May 2023',
     sourceUrl: 'https://www.ispace-inc.com/2023/05/26/ispace-announces-results-of-the-hakuto-r-mission-1-lunar-landing/',
@@ -124,6 +127,7 @@ export const FAILURES: FailureStory[] = [
     mission: 'IM-2 Athena',
     year: '2025',
     hazard: 'shadow',
+    summary: 'Altimeter noise, long shadows and mismatched crater images all contributed.',
     body: 'Intuitive Machines’ CEO said altimeter signal noise, long shadows from low-angle sunlight, and navigation imagery taken from 100 km that didn’t match how craters look lower down all contributed.',
     sourceLabel: 'Intuitive Machines earnings call, 13 May 2025, as reported by The Register (14 May 2025)',
     sourceUrl: 'https://www.theregister.com/2025/05/14/intuitive_machines_postmortem/',
@@ -132,6 +136,7 @@ export const FAILURES: FailureStory[] = [
     mission: 'Ingenuity, flight 72',
     year: '2024',
     hazard: 'texture',
+    summary: 'Featureless sand ripples likely left navigation too little to track.',
     body: 'NASA’s most likely explanation is that a lack of surface texture over steep, relatively featureless sand ripples gave Ingenuity’s navigation system too little information to work with.',
     sourceLabel: 'NASA JPL, 11 Dec 2024',
     sourceUrl: 'https://www.jpl.nasa.gov/news/nasa-performs-first-aircraft-accident-investigation-on-another-world/',
@@ -214,3 +219,90 @@ export function meetsTarget(v: number | undefined, t: ValidationTarget): boolean
   if (typeof t.max === 'number' && v > t.max) return false;
   return true;
 }
+
+// ---------------------------------------------------------------------------------------------
+// Story hero: the problem first (owner-approved wording; facts from docs/problem-facts.md)
+// ---------------------------------------------------------------------------------------------
+
+export const HERO = {
+  headline: 'Since 2019, 12 robot landers tried to land on the Moon. Only 5 stayed upright.',
+  body: 'In four of the failures, the lander misjudged or couldn’t measure its height, and twice the Moon itself fooled it: a crater rim and long low-sun shadows. Even Apollo astronauts struggled to judge distance and slope in lunar light.',
+  problem:
+    'The problem: landers keep failing when terrain and low sunlight fool their navigation, and there is no systematic way to find places on Earth that reproduce a specific south-pole site’s dangers, at the right sun angle, to rehearse first.',
+  kicker:
+    'NASA’s next crews land at the south pole, where the Sun hovers just above the horizon and shadows stretch for miles. We find the places on Earth to rehearse it first.',
+} as const;
+
+export type LandingOutcome = 'upright' | 'crashed' | 'not_upright';
+
+export interface LandingAttempt {
+  mission: string;
+  /** ISO date of the landing attempt. */
+  date: string;
+  outcome: LandingOutcome;
+  /** Outcome in the source's own terms, shown on hover or focus. */
+  detail: string;
+  /** Height or range measurement was involved in the failure (docs/problem-facts.md). */
+  heightProblem: boolean;
+  sourceLabel: string;
+  sourceUrl: string;
+}
+
+export const LANDING_OUTCOME_LABEL: Record<LandingOutcome, string> = {
+  upright: 'Upright',
+  crashed: 'Crashed',
+  not_upright: 'Landed, not upright',
+};
+
+// Do not claim: SLIM "upside-down" (JAXA: wrong attitude), IM-2 failed from lighting alone, Peregrine or Luna 25 attempted a landing.
+export const LANDING_ATTEMPTS: LandingAttempt[] = [
+  { mission: 'Chang’e 4', date: '2019-01-03', outcome: 'upright', detail: 'Upright', heightProblem: false, sourceLabel: 'Spaceflight Now', sourceUrl: 'https://spaceflightnow.com/2019/01/05/chinese-rover-begins-exploring-far-side-of-the-moon/' },
+  { mission: 'Beresheet', date: '2019-04-11', outcome: 'crashed', detail: 'Crashed', heightProblem: false, sourceLabel: 'Spaceflight Now', sourceUrl: 'https://spaceflightnow.com/2019/04/18/errant-command-doomed-israeli-moon-lander-officials-vow-to-try-again/' },
+  { mission: 'Chandrayaan-2 Vikram', date: '2019-09-06', outcome: 'crashed', detail: 'Crashed', heightProblem: false, sourceLabel: 'Scroll.in', sourceUrl: 'https://scroll.in/latest/944389/scroll_in' },
+  { mission: 'Chang’e 5', date: '2020-12-01', outcome: 'upright', detail: 'Upright', heightProblem: false, sourceLabel: 'SpaceNews', sourceUrl: 'https://spacenews.com/change-5-successfully-lands-on-moon-collect-youngest-lunar-samples/' },
+  { mission: 'Hakuto-R Mission 1', date: '2023-04-26', outcome: 'crashed', detail: 'Crashed', heightProblem: true, sourceLabel: 'ispace', sourceUrl: 'https://www.ispace-inc.com/2023/05/26/ispace-announces-results-of-the-hakuto-r-mission-1-lunar-landing/' },
+  { mission: 'Chandrayaan-3', date: '2023-08-23', outcome: 'upright', detail: 'Upright', heightProblem: false, sourceLabel: 'ISRO', sourceUrl: 'https://www.isro.gov.in/media_isro/pdf/Monthly_summary/MonthlySummary_August2023Eng.pdf' },
+  { mission: 'SLIM', date: '2024-01-20', outcome: 'not_upright', detail: 'Landed in the wrong attitude', heightProblem: false, sourceLabel: 'JAXA', sourceUrl: 'https://global.jaxa.jp/press/2024/01/20240125-1_e.html' },
+  { mission: 'IM-1 Odysseus', date: '2024-02-22', outcome: 'not_upright', detail: 'Landed on its side', heightProblem: true, sourceLabel: 'SpacePolicyOnline', sourceUrl: 'https://spacepolicyonline.com/news/ims-odysseus-lunar-lander-not-upright-after-all/' },
+  { mission: 'Chang’e 6', date: '2024-06-02', outcome: 'upright', detail: 'Upright', heightProblem: false, sourceLabel: 'Space.com', sourceUrl: 'https://www.space.com/china-change-6-lands-on-moon-far-side-sample-return-mission' },
+  { mission: 'Blue Ghost Mission 1', date: '2025-03-02', outcome: 'upright', detail: 'Upright', heightProblem: false, sourceLabel: 'NASA', sourceUrl: 'https://www.nasa.gov/news-release/touchdown-carrying-nasa-science-fireflys-blue-ghost-lands-on-moon/' },
+  { mission: 'IM-2 Athena', date: '2025-03-06', outcome: 'not_upright', detail: 'Landed on its side', heightProblem: true, sourceLabel: 'SpacePolicyOnline', sourceUrl: 'https://spacepolicyonline.com/news/im-2s-imperfect-landing-due-to-altimeter-interference-south-pole-lighting-conditions/' },
+  { mission: 'Hakuto-R Mission 2', date: '2025-06-06', outcome: 'crashed', detail: 'Crashed', heightProblem: true, sourceLabel: 'ispace', sourceUrl: 'https://www.ispace-inc.com/2025/06/24/ispace-releases-technical-cause-analysis-for-hakuto-r-mission-2/' },
+];
+
+export const LANDING_COUNT_RULE =
+  'Counts missions that began powered descent; Peregrine and Luna 25 never began a landing and are excluded.';
+export const LANDING_HEIGHT_LABEL = 'Height misjudged or not measured';
+
+export interface ApolloQuote {
+  mission: string;
+  setup: string;
+  quote: string;
+  sourceLabel: string;
+  sourceUrl: string;
+}
+
+export const APOLLO_HEADING = 'Apollo crews saw it too';
+export const APOLLO_QUOTES: ApolloQuote[] = [
+  {
+    mission: 'Apollo 14',
+    setup: 'Walking to Cone Crater, the crew',
+    quote: 'got within about 30 meters of the rim, without ever recognizing it',
+    sourceLabel: 'Apollo Lunar Surface Journal (NASA)',
+    sourceUrl: 'https://www.nasa.gov/history/alsj/',
+  },
+  {
+    mission: 'Apollo 12',
+    setup: 'With the Sun 7.7° up, looking away from it, it was',
+    quote: 'all but impossible to see detail',
+    sourceLabel: 'Apollo Lunar Surface Journal (NASA)',
+    sourceUrl: 'https://www.nasa.gov/history/alsj/',
+  },
+];
+
+// ---------------------------------------------------------------------------------------------
+// "How we find Earth analogs": fixed rules (numbers that are data come from method.json)
+// ---------------------------------------------------------------------------------------------
+
+/** Results are kept at least this far from any known analog, so they are new places. */
+export const NEW_PLACE_MIN_KM = 50;

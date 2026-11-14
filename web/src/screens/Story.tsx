@@ -1,9 +1,10 @@
 import type { JSX } from 'react';
-import { FAILURES, FAILURES_HEADING, FOURTH_MEASURE, HAZARDS, type FailureStory } from '../content';
+import { APOLLO_HEADING, APOLLO_QUOTES, FAILURES, FAILURES_HEADING, FOURTH_MEASURE, HAZARDS, HERO, type ApolloQuote, type FailureStory } from '../content';
 import { useApp } from '../store';
 import type { HazardId } from '../types/contract';
 import { HazardGlyph } from '../components/Glyphs';
 import { Explainer } from '../components/explainer/Explainer';
+import { LanderTally } from '../components/LanderTally';
 
 /** Schematic drawings, explicitly not to scale. */
 function Diagram({ hazard }: { hazard: HazardId }): JSX.Element {
@@ -86,8 +87,18 @@ function FailureCard({ f }: { f: FailureStory }): JSX.Element {
           <h2>{f.mission}</h2>
           <span className="faint">{f.year}</span>
         </div>
-        <blockquote>{f.body}</blockquote>
+        <p className="failure-summary">{f.summary}</p>
+        <details className="method failure-more">
+          <summary>Read more</summary>
+          <blockquote>{f.body}</blockquote>
+        </details>
         <div className="failure-foot">
+          <span className="hz-tag">
+            <HazardGlyph hazard={f.hazard} />
+            <span>
+              We measure: <strong>{hz.name}</strong>
+            </span>
+          </span>
           <span className="muted">
             Source:{' '}
             {f.sourceUrl ? (
@@ -98,44 +109,57 @@ function FailureCard({ f }: { f: FailureStory }): JSX.Element {
               f.sourceLabel
             )}
           </span>
-          <span className="hz-tag">
-            <HazardGlyph hazard={f.hazard} />
-            <span>
-              We measure: <strong>{hz.name}</strong>
-            </span>
-          </span>
         </div>
       </div>
     </article>
   );
 }
 
+function scrollToExplainer(): void {
+  document.getElementById('how-we-find-analogs')?.scrollIntoView({
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    block: 'start',
+  });
+}
+
 export function Story(): JSX.Element {
   const setScreen = useApp((s) => s.setScreen);
   return (
     <div>
-      <section className="story-hero">
-        <h1>Moon on Earth</h1>
-        <p className="story-lead">Finding Earth places that stand in for the Moon’s south pole.</p>
-        <p>
-          We profile NASA’s nine candidate regions near the lunar south pole for 3 dangers (long low-sun shadows, sudden height jumps
-          at crater rims, and smooth ground a camera can’t track) plus slope for walking. Then we search Earth for places with the same
-          terrain measurements, so crews and machines can rehearse there first.
-        </p>
-        <p>
-          <button
-            type="button"
-            className="link-btn"
-            onClick={(): void =>
-              document.getElementById('how-we-find-analogs')?.scrollIntoView({
-                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-                block: 'start',
-              })
-            }
-          >
-            How we find analogs ↓
-          </button>
-        </p>
+      <section className="story-hero" aria-labelledby="story-h">
+        <div className="story-hero-grid">
+          <div className="story-hero-text">
+            <h1 id="story-h">{HERO.headline}</h1>
+            <p>{HERO.body}</p>
+            <p className="story-problem">
+              <strong>{HERO.problem.slice(0, HERO.problem.indexOf(':') + 1)}</strong>
+              {HERO.problem.slice(HERO.problem.indexOf(':') + 1)}
+            </p>
+            <p className="story-kicker">{HERO.kicker}</p>
+            <div className="story-cta">
+              <button type="button" className="btn btn-primary btn-lg" onClick={(): void => setScreen('moon')}>
+                See the Moon danger profiles →
+              </button>
+              <button type="button" className="link-btn" onClick={scrollToExplainer}>
+                How we find Earth analogs ↓
+              </button>
+            </div>
+          </div>
+          <LanderTally />
+        </div>
+        <aside className="apollo" aria-label={APOLLO_HEADING}>
+          <h2 className="apollo-h">{APOLLO_HEADING}</h2>
+          <ul className="apollo-list">
+            {APOLLO_QUOTES.map((q: ApolloQuote) => (
+              <li key={q.mission}>
+                <span className="apollo-mission">{q.mission}</span>
+                <span>
+                  {q.setup} “{q.quote}.”
+                </span>
+              </li>
+            ))}
+          </ul>
+        </aside>
       </section>
 
       <h2 className="section-title">{FAILURES_HEADING}</h2>
@@ -159,7 +183,7 @@ export function Story(): JSX.Element {
             Every rehearsal we can run on Earth before then is cheaper than learning on the Moon.
           </p>
         </div>
-        <button type="button" className="btn btn-primary btn-lg" onClick={(): void => setScreen('moon')}>
+        <button type="button" className="btn btn-lg" onClick={(): void => setScreen('moon')}>
           Profile the nine regions →
         </button>
       </section>
