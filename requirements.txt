@@ -1,0 +1,13 @@
+numpy
+scipy
+numba
+rasterio
+rioxarray
+pyproj
+shapely
+opencv-python-headless
+astropy
+scikit-learn
+requests
+pytest
+py-eodms-rapi
