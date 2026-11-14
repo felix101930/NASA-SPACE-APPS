@@ -14,6 +14,7 @@ import {
   type SummaryFile,
 } from './types/contract';
 import { Loading } from './components/Loading';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Story } from './screens/Story';
 import { MoonOverview } from './screens/MoonOverview';
 import { RegionDetail } from './screens/RegionDetail';
@@ -218,9 +219,11 @@ export function App(): JSX.Element {
         ) : needsData && !core ? (
           <Loading label="Loading danger profiles and Earth matches…" />
         ) : (
-          <Suspense fallback={<Loading label="Loading the 3D engine…" />}>
-            <ScreenSwitch screen={screen} />
-          </Suspense>
+          <ErrorBoundary name={SCREENS.find((s) => s.id === screen)?.label ?? screen} resetKey={screen}>
+            <Suspense fallback={<Loading label="Loading the 3D engine…" />}>
+              <ScreenSwitch screen={screen} />
+            </Suspense>
+          </ErrorBoundary>
         )}
       </main>
       <footer className="footer">

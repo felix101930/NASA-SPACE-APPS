@@ -39,6 +39,37 @@ export function tuneDarkStyle(map: MlMap): void {
   }
 }
 
+const PIN_GAP = 34;
+
+/**
+ * Pins closer than PIN_GAP px on screen would sit on top of each other (pin 1 swallowing clicks meant for
+ * pin 3). Fan each cluster out around its first pin so every pin stays visible and clickable.
+ */
+function spreadPins(map: MlMap, markers: Marker[]): void {
+  const pts = markers.map((m: Marker) => map.project(m.getLngLat()));
+  const leader: number[] = pts.map((): number => -1);
+  const groups = new Map<number, number[]>();
+  pts.forEach((p, i: number): void => {
+    for (let j = 0; j < i; j++) {
+      if (leader[j] === -1 && Math.hypot(p.x - pts[j].x, p.y - pts[j].y) < PIN_GAP) {
+        leader[i] = j;
+        groups.set(j, [...(groups.get(j) ?? []), i]);
+        return;
+      }
+    }
+  });
+  markers.forEach((m: Marker, i: number): void => {
+    if (leader[i] === -1) {
+      m.setOffset([0, 0]);
+      return;
+    }
+    const members = groups.get(leader[i]) ?? [];
+    const k = members.indexOf(i);
+    const angle = -Math.PI / 2 + (k * 2 * Math.PI) / Math.max(members.length + 1, 3) + Math.PI / 3;
+    m.setOffset([Math.cos(angle) * PIN_GAP, Math.sin(angle) * PIN_GAP]);
+  });
+}
+
 interface Props {
   points: MapPoint[];
   lines?: MapLine[];
@@ -118,7 +149,21 @@ export function EarthMap({ points, lines = [], onSelect, fitKey, maxZoom = 6 }: 
       });
       return new Marker({ element: el }).setLngLat([p.lon, p.lat]).addTo(map);
     });
+    spreadPins(map, markers.current);
   }, [points, onSelect]);
+
+  // Keep overlapping pins fanned out at every zoom level.
+  useEffect((): (() => void) | void => {
+    const map = mapRef.current;
+    if (!map) return;
+    const relayout = (): void => spreadPins(map, markers.current);
+    map.on('zoomend', relayout);
+    map.on('moveend', relayout);
+    return (): void => {
+      map.off('zoomend', relayout);
+      map.off('moveend', relayout);
+    };
+  }, []);
 
   // lines
   useEffect((): void => {

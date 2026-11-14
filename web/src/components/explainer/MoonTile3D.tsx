@@ -1,13 +1,13 @@
 // Step 1 of the explainer: one real Moon tile in 3D, with an overlay for each danger we measure.
 // Loaded lazily so three.js stays out of the Story screen's first load.
 import { useEffect, useMemo, useState, type JSX } from 'react';
-import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import type { LoadedTile } from '../../data/tiles';
 import { computeShadowMask, hillshade, type Grid } from '../../lib/terrain';
 import { useTerrainGeometry } from '../terrainGeometry';
 import { HazardGlyph, SunGlyph } from '../Glyphs';
+import { SafeCanvas } from '../SafeCanvas';
 
 export type Overlay = 'slope' | 'shadow' | 'rim' | 'texture';
 
@@ -294,11 +294,17 @@ export default function MoonTile3D({ tile, overlay, regionName }: { tile: Loaded
 
   return (
     <div className="ex-3d">
-      <Canvas dpr={[1, 1.75]} camera={{ position: [0, 13, 15], fov: 38, near: 0.05, far: 200 }} gl={{ antialias: true }}>
+      <SafeCanvas
+        name="3D Moon tile"
+        resetKey={regionName}
+        dpr={[1, 1.75]}
+        camera={{ position: [0, 13, 15], fov: 38, near: 0.05, far: 200 }}
+        gl={{ antialias: true }}
+      >
         <color attach="background" args={['#1a1d23']} />
         {tex && <TileMesh tile={tile} map={tex} />}
         <OrbitControls enableZoom={false} enablePan={false} autoRotate={!reduce} autoRotateSpeed={0.5} maxPolarAngle={Math.PI / 2.1} />
-      </Canvas>
+      </SafeCanvas>
       <div className="ex-3d-tag">
         <strong>{regionName}</strong> <span className="muted">Moon · 15 × 15 km · height ×{EXAG}</span>
       </div>

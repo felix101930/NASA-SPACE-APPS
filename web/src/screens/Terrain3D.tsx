@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
+import { SafeCanvas } from '../components/SafeCanvas';
 import { Line, OrbitControls } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
@@ -355,7 +356,7 @@ function useShadowShare(tile: LoadedTile | null, el: number, az: number): Shadow
 }
 
 function pct(v: number): string {
-  return `${Math.round(v * 100)}%`;
+  return Number.isFinite(v) ? `${Math.round(v * 100)}%` : '—';
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -382,7 +383,9 @@ function Pane({ id, title, world, subtitle, tile, error, tileRef, origin, masks,
   const az = useApp((s) => s.sunAz);
   const mode = useApp((s) => s.shadowMode);
   const mask = useMaskTexture(tile, mode, el, az, masks, origin);
-  const extent = tileRef.size * tileRef.res_m * KM;
+  // Guard the shadow camera against a malformed tile reference (NaN bounds break the shadow map).
+  const rawExtent = tileRef.size * tileRef.res_m * KM;
+  const extent = Number.isFinite(rawExtent) && rawExtent > 0 ? rawExtent : 15;
   const realtime = mode === 'realtime';
   const pixels = useMemo((): [number, number][] | null => (tile && path ? path(tile) : null), [tile, path]);
 
@@ -393,7 +396,9 @@ function Pane({ id, title, world, subtitle, tile, error, tileRef, origin, masks,
       ) : !tile ? (
         <Loading label={`Loading ${title} terrain…`} />
       ) : (
-        <Canvas
+        <SafeCanvas
+          name={`3D view (${world})`}
+          resetKey={tileRef.path}
           shadows="percentage"
           dpr={[1, 1.75]}
           camera={{ position: [0, 17, 19], fov: 38, near: 0.05, far: 200 }}
@@ -405,7 +410,7 @@ function Pane({ id, title, world, subtitle, tile, error, tileRef, origin, masks,
           <TerrainMesh tile={tile} exag={exag} map={realtime ? null : mask.texture} shadows={realtime} />
           {pixels && <PathLine tile={tile} exag={exag} pixels={pixels} color="#edeae4" />}
           <SyncedControls id={id} />
-        </Canvas>
+        </SafeCanvas>
       )}
       <div className="twin-label">
         <span className="twin-tag">

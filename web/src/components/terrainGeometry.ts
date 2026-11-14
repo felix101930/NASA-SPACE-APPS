@@ -9,7 +9,8 @@ export const TERRAIN_KM = 1 / 1000;
 const KM = TERRAIN_KM;
 
 export function terrainHeightAt(tile: LoadedTile, col: number, row: number, exag: number): number {
-  return (sampleBilinear(tile.filled, col, row) - tile.stats.median) * KM * exag;
+  const v = (sampleBilinear(tile.filled, col, row) - tile.stats.median) * KM * exag;
+  return Number.isFinite(v) ? v : 0;
 }
 
 /** Grid mesh over the tile (x east, z south, y up), heights centred on the tile median. */
@@ -56,8 +57,10 @@ export function useTerrainGeometry(tile: LoadedTile, exag: number): THREE.Buffer
     if (!(attr instanceof THREE.BufferAttribute)) return;
     const arr = attr.array;
     const d = tile.filled.data;
-    const med = tile.stats.median;
-    for (let i = 0; i < d.length; i++) arr[i * 3 + 1] = (d[i] - med) * KM * exag;
+    const med = Number.isFinite(tile.stats.median) ? tile.stats.median : 0;
+    const floor = Number.isFinite(tile.stats.min) ? tile.stats.min : med;
+    // NaN heights would poison computeVertexNormals and the bounding sphere: pin them to the tile minimum.
+    for (let i = 0; i < d.length; i++) arr[i * 3 + 1] = ((Number.isFinite(d[i]) ? d[i] : floor) - med) * KM * exag;
     attr.needsUpdate = true;
     geom.computeVertexNormals();
     geom.computeBoundingSphere();
