@@ -40,17 +40,24 @@ def _iqr(vals: list[float]) -> tuple[float, float] | None:
     return float(np.percentile(v, 25)), float(np.percentile(v, 75))
 
 
-def block_values(dem: np.ndarray, horizon: np.ndarray, lat: float, lon: float) -> dict[str, list[float]]:
-    """Per-3 km-block values of every core metric (same definitions as pipeline.metrics.compute_all)."""
+def block_values(dem: np.ndarray, horizon: np.ndarray, lat: float, lon: float,
+                 sun: tuple[np.ndarray, np.ndarray] | None = None, with_shape: bool = True) -> dict[str, list[float]]:
+    """Per-3 km-block values of every core metric (same definitions as pipeline.metrics.compute_all).
+
+    ``sun`` = (elevation, grid azimuth) samples for shadow_frac_timeweighted; default is the Moon sun
+    path at (lat, lon). The patchiness check (patchiness.py) passes each Earth site's own low-sun
+    series so both worlds use this one function. ``with_shape=False`` skips the shape scalars.
+    """
     from pipeline.metrics import render_hillshade, rim_jump_stats, shadow_mask, slope_deg, sun_path_moon
     from pipeline.metrics.horizon import time_weighted_visibility
     from pipeline.metrics.shape import shape_features
 
     blocks = _blocks(dem.shape[0])
-    out: dict[str, list[float]] = {k: [] for k in CORE_KEYS + SHAPE_SCALARS}
+    out: dict[str, list[float]] = {k: [] for k in CORE_KEYS + (SHAPE_SCALARS if with_shape else ())}
     valid = np.isfinite(horizon[0])
     sh_maps = {el: np.where(valid, (horizon > el).mean(axis=0), np.nan) for el in (1.0, 3.0, 5.0)}
-    el_s, az_s = sun_path_moon(lat, 2048, lon_deg=lon)
+    el_s, az_s = sun if sun is not None else sun_path_moon(lat, 2048, lon_deg=lon)
+    el_s, az_s = np.asarray(el_s, float), np.asarray(az_s, float)
     keep = el_s >= 0.0
     vis = time_weighted_visibility(horizon, el_s[keep], az_s[keep])
     slope = slope_deg(dem, RES_M)
@@ -84,6 +91,8 @@ def block_values(dem: np.ndarray, horizon: np.ndarray, lat: float, lon: float) -
         out["fast_per_km2_el3"].append(float(np.mean(dens)))
         out["empty_cell_frac_el3"].append(float(np.mean(empt)))
         out["slope_p50_deg"].append(float(np.nanpercentile(slope[rs, cs], 50)))
+        if not with_shape:
+            continue
         sf = shape_features(dem[rs, cs], RES_M)["scalars"]
         for k in SHAPE_SCALARS:
             v = sf.get(k)

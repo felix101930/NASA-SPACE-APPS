@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_utc": "2026-11-14T22:05:46Z",
+  "generated_utc": "2026-11-14T23:17:14Z",
   "pipeline_version": "match-0.1.0",
   "sources": [
    {
@@ -100,10 +100,11 @@
    "earth_feats_s": 0.0,
    "matching_s": 0.5,
    "windows_s": 0.0,
+   "patchiness_s": 0.0,
    "weight_stability_s": 0.9,
    "classifier_s": 0.0,
    "synthetic_tests_s": 0.0,
-   "total_s": 1.4
+   "total_s": 1.5
   }
  },
  "ranking": [
@@ -1104,6 +1105,41 @@
    "stage1_top3_overlap_mean": 0.848,
    "note": "Earth screen rerun n_boot times on a fresh random sample (sample_frac of the pool); the value is the mean share of each search's top 3 that reappears in a rerun's top 3. Overall only: the per-site counts in screen_report.json use Earth-stage shortlist ids, not the final match ids."
   }
+ },
+ "patchiness": {
+  "n_top1": 27,
+  "n_similar_headline": 14,
+  "by_class": {
+   "similar": 14,
+   "smoother": 3,
+   "patchier": 10,
+   "unavailable": 0
+  },
+  "by_hazard": {
+   "shadow": {
+    "n": 9,
+    "similar": 4
+   },
+   "rim": {
+    "n": 9,
+    "similar": 5
+   },
+   "texture": {
+    "n": 9,
+    "similar": 5
+   }
+  },
+  "headline_metric": {
+   "shadow": "shadow_frac_el3",
+   "rim": "jump1km_p95_m",
+   "texture": "empty_cell_frac_el3"
+  },
+  "thresholds": {
+   "similar_min_ratio": 0.67,
+   "similar_max_ratio": 1.5,
+   "note": "illustrative thresholds, not calibrated"
+  },
+  "method": "Second indicator, not part of the rank. For each light metric, 25 block values (3 km blocks of the 15 km square, same code as the Moon IQRs) on both worlds; spread = IQR of the 25 values; spread_ratio = earth_spread / moon_spread; similar if 0.67 <= ratio <= 1.5, smoother below, patchier above (illustrative thresholds). Shadow and texture blocks use the horizon decimated to every 5th pixel on both worlds (the form stored for Earth sites)."
  },
  "notes": {
   "novelty_rule": "Each region x hazard top 3 must be >= 50 km from each other and >= 50 km from every catalogued analog site (every row with coordinates in data/literature_analogs.csv plus the known_analog rows of data/earth_candidates.csv). Greedy pick down the ranked list; if fewer than 3 qualify, the search keeps what qualifies and reports novelty_shortfall (rule never relaxed).",

@@ -70,7 +70,7 @@ def attach_windows(matches: list[dict], moon_ref: dict, sites: list[dict], feats
 
 
 def cmd_all(args: argparse.Namespace) -> None:
-    from pipeline.match import earth_feats, matches as MM, moon_ref, summary as SS, windows as W
+    from pipeline.match import earth_feats, matches as MM, moon_ref, patchiness as PP, summary as SS, windows as W
 
     t_all = time.time()
     times = {}
@@ -99,6 +99,11 @@ def cmd_all(args: argparse.Namespace) -> None:
     wstats = attach_windows(matches, mref, sites, feats)
     times["windows_s"] = round(time.time() - t, 1)
     log.info("windows: %s", wstats)
+    t = time.time()
+    patch = PP.attach(matches, regions, sites, force=args.force)
+    times["patchiness_s"] = round(time.time() - t, 1)
+    log.info("patchiness: %d of %d #1 matches similar on their headline metric", patch["n_similar_headline"],
+             patch["n_top1"])
 
     sources = merge_sources(regions_doc.get("meta", {}).get("sources", []), earth_doc.get("meta", {}).get("sources", []),
                             EXTRA_SOURCES)
@@ -116,6 +121,8 @@ def cmd_all(args: argparse.Namespace) -> None:
         "candidate_pool": (f"{pool_note}: selected_by global_screen/refine, documented (seed split only), validation "
                            "listed_candidate; held-out positives, split=holdout and decoys are scored for validation "
                            "only and can never be a match"),
+        "patchiness": {"note": PP.METHOD_NOTE, "headline_metric": PP.HEADLINE_METRIC,
+                       "similar_ratio": [PP.SIMILAR_LO, PP.SIMILAR_HI]},
         "novelty_rule": MM.NOVELTY_RULE, "novelty_km": MM.NOVELTY_KM,
         "n_pool": len(pool), "n_sites_by_source": n_by,
         "earth_sites_snapshot": {"generated_utc": emeta.get("generated_utc"), "pipeline_version": emeta.get("pipeline_version"),
@@ -181,7 +188,7 @@ def cmd_all(args: argparse.Namespace) -> None:
                                                                 f"{SS.GAP_PENALTY} × Σ max(0, best distance − {SS.CLOSE_DISTANCE})) "
                                                                 "over the 3 hazards; distance 1 ≈ one Moon-region IQR off"),
                                                 runtimes=times),
-                              "ranking": rank, "validation": validation,
+                              "ranking": rank, "validation": validation, "patchiness": patch,
                               "notes": {"novelty_rule": MM.NOVELTY_RULE,
                                         "novelty_shortfall_searches": shortfalls,
                                         "best_documented": {f"{x['region_id']}|{x['hazard']}": x["best_documented"]

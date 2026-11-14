@@ -116,3 +116,10 @@ Written by the Earth stage. It may be absent; the web app then falls back to moc
                "moon": {"metric": 0.0}, "earth": {"metric": 0.0} } }
 ```
 - `points`: at most about 6,000 entries, with coordinates rounded to 0.01°.
+
+## Patchiness (added to `matches.json` and `summary.json` by `pipeline/match/patchiness.py`)
+A second indicator next to the level check. It is not part of the distance, the lights or the rank.
+- **Each `matches[].lights[]` row also has:** `moon_blocks` and `earth_blocks` (25 floats each: the metric on the 25 blocks of 3 km in the 15 km square, row-major from the top-left, same code as the Moon IQRs), `moon_spread` and `earth_spread` (IQR of those 25 values, in the metric's units), `spread_ratio` (= earth_spread / moon_spread; null if the Moon spread is 0), and `patchiness` (`"similar"` if 0.67 ≤ ratio ≤ 1.5, `"smoother"` below, `"patchier"` above; the thresholds are illustrative). All of these are null when the blocks are unavailable.
+- **`matches[].patchiness_summary`:** `{ metric, label, patchiness, spread_ratio, earth_spread, moon_spread, text }` for the hazard's headline metric (shadow `shadow_frac_el3`, rim `jump1km_p95_m`, texture `empty_cell_frac_el3`), or null. `text` is one plain sentence, e.g. "Varies about as much as the Moon site (Earth spread 113 m vs Moon 136 m)".
+- **`summary.json` `patchiness`:** `{ n_top1, n_similar_headline, by_class: {similar, smoother, patchier, unavailable}, by_hazard: {h: {n, similar}}, headline_metric, thresholds, method }`.
+- **Horizon:** shadow and texture blocks use the horizon decimated to every 5th pixel on both worlds, because that is what is stored for Earth sites. On the Moon this changes block spreads by about 0.002 or less for shadow fractions.
