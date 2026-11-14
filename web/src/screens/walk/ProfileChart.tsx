@@ -37,11 +37,11 @@ export function MoonProfile({ heights, lengthM }: { heights: number[]; lengthM: 
             domain={[0, 'dataMax']}
             stroke={AXIS}
             tick={{ fontSize: 12 }}
-            tickFormatter={(v: number): string => `${v.toFixed(v < 1 && v > 0 ? 1 : 0)}`}
+            tickFormatter={(v: number): string => (Number.isInteger(v) ? String(v) : v.toFixed(1))}
             unit=" km"
             tickCount={5}
           />
-          <YAxis stroke={AXIS} tick={{ fontSize: 12 }} unit=" m" width={56} />
+          <YAxis stroke={AXIS} tick={{ fontSize: 12 }} unit=" m" width={68} />
           <ReferenceLine y={0} stroke="#3d424c" />
           <Tooltip
             contentStyle={TOOLTIP}

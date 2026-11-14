@@ -49,7 +49,7 @@ export function TwinMap({ path }: { path: TwinPath | null }): JSX.Element {
   const pathRef = useRef<TwinPath | null>(path);
   const [ready, setReady] = useState<boolean>(false);
   const [failed, setFailed] = useState<boolean>(false);
-  const [imagery, setImagery] = useState<Imagery>('map');
+  const [imagery, setImagery] = useState<Imagery>('satellite');
   const [img, setImg] = useState<ImageryState>({ kind: 'off' });
   const [zoomedIn, setZoomedIn] = useState<boolean>(false);
   pathRef.current = path;
@@ -72,11 +72,13 @@ export function TwinMap({ path }: { path: TwinPath | null }): JSX.Element {
       return;
     }
     map.addControl(new NavigationControl({ showCompass: false }), 'top-right');
-    map.addControl(new ScaleControl({ unit: 'metric', maxWidth: 120 }), 'bottom-left');
+    map.addControl(new ScaleControl({ unit: 'metric', maxWidth: 120 }), 'top-right');
     resolveMissingImages(map);
     map.on('error', (): void => undefined);
     map.on('load', (): void => {
       tuneDarkStyle(map);
+      // Start the attribution collapsed (the "i" button opens it) so it doesn't cover the path.
+      box.current?.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
       map.addSource('twin', { type: 'geojson', data: lineData(pathRef.current) });
       map.addLayer({ id: 'twin-casing', type: 'line', source: 'twin', paint: { 'line-color': '#0a0b0e', 'line-width': 8 }, layout: { 'line-cap': 'round' } });
       map.addLayer({ id: 'twin-line', type: 'line', source: 'twin', paint: { 'line-color': '#edeae4', 'line-width': 3.5 }, layout: { 'line-cap': 'round' } });

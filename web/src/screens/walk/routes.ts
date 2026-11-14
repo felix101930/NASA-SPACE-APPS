@@ -102,8 +102,9 @@ export function buildReadyRoutes(tile: LoadedTile, regionId: string): ReadyRoute
     out.push({
       id: `${regionId}:scramble`,
       name: 'Steep scramble · 1 km',
-      blurb: 'The single steepest kilometre we could find.',
-      moon_xy: scramble.route,
+      blurb: 'The single steepest kilometre, walked uphill.',
+      // Walk it uphill: every candidate exists in both directions, so flip the line if it descends.
+      moon_xy: netRise(scramble.prof) >= 0 ? scramble.route : [scramble.route[1], scramble.route[0]],
       best: [],
     });
   // Flattest long walk: lowest steepest-slope, ties broken by the least total climbing.

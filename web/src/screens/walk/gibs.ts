@@ -25,11 +25,28 @@ function isoDay(d: Date): string {
 }
 
 /** Days to try, newest first: daily for six weeks, then every 4 days back to about five months. */
-function candidateDays(now: Date): string[] {
+function candidateDays(latest: Date): string[] {
   const out: string[] = [];
-  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  for (let k = 3; k <= 160; k += k < 45 ? 1 : 4) out.push(isoDay(new Date(start.getTime() - k * 86400000)));
+  const start = new Date(Date.UTC(latest.getUTCFullYear(), latest.getUTCMonth(), latest.getUTCDate()));
+  for (let k = 0; k <= 150; k += k < 42 ? 1 : 4) out.push(isoDay(new Date(start.getTime() - k * 86400000)));
   return out;
+}
+
+let latestPromise: Promise<Date> | null = null;
+
+/** Newest published HLS day: GIBS answers a request for the default time with the actual day in a header. */
+function latestDay(): Promise<Date> {
+  if (!latestPromise) {
+    const fallback = new Date(Date.now() - 10 * 86400000);
+    latestPromise = fetch(`https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${LAYER}/default/default/${MATRIX}/0/0/0.png`, { mode: 'cors' })
+      .then((r: Response): Date => {
+        const t = r.headers.get('layer-time-actual');
+        const d = t ? new Date(t) : null;
+        return d && Number.isFinite(d.getTime()) ? d : fallback;
+      })
+      .catch((): Date => fallback);
+  }
+  return latestPromise;
 }
 
 interface TileScore {
@@ -73,9 +90,9 @@ export function findHlsDay(lat: number, lon: number): Promise<string | null> {
   const hit = cache.get(key);
   if (hit) return hit;
   const p = (async (): Promise<string | null> => {
-    const days = candidateDays(new Date());
+    const days = candidateDays(await latestDay());
     const ctrl = new AbortController();
-    const BATCH = 8;
+    const BATCH = 4; // GIBS answers bursts with the odd transient 500
     for (let i = 0; i < days.length; i += BATCH) {
       const batch = days.slice(i, i + BATCH);
       const scores = await Promise.all(
