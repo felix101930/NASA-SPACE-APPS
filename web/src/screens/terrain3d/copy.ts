@@ -4,8 +4,8 @@ import type { HazardId, LightRow, Match, RehearsalWindow } from '../../types/con
 
 /** Tab names and danger phrases; the mission label always comes from HAZARDS[].mission. */
 export const HAZARD_TAB: Record<HazardId, { name: string; mission: string; danger: string }> = {
-  shadow: { name: 'Shadow', mission: HAZARDS.shadow.mission, danger: 'low-sun shadow danger' },
-  rim: { name: 'Rim jump', mission: HAZARDS.rim.mission, danger: 'cliff-edge height-jump danger' },
+  shadow: { name: 'Shadow', mission: HAZARDS.shadow.mission, danger: 'shadow danger' },
+  rim: { name: 'Rim jump', mission: HAZARDS.rim.mission, danger: 'rim-drop danger' },
   texture: { name: 'Texture', mission: HAZARDS.texture.mission, danger: 'camera-texture danger' },
 };
 
@@ -42,7 +42,7 @@ export function fmtValue(metric: string, v: number): string {
   if (metric === 'frac_track_over_500m') return `${(v * 100).toFixed(v < 0.01 ? 2 : 1)}%`;
   if (metric.startsWith('jump')) return `${Math.round(v)} m`;
   if (metric.startsWith('slope')) return `${v.toFixed(0)}°`;
-  if (metric === 'fast_per_km2_el3') return `${v.toFixed(1)} per km²`;
+  if (metric === 'fast_per_km2_el3') return `${v.toFixed(1)} /km²`;
   return metricInfo(metric).fmt(v);
 }
 
@@ -59,29 +59,29 @@ export function verdictLight(match: Match): LightRow | null {
   return bestOther ?? head ?? null;
 }
 
-/** "41% of its 1 km squares have nothing for a camera to track, vs 43% on Malapert Massif". */
-export function statClause(l: LightRow, regionName: string): string {
+/** Short headline stat, Earth first: "57% vs 55% in shadow over a low-sun day". */
+export function statClause(l: LightRow): string {
   const e = fmtValue(l.metric, l.earth);
   const m = fmtValue(l.metric, l.moon);
   const el = /^shadow_frac_el(\d+)$/.exec(l.metric);
-  if (el) return `${e} of it lies in shadow at a ${el[1]}° sun, vs ${m} of ${regionName} (both averaged over all sun directions)`;
+  if (el) return `${e} vs ${m} in shadow at a ${el[1]}° sun (all directions averaged)`;
   switch (l.metric) {
     case 'shadow_frac_timeweighted':
-      return `${e} of it lies in shadow over a low-sun day, vs ${m} of ${regionName}`;
+      return `${e} vs ${m} in shadow over a low-sun day`;
     case 'jump1km_p95_m':
-      return `its worst 1 km height jumps reach ${e}, vs ${m} on ${regionName}`;
+      return `worst 1 km drops ${e} vs ${m}`;
     case 'jump1km_p99_m':
-      return `its very worst 1 km height jumps reach ${e}, vs ${m} on ${regionName}`;
+      return `very worst 1 km drops ${e} vs ${m}`;
     case 'frac_track_over_500m':
-      return `${e} of its ground tracks cross a 500 m jump, vs ${m} on ${regionName}`;
+      return `${e} vs ${m} of tracks cross a 500 m drop`;
     case 'empty_cell_frac_el3':
-      return `${e} of its 1 km squares have nothing for a camera to track, vs ${m} on ${regionName}`;
+      return `${e} vs ${m} of 1 km squares featureless`;
     case 'fast_per_km2_el3':
-      return `it offers ${e} camera landmarks, vs ${m} on ${regionName}`;
+      return `${e} vs ${m} camera landmarks`;
     case 'slope_p50_deg':
-      return `its typical slope is ${e}, vs ${m} on ${regionName}`;
+      return `typical slope ${e} vs ${m}`;
     default:
-      return `${lightLabel(l).toLowerCase()}: ${e} here vs ${m} on ${regionName}`;
+      return `${lightLabel(l).toLowerCase()}: ${e} vs ${m}`;
   }
 }
 
@@ -98,10 +98,10 @@ export function buildVerdict(match: Match, placeLabel: string, regionName: strin
   // Only an overall Close fit (same bands as the Summary grid) "matches"; Partial and Far are stand-ins.
   const close = distanceFit(match.distance) === 'green';
   const danger = HAZARD_TAB[match.hazard].danger;
-  const lead = close ? `${placeLabel} matches ${regionName}’s ${danger}` : `${placeLabel} is the closest Earth stand-in for ${regionName}’s ${danger}`;
+  const lead = close ? `${placeLabel} matches ${regionName}’s ${danger}` : `${placeLabel}: closest stand-in for ${regionName}’s ${danger}`;
   const rank =
     nScreened && nScreened > 0 ? `#${match.rank} pick from ${nScreened.toLocaleString('en-US')} Earth squares screened` : `#${match.rank} pick`;
-  return { lead, stat: statClause(l, regionName), rank, close };
+  return { lead, stat: statClause(l), rank, close };
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -142,4 +142,10 @@ export function fmtMinutes(m: number): string {
   if (m < 1) return 'under a minute';
   if (m < 90) return `${Math.round(m)} min`;
   return `${(m / 60).toFixed(1)} h`;
+}
+
+/** Earth windows this low are refraction-sensitive (air bends low sunlight by ~0.3–0.6°). */
+export function lowSunWindow(w: RehearsalWindow): boolean {
+  const flagged = 'refraction_sensitive' in w && w.refraction_sensitive === true;
+  return flagged || w.sun_el < 1;
 }

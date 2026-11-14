@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import math
 import subprocess
 import sys
 import tempfile
@@ -100,7 +101,16 @@ def shadow_vs_pgda() -> dict:
     if not p.exists():
         return {"pearson_r": None, "mae": None, "bias": None, "n_px": None, "note": "validation_pgda.json missing"}
     v = read_json(p)["shadow_vs_pgda"]
+
+    def _r(x: object) -> float | None:
+        return round(float(x), 4) if isinstance(x, (int, float)) and math.isfinite(x) else None
+
+    keep = ("pearson_r", "mae", "bias", "rmse", "r2", "mae_offset_removed", "n_px")
+    per_region = {rid: {k: (_r(st[k]) if k != "n_px" else st[k]) for k in keep if k in st}
+                  for rid, st in v.get("per_region", {}).items() if st.get("included")}
     return {"pearson_r": round(v["pearson_r"], 4), "mae": round(v["mae"], 4), "bias": round(v["bias"], 4),
+            "rmse": _r(v.get("rmse")), "r2": _r(v.get("r2")), "mae_offset_removed": _r(v.get("mae_offset_removed")),
+            "per_region": per_region,
             "n_px": v["n_px"], "region_mean_pearson_r": round(v.get("region_mean_pearson_r", float("nan")), 4),
             "n_regions": sum(1 for r in v.get("per_region", {}).values() if r.get("included")),
             "note": v.get("note", "")}
@@ -306,6 +316,27 @@ def where_it_fails() -> list[str]:
         "The Earth search covers only a seeded sample of bare land, so better analogs may exist unsampled",
         "Metrics describe terrain shape and lighting geometry only, not regolith, rock strength or dust",
     ]
+
+
+def bootstrap_reappearance() -> dict | None:
+    """validation.bootstrap from screen_report.json: how often each final top-3 site reappears when the Earth
+    screen is rerun on a fresh 80% sample (Earth stage stability_bootstrap), if present."""
+    p = EARTH_INTERIM / "screen_report.json"
+    if not p.exists():
+        return None
+    try:
+        b = read_json(p).get("stability_bootstrap")
+    except Exception as exc:  # noqa: BLE001
+        log.warning("screen_report.json unreadable (%s); bootstrap omitted", exc)
+        return None
+    if not isinstance(b, dict) or "final_top3_mean_reappearance_frac" not in b:
+        return None
+    return {"n_boot": b.get("n_boot"), "sample_frac": b.get("frac"),
+            "final_top3_mean_reappearance_frac": b.get("final_top3_mean_reappearance_frac"),
+            "stage1_top3_overlap_mean": b.get("stage1_top3_overlap_mean"),
+            "note": ("Earth screen rerun n_boot times on a fresh random sample (sample_frac of the pool); the value "
+                     "is the mean share of each search's top 3 that reappears in a rerun's top 3. Overall only: the "
+                     "per-site counts in screen_report.json use Earth-stage shortlist ids, not the final match ids.")}
 
 
 def walk_findback() -> dict | None:

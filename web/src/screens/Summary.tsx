@@ -1,134 +1,85 @@
-import { useEffect, useState, type JSX, type ReactNode } from 'react';
-import { HAZARDS, ROW_NAME, VALIDATION_TARGETS, distanceFit, meetsTarget, type ValidationTarget } from '../content';
-import { Fit, HazardGlyph, VerdictGlyph } from '../components/Glyphs';
+import { useEffect, useState, type JSX } from 'react';
+import { HAZARDS, ROW_NAME, distanceFit } from '../content';
+import { Fit, HazardGlyph } from '../components/Glyphs';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
+import { Term, Why } from '../components/Term';
 import { loadOptionalJson } from '../data/loader';
 import { useApp, type CoreData } from '../store';
-import { HAZARD_IDS, isTransectsFile, type HazardId, type Light, type Meta, type RankingRow } from '../types/contract';
+import { HAZARD_IDS, isTransectsFile, type HazardId, type Match, type Meta, type RankingRow } from '../types/contract';
 import { CreditsPanel } from '../components/Credits';
 import { buildCredits, hasNasademCheck } from '../lib/credits';
-import { featureName } from '../lib/plain';
+import { parseMethodExtras } from '../lib/methodExtras';
+import { parseBootstrap, parseWalkTest } from '../lib/validationExtras';
+import type { MethodNoteId } from '../lib/methodNotes';
+import { fmtM, fmtNum, fmtPct, fmtSpread, fmtStat } from '../lib/units';
+import '../styles/clarity.css';
 
-/** Best-match distance to a fit class (shared bands; see distanceFit in content.ts). */
-function distFit(d: number | undefined): Light | null {
-  return distanceFit(d);
+/** The three limits we state up front (docs/method-decisions.md, "Limits we state up front"). */
+const LIMITS: readonly string[] = [
+  'Features under ~60 m (boulders, small craters) are invisible at 30 m resolution.',
+  'On Earth this low sun lasts minutes; at the lunar pole it lasts days.',
+  'No Earth place reproduces 1/6 g gravity, vacuum or −200 °C nights.',
+];
+
+/** For each hazard, the one measure whose Moon–Earth gap the "How close?" line reports. */
+const GAP_METRIC: Record<HazardId, { metric: string; label: string; fmt: (v: number) => string }> = {
+  rim: { metric: 'jump1km_p95_m', label: 'rim drop', fmt: (v: number): string => `~${fmtM(v)}` },
+  shadow: { metric: 'shadow_frac_el3', label: 'shadow', fmt: (v: number): string => `~${fmtNum(v * 100, 0)} pts` },
+  texture: { metric: 'empty_cell_frac_el3', label: 'blank ground', fmt: (v: number): string => `~${fmtNum(v * 100, 0)} pts` },
+};
+
+function median(xs: number[]): number | null {
+  if (!xs.length) return null;
+  const s = [...xs].sort((a: number, b: number): number => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
 }
 
-/** Lifts dots that would overlap their neighbour onto a second row, so all nine stay visible. */
-function stackDots(entries: [string, number][]): { id: string; value: number; row: number }[] {
-  const sorted = [...entries].sort((a: [string, number], b: [string, number]): number => a[1] - b[1]);
-  let prev = -Infinity;
-  let prevRow = 1;
-  return sorted.map(([id, value]: [string, number]) => {
-    const row = value - prev < 0.025 && prevRow === 0 ? 1 : 0;
-    prev = value;
-    prevRow = row;
-    return { id, value, row };
+interface HowClose {
+  gaps: { hazard: HazardId; text: string }[];
+  nClose: number;
+  n: number;
+}
+
+/** Typical Moon–Earth gap of the #1 Earth match per region, one measure per hazard, plus how many #1s are close. */
+function howClose(matches: Match[]): HowClose {
+  const top = matches.filter((m: Match): boolean => m.rank === 1);
+  const gaps = (['rim', 'shadow', 'texture'] as HazardId[]).flatMap((h: HazardId): { hazard: HazardId; text: string }[] => {
+    const g = GAP_METRIC[h];
+    const diffs = top
+      .filter((m: Match): boolean => m.hazard === h)
+      .flatMap((m: Match): number[] => m.lights.filter((l) => l.metric === g.metric).map((l) => Math.abs(l.earth - l.moon)))
+      .filter((d: number): boolean => Number.isFinite(d));
+    const med = median(diffs);
+    return med === null ? [] : [{ hazard: h, text: `${g.label} ${g.fmt(med)}` }];
   });
-}
-
-function fmt(v: number | undefined, d: number = 2): string {
-  return typeof v === 'number' && Number.isFinite(v) ? v.toFixed(d) : '—';
+  return { gaps, nClose: top.filter((m: Match): boolean => distanceFit(m.distance) === 'green').length, n: top.length };
 }
 
 function Credits({ metas, nasadem }: { metas: { file: string; meta: Meta }[]; nasadem: boolean }): JSX.Element {
   const versions = Array.from(new Set(metas.map((m) => m.meta.pipeline_version))).join(', ');
   return (
-    <CreditsPanel
-      id="credits-h"
-      credits={buildCredits(metas, { nasadem })}
-      intro={<>Every source the results on these screens depend on, merged with the sources each data file lists. Pipeline version: {versions || 'unknown'}.</>}
-    >
-      <li>
-        <strong>Failure accounts</strong> · ispace (26 May 2023); Intuitive Machines earnings call (13 May 2025), as reported by The Register (14 May
-        2025); NASA JPL (11 Dec 2024)
-      </li>
-    </CreditsPanel>
+    <details className="method sum-section">
+      <summary>Data credits and licences</summary>
+      <CreditsPanel
+        id="credits-h"
+        credits={buildCredits(metas, { nasadem })}
+        intro={<>Every source behind these screens. Pipeline version: {versions || 'unknown'}.</>}
+      >
+        <li>
+          <strong>Failure accounts</strong> · ispace (26 May 2023); Intuitive Machines earnings call (13 May 2025), as reported by The Register (14
+          May 2025); NASA JPL (11 Dec 2024)
+        </li>
+      </CreditsPanel>
+    </details>
   );
 }
 
-/** Plain-language list of the classifier's most telling features, with importances in a tooltip. */
-function topFeatures(list: (string | { feature: string; importance: number })[]): { text: string; title: string } {
-  const items = list.slice(0, 3).map((f) => (typeof f === 'string' ? { feature: f, importance: null } : f));
-  return {
-    text: items.map((f) => featureName(f.feature)).join(', '),
-    title: items.map((f) => `${f.feature}${typeof f.importance === 'number' ? ` (${f.importance.toFixed(3)})` : ''}`).join(', '),
-  };
-}
-
-/** A 0–1 scale with the target zone shaded and this value marked. */
-function Band({ value, target }: { value: number | undefined; target: ValidationTarget }): JSX.Element {
-  const lo = target.min ?? 0;
-  const hi = target.max ?? 1;
-  const v = typeof value === 'number' && Number.isFinite(value) ? Math.min(Math.max(value, 0), 1) : null;
-  return (
-    <div className="band" aria-hidden="true">
-      <div className="band-track" />
-      <div className="band-target" style={{ left: `${lo * 100}%`, width: `${(hi - lo) * 100}%` }} />
-      {v !== null && <div className="band-marker" style={{ left: `${v * 100}%` }} />}
-      <span className="band-tick band-tick-0">0</span>
-      <span className="band-tick band-tick-1">1</span>
-    </div>
-  );
-}
-
-/** A validation figure. Sample values look real, so they always carry the chip right beside the number. */
-function ValueWithChip({ sample, children }: { sample: boolean; children: ReactNode }): JSX.Element {
-  return (
-    <span className="val-value-wrap">
-      <span className="val-value">{children}</span>
-      {sample && <SampleChip what="This figure and the others on this panel" />}
-    </span>
-  );
-}
-
-function Check({
-  title,
-  help,
-  term,
-  value,
-  digits = 2,
-  target,
-  sample,
-  children,
-}: {
-  sample: boolean;
-  title: string;
-  help: string;
-  /** Technical name of the statistic, shown as a tooltip. */
-  term?: string;
-  value: number | undefined;
-  digits?: number;
-  target: ValidationTarget;
-  children?: JSX.Element | null;
-}): JSX.Element {
-  const ok = meetsTarget(value, target);
-  return (
-    <div className="val-block">
-      <div className="val-head">
-        <div>
-          <h3>{title}</h3>
-          <p className="caption" title={term}>
-            {help}
-          </p>
-        </div>
-        <ValueWithChip sample={sample}>{fmt(value, digits)}</ValueWithChip>
-      </div>
-      <Band value={value} target={target} />
-      <p className="val-status">
-        {ok === null ? (
-          <span className="muted">Not available yet</span>
-        ) : (
-          <span className="val-verdict" data-ok={ok}>
-            <VerdictGlyph kind={ok ? 'pass' : 'fail'} />
-            {ok ? 'Meets target' : 'Below target'}
-          </span>
-        )}
-        <span className="caption">{target.text}</span>
-      </p>
-      {children}
-    </div>
-  );
+interface TrustCheck {
+  key: string;
+  what: string;
+  result: string;
+  why: MethodNoteId;
 }
 
 export function Summary(): JSX.Element {
@@ -160,220 +111,150 @@ export function Summary(): JSX.Element {
   const ranking = [...summary.ranking].sort((a: RankingRow, b: RankingRow): number => a.rank - b.rank);
   const easiest = ranking[0];
   const hardest = ranking[ranking.length - 1];
-  const tests = v.synthetic_tests ?? [];
-  const testsPassed = tests.filter((t) => t.passed).length;
-  const checks: (boolean | null)[] = [
-    meetsTarget(v.shadow_vs_pgda?.pearson_r, VALIDATION_TARGETS.shadow_r),
-    meetsTarget(v.known_vs_decoy_auc, VALIDATION_TARGETS.decoy_auc),
-    meetsTarget(v.weight_stability_jaccard, VALIDATION_TARGETS.jaccard),
-    tests.length ? testsPassed === tests.length : null,
-  ];
-  const known = checks.filter((c): c is boolean => c !== null);
-  const passed = known.filter((c: boolean): boolean => c).length;
   const sample = core.summaryOrigin !== 'data';
-  const aucs = Object.entries(v.classifier_two_sample?.per_region_auc ?? {});
+  const close = howClose(core.matches);
+  const extras = core.method ? parseMethodExtras(core.method.file) : null;
+  const boot = parseBootstrap(v);
+  const walkTop1 = parseWalkTest(v)?.top1;
   const open = (regionId: string, h: HazardId): void => {
     setRegion(regionId);
     setHazard(h);
     setScreen('region');
   };
 
+  const checks: TrustCheck[] = [
+    {
+      key: 'pgda',
+      what: 'Shadows agree with NASA’s sunlight map',
+      result: `r = ${fmtStat(v.shadow_vs_pgda?.pearson_r)}`,
+      why: 'shadowFar',
+    },
+    extras?.aucIndependent != null
+      ? {
+          key: 'analogs',
+          what: 'Real Moon-training sites outrank decoys',
+          result: `${fmtStat(extras.aucIndependent)} on ${fmtNum(extras.nIndependent)} independent sites (0.50 = chance)`,
+          why: 'analogs',
+        }
+      : {
+          key: 'analogs',
+          what: 'Real Moon-training sites outrank decoys',
+          result: `${fmtStat(v.known_vs_decoy_auc)} (0.50 = chance)`,
+          why: 'analogs',
+        },
+    ...(boot
+      ? [{ key: 'boot', what: 'Top 3 survive a fresh Earth sample', result: `${fmtPct(boot.reappearance)} reappear in reruns`, why: 'bootstrap' as const }]
+      : []),
+    ...(typeof walkTop1 === 'number'
+      ? [{ key: 'walk', what: 'Walk matcher finds a hidden Moon route', result: `first try ${fmtPct(walkTop1)} of the time`, why: 'walkMatcher' as const }]
+      : []),
+  ];
+
   return (
     <div>
       <ScreenHead
-        kicker="Summary and validation"
+        kicker="Summary"
         chips={core.summaryOrigin === 'mock' ? <SampleChip what="Ranking and validation figures" /> : null}
         result={
           easiest && hardest
             ? `${regionName(easiest.region_id)} is the easiest region to rehearse on Earth; ${regionName(hardest.region_id)} the hardest`
             : 'No ranking yet'
         }
-        method={
-          <p>
-            Regions are ranked by how close the best Earth match comes for each of the 3 dangers. Distances are in multiples of the Moon
-            region’s normal variation (its interquartile range): under 0.5 is close, 0.5 to 1.5 partial, 1.5 or more far. The same bands
-            colour the grid and word the reasons.
-          </p>
-        }
       />
+      <p className="sum-problem">
+        Low-sun shadows, crater-rim drops and blank ground fooled recent landers; we ranked NASA’s 9 south-pole regions by how well Earth stages
+        each hazard.
+      </p>
 
-      <div className="summary-layout">
-        <section className="panel" aria-labelledby="grid-h">
-          <div className="panel-head">
-            <h2 id="grid-h">Best Earth match, region by danger</h2>
-            <span className="caption">Easiest to hardest. Select a cell to open its Earth matches.</span>
-            {sample && <SampleChip what="This ranking" />}
-          </div>
-          <div className="table-scroll">
-            <table className="fit-grid">
-              <thead>
-                <tr>
-                  <th className="r" scope="col">
-                    #
+      <section className="panel" aria-labelledby="grid-h">
+        <div className="panel-head">
+          <h2 id="grid-h">Best Earth match, region by danger</h2>
+          <span className="caption">
+            Gap in × the Moon region’s <Term id="typicalSpread">typical spread</Term>
+          </span>
+          {sample && <SampleChip what="This ranking" />}
+        </div>
+        <div className="table-scroll">
+          <table className="fit-grid">
+            <thead>
+              <tr>
+                <th className="r" scope="col">
+                  #
+                </th>
+                <th scope="col">Region</th>
+                {HAZARD_IDS.map((h: HazardId) => (
+                  <th key={h} scope="col">
+                    <span className="th-hz">
+                      <HazardGlyph hazard={h} />
+                      {ROW_NAME[h]}
+                    </span>
                   </th>
-                  <th scope="col">Region</th>
-                  {HAZARD_IDS.map((h: HazardId) => (
-                    <th key={h} scope="col">
-                      <span className="th-hz">
-                        <HazardGlyph hazard={h} />
-                        {ROW_NAME[h]}
-                      </span>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {ranking.map((r: RankingRow) => (
-                  <tr key={r.region_id}>
-                    <td className="r fit-rank">{r.rank}</td>
-                    <th scope="row" className="fit-region">
-                      <span className="fit-region-name">{regionName(r.region_id)}</span>
-                      <span className="caption">{r.reason}</span>
-                    </th>
-                    {HAZARD_IDS.map((h: HazardId) => {
-                      const d = r.per_hazard_best_distance?.[h];
-                      const f = distFit(d);
-                      return (
-                        <td key={h}>
-                          <button
-                            type="button"
-                            className="fit-cell"
-                            title={`${HAZARDS[h].name}: best match ${fmt(d)} × the Moon region’s normal variation away (0 = identical)`}
-                            aria-label={`${regionName(r.region_id)}, ${HAZARDS[h].name}: ${f ? (f === 'green' ? 'close' : f === 'amber' ? 'partial' : 'far') : 'no data'}. Open Earth matches.`}
-                            onClick={(): void => open(r.region_id, h)}
-                          >
-                            {f ? <Fit fit={f} /> : <span className="faint">—</span>}
-                            <span className="fit-dist">{fmt(d)}</span>
-                          </button>
-                        </td>
-                      );
-                    })}
-                  </tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="panel" aria-labelledby="val-h">
-          <div className="panel-head">
-            <h2 id="val-h">Validation</h2>
-            <span className="val-summary">
-              {known.length ? `${passed} of ${known.length} checks meet their targets` : 'No checks available yet'}
-              {sample ? ' (sample values, not results)' : ''}
+              </tr>
+            </thead>
+            <tbody>
+              {ranking.map((r: RankingRow) => (
+                <tr key={r.region_id}>
+                  <td className="r fit-rank">{r.rank}</td>
+                  <th scope="row" className="fit-region" title={r.reason}>
+                    <span className="fit-region-name">{regionName(r.region_id)}</span>
+                  </th>
+                  {HAZARD_IDS.map((h: HazardId) => {
+                    const d = r.per_hazard_best_distance?.[h];
+                    const f = distanceFit(d);
+                    return (
+                      <td key={h}>
+                        <button
+                          type="button"
+                          className="fit-cell"
+                          title={`${HAZARDS[h].name}: best Earth match ${fmtSpread(d)} the Moon region’s typical spread away (0× = identical)`}
+                          aria-label={`${regionName(r.region_id)}, ${HAZARDS[h].name}: ${f ? (f === 'green' ? 'close' : f === 'amber' ? 'partial' : 'far') : 'no data'}, ${fmtSpread(d)}. Open Earth matches.`}
+                          onClick={(): void => open(r.region_id, h)}
+                        >
+                          {f ? <Fit fit={f} /> : <span className="faint">—</span>}
+                          <span className="fit-dist">{fmtSpread(d)}</span>
+                        </button>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {close.n > 0 && (
+          <div className="why-row sum-close">
+            <span>
+              <strong>How close?</strong> Typical gap of the #1 Earth match: {close.gaps.map((g) => g.text).join(', ')} · {close.nClose} of {close.n}{' '}
+              close
             </span>
           </div>
-          <Check
-            title="Shadows vs NASA PGDA illumination"
-            help="Agreement with NASA’s map (1 = perfect): our shadow share against NASA PGDA’s illumination map."
-            term={v.shadow_vs_pgda?.note ? `Pearson correlation. ${v.shadow_vs_pgda.note}` : 'Pearson correlation'}
-            value={v.shadow_vs_pgda?.pearson_r}
-            target={VALIDATION_TARGETS.shadow_r}
-            sample={sample}
-          >
-            <dl className="kv">
-              <dt>Mean absolute error</dt>
-              <dd>{fmt(v.shadow_vs_pgda?.mae, 3)}</dd>
-              <dt>Bias</dt>
-              <dd>{fmt(v.shadow_vs_pgda?.bias, 3)}</dd>
-              <dt>Pixels compared</dt>
-              <dd>{typeof v.shadow_vs_pgda?.n_px === 'number' ? v.shadow_vs_pgda.n_px.toLocaleString('en-US') : '—'}</dd>
-            </dl>
-          </Check>
-          <Check
-            title="Known analogs rank above decoys"
-            help="Chance a known analog outranks a decoy such as dune fields, farmland or forest (0.50 = coin flip)."
-            term="ROC-AUC"
-            value={v.known_vs_decoy_auc}
-            target={VALIDATION_TARGETS.decoy_auc}
-            sample={sample}
-          />
-          <Check
-            title="Top 3 stay put when weights move ±20%"
-            help="How much the top 3 stay the same when the weights are nudged (1 = identical lists)."
-            term="Jaccard index"
-            value={v.weight_stability_jaccard}
-            target={VALIDATION_TARGETS.jaccard}
-            sample={sample}
-          />
-          <div className="val-block">
-            <div className="val-head">
-              <div>
-                <h3>Synthetic tests</h3>
-                <p className="caption">Known-answer terrains run through the same code.</p>
-              </div>
-              <ValueWithChip sample={sample}>
-                {testsPassed}/{tests.length}
-              </ValueWithChip>
-            </div>
-            <ul className="test-list">
-              {tests.map((t) => (
-                <li key={t.name}>
-                  <span>{t.name.replace(/_/g, ' ')}</span>
-                  <span className="val-verdict" data-ok={t.passed}>
-                    <VerdictGlyph kind={t.passed ? 'pass' : 'fail'} />
-                    {t.passed ? 'Passed' : 'Failed'}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          {aucs.length > 0 && (
-            <div className="val-block">
-              <div className="val-head">
-                <div>
-                  <h3>Can a computer tell Moon from Earth terrain?</h3>
-                  <p className="caption" title="Classifier two-sample test (AUC), per region">
-                    0.5 = it can’t tell them apart; 1 = it always can. One dot per region. Shown for context, no target.
-                  </p>
-                </div>
-                {sample && <SampleChip what="These values" />}
-              </div>
-              <div
-                className="auc-strip"
-                role="img"
-                aria-label={`Classifier AUC per region, from ${fmt(Math.min(...aucs.map((a) => a[1])))} to ${fmt(Math.max(...aucs.map((a) => a[1])))}`}
-              >
-                <div className="band-track" />
-                {stackDots(aucs).map(({ id, value, row }) => (
-                  <span
-                    key={id}
-                    className="auc-dot"
-                    style={{ left: `${Math.min(Math.max((value - 0.5) / 0.5, 0), 1) * 100}%`, top: `${4 - row * 9}px` }}
-                    title={`${regionName(id)}: ${fmt(value)}`}
-                  />
-                ))}
-                <span className="band-tick band-tick-0">0.5</span>
-                <span className="band-tick band-tick-1">1</span>
-              </div>
-              <details className="method">
-                <summary>Per-region values</summary>
-                <dl className="kv method-body">
-                  {aucs.map(([k, auc]: [string, number]) => (
-                    <div key={k} className="kv-row">
-                      <dt>{regionName(k)}</dt>
-                      <dd>{fmt(auc)}</dd>
-                    </div>
-                  ))}
-                </dl>
-                {v.classifier_two_sample.top_features.length > 0 && (
-                  <p className="caption" title={topFeatures(v.classifier_two_sample.top_features).title}>
-                    What gives the Earth terrain away most: {topFeatures(v.classifier_two_sample.top_features).text}
-                  </p>
-                )}
-              </details>
-            </div>
-          )}
-          <div className="val-block">
-            <h3>Where it fails</h3>
-            <ul className="fails">
-              {v.where_it_fails.map((w: string) => (
-                <li key={w}>{w}</li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      </div>
+        )}
+      </section>
+
+      <section className="sum-section" aria-labelledby="sure-h">
+        <h2 id="sure-h">How sure are we?</h2>
+        <ul className="sure-list">
+          {checks.map((c: TrustCheck) => (
+            <li key={c.key}>
+              <span className="sure-what">{c.what}</span>
+              <span className="sure-result">{c.result}</span>
+              <Why id={c.why} align="end" />
+              {sample && <SampleChip what="This figure" />}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="sum-section" aria-labelledby="limits-h">
+        <h2 id="limits-h">Limits</h2>
+        <ul className="limits">
+          {LIMITS.map((l: string) => (
+            <li key={l}>{l}</li>
+          ))}
+        </ul>
+      </section>
+
       <Credits metas={metas} nasadem={nasadem} />
     </div>
   );

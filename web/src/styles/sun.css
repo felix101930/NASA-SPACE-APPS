@@ -1,0 +1,10 @@
+/* The visible sun in the 3D views (SunMarker): its small DOM tag. Tokens from styles.css only. */
+
+.t3-tag3d.t3-tag-sun,
+.x3d-tag.x3d-tag-sun {
+  padding: 1px 6px;
+  border-color: var(--sun);
+  color: var(--sun);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

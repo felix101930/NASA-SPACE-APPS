@@ -39,7 +39,7 @@ export function StepBar({ regions, regionId, onRegion, step2, step3 }: StepBarPr
         <Marker n={1} state="done" />
         <div className="wk-step-body">
           <label className="wk-step-label" htmlFor="wk-region">
-            Pick a Moon region
+            Moon region
           </label>
           <select id="wk-region" className="select wk-step-select" value={regionId} onChange={(e): void => onRegion(e.target.value)}>
             {regions.map((r: Region) => (
@@ -54,7 +54,7 @@ export function StepBar({ regions, regionId, onRegion, step2, step3 }: StepBarPr
         <Marker n={2} state={step2.state} />
         <div className="wk-step-body">
           <span className="wk-step-label">
-            Choose or draw a route <span className="sr-only">({stateWord(step2.state)})</span>
+            Route {step2.state !== 'done' && <span className="sr-only">({stateWord(step2.state)})</span>}
           </span>
           <span className="wk-step-value">{step2.value}</span>
         </div>
@@ -63,7 +63,7 @@ export function StepBar({ regions, regionId, onRegion, step2, step3 }: StepBarPr
         <Marker n={3} state={step3.state} />
         <div className="wk-step-body">
           <span className="wk-step-label">
-            Meet its Earth twin <span className="sr-only">({stateWord(step3.state)})</span>
+            Earth twin {step3.state !== 'done' && <span className="sr-only">({stateWord(step3.state)})</span>}
           </span>
           <span className="wk-step-value" aria-live="polite">
             {step3.value}

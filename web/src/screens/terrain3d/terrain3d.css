@@ -1005,3 +1005,76 @@
 .t3-dates > p {
   margin-bottom: 12px;
 }
+
+/* ---------- Clarity pass: captions with ⓘ, uncertainty, NASADEM, low-sun flags ---------- */
+
+.t3-caption-row {
+  font-size: var(--fs-label);
+  color: var(--text-2);
+  max-width: 110ch;
+}
+
+.t3-window-note.why-row {
+  align-items: center;
+}
+
+.t3-th-why {
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.t3-table th.r .t3-th-why {
+  justify-content: flex-end;
+}
+
+.t3-weak {
+  color: var(--text-2);
+}
+
+.t3-sun-dates button[data-low] {
+  color: var(--text-2);
+}
+
+.t3-sunbar-main .flag-note {
+  white-space: nowrap;
+}
+
+.t3-notes-more > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  cursor: pointer;
+  list-style: none;
+  margin-bottom: 12px;
+}
+
+.t3-notes-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.t3-notes-more > summary h2 {
+  font-size: var(--fs-h3);
+}
+
+.t3-notes-more > summary h2::after {
+  content: ' ▾';
+  color: var(--text-3);
+  font-size: var(--fs-label);
+}
+
+.t3-notes-more[open] > summary h2::after {
+  content: ' ▴';
+}
+
+/* Basic numbers table (Moon · Earth · difference) */
+.t3-section-head.why-row {
+  justify-content: flex-start;
+}
+
+.t3-diff {
+  font-size: var(--fs-label);
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

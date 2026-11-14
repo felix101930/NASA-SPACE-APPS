@@ -79,3 +79,17 @@ export function matchQuality(dist: number, s: Spread | null, nRoutes: number | n
   if (dist <= s.p90) return { fit: 'amber', word: 'Partial twin', sentence: `looser than most best matches for ${n}, but in the usual range` };
   return { fit: 'red', word: 'Loose twin', sentence: `looser than 9 in 10 best matches for ${n}: no Earth path climbs quite like this` };
 }
+
+export interface WalkTest {
+  /** Hidden-copy test on the summary: height + slope finds the copy first (0..1) vs DTW (0..1). */
+  top1: number;
+  dtwTop1: number;
+}
+
+/** Reads summary.validation.walk_findback (top1, dtw_top1) without trusting its shape. */
+export function parseWalkTest(validation: unknown): WalkTest | null {
+  if (!isObj(validation) || !isObj(validation.walk_findback)) return null;
+  const top1 = num(validation.walk_findback.top1);
+  const dtwTop1 = num(validation.walk_findback.dtw_top1);
+  return top1 !== null && dtwTop1 !== null ? { top1, dtwTop1 } : null;
+}

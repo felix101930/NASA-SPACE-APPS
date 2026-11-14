@@ -171,6 +171,9 @@ def cmd_all(args: argparse.Namespace) -> None:
     wf = SS.walk_findback()
     if wf is not None:
         validation["walk_findback"] = wf
+    bs = SS.bootstrap_reappearance()
+    if bs is not None:
+        validation["bootstrap"] = bs
     shortfalls = [f"{x['region_id']}|{x['hazard']}" for x in searches if x["novelty_shortfall"]]
     times["total_s"] = round(time.time() - t_all, 1)
     write_json(SUMMARY_JSON, {"meta": make_meta(sources, earth_sites_snapshot=method["earth_sites_snapshot"],

@@ -6,9 +6,22 @@ import { mapToPixel } from '../lib/terrain';
 import { matchesFor, useApp, useRegion, type CoreData } from '../store';
 import { HAZARD_IDS, type EarthSite, type HazardId, type LightRow, type Match, type Region, type RehearsalWindow, type ShadowMask } from '../types/contract';
 import { HAZARDS } from '../content';
-import { avgNote, avgShadowAt, dirWord } from '../lib/shadow';
+import { avgShadowAt, dirWord } from '../lib/shadow';
 import { fmtLatLon, placeName, type PlaceName } from '../lib/placeName';
-import { buildVerdict, compass, fmtMinutes, HAZARD_TAB, pct0, windowDate, windowMinutes, windowTime, type Verdict } from './terrain3d/copy';
+import { InfoTip } from '../components/InfoTip';
+import { Term, Why } from '../components/Term';
+import {
+  buildVerdict,
+  compass,
+  fmtMinutes,
+  HAZARD_TAB,
+  lowSunWindow,
+  pct0,
+  windowDate,
+  windowMinutes,
+  windowTime,
+  type Verdict,
+} from './terrain3d/copy';
 import {
   moonRimSegs,
   useAnnotations,
@@ -16,11 +29,12 @@ import {
   useEarthRimSegs,
   useMaskTexture,
   useShadowShare,
+  useSiteStillListed,
   useTile,
   type RimSeg,
   type ShadowShare,
 } from './terrain3d/data';
-import { EvidenceTable, NotesBoxes, WindowsList } from './terrain3d/Evidence';
+import { EvidenceTable, nasademAgreement, NotesBoxes, WindowsList } from './terrain3d/Evidence';
 import { Pane } from './terrain3d/Scene';
 import './terrain3d/terrain3d.css';
 
@@ -195,8 +209,8 @@ function Pickers({
       </div>
       <div className="t3-pick t3-pick-earth">
         <span className="t3-pick-label" id="t3-earth-label">
-          Earth stand-ins for this danger
-          <span className="t3-pick-hint">{n ? ` · best 3 of ${n.toLocaleString('en-US')} squares screened` : ' · best 3'}</span>
+          Earth stand-ins
+          <span className="t3-pick-hint">{n ? ` · top 3 of ${n.toLocaleString('en-US')} squares` : ' · top 3'}</span>
         </span>
         <div className="t3-chips" role="group" aria-labelledby="t3-earth-label">
           {choices.length === 0 && <p className="t3-note-empty">No Earth matches for this region and danger in matches.json.</p>}
@@ -206,13 +220,12 @@ function Pickers({
               type="button"
               className="t3-chip"
               aria-pressed={c.site.id === selectedId}
-              title={c.place.title}
+              title={`${c.place.title} · ${c.place.region ?? fmtLatLon(c.site.lat, c.site.lon)}`}
               onClick={(): void => setSite(c.site.id)}
             >
               <span className="t3-chip-rank">#{c.match?.rank ?? '–'}</span>
               <span className="t3-chip-text">
                 <span className="t3-chip-name">{c.place.label}</span>
-                <span className="t3-chip-sub">{c.place.region ?? fmtLatLon(c.site.lat, c.site.lon)}</span>
               </span>
             </button>
           ))}
@@ -221,7 +234,7 @@ function Pickers({
               <span className="t3-chip-rank">Walk</span>
               <span className="t3-chip-text">
                 <span className="t3-chip-name">{extra.place.label}</span>
-                <span className="t3-chip-sub">from your drawn walk, not a top-3 pick</span>
+                <span className="t3-chip-sub">from your walk</span>
               </span>
             </button>
           )}
@@ -248,6 +261,11 @@ function shareBig(s: ShadowShare | null): string {
   return s ? `${pct0(s.frac)} dark` : '…';
 }
 
+/** "at a 3° sun (50% averaged over all directions)": the marker shows the direction, so no direction words. */
+function atSun(elTxt: string, avg: number | null): string {
+  return `at a ${elTxt} sun${avg !== null ? ` (${pct0(avg)} averaged over all directions)` : ''}`;
+}
+
 export default function Terrain3D(): JSX.Element {
   const core = useApp((s) => s.core) as CoreData;
   const region = useRegion();
@@ -258,6 +276,7 @@ export default function Terrain3D(): JSX.Element {
   const el = useApp((s) => s.sunEl);
   const az = useApp((s) => s.sunAz);
   const setSun = useApp((s) => s.setSun);
+  const setSite = useApp((s) => s.setSite);
   const mode = useApp((s) => s.shadowMode);
   const setMode = useApp((s) => s.setShadowMode);
   const walk = useApp((s) => s.walk);
@@ -265,6 +284,14 @@ export default function Terrain3D(): JSX.Element {
   const [lift, setLift] = useState<boolean>(false);
   const [activeWindow, setActiveWindow] = useState<{ key: string; el: number; az: number } | null>(null);
   const [datesOpen, setDatesOpen] = useState<boolean>(false);
+
+  // A stale selection (e.g. a site from an older pipeline run kept in memory) falls back to this region × danger's
+  // #1 match, so the 3D view never asks for a tile that no longer exists.
+  useEffect((): void => {
+    if (!region || !siteId || core.siteById.has(siteId)) return;
+    const top = matchesFor(core, region.id, hazard).find((m: Match): boolean => core.siteById.has(m.site_id));
+    setSite(top?.site_id ?? null);
+  }, [core, region, hazard, siteId, setSite]);
 
   // Deep links (Earth matches, Walk) set a site; if it is a pick for another danger in this region, follow it.
   useEffect((): void => {
@@ -284,6 +311,7 @@ export default function Terrain3D(): JSX.Element {
       });
   }, [core, region, hazard]);
 
+  const agreement = useMemo((): Record<string, number> => nasademAgreement(core.method?.file), [core]);
   const inChoices = choices.find((c: SiteChoice): boolean => c.site.id === siteId) ?? null;
   const walkSite = !inChoices && siteId ? (core.siteById.get(siteId) ?? null) : null;
   const extra: SiteChoice | null = walkSite ? { site: walkSite, match: null, place: sitePlace(walkSite, null) } : null;
@@ -293,6 +321,7 @@ export default function Terrain3D(): JSX.Element {
 
   const moon = useTile(region?.tile ?? null, core.regionsOrigin);
   const earth = useTile(site?.tile ?? null, core.sitesOrigin);
+  const stillListed = useSiteStillListed(site?.id ?? null, earth.error !== null, core.sitesOrigin);
   const ann = useAnnotations(region, core.regionsOrigin);
   const moonShare = useShadowShare(moon.tile, el, az);
   const earthShare = useShadowShare(earth.tile, el, az);
@@ -351,13 +380,11 @@ export default function Terrain3D(): JSX.Element {
   };
   const activeW = activeIdx >= 0 ? windows[activeIdx] : null;
 
-  // Per-hazard readouts and captions. Live shadow shares are for ONE sun direction; the profile and table
-  // values are averaged over all directions, so every single-direction figure says so and shows the average.
+  // Per-hazard readouts. Live shadow shares are for ONE sun direction (the marker shows which); the profile and
+  // table values are averaged over all directions, so every single-direction figure also shows the average.
   const elTxt = `${el.toFixed(el % 1 ? 1 : 0)}°`;
-  const sunFrom = `from the ${compass(az)} of the tile`;
   const moonAvg = avgShadowAt(el, region.hazards.shadow.metrics, region.extras);
   const earthAvg = avgShadowAt(el, site.metrics);
-  const oneSun = `sun from the ${dirWord(az)} at ${elTxt}`;
   let moonReadout: ReactNode;
   let earthReadout: ReactNode;
   let earthNote: ReactNode = null;
@@ -365,49 +392,70 @@ export default function Terrain3D(): JSX.Element {
   if (hazard === 'rim') {
     const mTop = moonRim?.[0];
     const eTop = earthRim?.[0];
-    moonReadout = <Readout big={mTop ? `${Math.round(mTop.absDh)} m` : ann ? '–' : '…'} small="biggest height change over 1 km" />;
-    earthReadout = <Readout big={eTop ? `${Math.round(eTop.absDh)} m` : '…'} small="biggest height change over 1 km" />;
+    moonReadout = (
+      <Readout
+        big={
+          mTop ? (
+            <>
+              {Math.round(mTop.absDh)} m
+            </>
+          ) : ann ? (
+            '–'
+          ) : (
+            '…'
+          )
+        }
+        small="biggest 1 km height change"
+      />
+    );
+    earthReadout = <Readout big={eTop ? `${Math.round(eTop.absDh)} m` : '…'} small="biggest 1 km height change" />;
     caption = (
       <>
-        <strong>Orange lines</strong> = the three biggest height changes over 1 km on each view; the dot marks the high end. A drop like this
-        is what Hakuto-R’s software rejected as a sensor error.
+        <span>
+          <strong>Orange</strong> = 3 biggest 1 km height changes (dot = high end). Hakuto-R’s software rejected a drop like this as a
+          sensor error.
+        </span>
+        <Term id="rimDrop" />
+        <Why id="rimP95" />
       </>
     );
   } else if (hazard === 'texture') {
     const mEmpty = ann?.texture?.empty_frac ?? region.hazards.texture.metrics.empty_cell_frac_el3;
     const lightE = match?.lights.find((l: LightRow): boolean => l.metric === 'empty_cell_frac_el3');
     const eEmpty = lightE ? lightE.earth : siteMetric(site, 'empty_cell_frac_el3');
-    moonReadout = <Readout big={typeof mEmpty === 'number' ? pct0(mEmpty) : '–'} small="of 1 km squares featureless at a 3° sun" />;
-    earthReadout = <Readout big={eEmpty !== null ? pct0(eEmpty) : '–'} small="of 1 km squares featureless at a 3° sun" />;
-    earthNote = <>Pipeline figure. Which Earth squares are empty isn’t mapped yet, so only the 1 km grid is drawn here.</>;
+    moonReadout = <Readout big={typeof mEmpty === 'number' ? pct0(mEmpty) : '–'} small="of 1 km squares featureless (3° sun)" />;
+    earthReadout = <Readout big={eEmpty !== null ? pct0(eEmpty) : '–'} small="of 1 km squares featureless (3° sun)" />;
+    earthNote = <span title="Which Earth squares are empty isn’t mapped yet, so only the 1 km grid is drawn here.">Pipeline figure · grid only</span>;
     caption = (
       <>
-        <strong>Pink</strong> = squares where a camera finds nothing to track (what tripped up Ingenuity). Darker pink = worse.
+        <span>
+          <strong>Pink</strong> = squares with nothing for a camera to track (what tripped up Ingenuity). Darker = worse.
+        </span>
+        <Term id="cameraTexture" />
+        <Why id="texture" />
       </>
     );
   } else {
-    moonReadout = <Readout big={shareBig(moonShare)} small={`${oneSun}${moonAvg !== null ? ` · ${pct0(moonAvg)} averaged over all directions` : ''}`} />;
-    earthReadout = <Readout big={shareBig(earthShare)} small={`same sun${earthAvg !== null ? ` · ${pct0(earthAvg)} averaged over all directions` : ''}`} />;
-    caption = earthShare ? (
+    moonReadout = <Readout big={shareBig(moonShare)} small={atSun(elTxt, moonAvg)} />;
+    earthReadout = (
+      <Readout big={shareBig(earthShare)} small={`same sun${earthAvg !== null ? ` (${pct0(earthAvg)} averaged over all directions)` : ''}`} />
+    );
+    caption = (
       <>
-        Long low-sun shadows like these were one of the things IM-2 faced. Under the same sun, {pct0(earthShare.frac)} of {place.label} is
-        dark{earthAvg !== null ? ` ${avgNote(earthAvg)}` : ''}.
+        <span>
+          <strong>Black</strong> = real shadow, like the long low-sun shadows IM-2 faced.
+        </span>
+        <Term id="shadowShare" />
+        <Why id="shadowFar" />
       </>
-    ) : null;
+    );
   }
-  const darkNote = moonShare ? (
-    <>
-      <strong>Black</strong> = real shadow: at a {elTxt} sun from the {dirWord(az)} of the tile, {pct0(moonShare.frac)} of {region.name} gets no
-      light{moonAvg !== null ? ` ${avgNote(moonAvg)}` : ''}.
-    </>
-  ) : (
-    <>Measuring the shadow at a {elTxt} sun…</>
-  );
 
   // When to go: the next window, chips beside the sun presets, and the full list on demand.
   const nextIdx = nextWindowIndex(windows);
   const nextW = nextIdx >= 0 ? windows[nextIdx] : null;
   const insight = lowSunInsight(windows, site);
+  const anyLow = windows.slice(0, 3).some(lowSunWindow);
   const openDates = (): void => {
     setDatesOpen(true);
     window.requestAnimationFrame((): void =>
@@ -417,6 +465,17 @@ export default function Terrain3D(): JSX.Element {
       }),
     );
   };
+  const earthError =
+    earth.error && stillListed === false ? (
+      <>
+        This page’s data is older than the files on disk (this site was replaced by a newer run).{' '}
+        <button type="button" className="link-btn" onClick={(): void => window.location.reload()}>
+          Reload
+        </button>
+      </>
+    ) : (
+      earth.error
+    );
 
   return (
     <div className="t3">
@@ -430,44 +489,51 @@ export default function Terrain3D(): JSX.Element {
       <div className="t3-verdict" data-hz={hazard}>
         <HazardGlyph hazard={hazard} size={24} />
         {verdict ? (
-          <h1>
+          <h1 title={verdict.rank ?? undefined}>
             {verdict.lead}: <span className="t3-verdict-stat">{verdict.stat}</span>
-            {verdict.rank && <span className="t3-verdict-rank"> — {verdict.rank}</span>}
           </h1>
         ) : (
-          <h1>
-            {place.label} came from your drawn walk. It isn’t one of the top-3 Earth picks for {region.name}, so there is no match to explain;
-            the 3D views still compare the terrain.
-          </h1>
+          <h1>{place.label} came from your drawn walk, not a top-3 pick; the views still compare the terrain.</h1>
         )}
       </div>
 
       {match && (
         <div className="t3-when">
           {nextW ? (
-            <p className="t3-when-line">
+            <div className="t3-when-line why-row">
               <SunGlyph size={14} />
               <span>
-                <strong>Next chance to see this on site:</strong> {windowDate(nextW)}, {windowTime(nextW)} · sun {nextW.sun_el.toFixed(1)}° from
-                the {dirWord(nextW.sun_az)}
-                {windowMinutes(nextW) !== null ? ` · lasts ~${fmtMinutes(windowMinutes(nextW) ?? 0)}` : ''}
+                <strong>
+                  <Term id="rehearsalWindow">Next on site:</Term>
+                </strong>{' '}
+                {windowDate(nextW)}, {windowTime(nextW)} · sun {nextW.sun_el.toFixed(1)}° {compass(nextW.sun_az)}
+                {windowMinutes(nextW) !== null ? ` · ~${fmtMinutes(windowMinutes(nextW) ?? 0)}` : ''}
               </span>
+              {lowSunWindow(nextW) && (
+                <span className="flag-note">
+                  below 1° <Why id="refraction" />
+                </span>
+              )}
+              {insight && (
+                <InfoTip label="How long does this low sun last?" title="Minutes on Earth, days on the Moon">
+                  <p>{insight}</p>
+                </InfoTip>
+              )}
               {windows.length > 1 && (
                 <button type="button" className="link-btn t3-when-more" aria-controls="t3-all-dates" onClick={openDates}>
-                  {windows.length - 1} more {windows.length - 1 === 1 ? 'date' : 'dates'} ▾
+                  +{windows.length - 1} {windows.length - 1 === 1 ? 'date' : 'dates'} ▾
                 </button>
               )}
-            </p>
+            </div>
           ) : (
-            <p className="t3-when-line">No low-sun window at this site in the next year (for example, polar night at this latitude).</p>
+            <p className="t3-when-line">No low-sun window here in the next year (e.g. polar night).</p>
           )}
-          {insight && <p className="t3-when-insight">{insight}</p>}
         </div>
       )}
 
       <div className="t3-sunbar">
         <div className="t3-sunbar-main">
-          <span className="t3-pick-label" id="t3-sun-label">
+          <span className="t3-pick-label why-row" id="t3-sun-label">
             <SunGlyph /> Moon-like low sun
           </span>
           <div className="t3-sun-presets" role="group" aria-labelledby="t3-sun-label">
@@ -486,32 +552,46 @@ export default function Terrain3D(): JSX.Element {
           </div>
           {windows.length > 0 && (
             <div className="t3-sun-presets t3-sun-dates" role="group" aria-label="Light both views with the sun of a rehearsal date at the Earth site">
-              <span className="t3-sun-dates-label">On site:</span>
-              {windows.slice(0, 4).map((w: RehearsalWindow, i: number) => (
+              <span className="t3-sun-dates-label">Dates:</span>
+              {windows.slice(0, 3).map((w: RehearsalWindow, i: number) => (
                 <button
                   key={`${w.start_utc}-${i}`}
                   type="button"
                   aria-pressed={activeIdx === i}
-                  title={`${windowDate(w)}, ${windowTime(w)} · sun ${w.sun_el.toFixed(1)}° from the ${dirWord(w.sun_az)}`}
+                  data-low={lowSunWindow(w) || undefined}
+                  title={`${windowDate(w)}, ${windowTime(w)} · sun ${w.sun_el.toFixed(1)}° from the ${dirWord(w.sun_az)}${lowSunWindow(w) ? ' · below 1°: refraction-sensitive' : ''}`}
                   onClick={(): void => pickWindow(i)}
                 >
                   {shortDate(w)}
+                  {lowSunWindow(w) ? ' *' : ''}
                 </button>
               ))}
-              {windows.length > 4 && (
+              {windows.length > 3 && (
                 <button type="button" onClick={openDates} aria-controls="t3-all-dates">
                   …
                 </button>
               )}
             </div>
           )}
+          {anyLow && (
+            <span className="flag-note">
+              * below 1° <Why id="refraction" />
+            </span>
+          )}
           <button type="button" className="btn btn-primary t3-sweep" aria-pressed={sweep.sweeping} onClick={sweep.sweeping ? sweep.stop : sweep.start}>
             <SunGlyph />
             {sweep.sweeping ? 'Stop the sweep' : 'Sweep the sun'}
           </button>
-          <span className="t3-sun-now">
-            Sun {elTxt} high, {sunFrom}
-          </span>
+          <InfoTip label="Where is the sun in the views?" title="The gold disc is the sun" align="end">
+            <p>
+              It sits on the true sun angle ({elTxt} now) above a horizon ring with ticks every 45°; the dashed line is the light’s path.
+              Shadows fall away from it.
+            </p>
+            <p>
+              Sun direction is relative to the tile’s top: the map grid on the Moon, north on Earth (now {Math.round(az) % 360}°, from the{' '}
+              {compass(az)} of the tile).
+            </p>
+          </InfoTip>
         </div>
         <details className="t3-more">
           <summary>More options</summary>
@@ -593,8 +673,8 @@ export default function Terrain3D(): JSX.Element {
           id="moon"
           world="Moon"
           name={region.name}
-          sub="NASA LOLA heights · 15 × 15 km"
-          upNote="up = map grid, not north"
+          sub="NASA LOLA · 15 × 15 km"
+          upNote="up = grid, not north"
           tile={moon.tile}
           error={moon.error}
           extentKm={extentOf(region.tile.size, region.tile.res_m)}
@@ -615,10 +695,10 @@ export default function Terrain3D(): JSX.Element {
           world="Earth"
           name={place.label}
           nameTitle={place.title}
-          sub={`${place.region ? `${place.region} · ` : ''}30 m heights · 15 × 15 km`}
+          sub={`${place.region ? `${place.region} · ` : ''}15 × 15 km`}
           upNote="up = north"
           tile={earth.tile}
-          error={earth.error}
+          error={earthError}
           extentKm={extentOf(site.tile.size, site.tile.res_m)}
           exag={exag}
           el={el}
@@ -636,30 +716,27 @@ export default function Terrain3D(): JSX.Element {
 
       <div className="t3-caption">
         <div className="t3-caption-lines">
-          {hazard === 'shadow' ? (
-            <>
-              <p>{darkNote}</p>
-              {caption && <p>{caption}</p>}
-            </>
-          ) : (
-            <>
-              {caption && <p>{caption}</p>}
-              <p>{darkNote}</p>
-            </>
-          )}
-          {walk && walk.regionId === region.id && <p className="t3-caption-dark">The white line is your drawn walk.</p>}
+          <div className="why-row t3-caption-row">{caption}</div>
+          {walk && walk.regionId === region.id && <p className="t3-caption-dark">White line = your drawn walk.</p>}
         </div>
         <label className="check t3-lift">
           <input type="checkbox" checked={lift} onChange={(e): void => setLift(e.target.checked)} />
-          Show terrain in shadow
+          See into shadows
         </label>
       </div>
       {activeW && (
-        <p className="t3-window-note">
-          <SunGlyph size={14} /> Lit with the sun of {activeW.start_utc.slice(0, 10)}: {activeW.sun_el.toFixed(1)}° high, from the{' '}
-          {compass(activeW.sun_az)} ({Math.round(activeW.sun_az)}° from north) — the sun direction as seen at the Earth site. The Moon view
-          uses the same direction measured from the top of its tile.
-        </p>
+        <div className="t3-window-note why-row">
+          <SunGlyph size={14} />
+          <span>
+            Sun of {windowDate(activeW)} on site: {activeW.sun_el.toFixed(1)}°, from {Math.round(activeW.sun_az)}° (north = 0°). The Moon view
+            uses the same angle from its tile’s top.
+          </span>
+          {lowSunWindow(activeW) && (
+            <span className="flag-note">
+              below 1° <Why id="refraction" />
+            </span>
+          )}
+        </div>
       )}
       <details className="t3-more t3-drawn">
         <summary>How this is drawn</summary>
@@ -672,14 +749,19 @@ export default function Terrain3D(): JSX.Element {
             Both views use a 30 m grid. The dark percentages are worked out in your browser from true heights in 90 m steps, for the one sun
             direction shown; the profile and table figures are averaged over all sun directions. Pink squares are 1 km squares with no camera
             landmark at a 3° sun from at least half of 8 sun directions. Orange lines come from a scan of every point in 16 directions, with
-            picks at least 1.5 km apart. Because heights are exaggerated, the 3D sun is raised by the same factor.
+            picks at least 1.5 km apart.
+          </p>
+          <p className="t3-fine">
+            The sun: because heights are exaggerated ×{exag.toFixed(1)}, the light is raised to atan({exag.toFixed(1)} × tan(sun height)) so
+            shadows keep their true lengths. The gold disc is drawn at the true sun height, on exactly the same direction as the light, so
+            shadows always fall straight away from it. At 1× the two angles are the same.
           </p>
         </div>
       </details>
 
       {match && (
         <>
-          <EvidenceTable match={match} regionName={region.name} placeLabel={place.label} />
+          <EvidenceTable match={match} region={region} placeLabel={place.label} agreement={agreement} />
           <NotesBoxes match={match} />
           <WindowsList
             windows={windows}

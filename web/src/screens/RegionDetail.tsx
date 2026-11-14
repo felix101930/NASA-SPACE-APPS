@@ -4,11 +4,16 @@ import { EarthMap, type MapPoint } from '../components/EarthMap';
 import { CoordBadge } from '../components/DangerProfile';
 import { Fit, FitGlyph, HazardGlyph, VerdictGlyph, type VerdictKind } from '../components/Glyphs';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
+import { InfoTip } from '../components/InfoTip';
+import { Term, Why } from '../components/Term';
+import { fmtDeg, fmtNum, fmtPct, fmtSpread, fmtStat } from '../lib/units';
+import { parseBootstrap } from '../lib/validationExtras';
+import '../styles/clarity-moon.css';
 import { localSolarTime } from '../lib/solar';
 import { placeName } from '../lib/placeName';
-import { fmtRock, plainNote } from '../lib/plain';
+import { plainNote } from '../lib/plain';
 import { matchesFor, useApp, useRegion, type CoreData } from '../store';
-import { HAZARD_IDS, type EarthSite, type HazardId, type Light, type Match, type RehearsalWindow } from '../types/contract';
+import { HAZARD_IDS, isObj, type EarthSite, type HazardId, type Light, type Match, type RehearsalWindow } from '../types/contract';
 
 const DAY_FMT = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
 
@@ -26,41 +31,102 @@ function countFits(m: Match): Record<Light, number> {
   return c;
 }
 
-function WindowsTable({ windows, site }: { windows: RehearsalWindow[]; site: EarthSite }): JSX.Element {
-  if (windows.length === 0) {
-    return <p className="muted">No matching low-sun window in the searched period (for example, polar night at this latitude).</p>;
-  }
+type Loose = Record<string, unknown>;
+
+function field(o: unknown, k: string): unknown {
+  return isObj(o) ? (o as Loose)[k] : undefined;
+}
+
+function numField(o: unknown, k: string): number | null {
+  const v = field(o, k);
+  return typeof v === 'number' && Number.isFinite(v) ? v : null;
+}
+
+function strField(o: unknown, k: string): string | null {
+  const v = field(o, k);
+  return typeof v === 'string' && v ? v : null;
+}
+
+/** Pearson r per metric, Copernicus vs NASADEM, from method.json nasadem_check.per_metric. */
+function nasademAgreement(core: CoreData): Record<string, number> {
+  const out: Record<string, number> = {};
+  const per = field(field(core.method?.file, 'nasadem_check'), 'per_metric');
+  if (!isObj(per)) return out;
+  Object.entries(per as Loose).forEach(([k, v]: [string, unknown]): void => {
+    const r = numField(v, 'r');
+    if (r !== null) out[k] = r;
+  });
+  return out;
+}
+
+/** Below this r the two elevation datasets disagree enough to flag the measure as less certain. */
+const WEAK_R = 0.8;
+
+/** Sun this low is bent noticeably by the atmosphere, so timing is uncertain. */
+const REFRACTION_EL_DEG = 1;
+
+const SHOWN_WINDOWS = 3;
+
+function WindowRows({ windows, site }: { windows: RehearsalWindow[]; site: EarthSite }): JSX.Element {
   return (
     <table className="data-table">
       <thead>
         <tr>
           <th>Date (UTC)</th>
-          <th className="r">UTC</th>
-          <th className="r">Local solar time</th>
-          <th className="r">Sun elevation / azimuth</th>
+          <th className="r">UTC (h:mm)</th>
+          <th className="r">Local solar (h:mm)</th>
+          <th className="r">Sun elev. · azimuth</th>
+          <th className="r">Length</th>
         </tr>
       </thead>
       <tbody>
         {windows.map((w: RehearsalWindow) => {
-          const s = new Date(w.start_utc);
+          const st = new Date(w.start_utc);
           const e = new Date(w.end_utc);
+          const duration = numField(w, 'duration_min') ?? (e.getTime() - st.getTime()) / 60000;
+          const refr = field(w, 'refraction_sensitive') === true || w.sun_el < REFRACTION_EL_DEG;
           return (
             <tr key={w.start_utc}>
-              <td className="mono">{DAY_FMT.format(s)}</td>
+              <td className="mono">{DAY_FMT.format(st)}</td>
               <td className="r mono">
-                {hhmmUTC(s)}–{hhmmUTC(e)}
+                {hhmmUTC(st)}–{hhmmUTC(e)}
               </td>
               <td className="r">
-                {localSolarTime(s, site.lon)}–{localSolarTime(e, site.lon)}
+                {localSolarTime(st, site.lon)}–{localSolarTime(e, site.lon)}
               </td>
               <td className="r" title={w.el_kind}>
-                {w.sun_el.toFixed(1)}° / {w.sun_az.toFixed(0)}°
+                {fmtDeg(w.sun_el)} · {fmtDeg(w.sun_az, 0)}
+                {refr && (
+                  <span className="refr-flag">
+                    refraction-sensitive
+                    <Why id="refraction" align="end" />
+                  </span>
+                )}
               </td>
+              <td className="r">{fmtNum(duration, 1)} min</td>
             </tr>
           );
         })}
       </tbody>
     </table>
+  );
+}
+
+function WindowsTable({ windows, site }: { windows: RehearsalWindow[]; site: EarthSite }): JSX.Element {
+  if (windows.length === 0) {
+    return <p className="muted">No matching low-sun window in the searched period (for example, polar night at this latitude).</p>;
+  }
+  const rest = windows.slice(SHOWN_WINDOWS);
+  return (
+    <>
+      <WindowRows windows={windows.slice(0, SHOWN_WINDOWS)} site={site} />
+      {rest.length > 0 && (
+        <details className="more-windows">
+          <summary>{rest.length} more windows</summary>
+          <WindowRows windows={rest} site={site} />
+        </details>
+      )}
+    </>
   );
 }
 
@@ -107,62 +173,108 @@ function FitCounts({ match }: { match: Match }): JSX.Element {
 function SiteCard({
   match,
   site,
+  agreement,
+  screened,
+  regions,
   active,
   onToggle,
   onCompare,
 }: {
   match: Match;
   site: EarthSite;
+  agreement: Record<string, number>;
+  screened: number | null;
+  regions: { id: string; name: string }[];
   active: boolean;
   onToggle: () => void;
   onCompare: () => void;
 }): JSX.Element {
   const place = placeName(site);
-  const rock = fmtRock(site.rock.lith);
+  const nasadem: unknown = field(site, 'nasadem');
+  const nasMetrics: unknown = field(nasadem, 'metrics');
+  const rehearsal: unknown = field(match, 'rehearsal');
+  const targetEl = numField(rehearsal, 'target_sun_el');
+  const tolEl = numField(rehearsal, 'el_tolerance');
+  const rehearsalNote = [strField(rehearsal, 'azimuth_note'), strField(rehearsal, 'note'), strField(rehearsal, 'search')].filter(
+    (t: string | null): t is string => t !== null,
+  );
+  const stageRank = numField(site, 'stage1_rank');
+  const stageBest = strField(site, 'stage1_best');
+  // One quality line: the site's screening rank among all Earth squares screened. stage1_best names the Moon
+  // search where it got that rank, which may be another region; the line stays true either way and the
+  // tooltip names the search.
+  let quality: string | null = null;
+  let qualityTitle: string | undefined;
+  if (stageRank !== null && screened) {
+    const topPct = Math.max(Math.ceil((stageRank / screened) * 1000) / 10, 0.1);
+    quality = `Top ${fmtNum(topPct, 1)}% of ${fmtNum(screened)} Earth squares screened`;
+    if (stageBest) {
+      const [rid, hz] = stageBest.split('|');
+      const rn = regions.find((r) => r.id === rid)?.name ?? rid;
+      qualityTitle = `Ranked #${fmtNum(stageRank)} of ${fmtNum(screened)} when screened as a ${hz ?? ''} match for ${rn}`;
+    }
+  }
   return (
     <article className="site-card" data-active={active}>
-      <button type="button" className="site-card-head" onClick={onToggle} aria-expanded={active}>
-        <span className="rank">{match.rank}</span>
-        <span className="site-card-title">
-          <span className="site-name" title={place.title}>
-            {place.label}
+      <div className="site-card-head">
+        <button type="button" className="site-card-toggle" onClick={onToggle} aria-expanded={active}>
+          <span className="rank">{match.rank}</span>
+          <span className="site-card-title">
+            <span className="site-name" title={place.title}>
+              {place.label}
+            </span>
+            {quality && <span className="caption" title={qualityTitle}>{quality}</span>}
           </span>
-          <span className="caption">
-            {place.region ? `${place.region} · ` : ''}
-            {site.category.replace(/_/g, ' ')}
-            {rock ? ` · ${rock}` : ''}
-            {site.rock.anorthosite ? ' · anorthosite' : ''}
-          </span>
-        </span>
+        </button>
         <span className="site-card-tags">
-          {site.known_analog && <span className="chip">Known analog</span>}
-          {site.role === 'decoy' && <span className="chip chip-dashed">Decoy (control)</span>}
+          {site.known_analog && (
+            <span className="chip">
+              <Term id="knownAnalog">Known analog</Term>
+            </span>
+          )}
+          {site.role === 'decoy' && (
+            <span className="chip chip-dashed">
+              <Term id="decoy">Decoy (control)</Term>
+            </span>
+          )}
           <FitCounts match={match} />
         </span>
-      </button>
+      </div>
       {active && (
         <div className="site-card-body">
-          <div className="verdicts">
-            <Verdict kind="match" title="Matches" items={match.matches_text} empty="No metric is within the Moon region’s spread." />
-            <Verdict kind="mismatch" title="Doesn’t match" items={match.mismatches_text} empty="Every measured metric is close." />
-            <Verdict kind="cannot" title="Can’t test here" items={match.cannot_test} empty="Nothing listed." />
-          </div>
-
+          <details className="verdict-details">
+            <summary>Metric by metric and in words</summary>
+            <div className="list-lede">
+              <span className="why-row">
+                Gap in × the Moon region’s <Term id="typicalSpread">typical spread</Term> (under 0.5× close)
+                <Why id="iqr" />
+              </span>
+            </div>
           <section>
             <h4 className="section-label">Metric by metric</h4>
             <table className="data-table">
               <thead>
                 <tr>
                   <th>Metric</th>
-                  <th className="r">Moon (spread)</th>
+                  <th className="r">Moon (middle 50%)</th>
                   <th className="r">This site</th>
-                  <th>Gap</th>
+                  <th className="r">
+                    <span className="th-tip">
+                      NASADEM check
+                      <Why id="nasadem" align="end" />
+                    </span>
+                  </th>
+                  <th className="r">Gap (× spread)</th>
                   <th>Fit</th>
                 </tr>
               </thead>
               <tbody>
                 {match.lights.map((l) => {
                   const mi = metricInfo(l.metric);
+                  const nv = field(nasMetrics, l.metric);
+                  const r = agreement[l.metric];
+                  const weak = typeof r === 'number' && r < WEAK_R;
+                  const gap = numField(l, 'gap_in_iqr');
                   return (
                     <tr key={l.metric}>
                       <td title={mi.help}>{mi.label}</td>
@@ -173,7 +285,13 @@ function SiteCard({
                         </span>
                       </td>
                       <td className="r">{mi.fmt(l.earth)}</td>
-                      <td className="muted">{l.gap_text}</td>
+                      <td className="r metric-nasadem" data-weak={weak} title={weak ? 'Least certain measure: the two elevation datasets agree only moderately.' : undefined}>
+                        {typeof nv === 'number' ? mi.fmt(nv) : '—'}
+                        {typeof r === 'number' && <span className="pm">r {fmtStat(r)}{weak ? ' · least certain' : ''}</span>}
+                      </td>
+                      <td className="r" title={l.gap_text}>
+                        {gap !== null ? fmtSpread(gap, 1) : l.gap_text}
+                      </td>
                       <td>
                         <Fit fit={l.light} />
                       </td>
@@ -183,9 +301,32 @@ function SiteCard({
               </tbody>
             </table>
           </section>
+          <div className="verdicts">
+              <Verdict kind="match" title="Matches" items={match.matches_text} empty="No metric is within the Moon region’s spread." />
+              <Verdict kind="mismatch" title="Doesn’t match" items={match.mismatches_text} empty="Every measured metric is close." />
+              <Verdict kind="cannot" title="Can’t test here" items={match.cannot_test} empty="Nothing listed." />
+          </div>
+          </details>
 
           <section>
-            <h4 className="section-label">Rehearsal windows: when the sun here matches the Moon’s</h4>
+            <div className="windows-head">
+              <h4 className="section-label">
+                <Term id="rehearsalWindow">Rehearsal windows</Term>
+              </h4>
+              {targetEl !== null && (
+                <span className="caption">
+                  Sun elevation {fmtDeg(targetEl)}
+                  {tolEl !== null ? ` ±${fmtDeg(tolEl, 2)}` : ''}
+                </span>
+              )}
+              {rehearsalNote.length > 0 && (
+                <InfoTip label="How the windows were searched" title="Window search" align="end">
+                  {rehearsalNote.map((t: string) => (
+                    <p key={t}>{t}</p>
+                  ))}
+                </InfoTip>
+              )}
+            </div>
             <WindowsTable windows={match.windows} site={site} />
           </section>
 
@@ -193,9 +334,6 @@ function SiteCard({
             <button type="button" className="btn btn-primary" onClick={onCompare}>
               Compare terrain in 3D →
             </button>
-            <span className="caption">
-              Bare ground {(site.bare_frac * 100).toFixed(0)}% · {site.worldcover_note}
-            </span>
           </div>
         </div>
       )}
@@ -233,6 +371,9 @@ export function RegionDetail(): JSX.Element {
       }),
     [list, core, activeId],
   );
+  const agreement = useMemo((): Record<string, number> => nasademAgreement(core), [core]);
+  const screened = numField(field(core.method?.file, 'screen'), 'n_screened');
+  const boot = parseBootstrap(core.summary?.validation);
   const onSelect = useCallback((id: string): void => setSite(id), [setSite]);
 
   if (!region) return <p>No region selected.</p>;
@@ -252,9 +393,8 @@ export function RegionDetail(): JSX.Element {
         result={resultLine(region.name, hazard, best, best ? core.siteById.get(best.site_id) : undefined)}
         method={
           <p>
-            For each of the 3 dangers, the three Earth sites whose terrain and light reproduce it most closely. Each metric is compared
-            with the Moon region’s normal variation (its interquartile range) and marked close, partial or far. There is no overall “% Moon-like” score, on
-            purpose.
+            For each danger, the three Earth sites whose terrain and light reproduce it best. Each metric is marked close, partial or far
+            against the Moon region’s typical spread. No overall “% Moon-like” score, on purpose.
           </p>
         }
       />
@@ -265,10 +405,17 @@ export function RegionDetail(): JSX.Element {
             <button key={h} type="button" role="tab" className="tab" aria-selected={h === hazard} onClick={(): void => setHazard(h)}>
               <HazardGlyph hazard={h} />
               {HAZARDS[h].name}
-              <span className="caption">{HAZARDS[h].mission}</span>
             </button>
           ))}
         </div>
+        <span className="tab-lesson">
+          Lesson
+          <InfoTip label={`Lesson from ${hz.mission}`} title={`Lesson from ${hz.mission}`} align="end">
+            <p>
+              <strong>{hz.mission}:</strong> {hz.lesson}
+            </p>
+          </InfoTip>
+        </span>
         <label className="field field-inline">
           <span className="field-label">Moon region</span>
           <select className="select" value={regionId} onChange={(e): void => setRegion(e.target.value)}>
@@ -281,15 +428,19 @@ export function RegionDetail(): JSX.Element {
         </label>
       </div>
 
-      <p className="lesson">
-        <strong>Lesson from {hz.mission}:</strong> {hz.lesson}
-      </p>
-
       <div className="region-layout" role="tabpanel">
         <div className="map-box">
           <EarthMap points={points} onSelect={onSelect} fitKey={`${regionId}:${hazard}`} />
         </div>
         <div className="site-list">
+          <div className="list-lede">
+            {boot && (
+              <span className="why-row">
+                This top 3 reappears in {fmtPct(boot.reappearance)} of reruns on a fresh sample
+                <Why id="bootstrap" />
+              </span>
+            )}
+          </div>
           {list.length === 0 && <p className="muted">No matches for this region and danger in matches.json.</p>}
           {list.map((m: Match) => {
             const site = core.siteById.get(m.site_id);
@@ -305,6 +456,9 @@ export function RegionDetail(): JSX.Element {
                 key={m.site_id}
                 match={m}
                 site={site}
+                agreement={agreement}
+                screened={screened}
+                regions={core.regions}
                 active={m.site_id === activeId}
                 onToggle={(): void => setSite(m.site_id)}
                 onCompare={(): void => {

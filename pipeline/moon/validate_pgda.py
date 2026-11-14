@@ -65,8 +65,17 @@ def read_pgda(x0: float, y0: float, n: int) -> np.ndarray | None:
 def _stats(ours: np.ndarray, ref: np.ndarray) -> dict:
     ok = np.isfinite(ours) & np.isfinite(ref)
     a, b = ours[ok], ref[ok]
-    return {"pearson_r": float(np.corrcoef(a, b)[0, 1]), "mae": float(np.mean(np.abs(a - b))),
-            "bias": float(np.mean(a - b)), "n_px": int(ok.sum()),
+    d = a - b
+    bias = float(d.mean())
+    ss_res = float(np.sum(d ** 2))
+    ss_tot = float(np.sum((b - b.mean()) ** 2))
+    return {"pearson_r": float(np.corrcoef(a, b)[0, 1]), "mae": float(np.mean(np.abs(d))),
+            "bias": bias, "rmse": float(np.sqrt(np.mean(d ** 2))),
+            # R² of ours as a direct predictor of PGDA (1 - SS_res/SS_tot), offset included
+            "r2": float(1.0 - ss_res / ss_tot) if ss_tot > 0 else float("nan"),
+            # MAE after removing the constant mean offset: how well the pattern itself matches
+            "mae_offset_removed": float(np.mean(np.abs(d - bias))),
+            "n_px": int(ok.sum()),
             "ours_mean": float(a.mean()), "pgda_mean": float(b.mean())}
 
 
@@ -95,18 +104,21 @@ def run(force: bool = False) -> dict:
         per[r.id] = st
         all_o.append(vis60.ravel())
         all_p.append(ref.ravel())
-        log.info("%s vs PGDA: r=%.3f MAE=%.3f bias=%+.3f", r.id, st["pearson_r"], st["mae"], st["bias"])
+        log.info("%s vs PGDA: r=%.3f MAE=%.3f bias=%+.3f RMSE=%.3f R2=%.3f MAE0=%.3f", r.id, st["pearson_r"],
+                 st["mae"], st["bias"], st["rmse"], st["r2"], st["mae_offset_removed"])
     pooled = _stats(np.concatenate(all_o), np.concatenate(all_p))
     region_means = [(v["ours_mean"], v["pgda_mean"]) for v in per.values() if v.get("included")]
     mo, mp = np.array(region_means).T
     doc = {
         "shadow_vs_pgda": {
-            **{k: pooled[k] for k in ("pearson_r", "mae", "bias", "n_px")},
+            **{k: pooled[k] for k in ("pearson_r", "mae", "bias", "rmse", "r2", "mae_offset_removed", "n_px")},
             "region_mean_pearson_r": float(np.corrcoef(mo, mp)[0, 1]) if len(mo) > 2 else None,
             "note": ("Pixelwise at 60 m over the 15 km cores of regions inside 85-90S; ours = mean solar-disk "
                      "visibility over an approximate 18.6-yr sun path (declination 1.54°·sin(phase), 11 520 directions, solar disk 0.27°) from LOLA 20 m "
                      "(PGDA 90) horizons; PGDA = AVGVISIB_85S_060M_201608 (Mazarico et al. 2011, hourly 18.6 yr, "
-                     "older LOLA DEM). bias = ours − PGDA (visibility, 0..1)."),
+                     "older LOLA DEM). bias = ours − PGDA (visibility, 0..1); rmse = root-mean-square error; r2 = 1 − SS_res/SS_tot "
+                     "(ours as a direct predictor, offset included); mae_offset_removed = MAE after subtracting the "
+                     "mean bias (pattern error only)."),
             "per_region": per,
         },
         "source": {"pgda_url": ILLUM_URL, "citation": "Mazarico et al. (2011) Icarus 211:1066, doi:10.1016/j.icarus.2010.10.030"},
@@ -114,7 +126,8 @@ def run(force: bool = False) -> dict:
     if not all(math.isfinite(pooled[k]) for k in ("pearson_r", "mae", "bias")):
         log.warning("non-finite validation stats")
     write_json(OUT, doc)
-    log.info("PGDA validation pooled: %s", {k: round(pooled[k], 4) for k in ("pearson_r", "mae", "bias")})
+    log.info("PGDA validation pooled: %s",
+             {k: round(pooled[k], 4) for k in ("pearson_r", "mae", "bias", "rmse", "r2", "mae_offset_removed")})
     return doc
 
 

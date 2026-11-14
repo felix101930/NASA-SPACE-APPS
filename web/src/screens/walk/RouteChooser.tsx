@@ -3,10 +3,12 @@ import { useMemo, type JSX } from 'react';
 import type { LoadedTile } from '../../data/tiles';
 import { sampleProfile, type WalkProfile } from '../../lib/terrain';
 import type { Region } from '../../types/contract';
+import { InfoTip } from '../../components/InfoTip';
+import { Why } from '../../components/Term';
 import { Loading } from '../../components/Loading';
 import { MoonPad } from './MoonPad';
 import { MoonProfile } from './ProfileChart';
-import { summarise, type ReadyRoute } from './routes';
+import { type ReadyRoute } from './routes';
 
 type XY = [number, number];
 
@@ -19,6 +21,8 @@ interface RouteChooserProps {
   drawing: boolean;
   hover: XY | null;
   live: WalkProfile | null;
+  /** Moon height error (m) shown beside the route numbers. */
+  demErrM: number;
   busy: boolean;
   dataReady: boolean;
   stretch: boolean;
@@ -65,18 +69,17 @@ export function RouteChooser(props: RouteChooserProps): JSX.Element {
   }, [ready, tile]);
 
   const hint = !drawing
-    ? 'Or click anywhere on the terrain to start drawing.'
+    ? ''
     : route.length === 0
-      ? 'Click the terrain to place the start of your walk.'
+      ? 'Click to place the start.'
       : route.length === 1
         ? 'Click to place the next point.'
-        : 'Click to add turns, then press “Find its Earth twin”.';
+        : 'Click to add turns, then search.';
 
   return (
     <section className="wk-moon" aria-labelledby="wk-route-title">
       <div className="wk-col-head">
-        <h2 id="wk-route-title">Routes on {region.name}</h2>
-        <p className="caption">Ready-made routes run straight away. Lengths match the Earth paths: 1, 2 or 5 km.</p>
+        <h2 id="wk-route-title">Routes</h2>
       </div>
 
       {ready.length > 0 ? (
@@ -88,17 +91,17 @@ export function RouteChooser(props: RouteChooserProps): JSX.Element {
                 key={r.id}
                 type="button"
                 className="wk-route-card"
+                title={r.blurb}
                 aria-pressed={!drawing && activeId === r.id}
                 disabled={!dataReady || busy}
                 onClick={(): void => props.onPick(r)}
               >
                 <span className="wk-route-name">{r.name}</span>
-                <span className="wk-route-blurb">{r.blurb}</span>
                 {p && (
                   <span className="wk-route-foot">
                     <Silhouette heights={p.heights} />
-                    <span className="wk-route-stats">
-                      climbs {Math.round(p.climb_m)} m · steepest {Math.round(p.max_slope_deg)}°
+                    <span className="wk-route-stats" title="Climb (m) · steepest slope (°)">
+                      {Math.round(p.climb_m)} m · {Math.round(p.max_slope_deg)}°
                     </span>
                   </span>
                 )}
@@ -135,7 +138,7 @@ export function RouteChooser(props: RouteChooserProps): JSX.Element {
           </button>
         )}
       </div>
-      <p className="caption wk-hint" aria-live="polite">
+      <p className="caption wk-hint" aria-live="polite" hidden={!drawing && !hint}>
         {hint}
         {(drawing || canSearch) && searchBlock && !busy ? ` · ${searchBlock}` : ''}
       </p>
@@ -154,21 +157,23 @@ export function RouteChooser(props: RouteChooserProps): JSX.Element {
         ) : (
           <Loading label="Loading Moon terrain…" />
         )}
-        {tile && live && drawing && <div className="wk-pad-sum">{summarise(live)}</div>}
       </div>
 
       <div className="wk-live" aria-live="polite">
         {live ? (
           <>
-            <p className="wk-live-sum">
-              <span className="wk-live-label">Height along {drawing ? 'your route' : 'this route'}:</span> {summarise(live)}
-            </p>
+            <div className="wk-live-sum why-row">
+              <span className="caption">Moon elevation error</span>
+              <InfoTip label="How exact are the Moon values?" title="Moon elevation error">
+                <p>
+                  Heights ±{props.demErrM.toFixed(1)} m, slopes ±1.5–2.5° (NASA LOLA elevation data).
+                </p>
+              </InfoTip>
+            </div>
             <MoonProfile heights={live.heights} lengthM={live.length_m} />
           </>
         ) : (
-          <p className="caption wk-live-empty">
-            {drawing ? 'The height profile appears here as you draw.' : 'Pick a route to see how it climbs.'}
-          </p>
+          <p className="caption wk-live-empty">{drawing ? 'Profile appears as you draw.' : 'Pick a route to see its profile.'}</p>
         )}
       </div>
 
@@ -181,14 +186,13 @@ export function RouteChooser(props: RouteChooserProps): JSX.Element {
       <details className="method wk-more">
         <summary>More options</summary>
         <div className="method-body">
-          <label className="check">
-            <input type="checkbox" checked={stretch} onChange={(e): void => props.onStretch(e.target.checked)} />
-            Tolerate stretched routes (slower)
-          </label>
-          <p className="caption">
-            Lets hills sit a little out of place along the walk. Use it when your route has a long flat stretch the Earth path may not.
-            It is slower and, on ordinary routes, finds the right twin less often.
-          </p>
+          <div className="why-row">
+            <label className="check">
+              <input type="checkbox" checked={stretch} onChange={(e): void => props.onStretch(e.target.checked)} />
+              Tolerate stretched routes (slower)
+            </label>
+            <Why id="walkMatcher" />
+          </div>
         </div>
       </details>
     </section>

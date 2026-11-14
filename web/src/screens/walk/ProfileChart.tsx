@@ -29,7 +29,7 @@ export function MoonProfile({ heights, lengthM }: { heights: number[]; lengthM: 
   return (
     <div className="wk-moon-chart" aria-label="Height along the Moon route">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 6, right: 8, bottom: 0, left: -12 }}>
+        <AreaChart data={data} margin={{ top: 6, right: 8, bottom: 0, left: 4 }}>
           <CartesianGrid stroke={GRID} strokeDasharray="3 3" vertical={false} />
           <XAxis
             dataKey="km"
@@ -38,10 +38,17 @@ export function MoonProfile({ heights, lengthM }: { heights: number[]; lengthM: 
             stroke={AXIS}
             tick={{ fontSize: 12 }}
             tickFormatter={(v: number): string => (Number.isInteger(v) ? String(v) : v.toFixed(1))}
-            unit=" km"
-            tickCount={5}
+            tickCount={4}
+            label={{ value: 'Distance walked (km)', position: 'insideBottom', offset: 0, fill: AXIS, fontSize: 12 }}
+            height={40}
           />
-          <YAxis stroke={AXIS} tick={{ fontSize: 12 }} unit=" m" width={68} />
+          <YAxis
+            stroke={AXIS}
+            tick={{ fontSize: 12 }}
+            tickCount={3}
+            width={52}
+            label={{ value: 'Height above start (m)', angle: -90, position: 'insideLeft', offset: 8, fill: AXIS, fontSize: 12, style: { textAnchor: 'middle' } }}
+          />
           <ReferenceLine y={0} stroke="#3d424c" />
           <Tooltip
             contentStyle={TOOLTIP}
@@ -109,10 +116,9 @@ export function TwinChart({ moonHeights, earthHeights, moonSlopes, earthSlopes, 
           </button>
         </div>
       </div>
-      <p className="caption">{mode === 'height' ? 'Height above the start of each walk, in metres' : 'Slope underfoot in degrees; above 0 is uphill'}</p>
       <div className="wk-twin-box" role="img" aria-label={`${mode === 'height' ? 'Height' : 'Slope'} along the walk: ${moonLabel} against ${earthLabel}`}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: -8 }}>
+          <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 4 }}>
             <CartesianGrid stroke={GRID} strokeDasharray="3 3" vertical={false} />
             <XAxis
               dataKey="t"
@@ -122,8 +128,24 @@ export function TwinChart({ moonHeights, earthHeights, moonSlopes, earthSlopes, 
               stroke={AXIS}
               tick={{ fontSize: 12 }}
               tickFormatter={(v: number): string => TICK_WORD[v] ?? ''}
+              label={{ value: 'Along the walk (start to end)', position: 'insideBottom', offset: 0, fill: AXIS, fontSize: 12 }}
+              height={40}
             />
-            <YAxis stroke={AXIS} tick={{ fontSize: 12 }} unit={unit} width={60} />
+            <YAxis
+              stroke={AXIS}
+              tick={{ fontSize: 12 }}
+              tickCount={3}
+              width={52}
+              label={{
+                value: mode === 'height' ? 'Height above start (m)' : 'Slope (°, above 0 = uphill)',
+                angle: -90,
+                position: 'insideLeft',
+                offset: 6,
+                fill: AXIS,
+                fontSize: 12,
+                style: { textAnchor: 'middle' },
+              }}
+            />
             <ReferenceLine y={0} stroke="#3d424c" />
             <Tooltip
               contentStyle={TOOLTIP}

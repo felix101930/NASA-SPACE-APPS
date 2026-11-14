@@ -1,0 +1,165 @@
+/* Clarity pass, Moon + Earth matches screens. Tokens from styles.css only; no new hues. */
+
+/* Danger profile: row is a div (so ⓘ buttons can sit inside); the chevron is the real button. */
+.profile-row-btn {
+  position: relative;
+}
+.profile-row-btn:has(.profile-chev:focus-visible) {
+  background: var(--surface-2);
+}
+.profile-chev {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.quiet-tip {
+  display: inline-flex;
+  align-items: center;
+}
+.profile-value {
+  flex-wrap: wrap;
+}
+.profile-head h3 {
+  margin: 0;
+}
+
+/* Sun and data quality list */
+.dq-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin: 0;
+  font-size: var(--fs-label);
+}
+.dq-list dt {
+  color: var(--text-3);
+}
+.dq-list dd {
+  margin: 0;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Earth matches: site card head = toggle button + tags (tags hold ⓘ buttons, so they are siblings) */
+.site-card-head {
+  position: relative;
+  padding: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0;
+  cursor: default;
+}
+.site-card-head:hover {
+  background: none;
+}
+.site-card-toggle {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 16px 12px 16px 20px;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  min-width: 0;
+}
+.site-card-toggle:hover {
+  background: var(--surface-2);
+}
+.site-card-head .site-card-tags {
+  padding: 16px 20px 16px 0;
+}
+.spread-chip {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+  font-size: var(--fs-label);
+  white-space: nowrap;
+}
+
+.list-lede {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: var(--fs-label);
+  color: var(--text-2);
+}
+.list-lede .why-row {
+  gap: 6px;
+}
+
+.metric-nasadem {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.metric-nasadem .pm {
+  margin-left: 6px;
+}
+.metric-nasadem[data-weak='true'] {
+  color: var(--text);
+}
+.th-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.windows-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 8px;
+}
+.windows-head h4 {
+  margin: 0;
+}
+.refr-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  font-size: var(--fs-caption);
+  color: var(--text-3);
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.verdict-details {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.verdict-details > summary {
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: var(--fs-label);
+}
+.verdict-details .verdicts {
+  border: 0;
+  padding-bottom: 0;
+}
+.more-windows > summary {
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: var(--fs-label);
+  margin-top: 8px;
+}
+
+.tab-lesson {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-label);
+  color: var(--text-2);
+  white-space: nowrap;
+}

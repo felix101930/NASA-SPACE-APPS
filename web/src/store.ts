@@ -150,6 +150,8 @@ export const useApp = create<AppState>()((set) => ({
     set((s: AppState) => ({
       core,
       regionId: core.regions.some((r: Region): boolean => r.id === s.regionId) ? s.regionId : (core.regions[0]?.id ?? s.regionId),
+      // A site chosen against an older data set (e.g. before a pipeline rerun) is dropped so screens fall back to the #1 match.
+      siteId: s.siteId !== null && core.siteById.has(s.siteId) ? s.siteId : null,
     }));
   },
   setLoadError: (loadError: string): void => set({ loadError }),

@@ -1,11 +1,11 @@
 // Data hooks and in-browser measurements for the 3D comparison screen.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { loadImage, loadJsonFrom, type Loaded, type Origin } from '../../data/loader';
+import { assetUrl, loadImage, loadJsonFrom, type Loaded, type Origin } from '../../data/loader';
 import { loadTile, type LoadedTile } from '../../data/tiles';
 import { computeShadowMask, sampleBilinear, type Grid } from '../../lib/terrain';
 import type { ShadowMode } from '../../store';
-import type { Region, ShadowMask, TileRef } from '../../types/contract';
+import { isObj, type Region, type ShadowMask, type TileRef } from '../../types/contract';
 import { isAnnotations, type Annotations, type RimDrop, type TextureCell } from '../../types/annotations';
 
 // ------------------------------------------------------------------------------------------------
@@ -35,6 +35,32 @@ export function useTile(ref: TileRef | null, origin: Origin): TileState {
     };
   }, [ref, origin]);
   return state;
+}
+
+/**
+ * After an Earth tile fails to load, ask the server whether the site is still listed in earth_sites.json
+ * (bypassing the HTTP cache). false = the files on disk changed since this page loaded its data (the site was
+ * replaced by a newer pipeline run), so a reload fixes it; true = the site is listed but its tile is genuinely
+ * missing; null = not checked / unknown.
+ */
+export function useSiteStillListed(siteId: string | null, failed: boolean, origin: Origin): boolean | null {
+  const [listed, setListed] = useState<{ id: string; ok: boolean } | null>(null);
+  useEffect((): (() => void) | void => {
+    if (!siteId || !failed) return;
+    let alive = true;
+    fetch(assetUrl('earth_sites.json', origin), { cache: 'no-store' })
+      .then((r: Response): Promise<unknown> => (r.ok ? r.json() : Promise.resolve(null)))
+      .then((doc: unknown): void => {
+        if (!alive || !isObj(doc) || !Array.isArray(doc.sites)) return;
+        const ok = doc.sites.some((x: unknown): boolean => isObj(x) && x.id === siteId);
+        setListed({ id: siteId, ok });
+      })
+      .catch((): void => undefined);
+    return (): void => {
+      alive = false;
+    };
+  }, [siteId, failed, origin]);
+  return listed && listed.id === siteId && failed ? listed.ok : null;
 }
 
 const annCache = new Map<string, Promise<Annotations | null>>();

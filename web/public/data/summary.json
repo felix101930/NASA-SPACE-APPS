@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_utc": "2026-11-14T21:55:05Z",
+  "generated_utc": "2026-11-14T22:05:46Z",
   "pipeline_version": "match-0.1.0",
   "sources": [
    {
@@ -96,14 +96,14 @@
   },
   "ranking_method": "rehearsability = 1 / (1 + mean best distance + 0.5 × Σ max(0, best distance − 0.5)) over the 3 hazards; distance 1 ≈ one Moon-region IQR off",
   "runtimes": {
-   "moon_ref_s": 5.9,
-   "earth_feats_s": 30.4,
-   "matching_s": 0.2,
-   "windows_s": 38.6,
+   "moon_ref_s": 0.0,
+   "earth_feats_s": 0.0,
+   "matching_s": 0.5,
+   "windows_s": 0.0,
    "weight_stability_s": 0.9,
-   "classifier_s": 26.3,
-   "synthetic_tests_s": 0.8,
-   "total_s": 103.2
+   "classifier_s": 0.0,
+   "synthetic_tests_s": 0.0,
+   "total_s": 1.4
   }
  },
  "ranking": [
@@ -275,10 +275,69 @@
    "pearson_r": 0.9794,
    "mae": 0.0273,
    "bias": -0.0251,
+   "rmse": 0.0355,
+   "r2": 0.9155,
+   "mae_offset_removed": 0.0172,
+   "per_region": {
+    "haworth": {
+     "pearson_r": 0.9679,
+     "mae": 0.0313,
+     "bias": -0.0305,
+     "rmse": 0.0401,
+     "r2": 0.8436,
+     "mae_offset_removed": 0.019,
+     "n_px": 62500
+    },
+    "malapert_massif": {
+     "pearson_r": 0.9726,
+     "mae": 0.0283,
+     "bias": -0.0271,
+     "rmse": 0.0376,
+     "r2": 0.8586,
+     "mae_offset_removed": 0.0197,
+     "n_px": 62500
+    },
+    "mons_mouton": {
+     "pearson_r": 0.9811,
+     "mae": 0.0273,
+     "bias": -0.024,
+     "rmse": 0.0356,
+     "r2": 0.9312,
+     "mae_offset_removed": 0.0178,
+     "n_px": 62500
+    },
+    "nobile_rim_1": {
+     "pearson_r": 0.9829,
+     "mae": 0.0244,
+     "bias": -0.0214,
+     "rmse": 0.0312,
+     "r2": 0.935,
+     "mae_offset_removed": 0.0142,
+     "n_px": 62500
+    },
+    "de_gerlache_rim_2": {
+     "pearson_r": 0.9625,
+     "mae": 0.0269,
+     "bias": -0.0238,
+     "rmse": 0.0338,
+     "r2": 0.8245,
+     "mae_offset_removed": 0.0161,
+     "n_px": 62500
+    },
+    "slater_plain": {
+     "pearson_r": 0.9838,
+     "mae": 0.0258,
+     "bias": -0.0237,
+     "rmse": 0.0339,
+     "r2": 0.9369,
+     "mae_offset_removed": 0.015,
+     "n_px": 62500
+    }
+   },
    "n_px": 375000,
    "region_mean_pearson_r": 0.9977,
    "n_regions": 6,
-   "note": "Pixelwise at 60 m over the 15 km cores of regions inside 85-90S; ours = mean solar-disk visibility over an approximate 18.6-yr sun path (declination 1.54°·sin(phase), 11 520 directions, solar disk 0.27°) from LOLA 20 m (PGDA 90) horizons; PGDA = AVGVISIB_85S_060M_201608 (Mazarico et al. 2011, hourly 18.6 yr, older LOLA DEM). bias = ours − PGDA (visibility, 0..1)."
+   "note": "Pixelwise at 60 m over the 15 km cores of regions inside 85-90S; ours = mean solar-disk visibility over an approximate 18.6-yr sun path (declination 1.54°·sin(phase), 11 520 directions, solar disk 0.27°) from LOLA 20 m (PGDA 90) horizons; PGDA = AVGVISIB_85S_060M_201608 (Mazarico et al. 2011, hourly 18.6 yr, older LOLA DEM). bias = ours − PGDA (visibility, 0..1); rmse = root-mean-square error; r2 = 1 − SS_res/SS_tot (ours as a direct predictor, offset included); mae_offset_removed = MAE after subtracting the mean bias (pattern error only)."
   },
   "known_vs_decoy_auc": 0.795,
   "known_vs_decoy_detail": {
@@ -1037,6 +1096,13 @@
    "top5": 0.85,
    "n_routes": 300,
    "dtw_top1": 0.3833
+  },
+  "bootstrap": {
+   "n_boot": 3,
+   "sample_frac": 0.8,
+   "final_top3_mean_reappearance_frac": 0.807,
+   "stage1_top3_overlap_mean": 0.848,
+   "note": "Earth screen rerun n_boot times on a fresh random sample (sample_frac of the pool); the value is the mean share of each search's top 3 that reappears in a rerun's top 3. Overall only: the per-site counts in screen_report.json use Earth-stage shortlist ids, not the final match ids."
   }
  },
  "notes": {

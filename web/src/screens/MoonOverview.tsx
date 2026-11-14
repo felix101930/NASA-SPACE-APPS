@@ -1,9 +1,11 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type JSX, type RefObject } from 'react';
 import { loadImage, type Origin } from '../data/loader';
-import { CoordBadge, DangerProfile, formatLatLon, profileSentence } from '../components/DangerProfile';
+import { CoordBadge, DangerProfile, formatLatLon } from '../components/DangerProfile';
 import { ScreenHead } from '../components/ScreenHead';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Loading } from '../components/Loading';
+import { InfoTip } from '../components/InfoTip';
+import { fmtDeg, fmtPct } from '../lib/units';
 import type { ExploreLayer } from '../components/ExploreRegion';
 
 const ExploreRegion = lazy(() => import('../components/ExploreRegion'));
@@ -483,20 +485,15 @@ export function MoonOverview(): JSX.Element {
   return (
     <div>
       <ScreenHead
-        kicker="Moon danger profiles · 9 candidate regions"
+        kicker="Moon · 9 candidate regions"
         result={overviewResult(core.regions)}
         method={
           <>
             <p>
-              Each region is a 15 × 15 km tile of the 20 m LOLA elevation model, resampled to 30 m. We measure 3 dangers plus slope
-              directly from the terrain: cast shadow at 1°, 3° and 5° sun (averaged over all sun directions); height jumps along 1 km tracks
-              in 16 directions; camera keypoints on a low-sun hillshade; and slope at a 30 m baseline, which matters for walking and
-              touchdown.
+              Each region is a 15 × 15 km tile of 20 m LOLA elevation data, resampled to 30 m. Measured: cast shadow at 1°, 3° and 5° sun;
+              height jumps along 1 km tracks; camera keypoints on a low-sun hillshade; slope at a 30 m baseline.
             </p>
-            <p>
-              The danger level is the tercile of a score that combines a danger’s metrics, ranked across the nine regions. It says how a
-              region compares with the other eight, not whether it is safe.
-            </p>
+            <p>The level (low, medium, high) is a tercile of the nine regions: a comparison with the other eight, not a safety verdict.</p>
           </>
         }
       />
@@ -524,18 +521,19 @@ export function MoonOverview(): JSX.Element {
           ) : (
             <PoleMap core={core} selected={regionId} onSelect={setRegion} onOpen={openRegion} />
           )}
-          {view === '3d' ? (
-            <p className="map-caption">
-              Drag to orbit. Click a danger row on the right to turn its layer on. Shadows are precomputed masks from the elevation model;
-              slope classes and the safest patch use illustrative thresholds, not mission rules.
-            </p>
-          ) : (
-            <p className="map-caption">
-              South-polar stereographic, 0° longitude up. Each square is a 15 × 15 km analysis tile at true scale, shaded from our own
-              hillshade. Dashed outline: approximate location.
-              {ovNote ? ` Backdrop: ${ovNote}` : ''}
-            </p>
-          )}
+          <div className="why-row caption map-key">
+            {view === '3d' ? 'Drag to orbit' : 'Map key'}
+            <InfoTip label="Map key" title="Map key">
+              {view === '3d' ? (
+                <p>Click a danger row to switch its layer on. Slope classes use illustrative thresholds, not mission rules.</p>
+              ) : (
+                <p>
+                  South pole, 0° longitude up. Squares are 15 × 15 km analysis tiles at true scale. Dashed outline: approximate location.
+                  {ovNote ? ` Backdrop: ${ovNote}` : ''}
+                </p>
+              )}
+            </InfoTip>
+          </div>
         </div>
         <aside className="panel panel-pad region-panel">
           <div className="region-list" role="group" aria-label="Choose a region">
@@ -559,7 +557,6 @@ export function MoonOverview(): JSX.Element {
                   <CoordBadge region={region} />
                   <span className="chip mono">{formatLatLon(region.lat, region.lon)}</span>
                 </div>
-                <p className="region-sentence">{profileSentence(region)}</p>
               </div>
               <DangerProfile
                 region={region}
@@ -574,18 +571,23 @@ export function MoonOverview(): JSX.Element {
               <details className="method">
                 <summary>Sun and data quality here</summary>
                 <div className="method-body">
-                  <p>
-                    Sun elevation here ranges from {region.sun.el_min.toFixed(1)}° to {region.sun.el_max.toFixed(1)}° ({region.sun.note}).
-                    Elevation-model error (median) {region.uncertainty.dem_err_p50_m.toFixed(1)} m.
-                    {region.illumination && typeof region.illumination.pgda_avg_visibility === 'number'
-                      ? ` Long-term average sun visibility (NASA PGDA): ${(region.illumination.pgda_avg_visibility * 100).toFixed(0)}%.`
-                      : ''}
-                  </p>
+                  <dl className="dq-list">
+                    <dt>Sun above the horizon</dt>
+                    <dd>
+                      {fmtDeg(region.sun.el_min)} to {fmtDeg(region.sun.el_max)} elevation ({region.sun.note})
+                    </dd>
+                    {region.illumination && typeof region.illumination.pgda_avg_visibility === 'number' && (
+                      <>
+                        <dt>Sun visible (long-term)</dt>
+                        <dd>{fmtPct(region.illumination.pgda_avg_visibility)} of the time (NASA PGDA average)</dd>
+                      </>
+                    )}
+                  </dl>
                 </div>
               </details>
               <div className="panel-actions">
                 <button type="button" className="btn btn-primary" onClick={(): void => setScreen('region')}>
-                  Find Earth sites for {region.name} →
+                  Find Earth matches →
                 </button>
                 <button type="button" className="btn" onClick={(): void => setView(view === '3d' ? 'map' : '3d')}>
                   {view === '3d' ? 'Back to the map' : 'Explore in 3D'}

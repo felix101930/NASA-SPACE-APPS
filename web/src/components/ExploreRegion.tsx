@@ -15,7 +15,10 @@ import { HazardGlyph, SunGlyph, type HazardKey } from './Glyphs';
 import { Loading } from './Loading';
 import { SafeCanvas } from './SafeCanvas';
 import { TERRAIN_KM, terrainHeightAt, useTerrainGeometry } from './terrainGeometry';
-import { avgShadowAt, singleSunShadow } from '../lib/shadow';
+import { avgShadowAt } from '../lib/shadow';
+import { SunMarker, sunGeometry, sunPosition } from './SunMarker';
+import { InfoTip } from './InfoTip';
+import { fmtPm } from '../lib/units';
 
 export type ExploreLayer = 'shadow' | 'rim' | 'texture' | 'slope' | 'safe';
 
@@ -210,6 +213,30 @@ interface Tag3D {
   text: string;
 }
 
+/** The sun lighting the shadow layer: exactly the elevation and azimuth of the mask on screen. */
+interface SunDir {
+  el: number;
+  az: number;
+}
+
+function tileExtent(tile: LoadedTile): number {
+  return tile.filled.size * tile.filled.res * TERRAIN_KM;
+}
+
+function tileBase(tile: LoadedTile): number {
+  const v = (tile.stats.min - tile.stats.median) * TERRAIN_KM * EXAG;
+  return Number.isFinite(v) ? v : 0;
+}
+
+function pct(v: number): string {
+  return `${Math.round(v * 100)}%`;
+}
+
+/** "81% dark at a 3° sun (50% averaged over all directions)". */
+function darkAt(frac: number, el: number, avg: number | null): string {
+  return `${pct(frac)} dark at a ${el}° sun${avg !== null ? ` (${pct(avg)} averaged over all directions)` : ''}`;
+}
+
 /**
  * Labels are plain DOM elements over the canvas, moved every frame to their projected 3D anchor.
  * (drei's <Html> mounts a nested React root per label, which throws when it unmounts mid-render.)
@@ -251,7 +278,7 @@ function TagProjector({ tags, els }: { tags: Tag3D[]; els: MutableRefObject<Map<
   return null;
 }
 
-function buildTags(d: ExploreData, layers: Set<ExploreLayer>, maskNote: string | null): Tag3D[] {
+function buildTags(d: ExploreData, layers: Set<ExploreLayer>, maskNote: string | null, sun: SunDir | null): Tag3D[] {
   const a = d.annotations;
   const n = d.tile.filled.size;
   const out: Tag3D[] = [];
@@ -275,6 +302,11 @@ function buildTags(d: ExploreData, layers: Set<ExploreLayer>, maskNote: string |
     out.push({ key: 'shadow', pos: toScene(d.tile, [n / 2, n / 2], 0.6), hazard: 'shadow', text: maskNote });
   const safe = a?.safest_patch;
   if (layers.has('safe') && safe) out.push({ key: 'safe', pos: toScene(d.tile, safe.anchor.px, 0.5), hazard: null, text: safe.label });
+  if (sun) {
+    const ext = tileExtent(d.tile);
+    const at = sunPosition(sun.el, sun.az, sunGeometry(ext, tileBase(d.tile)));
+    out.push({ key: 'sun', pos: [at[0], at[1] + ext * 0.07, at[2]], hazard: null, text: `Sun ${sun.el}°` });
+  }
   return out;
 }
 
@@ -284,10 +316,12 @@ function Scene({
   mask,
   tags,
   tagEls,
+  sun,
 }: {
   d: ExploreData;
   layers: Set<ExploreLayer>;
   mask: Uint8Array | null;
+  sun: SunDir | null;
   tags: Tag3D[];
   tagEls: MutableRefObject<Map<string, HTMLSpanElement>>;
 }): JSX.Element {
@@ -326,6 +360,7 @@ function Scene({
           gapSize={0.15}
         />
       )}
+      {sun && <SunMarker el={sun.el} az={sun.az} extent={tileExtent(d.tile)} baseY={tileBase(d.tile)} />}
       <TagProjector tags={tags} els={tagEls} />
       <OrbitControls makeDefault enableDamping={false} maxPolarAngle={Math.PI / 2.05} minDistance={4} maxDistance={60} />
     </>
@@ -383,19 +418,16 @@ export default function ExploreRegion({ region, origin, layers, onToggle, onAvai
   }, [data, masks.length]);
   useEffect((): void => onAvailable(available), [available, onAvailable]);
 
-  // One sun direction; the profile's figure is averaged over all directions, so show both.
+  // One sun direction (the marker shows which); the profile's figure is averaged over all directions, so show both.
   const maskNote = maskRef
     ? note
-      ? singleSunShadow(
-          note.frac,
-          maskRef.el,
-          `from ${AZ_WORD[maskRef.az] ?? `${maskRef.az}°`}`,
-          avgShadowAt(maskRef.el, region.hazards.shadow.metrics, region.extras),
-        )
-      : `Shadow with the sun from ${AZ_WORD[maskRef.az] ?? `${maskRef.az}°`} at ${maskRef.el}°`
+      ? darkAt(note.frac, maskRef.el, avgShadowAt(maskRef.el, region.hazards.shadow.metrics, region.extras))
+      : `Shadow at a ${maskRef.el}° sun`
     : null;
+  const sun = useMemo((): SunDir | null => (layers.has('shadow') && maskRef ? { el: maskRef.el, az: maskRef.az } : null), [layers, maskRef]);
+  const demErr = Number.isFinite(region.uncertainty?.dem_err_p50_m) ? region.uncertainty.dem_err_p50_m : null;
   const steep = data?.annotations?.steep_mask_summary;
-  const tags = useMemo((): Tag3D[] => (data ? buildTags(data, layers, maskNote) : []), [data, layers, maskNote]);
+  const tags = useMemo((): Tag3D[] => (data ? buildTags(data, layers, maskNote, sun) : []), [data, layers, maskNote, sun]);
   const tagEls = useRef<Map<string, HTMLSpanElement>>(new Map());
 
   return (
@@ -413,14 +445,14 @@ export default function ExploreRegion({ region, origin, layers, onToggle, onAvai
             camera={{ position: [0, 21, 13], fov: 38, near: 0.05, far: 200 }}
             gl={{ antialias: true }}
           >
-            <Scene d={data} layers={layers} mask={mask} tags={tags} tagEls={tagEls} />
+            <Scene d={data} layers={layers} mask={mask} tags={tags} tagEls={tagEls} sun={sun} />
           </SafeCanvas>
         )}
         <div className="x3d-tags" aria-hidden="true">
           {tags.map((t: Tag3D) => (
             <span
               key={t.key}
-              className="x3d-tag"
+              className={t.key === 'sun' ? 'x3d-tag x3d-tag-sun' : 'x3d-tag'}
               data-hz={t.hazard ?? undefined}
               ref={(el: HTMLSpanElement | null): void => {
                 if (el) tagEls.current.set(t.key, el);
@@ -468,11 +500,16 @@ export default function ExploreRegion({ region, origin, layers, onToggle, onAvai
                 {LAYER_LABEL[l]}
               </button>
             ))}
+          {layers.has('rim') && demErr !== null && (
+            <InfoTip label="How exact are the rim heights?" title="How sure?">
+              <p>Moon heights {fmtPm(demErr, 'm')} (NASA LOLA error), against drops of hundreds of metres.</p>
+            </InfoTip>
+          )}
         </div>
         {layers.has('shadow') && elevations.length > 0 && (
           <div className="x3d-sun">
             <span className="field-label sun-label" id="x3d-el">
-              <SunGlyph /> Sun elevation
+              <SunGlyph /> Sun height
             </span>
             <div className="seg" role="group" aria-labelledby="x3d-el">
               {elevations.map((e: number) => (
@@ -495,11 +532,13 @@ export default function ExploreRegion({ region, origin, layers, onToggle, onAvai
               />
               <span className="field-value">{az}°</span>
             </label>
+            <InfoTip label="How is the sun drawn?" title="The sun in 3D" align="end">
+              <p>The gold disc sits on the true sun angle; the ring marks the horizon with ticks every 45°. Shadows fall away from it.</p>
+              <p>Sun direction is measured clockwise from the tile’s top (the map grid, not north). Heights are drawn ×{EXAG}.</p>
+            </InfoTip>
           </div>
         )}
-        {!data?.annotations && data && (
-          <p className="caption">Rim, texture and slope layers appear when this region’s annotation file is available.</p>
-        )}
+        {!data?.annotations && data && <p className="caption">Rim, texture and slope layers need this region’s annotation file.</p>}
       </div>
     </div>
   );

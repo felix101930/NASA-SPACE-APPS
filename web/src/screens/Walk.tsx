@@ -3,11 +3,11 @@ import { loadFloat32, loadJson, loadJsonFrom, type Origin } from '../data/loader
 import { loadTile, type LoadedTile } from '../data/tiles';
 import { sampleProfile, type WalkProfile } from '../lib/terrain';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
-import { useApp, useRegion, type CoreData } from '../store';
+import { matchesFor, useApp, useRegion, type CoreData } from '../store';
 import { isEarthSitesFile, isPresetsFile, isTransectsFile, type EarthSite, type PresetRoute, type TransectItem, type TransectsFile } from '../types/contract';
 import type { InitMsg, QueryMsg, ResultRow, WorkerReply } from '../workers/dtw.worker';
 import { heightsFromSlopes, netRise } from '../lib/match';
-import { isFindbackRaw, matchQuality, parseFindback, type Findback } from './walk/findback';
+import { isFindbackRaw, matchQuality, parseFindback, parseWalkTest, type Findback } from './walk/findback';
 import type { SiteInfo } from './walk/place';
 import { buildReadyRoutes, fromPresets, routeLength, type ReadyRoute } from './walk/routes';
 import { StepBar, type StepState } from './walk/StepBar';
@@ -123,6 +123,8 @@ export default function Walk(): JSX.Element {
   const setSite = useApp((s) => s.setSite);
   const setScreen = useApp((s) => s.setScreen);
   const walk = useApp((s) => s.walk);
+  const siteId = useApp((s) => s.siteId);
+  const hazard = useApp((s) => s.hazard);
   const setWalk = useApp((s) => s.setWalk);
 
   const [data, setData] = useState<WalkData | null>(null);
@@ -346,11 +348,25 @@ export default function Walk(): JSX.Element {
     return p && !p.hasNaN ? p : null;
   }, [tile, route, hover, drawing]);
 
+  // Stale-selection guard: a selected site or walk hand-off must exist in the current data. If not, fall back
+  // silently to this region and hazard's #1 match (else the first valid walk site) and clear the stale values.
+  useEffect((): void => {
+    if (!data) return;
+    const inWalk = (id: string): boolean => data.sites.size === 0 || data.sites.has(id);
+    const valid = (id: string): boolean => core.siteById.has(id) && inWalk(id);
+    if (siteId !== null && !valid(siteId)) {
+      const top = matchesFor(core, region?.id ?? '', hazard).find((m: { site_id: string }): boolean => valid(m.site_id));
+      const firstWalk = data.transects.items.find((t: TransectItem): boolean => valid(t.site_id));
+      setSite(top?.site_id ?? firstWalk?.site_id ?? null);
+    }
+    if (walk?.bestItem && !valid(walk.bestItem.site_id)) setWalk({ ...walk, bestItem: null, bestSlopes: null });
+  }, [data, core, region, hazard, siteId, walk, setSite, setWalk]);
+
   if (!region) return <p>No region selected.</p>;
 
   const routeLen = routeLength(route);
   const activeReady = source?.kind === 'ready' ? (ready.find((r: ReadyRoute): boolean => r.id === source.id) ?? null) : null;
-  const routeLabel = activeReady ? activeReady.name : route.length >= 2 ? `Your route · ${(routeLen / 1000).toFixed(1)} km` : null;
+  const routeLabel = activeReady ? `${activeReady.name}` : route.length >= 2 ? `Your route · ${(routeLen / 1000).toFixed(1)} km` : null;
   const stale = searched !== null && searched.route !== route;
   const searchBlock = route.length < 2 ? 'Place at least two points' : routeLen < 200 ? 'Make the route at least 200 m long' : !data ? 'Loading Earth paths…' : null;
 
@@ -362,10 +378,11 @@ export default function Walk(): JSX.Element {
     : null;
   // Only a close twin "is" the route's twin; partial and loose ones are the closest stand-in we found.
   const twinLead = bestQuality && bestQuality.fit !== 'green' ? 'The closest Earth stand-in for your route is' : 'Your route’s twin is';
+  const walkTest = parseWalkTest(core.summary?.validation);
   const nPaths = data ? nf.format(data.transects.n) : '22,000';
 
   const verdict = best
-    ? `${twinLead} ${placeOf(best.item.site_id).label}: heights within ${best.rmsHeight.toFixed(0)} m, slopes within ${best.rmsSlope.toFixed(1)}°`
+    ? `${twinLead.replace('The closest Earth stand-in for your route is','Closest Earth stand-in:').replace('Your route’s twin is','Earth twin:')} ${placeOf(best.item.site_id).label}: heights within ${best.rmsHeight.toFixed(0)} m, slopes within ${best.rmsSlope.toFixed(1)}°`
     : busy
       ? `Searching ${nPaths} Earth paths for the same ups and downs…`
       : `Pick a route on ${region.name}; we find the Earth path with the same ups and downs`;
@@ -375,7 +392,7 @@ export default function Walk(): JSX.Element {
   const step3Value = busy
     ? 'Searching…'
     : best && !stale
-      ? placeOf(best.item.site_id).label
+      ? 'Found'
       : route.length >= 2 && data
         ? 'Press “Find its Earth twin”'
         : 'Waiting for a route';
@@ -389,7 +406,7 @@ export default function Walk(): JSX.Element {
   };
 
   const current = found[sel] ?? null;
-  const in3d = current ? core.setOrigin === data?.transectsOrigin && core.siteById.has(current.item.site_id) : false;
+  const in3d = current && data ? core.setOrigin === data.transectsOrigin && core.siteById.has(current.item.site_id) && data.sites.has(current.item.site_id) : false;
 
   return (
     <div className="wk">
@@ -419,6 +436,7 @@ export default function Walk(): JSX.Element {
           drawing={drawing}
           hover={hover}
           live={live}
+          demErrM={region.uncertainty.dem_err_p50_m}
           busy={busy}
           dataReady={data !== null}
           stretch={stretch}
@@ -443,6 +461,8 @@ export default function Walk(): JSX.Element {
 
         <Results
           region={region}
+          demErrM={region.uncertainty.dem_err_p50_m}
+          walkTest={walkTest}
           data={data ? { sites: data.sites, n: data.transects.n, findback: data.findback } : null}
           dataErr={dataErr}
           busy={busy}

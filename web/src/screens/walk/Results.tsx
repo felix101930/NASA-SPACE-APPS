@@ -6,7 +6,11 @@ import type { WalkProfile } from '../../lib/terrain';
 import { heightsFromSlopes } from '../../lib/match';
 import type { Region, TransectItem } from '../../types/contract';
 import type { ResultRow } from '../../workers/dtw.worker';
-import { matchQuality, type Findback } from './findback';
+import { InfoTip } from '../../components/InfoTip';
+import { Why } from '../../components/Term';
+
+import { fmtPct } from '../../lib/units';
+import { matchQuality, type Findback, type WalkTest } from './findback';
 import { fmtKm, fmtLatLon, headingWord, sitePlace, type SiteInfo } from './place';
 import { TwinChart } from './ProfileChart';
 import { TwinMap, type TwinPath } from './TwinMap';
@@ -26,6 +30,9 @@ export interface Found {
 
 interface ResultsProps {
   region: Region;
+  /** Moon height error (m, median) from the region's uncertainty. */
+  demErrM: number;
+  walkTest: WalkTest | null;
   data: { sites: Map<string, SiteInfo>; n: number; findback: Findback | null } | null;
   dataErr: string | null;
   busy: boolean;
@@ -45,7 +52,7 @@ interface ResultsProps {
 const nf = new Intl.NumberFormat('en-US');
 
 export function Results(props: ResultsProps): JSX.Element {
-  const { region, data, dataErr, busy, stale, query, found, sel } = props;
+  const { data, dataErr, busy, stale, query, found, sel } = props;
   const current = found[sel] ?? null;
   const place = (id: string): ReturnType<typeof sitePlace> => sitePlace(data?.sites.get(id), id);
 
@@ -85,10 +92,7 @@ export function Results(props: ResultsProps): JSX.Element {
       <section className="wk-earth wk-earth-empty">
         <div className="wk-empty">
           <h2>Your Earth twin appears here</h2>
-          <p className="muted">
-            Pick a ready-made route on the left, or draw your own on the terrain and press “Find its Earth twin”. We compare it with {nf.format(data.n)}{' '}
-            straight Earth paths and show the one that climbs the same way.
-          </p>
+          <p className="muted">Pick or draw a route, then press “Find its Earth twin”.</p>
         </div>
       </section>
     );
@@ -103,38 +107,48 @@ export function Results(props: ResultsProps): JSX.Element {
     <section className="wk-earth" aria-labelledby="wk-twin-title" aria-busy={busy} data-dim={busy || stale}>
       {(stale || busy) && (
         <p className="wk-stale" role="status">
-          {busy ? 'Searching for a new twin…' : `These results are for “${props.searchedLabel}”. Press “Find its Earth twin” for your new route.`}
+          {busy ? 'Searching for a new twin…' : `Results are for “${props.searchedLabel}”. Press “Find its Earth twin” to update.`}
         </p>
       )}
 
       <div className="wk-twin-head">
-        <p className="wk-rank">{sel === 0 ? `Best of ${nf.format(data.n)} Earth paths` : `Runner-up ${sel + 1} of ${found.length}`}</p>
+        <p className="wk-rank">{sel === 0 ? 'Best match' : `Runner-up ${sel + 1} of ${found.length}`}</p>
         <h2 id="wk-twin-title" title={p.title}>
           {p.label}
         </h2>
         <p className="caption">
           {p.region ? `${p.region} · ` : ''}
-          {fmtLatLon(current.item.lat0, current.item.lon0)} · a straight {fmtKm(current.item.length_m)} walk heading {heading}
+          {fmtLatLon(current.item.lat0, current.item.lon0)} · {fmtKm(current.item.length_m)} straight, heading {heading}
         </p>
-        {quality && (
-          <p className="wk-quality">
+        <div className="wk-quality">
+          {quality && (
             <span className="wk-quality-word">
               <FitGlyph fit={quality.fit} />
               {quality.word}
+              <InfoTip label="What does this fit mean?" title={quality.word} align="start">
+                <p>It is {quality.sentence}.</p>
+              </InfoTip>
             </span>
-            <span className="wk-quality-text">{quality.sentence}</span>
-          </p>
-        )}
+          )}
+          {props.walkTest && (
+            <span className="wk-quality-text">
+              Finds a hidden copy first {fmtPct(props.walkTest.top1)} of the time (time-warping: {fmtPct(props.walkTest.dtwTop1)})
+              <Why id="walkMatcher" />
+            </span>
+          )}
+        </div>
       </div>
 
       <TwinMap path={path} />
 
       <table className="wk-compare">
-        <caption className="sr-only">Moon route and Earth twin compared</caption>
+        
         <thead>
           <tr>
             <th scope="col" />
-            <th scope="col">Moon · {props.searchedLabel}</th>
+            <th scope="col" title={props.searchedLabel}>
+              Moon route
+            </th>
             <th scope="col">Earth twin</th>
           </tr>
         </thead>
@@ -145,36 +159,44 @@ export function Results(props: ResultsProps): JSX.Element {
             <td>{fmtKm(current.item.length_m)}</td>
           </tr>
           <tr>
-            <th scope="row">Climbs</th>
-            <td>{Math.round(query.climb_m)} m</td>
+            <th scope="row">Climb</th>
+            <td>
+              {Math.round(query.climb_m)} m
+            </td>
             <td>{Math.round(current.climb)} m</td>
           </tr>
           <tr>
             <th scope="row">Steepest</th>
-            <td>{query.max_slope_deg.toFixed(1)}°</td>
-            <td>{current.item.max_slope_deg.toFixed(1)}°</td>
-          </tr>
-          <tr>
-            <th scope="row">Typical gap</th>
-            <td colSpan={2}>
-              heights {current.rmsHeight.toFixed(0)} m apart, slopes {current.rmsSlope.toFixed(1)}° apart
+            <td>
+              {query.max_slope_deg.toFixed(1)}°
             </td>
+            <td>{current.item.max_slope_deg.toFixed(1)}°</td>
           </tr>
         </tbody>
       </table>
+
+      <div className="caption wk-pm-note">
+        Moon values are measured
+        <InfoTip label="How exact are the Moon values?" title="Moon elevation error">
+          <p>
+            Moon heights ±{props.demErrM.toFixed(1)} m, slopes ±1.5–2.5° (NASA LOLA elevation data).
+          </p>
+        </InfoTip>
+      </div>
 
       <TwinChart
         moonHeights={moonHeights}
         earthHeights={current.heights}
         moonSlopes={query.slopes}
         earthSlopes={current.slopes}
-        moonLabel={`Moon · ${region.name}`}
-        earthLabel={`Earth · ${p.label}`}
+        moonLabel="Moon route"
+        earthLabel="Earth twin"
       />
 
 
+      <details className="method wk-runners-details">
+        <summary>Closest Earth paths (top {found.length})</summary>
       <div className="wk-runners">
-        <h3>Closest Earth paths</h3>
         <table className="data-table wk-runner-table">
           <thead>
             <tr>
@@ -182,10 +204,10 @@ export function Results(props: ResultsProps): JSX.Element {
               <th>Place</th>
               <th className="r">Length</th>
               <th className="r" title="Typical height difference along the walk (root-mean-square)">
-                Heights apart
+                Height gap (m)
               </th>
               <th className="r" title="Typical slope difference along the walk (root-mean-square)">
-                Slopes apart
+                Slope gap (°)
               </th>
             </tr>
           </thead>
@@ -208,8 +230,14 @@ export function Results(props: ResultsProps): JSX.Element {
             })}
           </tbody>
         </table>
-        <p className="caption">{props.note} Hover a place for its region and exact coordinates.</p>
+        <div className="why-row">
+          <span className="caption">How compared</span>
+          <InfoTip label="How was this compared?" title="How this was compared">
+            <p>{props.note}</p>
+          </InfoTip>
+        </div>
       </div>
+      </details>
 
       <div className="wk-actions">
         <button type="button" className="btn" disabled={!props.in3d} onClick={props.onWalk3d}>
@@ -217,10 +245,10 @@ export function Results(props: ResultsProps): JSX.Element {
           <span aria-hidden="true">→</span>
         </button>
         <button type="button" className="btn" onClick={props.onCalgary}>
-          Find a twin in Calgary instead
+          Twin in Calgary
           <span aria-hidden="true">→</span>
         </button>
-        {!props.in3d && <span className="caption">This Earth square isn’t in the 3D site set, so it can’t open in 3D.</span>}
+        {!props.in3d && <span className="caption">Not in the 3D site set.</span>}
       </div>
     </section>
   );

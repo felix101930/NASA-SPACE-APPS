@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { SafeCanvas } from '../../components/SafeCanvas';
 import { Loading } from '../../components/Loading';
 import { TERRAIN_KM, terrainHeightAt, useTerrainGeometry } from '../../components/terrainGeometry';
+import { SunMarker, sunGeometry, sunPosition } from '../../components/SunMarker';
 import type { LoadedTile } from '../../data/tiles';
 import type { RimSeg } from './data';
 
@@ -19,7 +20,8 @@ const PATH_COLOR = '#edeae4';
 // Camera sync (shared mutable state, not React state, so dragging does not re-render the screen)
 // ------------------------------------------------------------------------------------------------
 
-const START_POS: [number, number, number] = [0, 17, 19];
+// Far enough back that the sun's ring (0.76× the tile width) fits in the first view.
+const START_POS: [number, number, number] = [0, 19.5, 23];
 const sync = { pos: new THREE.Vector3(...START_POS), target: new THREE.Vector3(0, 0, 0), version: 0, source: '' };
 
 function SyncedControls({ id }: { id: string }): JSX.Element {
@@ -150,8 +152,19 @@ function RimOverlay({ tile, exag, segs }: { tile: LoadedTile; exag: number; segs
 interface Tag3D {
   key: string;
   pos: [number, number, number];
+  /** Rim rank; 0 for the sun tag. */
   rank: number;
   text: string;
+}
+
+/** Lowest point of the tile in scene units (the horizon plane for the sun marker). */
+function baseHeight(tile: LoadedTile, exag: number): number {
+  const v = (tile.stats.min - tile.stats.median) * KM * exag;
+  return Number.isFinite(v) ? v : 0;
+}
+
+function elLabel(el: number): string {
+  return `${Number.isInteger(el) ? el.toFixed(0) : el.toFixed(1)}°`;
 }
 
 function rimTags(tile: LoadedTile, exag: number, segs: RimSeg[]): Tag3D[] {
@@ -273,7 +286,8 @@ export interface PaneProps {
   /** "Up" direction note for this tile. */
   upNote: string;
   tile: LoadedTile | null;
-  error: string | null;
+  /** Load failure: a message, or richer content (e.g. a reload prompt). */
+  error: ReactNode;
   extentKm: number;
   exag: number;
   el: number;
@@ -294,7 +308,13 @@ export function Pane(p: PaneProps): JSX.Element {
   const { tile } = p;
   const shadows = p.realtime;
   const tagEls = useRef<Map<string, HTMLSpanElement>>(new Map());
-  const tags = useMemo((): Tag3D[] => (tile && p.rim ? rimTags(tile, p.exag, p.rim) : []), [tile, p.exag, p.rim]);
+  const baseY = tile ? baseHeight(tile, p.exag) : 0;
+  const tags = useMemo((): Tag3D[] => {
+    if (!tile) return [];
+    const sunAt = sunPosition(p.el, p.az, sunGeometry(p.extentKm, baseY));
+    const sunTag: Tag3D = { key: 'sun', pos: [sunAt[0], sunAt[1] + p.extentKm * 0.07, sunAt[2]], rank: 0, text: `Sun ${elLabel(p.el)}` };
+    return [...(p.rim ? rimTags(tile, p.exag, p.rim) : []), sunTag];
+  }, [tile, p.exag, p.rim, p.el, p.az, p.extentKm, baseY]);
   return (
     <figure className="t3-pane" data-world={p.id}>
       {p.error ? (
@@ -315,7 +335,9 @@ export function Pane(p: PaneProps): JSX.Element {
         >
           <color attach="background" args={['#14161b']} />
           <hemisphereLight args={['#9aa3b5', '#2a2620', p.lift ? 0.45 : 0.05]} />
+          {/* Light raised for the exaggeration (true shadow lengths); marker on the TRUE angle; same azimuth. */}
           <Sun el={sceneSunEl(p.el, p.exag)} az={p.az} shadows={shadows} extent={p.extentKm} />
+          <SunMarker el={p.el} az={p.az} extent={p.extentKm} baseY={baseY} />
           <TerrainMesh tile={tile} exag={p.exag} map={p.realtime ? null : p.shadeMap} emissiveMap={p.cellMap} shadows={shadows} />
           {p.rim && <RimOverlay tile={tile} exag={p.exag} segs={p.rim} />}
           {p.path &&
@@ -326,19 +348,20 @@ export function Pane(p: PaneProps): JSX.Element {
           <SyncedControls id={p.id} />
         </SafeCanvas>
       )}
-      {tile && !p.error && tags.length > 0 && (
+      {tile && !p.error && (
         <div className="t3-tags" aria-hidden="true">
           {tags.map((t: Tag3D) => (
             <span
               key={t.key}
-              className="t3-tag3d"
+              className={t.rank === 0 ? 't3-tag3d t3-tag-sun' : 't3-tag3d'}
               style={{ visibility: 'hidden' }}
               ref={(el: HTMLSpanElement | null): void => {
                 if (el) tagEls.current.set(t.key, el);
                 else tagEls.current.delete(t.key);
               }}
             >
-              <b>#{t.rank}</b> {t.text}
+              {t.rank > 0 && <b>#{t.rank} </b>}
+              {t.text}
             </span>
           ))}
         </div>

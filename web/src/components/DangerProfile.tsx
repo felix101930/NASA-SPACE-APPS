@@ -1,7 +1,11 @@
-import { useState, type JSX } from 'react';
+import { useState, type JSX, type MouseEvent, type ReactNode } from 'react';
 import { HEADLINE, LEVEL_LABEL, ROW_NAME, ROW_SUB, metricInfo, ordinal, type ProfileRowId } from '../content';
 import type { HazardId, Level, Region } from '../types/contract';
 import { ChevronGlyph, HazardGlyph } from './Glyphs';
+import { InfoTip } from './InfoTip';
+import { Term, Why, WhyBody } from './Term';
+import { fmtPm } from '../lib/units';
+import '../styles/clarity-moon.css';
 
 const ROWS: ProfileRowId[] = ['shadow', 'rim', 'texture', 'slope'];
 
@@ -98,6 +102,50 @@ export function RankStrip({
   );
 }
 
+/** Shorter unit captions than content.ts HEADLINE (same facts, fewer words). */
+const UNIT_SHORT: Record<ProfileRowId, string> = {
+  shadow: 'in shadow, 3° sun',
+  rim: 'over 1 km (95th pct)',
+  texture: 'of 1 km cells blank',
+  slope: '90th percentile',
+};
+
+function stop(e: MouseEvent): void {
+  e.stopPropagation();
+}
+
+/** Keeps an ⓘ inside a clickable row from also toggling the row. */
+function Quiet({ children }: { children: ReactNode }): JSX.Element {
+  return (
+    <span className="quiet-tip" onClick={stop}>
+      {children}
+    </span>
+  );
+}
+
+function nameTerm(id: ProfileRowId): JSX.Element {
+  const label = <span className="profile-name-text">{ROW_NAME[id]}</span>;
+  if (id === 'shadow') return <Term id="shadowShare">{label}</Term>;
+  if (id === 'rim') return <Term id="rimDrop">{label}</Term>;
+  if (id === 'texture') return <Term id="cameraTexture">{label}</Term>;
+  return label;
+}
+
+function valueWhy(region: Region, id: ProfileRowId): JSX.Element {
+  if (id === 'shadow') return <Why id="shadowFar" />;
+  if (id === 'texture') return <Why id="texture" />;
+  const err = id === 'rim' ? fmtPm(region.uncertainty.dem_err_p50_m, 'm') : '±1.5–2.5°';
+  return (
+    <InfoTip label={id === 'rim' ? 'Why the 95th percentile, and how exact is the Moon height?' : 'How exact is the Moon slope?'}>
+      {id === 'rim' && <WhyBody id="rimP95" />}
+      <p>
+        <strong>Moon data error:</strong> {err} {id === 'rim' ? '(median height error of the LOLA elevation model)' : '(LOLA slope error)'}.
+      </p>
+      {id === 'slope' && <WhyBody id="moonDem" />}
+    </InfoTip>
+  );
+}
+
 interface DangerProfileProps {
   region: Region;
   regions: Region[];
@@ -113,8 +161,18 @@ export function DangerProfile({ region, regions, activeLayers, onRowActivate }: 
   return (
     <div className="profile">
       <div className="profile-head">
-        <h3>Danger profile</h3>
-        <span className="caption">Dots: the 9 regions from least to most dangerous</span>
+        <h3>
+          <Term id="dangerProfile">Danger profile</Term>
+        </h3>
+        <span className="why-row caption">
+          Rank of 9 (1st = least)
+          <InfoTip label="What do the dots and the rank show?" title="Rank among the 9 regions" align="end">
+            <p>
+              The nine dots are the nine candidate regions, ordered from least to most dangerous for that danger. The filled dot is this
+              region. “4th of 9” means three regions are less dangerous and five are more.
+            </p>
+          </InfoTip>
+        </span>
       </div>
       <ul className="profile-rows">
         {ROWS.map((id: ProfileRowId) => {
@@ -125,11 +183,8 @@ export function DangerProfile({ region, regions, activeLayers, onRowActivate }: 
           const levelWord = LEVEL_LABEL[level] ?? level;
           return (
             <li key={id} className="profile-row" data-open={isOpen} data-layer={activeLayers?.has(id) ?? false}>
-              <button
-                type="button"
+              <div
                 className="profile-row-btn"
-                aria-expanded={isOpen}
-                aria-controls={`raw-${id}`}
                 onClick={(): void => {
                   setOpen(isOpen ? null : id);
                   onRowActivate?.(id);
@@ -137,19 +192,22 @@ export function DangerProfile({ region, regions, activeLayers, onRowActivate }: 
               >
                 <span className="profile-name">
                   <HazardGlyph hazard={id} />
-                  <span className="profile-name-text">{ROW_NAME[id]}</span>
-                  <span className="caption">{ROW_SUB[id]}</span>
+                  <Quiet>{nameTerm(id)}</Quiet>
+                  <span className="caption" title={ROW_SUB[id]}>
+                    {ROW_SUB[id].split(' · ')[0].replace('Walking and touchdown', 'Walking')}
+                  </span>
                   {activeLayers?.has(id) && <span className="chip layer-on">On in 3D</span>}
                 </span>
                 <span className="profile-level">
                   <strong>{levelWord}</strong>
-                  <span className="caption">
+                  <span className="caption" title="Rank among the 9 regions, 1st = least dangerous">
                     {ordinal(info.rank)} of {info.n}
                   </span>
                 </span>
                 <span className="profile-value">
                   <span className="profile-big">{typeof v === 'number' ? HEADLINE[id].value(v) : '—'}</span>
-                  <span className="caption">{HEADLINE[id].unit}</span>
+                  <span className="caption">{UNIT_SHORT[id]}</span>
+                  <Quiet>{valueWhy(region, id)}</Quiet>
                 </span>
                 <span className="profile-strip">
                   <RankStrip
@@ -158,9 +216,22 @@ export function DangerProfile({ region, regions, activeLayers, onRowActivate }: 
                     hazard={id}
                     label={`${ROW_NAME[id]}: ${levelWord}, ${ordinal(info.rank)} least dangerous of ${info.n} regions`}
                   />
-                  <ChevronGlyph open={isOpen} />
+                  <button
+                    type="button"
+                    className="profile-chev"
+                    aria-expanded={isOpen}
+                    aria-controls={`raw-${id}`}
+                    aria-label={`${ROW_NAME[id]}: ${isOpen ? 'hide' : 'show'} measured values`}
+                    onClick={(e: MouseEvent): void => {
+                      e.stopPropagation();
+                      setOpen(isOpen ? null : id);
+                      onRowActivate?.(id);
+                    }}
+                  >
+                    <ChevronGlyph open={isOpen} />
+                  </button>
                 </span>
-              </button>
+              </div>
               {isOpen && (
                 <table className="metric-table" id={`raw-${id}`}>
                   <tbody>
