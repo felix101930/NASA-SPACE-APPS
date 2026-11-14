@@ -119,6 +119,41 @@ export interface LightRow {
   earth: number;
   gap_text: string;
   light: Light;
+  // Patchiness (pipeline/match/patchiness.py; docs/data-contract.md). Null when the blocks are unavailable.
+  /** The metric on the 25 blocks of 3 km in the 15 km square, row-major from the top-left. */
+  moon_blocks?: (number | null)[] | null;
+  earth_blocks?: (number | null)[] | null;
+  /** IQR of the 25 block values, in the metric's units. */
+  moon_spread?: number | null;
+  earth_spread?: number | null;
+  /** earth_spread / moon_spread; null when the Moon spread is 0. */
+  spread_ratio?: number | null;
+  patchiness?: Patchiness | null;
+}
+
+export type Patchiness = 'similar' | 'smoother' | 'patchier';
+
+/** Patchiness of a match's headline metric (shadow_frac_el3 / jump1km_p95_m / empty_cell_frac_el3). */
+export interface PatchinessSummary {
+  metric: string;
+  label: string;
+  patchiness: Patchiness | null;
+  spread_ratio: number | null;
+  earth_spread: number | null;
+  moon_spread: number | null;
+  /** One plain sentence, e.g. "Varies about as much as the Moon site (Earth spread 113 m vs Moon 136 m)". */
+  text: string;
+}
+
+/** summary.json `patchiness`: how many #1 matches also vary about as much as their Moon site. */
+export interface SummaryPatchiness {
+  n_top1: number;
+  n_similar_headline: number;
+  by_class: { similar: number; smoother: number; patchier: number; unavailable: number };
+  by_hazard: Partial<Record<HazardId, { n: number; similar: number }>>;
+  headline_metric: Partial<Record<HazardId, string>>;
+  thresholds: { similar_min_ratio: number; similar_max_ratio: number; note?: string };
+  method: string;
 }
 
 export interface RehearsalWindow {
@@ -140,6 +175,7 @@ export interface Match {
   mismatches_text: string[];
   cannot_test: string[];
   windows: RehearsalWindow[];
+  patchiness_summary?: PatchinessSummary | null;
 }
 
 export interface MatchesFile {
@@ -169,6 +205,7 @@ export interface SummaryFile {
   meta: Meta;
   ranking: RankingRow[];
   validation: Validation;
+  patchiness?: SummaryPatchiness | null;
 }
 
 export interface TransectItem {
@@ -357,8 +394,50 @@ export function isEarthSitesFile(v: unknown): v is EarthSitesFile {
   return isObj(v) && isMeta(v.meta) && isArr(v.sites) && v.sites.every(isEarthSite);
 }
 
+function isOptNum(v: unknown): v is number | null | undefined {
+  return v === undefined || v === null || isNum(v);
+}
+function isOptNumArr(v: unknown): v is (number | null)[] | null | undefined {
+  return v === undefined || v === null || (isArr(v) && v.every((x: unknown): boolean => isNum(x) || x === null));
+}
+function isPatchiness(v: unknown): v is Patchiness {
+  return v === 'similar' || v === 'smoother' || v === 'patchier';
+}
+function isOptPatchiness(v: unknown): v is Patchiness | null | undefined {
+  return v === undefined || v === null || isPatchiness(v);
+}
+
 function isLightRow(v: unknown): v is LightRow {
-  return isObj(v) && isStr(v.metric) && isNum(v.moon) && isNum(v.earth) && isStr(v.light);
+  return (
+    isObj(v) &&
+    isStr(v.metric) &&
+    isNum(v.moon) &&
+    isNum(v.earth) &&
+    isStr(v.light) &&
+    isOptNumArr(v.moon_blocks) &&
+    isOptNumArr(v.earth_blocks) &&
+    isOptNum(v.moon_spread) &&
+    isOptNum(v.earth_spread) &&
+    isOptNum(v.spread_ratio) &&
+    isOptPatchiness(v.patchiness)
+  );
+}
+
+function isPatchinessSummary(v: unknown): v is PatchinessSummary {
+  return (
+    isObj(v) &&
+    isStr(v.metric) &&
+    isStr(v.label) &&
+    isStr(v.text) &&
+    isOptPatchiness(v.patchiness) &&
+    isOptNum(v.spread_ratio) &&
+    isOptNum(v.earth_spread) &&
+    isOptNum(v.moon_spread)
+  );
+}
+
+function isSummaryPatchiness(v: unknown): v is SummaryPatchiness {
+  return isObj(v) && isNum(v.n_top1) && isNum(v.n_similar_headline) && isObj(v.by_class) && isObj(v.by_hazard) && isObj(v.thresholds);
 }
 
 function isWindow(v: unknown): v is RehearsalWindow {
@@ -376,7 +455,8 @@ function isMatch(v: unknown): v is Match {
     v.lights.every(isLightRow) &&
     isArr(v.cannot_test) &&
     isArr(v.windows) &&
-    v.windows.every(isWindow)
+    v.windows.every(isWindow) &&
+    (v.patchiness_summary === undefined || v.patchiness_summary === null || isPatchinessSummary(v.patchiness_summary))
   );
 }
 
@@ -387,7 +467,8 @@ export function isMatchesFile(v: unknown): v is MatchesFile {
 export function isSummaryFile(v: unknown): v is SummaryFile {
   if (!isObj(v) || !isMeta(v.meta) || !isArr(v.ranking) || !isObj(v.validation)) return false;
   const okRows = v.ranking.every((r: unknown) => isObj(r) && isStr(r.region_id) && isNum(r.rank));
-  return okRows;
+  const okPatch = v.patchiness === undefined || v.patchiness === null || isSummaryPatchiness(v.patchiness);
+  return okRows && okPatch;
 }
 
 export function isTransectsFile(v: unknown): v is TransectsFile {

@@ -87,8 +87,10 @@ function TerrainMesh({
   const geom = useTerrainGeometry(tile, exag);
   return (
     <mesh geometry={geom} castShadow={shadows} receiveShadow={shadows}>
+      {/* Keyed on whether maps are present (that changes the shader), not on which texture: a new material per
+          shadow mask released and recompiled the program on every sun step. Swapping textures needs no recompile. */}
       <meshStandardMaterial
-        key={`${map ? map.uuid : 'plain'}:${emissiveMap ? emissiveMap.uuid : 'none'}`}
+        key={`${map ? 'map' : 'plain'}:${emissiveMap ? 'em' : 'none'}`}
         color="#c4beb3"
         roughness={0.97}
         metalness={0}

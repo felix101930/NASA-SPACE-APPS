@@ -9,6 +9,8 @@ import { HAZARDS } from '../content';
 import { avgShadowAt, dirWord } from '../lib/shadow';
 import { fmtLatLon, placeName, type PlaceName } from '../lib/placeName';
 import { InfoTip } from '../components/InfoTip';
+import { Select } from '../components/Select';
+import { regionOptions } from '../lib/regionOptions';
 import { Term, Why } from '../components/Term';
 import {
   buildVerdict,
@@ -36,6 +38,7 @@ import {
 } from './terrain3d/data';
 import { EvidenceTable, nasademAgreement, NotesBoxes, WindowsList } from './terrain3d/Evidence';
 import { Pane } from './terrain3d/Scene';
+import { useSunSweep, type SunSweep, type SweepMode } from '../lib/useSunSweep';
 import './terrain3d/terrain3d.css';
 
 const SUN_PRESETS: readonly number[] = [1.5, 3, 5];
@@ -106,38 +109,70 @@ function nScreened(core: CoreData): number | null {
   return typeof n === 'number' && n > 0 ? n : null;
 }
 
-function useSunSweep(): { sweeping: boolean; start: () => void; stop: () => void } {
-  const [sweeping, setSweeping] = useState<boolean>(false);
-  useEffect((): (() => void) | void => {
-    if (!sweeping) return;
-    const startAz = useApp.getState().sunAz;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      // No continuous motion: step the sun round in 30° jumps instead.
-      let k = 0;
-      const id = window.setInterval((): void => {
-        k += 1;
-        const s2 = useApp.getState();
-        s2.setSun(s2.sunEl, (startAz + k * 30) % 360);
-        if (k >= 12) setSweeping(false);
-      }, 700);
-      return (): void => window.clearInterval(id);
-    }
-    const DUR = 10000;
-    const t0 = performance.now();
-    let raf = 0;
-    const tick = (now: number): void => {
-      const p = Math.min(1, (now - t0) / DUR);
-      const eased = 0.5 - 0.5 * Math.cos(Math.PI * p);
-      const s2 = useApp.getState();
-      s2.setSun(s2.sunEl, Math.round(((startAz + 360 * eased) % 360) * 10) / 10);
-      if (p < 1) raf = requestAnimationFrame(tick);
-      else setSweeping(false);
-    };
-    raf = requestAnimationFrame(tick);
-    return (): void => cancelAnimationFrame(raf);
-  }, [sweeping]);
-  return { sweeping, start: (): void => setSweeping(true), stop: (): void => setSweeping(false) };
+/** The sweep's reference directions: the 8 compass marks, every 45° from the tile's top. */
+const SWEEP_MARKS: readonly number[] = [0, 45, 90, 135, 180, 225, 270, 315];
+
+function readSunAz(): number {
+  return useApp.getState().sunAz;
+}
+
+function applySunAz(az: number): void {
+  const s = useApp.getState();
+  s.setSun(s.sunEl, az);
+}
+
+/** "64% dark" when the readout is for this sun, else an ellipsis (a fresh figure is on its way, ≤ 4 a second). */
+function shareFor(s: ShadowShare | null, el: number, az: number | null): string {
+  // az null = smooth turn: show the latest figure (it trails the sun by at most a quarter second).
+  return s && Math.abs(s.el - el) < 0.01 && (az === null || Math.abs(s.az - az) < 0.6) ? `${pct0(s.frac)} dark` : '…';
+}
+
+function SweepNow({
+  sweep,
+  el,
+  az,
+  moon,
+  earth,
+}: {
+  sweep: SunSweep;
+  el: number;
+  az: number;
+  moon: ShadowShare | null;
+  earth: ShadowShare | null;
+}): JSX.Element | null {
+  const st = sweep.state;
+  if (st.phase === 'idle') return null;
+  const dirAz = st.markAz ?? az;
+  const elTxt = `${el.toFixed(el % 1 ? 1 : 0)}°`;
+  const settled = st.markAz === null || st.arrived;
+  const figures = settled ? (
+    <>
+      Moon <strong>{shareFor(moon, el, st.markAz)}</strong> · Earth <strong>{shareFor(earth, el, st.markAz)}</strong>
+    </>
+  ) : (
+    <span className="sweep-moving">moving…</span>
+  );
+  return (
+    <div className="t3-sweep-now sweep-now" role="status">
+      {st.total > 0 && (
+        <span className="sweep-marks" aria-hidden="true">
+          {Array.from({ length: st.total }, (_v: unknown, i: number) => (
+            <span key={i} className="sweep-mark" data-state={st.step === null ? 'todo' : i < st.step ? 'done' : i === st.step ? 'now' : 'todo'} />
+          ))}
+        </span>
+      )}
+      <span className="sweep-text">
+        Sun from the <strong>{dirWord(dirAz)}</strong> · {elTxt} · {figures}
+        {st.step !== null && st.total > 0 && (
+          <span className="sweep-count">
+            {' '}
+            ({st.step + 1} of {st.total})
+          </span>
+        )}
+        {st.phase === 'paused' && <span className="sweep-count"> · paused</span>}
+      </span>
+    </div>
+  );
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -172,16 +207,14 @@ function Pickers({
   return (
     <div className="t3-pickers panel">
       <div className="t3-pick-row">
-        <label className="t3-pick">
-          <span className="t3-pick-label">Moon region</span>
-          <select className="select" value={region.id} onChange={(e): void => setRegion(e.target.value)}>
-            {core.regions.map((r: Region) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          className="t3-pick"
+          labelClassName="t3-pick-label"
+          label="Moon region"
+          value={region.id}
+          options={regionOptions(core.regions, core.summary?.ranking)}
+          onChange={setRegion}
+        />
         <div className="t3-pick t3-pick-hazard">
           <span className="t3-pick-label" id="t3-hz-label">
             Danger
@@ -280,7 +313,9 @@ export default function Terrain3D(): JSX.Element {
   const mode = useApp((s) => s.shadowMode);
   const setMode = useApp((s) => s.setShadowMode);
   const walk = useApp((s) => s.walk);
-  const sweep = useSunSweep();
+  const [sweepMode, setSweepMode] = useState<SweepMode>('marks');
+  const sweep = useSunSweep({ marks: SWEEP_MARKS, mode: sweepMode, getAz: readSunAz, setAz: applySunAz, holdMs: 1200, glideMs: 450 });
+  const sweeping = sweep.state.phase !== 'idle';
   const [lift, setLift] = useState<boolean>(false);
   const [activeWindow, setActiveWindow] = useState<{ key: string; el: number; az: number } | null>(null);
   const [datesOpen, setDatesOpen] = useState<boolean>(false);
@@ -578,10 +613,33 @@ export default function Terrain3D(): JSX.Element {
               * below 1° <Why id="refraction" />
             </span>
           )}
-          <button type="button" className="btn btn-primary t3-sweep" aria-pressed={sweep.sweeping} onClick={sweep.sweeping ? sweep.stop : sweep.start}>
-            <SunGlyph />
-            {sweep.sweeping ? 'Stop the sweep' : 'Sweep the sun'}
-          </button>
+          <div className="t3-sweep-ctl" role="group" aria-label="Sun sweep">
+            {!sweeping ? (
+              <button
+                type="button"
+                className="btn btn-primary t3-sweep"
+                onClick={sweep.start}
+                title={sweepMode === 'marks' ? 'Steps the sun once round 8 compass directions, pausing at each' : 'Turns the sun once round'}
+              >
+                <SunGlyph />
+                Sweep the sun
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="btn t3-sweep t3-sweep-pause"
+                  onClick={sweep.state.phase === 'paused' ? sweep.resume : sweep.pause}
+                >
+                  <SunGlyph />
+                  {sweep.state.phase === 'paused' ? 'Resume' : 'Pause'}
+                </button>
+                <button type="button" className="btn t3-sweep-stop" onClick={sweep.stop}>
+                  Stop
+                </button>
+              </>
+            )}
+          </div>
           <InfoTip label="Where is the sun in the views?" title="The gold disc is the sun" align="end">
             <p>
               It sits on the true sun angle ({elTxt} now) above a horizon ring with ticks every 45°; the dashed line is the light’s path.
@@ -593,6 +651,7 @@ export default function Terrain3D(): JSX.Element {
             </p>
           </InfoTip>
         </div>
+        <SweepNow sweep={sweep} el={el} az={az} moon={moonShare} earth={earthShare} />
         <details className="t3-more">
           <summary>More options</summary>
           <div className="t3-more-body">
@@ -661,6 +720,36 @@ export default function Terrain3D(): JSX.Element {
                 </button>
                 <button type="button" aria-pressed={!realtime} onClick={(): void => setMode('precomputed')}>
                   Reference masks
+                </button>
+              </div>
+            </div>
+            <div className="t3-ctl">
+              <span className="t3-ctl-label" id="t3-sweep-label">
+                <span>
+                  <SunGlyph size={14} /> Sweep style
+                </span>
+              </span>
+              <div className="seg" role="group" aria-labelledby="t3-sweep-label">
+                <button
+                  type="button"
+                  aria-pressed={sweepMode === 'marks'}
+                  onClick={(): void => {
+                    sweep.stop();
+                    setSweepMode('marks');
+                  }}
+                >
+                  8 directions
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={sweepMode === 'smooth'}
+                  title="One continuous turn; the dark figures refresh up to 4 times a second. With reduced motion this steps instead."
+                  onClick={(): void => {
+                    sweep.stop();
+                    setSweepMode('smooth');
+                  }}
+                >
+                  Smooth
                 </button>
               </div>
             </div>

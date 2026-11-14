@@ -136,15 +136,17 @@ export function SunMarker({ el, az, extent, baseY }: SunMarkerProps): JSX.Elemen
       }),
     [geo],
   );
-  // Foot of the sun on the ring, then the light's path toward the tile centre.
-  const ray = useMemo((): [number, number, number][] => [pos, [0, geo.baseY, 0]], [pos, geo]);
-  const foot = useMemo((): [number, number, number][] => {
-    const a = (az * Math.PI) / 180;
-    return [
-      [Math.sin(a) * geo.radius, geo.baseY, -Math.cos(a) * geo.radius],
-      pos,
-    ];
-  }, [az, geo, pos]);
+  // Foot of the sun on the ring, then the light's path toward the tile centre. Both lines have FIXED geometry and
+  // are placed by group rotations: drei's <Line> disposes its material whenever its points change, which forced a
+  // fresh shader compile (a main-thread stall of 100 ms to seconds) on every sun step and made the sweep hang.
+  //   yaw group:   rotation.y = −az puts local −z on the sun's azimuth (x = sin(az)·R, z = −cos(az)·R);
+  //   ray group:   rotation.x = el tilts local (0, 0, −R) up to the sun, so the ray to the centre is constant;
+  //   foot group:  at the ring point, rotation.x = el/2 aims local +y along the chord to the sun, scaled to its length.
+  const ray = useMemo((): [number, number, number][] => [[0, 0, -geo.radius], [0, 0, 0]], [geo]);
+  const unit = useMemo((): [number, number, number][] => [[0, 0, 0], [0, 1, 0]], []);
+  const e = (el * Math.PI) / 180;
+  const a = (az * Math.PI) / 180;
+  const chord = Math.max(1e-4, 2 * geo.radius * Math.sin(e / 2));
 
   return (
     <group>
@@ -152,8 +154,14 @@ export function SunMarker({ el, az, extent, baseY }: SunMarkerProps): JSX.Elemen
       {ticks.map((t: Tick) => (
         <Line key={t.key} points={t.pts} color={RING} lineWidth={t.main ? 2 : 1.25} transparent opacity={t.main ? 0.7 : 0.45} />
       ))}
-      <Line points={foot} color={SUN} lineWidth={1.5} transparent opacity={0.8} />
-      <Line points={ray} color={SUN} lineWidth={1.5} dashed dashSize={0.35} gapSize={0.25} transparent opacity={0.85} />
+      <group position={[0, geo.baseY, 0]} rotation={[0, -a, 0]}>
+        <group position={[0, 0, -geo.radius]} rotation={[e / 2, 0, 0]} scale={[1, chord, 1]}>
+          <Line points={unit} color={SUN} lineWidth={1.5} transparent opacity={0.8} />
+        </group>
+        <group rotation={[e, 0, 0]}>
+          <Line points={ray} color={SUN} lineWidth={1.5} dashed dashSize={0.35} gapSize={0.25} transparent opacity={0.85} />
+        </group>
+      </group>
       <sprite ref={halo} position={pos} scale={[haloSize, haloSize, 1]} renderOrder={10}>
         <spriteMaterial map={haloTex} color={SUN} transparent depthWrite={false} depthTest={false} blending={THREE.AdditiveBlending} />
       </sprite>

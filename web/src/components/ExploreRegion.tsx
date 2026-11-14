@@ -19,6 +19,7 @@ import { avgShadowAt } from '../lib/shadow';
 import { SunMarker, sunGeometry, sunPosition } from './SunMarker';
 import { InfoTip } from './InfoTip';
 import { fmtPm } from '../lib/units';
+import { useSunSweep } from '../lib/useSunSweep';
 
 export type ExploreLayer = 'shadow' | 'rim' | 'texture' | 'slope' | 'safe';
 
@@ -105,7 +106,8 @@ function useMask(mask: ShadowMask | null, size: number, origin: Origin): Uint8Ar
   const [m, setM] = useState<Uint8Array | null>(null);
   useEffect((): (() => void) => {
     let alive = true;
-    setM(null);
+    // Keep the previous mask on screen until the next one has loaded (no flash of an unshadowed tile mid-sweep).
+    if (!mask) setM(null);
     if (mask) {
       loadImage(mask.path, origin)
         .then((img: HTMLImageElement): Promise<Uint8Array> => readGrey(img, size))
@@ -381,6 +383,14 @@ function nearestMask(masks: ShadowMask[], el: number, az: number): ShadowMask | 
   return best;
 }
 
+/** Indicator dot state for mark i, given the mark now shown (index `now`) and how many marks have been visited. */
+function markState(i: number, n: number, now: number, step: number | null): 'done' | 'now' | 'todo' {
+  if (step === null || now < 0) return 'todo';
+  const first = (now - step + n) % n;
+  const visit = (i - first + n) % n;
+  return visit < step ? 'done' : visit === step ? 'now' : 'todo';
+}
+
 const AZ_WORD: Record<number, string> = { 0: 'the top of the tile', 90: 'the right', 180: 'the bottom', 270: 'the left' };
 
 interface ExploreProps {
@@ -403,6 +413,27 @@ export default function ExploreRegion({ region, origin, layers, onToggle, onAvai
   const [el, setEl] = useState<number>(elevations.includes(3) ? 3 : (elevations[0] ?? 3));
   const [azIdx, setAzIdx] = useState<number>(Math.max(0, azimuths.indexOf(90)));
   const az = azimuths[azIdx] ?? 90;
+  // Sweep: step once round the directions that have a reference mask (pipeline masks, e.g. every 90°), holding at
+  // each so the dark figure can be read. Masks are discrete images, so the sun jumps between them (no glide).
+  const azRef = useRef<number>(az);
+  azRef.current = az;
+  const sweep = useSunSweep({
+    marks: azimuths,
+    mode: 'marks',
+    getAz: (): number => azRef.current,
+    setAz: (a: number): void => {
+      const i = azimuths.indexOf(a);
+      if (i >= 0) setAzIdx(i);
+    },
+    holdMs: 1200,
+    glideMs: 0,
+  });
+  const sweeping = sweep.state.phase !== 'idle';
+  const stopSweep = sweep.stop;
+  const shadowOn = layers.has('shadow');
+  useEffect((): void => {
+    if (!shadowOn) stopSweep();
+  }, [shadowOn, stopSweep]);
   const maskRef = useMemo((): ShadowMask | null => nearestMask(masks, el, az), [masks, el, az]);
   const mask = useMask(layers.has('shadow') ? maskRef : null, region.tile.size, origin);
   const note = data?.annotations?.shadow?.masks.find((m) => m.path === maskRef?.path);
@@ -527,15 +558,55 @@ export default function ExploreRegion({ region, origin, layers, onToggle, onAvai
                 max={Math.max(azimuths.length - 1, 0)}
                 step={1}
                 value={azIdx}
-                onChange={(e): void => setAzIdx(Number(e.target.value))}
+                onChange={(e): void => {
+                  sweep.stop();
+                  setAzIdx(Number(e.target.value));
+                }}
                 aria-valuetext={`from ${AZ_WORD[az] ?? `${az}°`}`}
               />
               <span className="field-value">{az}°</span>
             </label>
+            {!sweeping ? (
+              <button type="button" className="btn btn-sm btn-primary" onClick={sweep.start} disabled={azimuths.length < 2}>
+                <SunGlyph /> Sweep the sun
+              </button>
+            ) : (
+              <span className="x3d-sweep-ctl" role="group" aria-label="Sun sweep">
+                <button type="button" className="btn btn-sm" onClick={sweep.state.phase === 'paused' ? sweep.resume : sweep.pause}>
+                  <SunGlyph /> {sweep.state.phase === 'paused' ? 'Resume' : 'Pause'}
+                </button>
+                <button type="button" className="btn btn-sm" onClick={sweep.stop}>
+                  Stop
+                </button>
+              </span>
+            )}
             <InfoTip label="How is the sun drawn?" title="The sun in 3D" align="end">
               <p>The gold disc sits on the true sun angle; the ring marks the horizon with ticks every 45°. Shadows fall away from it.</p>
               <p>Sun direction is measured clockwise from the tile’s top (the map grid, not north). Heights are drawn ×{EXAG}.</p>
             </InfoTip>
+          </div>
+        )}
+        {sweeping && layers.has('shadow') && (
+          <div className="x3d-sweep-now sweep-now" role="status">
+            <span className="sweep-marks" aria-hidden="true">
+              {azimuths.map((a: number, i: number) => (
+                <span
+                  key={a}
+                  className="sweep-mark"
+                  data-state={markState(i, azimuths.length, azimuths.indexOf(sweep.state.markAz ?? -1), sweep.state.step)}
+                />
+              ))}
+            </span>
+            <span>
+              Sun from <strong>{AZ_WORD[az] ?? `${az}°`}</strong> · {el}° ·{' '}
+              <strong>{note && maskRef && maskRef.az === az ? `${Math.round(note.frac * 100)}% dark` : '…'}</strong>
+              {sweep.state.step !== null && (
+                <span className="sweep-count">
+                  {' '}
+                  ({sweep.state.step + 1} of {sweep.state.total}){sweep.state.phase === 'paused' ? ' · paused' : ''}
+                </span>
+              )}
+            </span>
           </div>
         )}
         {!data?.annotations && data && <p className="caption">Rim, texture and slope layers need this region’s annotation file.</p>}

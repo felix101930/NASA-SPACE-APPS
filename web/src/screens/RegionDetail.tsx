@@ -5,6 +5,9 @@ import { CoordBadge } from '../components/DangerProfile';
 import { Fit, FitGlyph, HazardGlyph, VerdictGlyph, type VerdictKind } from '../components/Glyphs';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
 import { InfoTip } from '../components/InfoTip';
+import { headlineLight, PatchFor } from '../components/PatchFor';
+import { Select, type SelectOption } from '../components/Select';
+import { regionOptions } from '../lib/regionOptions';
 import { Term, Why } from '../components/Term';
 import { fmtDeg, fmtNum, fmtPct, fmtSpread, fmtStat } from '../lib/units';
 import { parseBootstrap } from '../lib/validationExtras';
@@ -18,6 +21,21 @@ import { HAZARD_IDS, isObj, type EarthSite, type HazardId, type Light, type Matc
 const DAY_FMT = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
 
 const HAZARD_NOUN: Record<HazardId, string> = { shadow: 'shadow', rim: 'rim-jump', texture: 'texture' };
+
+/** Signed Earth − Moon difference in the metric's own unit: shares as percentage points, others as-is. */
+function realGap(diff: number, unit: string): string {
+  if (!Number.isFinite(diff)) return '—';
+  const sign = diff > 0 ? '+' : diff < 0 ? '−' : '±';
+  const a = Math.abs(diff);
+  if (unit === '%') {
+    const v = a * 100;
+    return `${sign}${v < 1 ? v.toFixed(1) : Math.round(v)} pts`;
+  }
+  if (unit === 'm') return `${sign}${Math.round(a)} m`;
+  if (unit === '°') return `${sign}${a.toFixed(1)}°`;
+  if (unit === '/km²') return `${sign}${a.toFixed(1)} /km²`;
+  return `${sign}${a < 10 ? a.toFixed(2) : a.toFixed(1)}`;
+}
 
 function hhmmUTC(d: Date): string {
   return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
@@ -242,11 +260,12 @@ function SiteCard({
       </div>
       {active && (
         <div className="site-card-body">
+          {match.patchiness_summary?.text && <p className="patch-line">{match.patchiness_summary.text}</p>}
           <details className="verdict-details">
             <summary>Metric by metric and in words</summary>
             <div className="list-lede">
               <span className="why-row">
-                Gap in × the Moon region’s <Term id="typicalSpread">typical spread</Term> (under 0.5× close)
+                Gap = this site minus the Moon region. Hover a gap for its <Term id="typicalSpread">× figure</Term>
                 <Why id="iqr" />
               </span>
             </div>
@@ -264,7 +283,7 @@ function SiteCard({
                       <Why id="nasadem" align="end" />
                     </span>
                   </th>
-                  <th className="r">Gap (× spread)</th>
+                  <th className="r">Gap</th>
                   <th>Fit</th>
                 </tr>
               </thead>
@@ -289,8 +308,8 @@ function SiteCard({
                         {typeof nv === 'number' ? mi.fmt(nv) : '—'}
                         {typeof r === 'number' && <span className="pm">r {fmtStat(r)}{weak ? ' · least certain' : ''}</span>}
                       </td>
-                      <td className="r" title={l.gap_text}>
-                        {gap !== null ? fmtSpread(gap, 1) : l.gap_text}
+                      <td className="r" title={`${l.gap_text}${gap !== null ? ` · ${fmtSpread(gap, 1)} (× = how far off, compared with how much the Moon region varies within itself; under 0.5 = close)` : ''}`}>
+                        {realGap(l.earth - l.moon, mi.unit)}
                       </td>
                       <td>
                         <Fit fit={l.light} />
@@ -301,6 +320,7 @@ function SiteCard({
               </tbody>
             </table>
           </section>
+          <PatchFor light={headlineLight(match)} hazard={match.hazard} />
           <div className="verdicts">
               <Verdict kind="match" title="Matches" items={match.matches_text} empty="No metric is within the Moon region’s spread." />
               <Verdict kind="mismatch" title="Doesn’t match" items={match.mismatches_text} empty="Every measured metric is close." />
@@ -359,6 +379,7 @@ export function RegionDetail(): JSX.Element {
   const region = useRegion();
 
   const list = useMemo((): Match[] => matchesFor(core, regionId, hazard), [core, regionId, hazard]);
+  const regionOpts = useMemo((): SelectOption<string>[] => regionOptions(core.regions, core.summary?.ranking), [core]);
   const activeId = siteId && list.some((m: Match): boolean => m.site_id === siteId) ? siteId : (list[0]?.site_id ?? null);
 
   const points = useMemo(
@@ -416,16 +437,14 @@ export function RegionDetail(): JSX.Element {
             </p>
           </InfoTip>
         </span>
-        <label className="field field-inline">
-          <span className="field-label">Moon region</span>
-          <select className="select" value={regionId} onChange={(e): void => setRegion(e.target.value)}>
-            {core.regions.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          className="field field-inline"
+          labelClassName="field-label"
+          label="Moon region"
+          value={regionId}
+          options={regionOpts}
+          onChange={setRegion}
+        />
       </div>
 
       <div className="region-layout" role="tabpanel">

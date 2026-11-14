@@ -1,5 +1,6 @@
 // Below the 3D panes: the basic numbers behind the match, what doesn't match, what can't be tested, and when to go.
 import type { JSX } from 'react';
+import { headlineLight, PatchFor } from '../../components/PatchFor';
 import { SunGlyph, VerdictGlyph, type VerdictKind } from '../../components/Glyphs';
 import { InfoTip } from '../../components/InfoTip';
 import { Why } from '../../components/Term';
@@ -135,6 +136,8 @@ export function EvidenceTable({ match, region, placeLabel, agreement }: Evidence
           </tbody>
         </table>
       </div>
+      <PatchFor light={headlineLight(match)} hazard={match.hazard} />
+      {match.patchiness_summary?.text && <p className="t3-patch-line">{match.patchiness_summary.text}</p>}
     </section>
   );
 }

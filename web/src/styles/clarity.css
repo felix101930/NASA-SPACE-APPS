@@ -124,3 +124,8 @@
     text-align: left;
   }
 }
+
+.sum-close.sum-patch {
+  border-top: 0;
+  padding-top: 0;
+}

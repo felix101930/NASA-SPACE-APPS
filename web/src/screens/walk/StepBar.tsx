@@ -1,6 +1,8 @@
 // The three steps of the walk screen, always visible: what you picked, and what happens next.
 import type { JSX } from 'react';
-import type { Region } from '../../types/contract';
+import { Select } from '../../components/Select';
+import { regionOptions } from '../../lib/regionOptions';
+import type { RankingRow, Region } from '../../types/contract';
 
 export type StepState = 'done' | 'current' | 'todo';
 
@@ -12,6 +14,8 @@ interface StepInfo {
 interface StepBarProps {
   regions: Region[];
   regionId: string;
+  /** Summary ranking, for a one-line hint per region (optional). */
+  ranking?: readonly RankingRow[] | null;
   onRegion: (id: string) => void;
   step2: StepInfo;
   step3: StepInfo;
@@ -31,23 +35,23 @@ function Marker({ n, state }: { n: number; state: StepState }): JSX.Element {
   );
 }
 
-export function StepBar({ regions, regionId, onRegion, step2, step3 }: StepBarProps): JSX.Element {
+export function StepBar({ regions, regionId, ranking, onRegion, step2, step3 }: StepBarProps): JSX.Element {
   const stateWord = (s: StepState): string => (s === 'done' ? 'done' : s === 'current' ? 'current step' : 'not started');
   return (
     <ol className="wk-steps" aria-label="Steps">
       <li className="wk-step" data-state="done">
         <Marker n={1} state="done" />
         <div className="wk-step-body">
-          <label className="wk-step-label" htmlFor="wk-region">
-            Moon region
-          </label>
-          <select id="wk-region" className="select wk-step-select" value={regionId} onChange={(e): void => onRegion(e.target.value)}>
-            {regions.map((r: Region) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
+          <Select
+            id="wk-region"
+            className="wk-step-pick"
+            labelClassName="wk-step-label"
+            triggerClassName="wk-step-select"
+            label="Moon region"
+            value={regionId}
+            options={regionOptions(regions, ranking)}
+            onChange={onRegion}
+          />
         </div>
       </li>
       <li className="wk-step" data-state={step2.state} aria-current={step2.state === 'current' ? 'step' : undefined}>

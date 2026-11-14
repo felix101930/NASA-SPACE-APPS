@@ -8,3 +8,65 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
+
+/* Sun sweep indicator (3D side by side and Explore in 3D): the mark being shown is the one gold dot. */
+.sweep-now {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  min-height: 40px;
+  padding: 8px 12px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-label);
+  color: var(--text-2);
+}
+
+.sweep-now strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.sweep-marks {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.sweep-mark {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-3);
+  transition:
+    background-color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out);
+}
+
+.sweep-mark[data-state='done'] {
+  background: var(--text-3);
+}
+
+.sweep-mark[data-state='now'] {
+  background: var(--sun);
+  border-color: var(--sun);
+}
+
+.sweep-count,
+.sweep-moving {
+  color: var(--text-3);
+}
+
+.x3d-sweep-ctl {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.x3d-sweep-ctl .glyph-sun {
+  color: var(--sun);
+}
+
+.x3d-sweep-now {
+  flex-basis: 100%;
+}

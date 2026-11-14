@@ -276,6 +276,25 @@
   min-width: 164px;
 }
 
+/* Sweep: gold only on the start action; pause/stop are neutral; the running sweep's mark is the one gold dot. */
+.t3-sweep-ctl {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.t3-sweep-pause {
+  min-width: 120px;
+}
+
+.t3-sweep-pause .glyph-sun {
+  color: var(--sun);
+}
+
+.t3-sweep-now {
+  flex-basis: 100%;
+}
+
+
 .t3-sun-now {
   font-size: var(--fs-label);
   color: var(--text-3);
@@ -328,7 +347,7 @@
 
 .t3-more-body {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px 24px;
   align-items: end;
   margin-top: 12px;
@@ -1077,4 +1096,14 @@
   color: var(--text-2);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.t3-patch-line {
+  margin: 8px 0 0;
+  font-size: var(--fs-label);
+  color: var(--text-2);
+}
+
+.t3-section > .patchdots {
+  margin-top: 16px;
 }

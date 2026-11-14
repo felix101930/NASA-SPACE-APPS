@@ -163,3 +163,7 @@
   color: var(--text-2);
   white-space: nowrap;
 }
+
+.verdict-details .patchdots {
+  margin: 16px 0 8px;
+}

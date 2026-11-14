@@ -15,6 +15,8 @@ import { useApp } from '../store';
 import { HAZARD_IDS, type HazardId, type Meta } from '../types/contract';
 import { CreditsPanel } from '../components/Credits';
 import { InfoTip } from '../components/InfoTip';
+import { Select, type SelectOption } from '../components/Select';
+import { regionOptions } from '../lib/regionOptions';
 import { buildCredits, type CreditArea } from '../lib/credits';
 import '../styles/calgary.css';
 import {
@@ -963,6 +965,8 @@ function MatcherView({ data, onWalk }: { data: CalgaryData; onWalk: (w: CalgaryW
     return Array.from(m.entries()).map(([id, name]: [string, string]) => ({ id, name }));
   }, [data]);
   const [region, setRegion] = useState<string>(regions.some((r) => r.id === storeRegion) ? storeRegion : (regions[0]?.id ?? ''));
+  const ranking = useApp((s) => s.core?.summary?.ranking);
+  const regionOpts = useMemo((): SelectOption<string>[] => regionOptions(regions, ranking), [regions, ranking]);
   const [kind, setKind] = useState<'gentle' | 'steeper'>('gentle');
   const preset = data.presets.presets.find((p: CalgaryPreset): boolean => p.region === region && p.kind === kind) ?? null;
   const [pick, setPick] = useState<string | null>(null);
@@ -986,16 +990,14 @@ function MatcherView({ data, onWalk }: { data: CalgaryData; onWalk: (w: CalgaryW
     <>
       <p className="caption">{calgaryResult(data.presets.presets)}.</p>
       <div className="cg-controls">
-        <label className="field">
-          <span className="field-label">Moon region</span>
-          <select className="select" value={region} onChange={(e): void => setRegion(e.target.value)}>
-            {regions.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          className="field"
+          labelClassName="field-label"
+          label="Moon region"
+          value={region}
+          options={regionOpts}
+          onChange={setRegion}
+        />
         <div className="field">
           <span className="field-label" id="cg-kind">
             Moon route

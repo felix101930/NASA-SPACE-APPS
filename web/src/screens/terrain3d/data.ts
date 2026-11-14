@@ -3,7 +3,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { assetUrl, loadImage, loadJsonFrom, type Loaded, type Origin } from '../../data/loader';
 import { loadTile, type LoadedTile } from '../../data/tiles';
-import { computeShadowMask, sampleBilinear, type Grid } from '../../lib/terrain';
+import { sampleBilinear, type Grid } from '../../lib/terrain';
+import type { ShadowReply, ShadowRequest } from '../../workers/shadow.worker';
 import type { ShadowMode } from '../../store';
 import { isObj, type Region, type ShadowMask, type TileRef } from '../../types/contract';
 import { isAnnotations, type Annotations, type RimDrop, type TextureCell } from '../../types/annotations';
@@ -228,40 +229,99 @@ export interface ShadowShare {
   frac: number;
 }
 
+// The ray marching runs in a worker (workers/shadow.worker.ts): inline it blocked the page for tens to hundreds of
+// milliseconds per sun change. One job in flight per hook, the newest request wins, and at most 4 updates a second.
+
+let shadowWorker: Worker | null = null;
+let nextJob = 1;
+let nextGridKey = 1;
+const jobs = new Map<number, (r: ShadowReply) => void>();
+const gridKeys = new WeakMap<Grid, number>();
+
+function getShadowWorker(): Worker {
+  if (shadowWorker) return shadowWorker;
+  const w = new Worker(new URL('../../workers/shadow.worker.ts', import.meta.url), { type: 'module' });
+  w.onmessage = (e: MessageEvent<ShadowReply>): void => {
+    const cb = jobs.get(e.data.id);
+    if (!cb) return;
+    jobs.delete(e.data.id);
+    cb(e.data);
+  };
+  shadowWorker = w;
+  return w;
+}
+
+/** Runs one shadow job off the main thread. The grid is copied to the worker once per Grid object. */
+function shadowJob(g: Grid, type: 'frac' | 'mask', el: number, az: number, maxDist: number, done: (r: ShadowReply) => void): () => void {
+  const w = getShadowWorker();
+  let key = gridKeys.get(g);
+  if (key === undefined) {
+    key = nextGridKey++;
+    gridKeys.set(g, key);
+    const msg: ShadowRequest = { type: 'grid', key, data: g.data.slice(), size: g.size, res: g.res };
+    w.postMessage(msg);
+  }
+  const id = nextJob++;
+  jobs.set(id, done);
+  const req: ShadowRequest = { type, id, key, el, az, maxDist };
+  w.postMessage(req);
+  return (): void => {
+    jobs.delete(id);
+  };
+}
+
+const READOUT_MIN_MS = 250;
+
 export function useShadowShare(tile: LoadedTile | null, el: number, az: number): ShadowShare | null {
   const small = useMemo((): Grid | null => (tile ? downsample(tile.filled, READOUT_STEP) : null), [tile]);
   const [share, setShare] = useState<ShadowShare | null>(null);
   const smallRef = useRef<Grid | null>(small);
-  const pending = useRef<{ el: number; az: number } | null>(null);
+  const want = useRef<{ el: number; az: number } | null>(null);
+  const busy = useRef<boolean>(false);
   const timer = useRef<number | null>(null);
   const last = useRef<number>(0);
+  const gen = useRef<number>(0);
+  const pumpRef = useRef<() => void>((): void => undefined);
   smallRef.current = small;
 
+  pumpRef.current = (): void => {
+    const g = smallRef.current;
+    if (!g || busy.current || timer.current !== null || !want.current) return;
+    const wait = READOUT_MIN_MS - (performance.now() - last.current);
+    if (wait > 0) {
+      timer.current = window.setTimeout((): void => {
+        timer.current = null;
+        pumpRef.current();
+      }, wait);
+      return;
+    }
+    const p = want.current;
+    want.current = null;
+    busy.current = true;
+    last.current = performance.now();
+    const myGen = gen.current;
+    shadowJob(g, 'frac', p.el, p.az, g.size, (r: ShadowReply): void => {
+      busy.current = false;
+      if (myGen === gen.current && r.type === 'frac') setShare({ el: r.el, az: r.az, frac: r.frac });
+      pumpRef.current();
+    });
+  };
+
   useEffect((): void => {
+    gen.current += 1;
+    busy.current = false;
     setShare(null);
   }, [small]);
 
   useEffect((): void => {
     if (!small) return;
-    pending.current = { el, az };
-    if (timer.current !== null) return;
-    const wait = Math.max(30, 140 - (performance.now() - last.current));
-    timer.current = window.setTimeout((): void => {
-      timer.current = null;
-      const p = pending.current;
-      const g = smallRef.current;
-      pending.current = null;
-      if (!p || !g) return;
-      last.current = performance.now();
-      const m = computeShadowMask(g, p.el, p.az, g.size);
-      let k = 0;
-      for (let i = 0; i < m.length; i++) k += m[i];
-      setShare({ el: p.el, az: p.az, frac: k / m.length });
-    }, wait);
+    want.current = { el, az };
+    pumpRef.current();
   }, [small, el, az]);
 
   useEffect(
     (): (() => void) => (): void => {
+      gen.current += 1;
       if (timer.current !== null) window.clearTimeout(timer.current);
     },
     [],
@@ -357,8 +417,12 @@ export function useMaskTexture(
     const fallbackToCpu = (): void => {
       const t = window.setTimeout((): void => {
         if (!alive) return;
-        const m = computeShadowMask(tile.filled, el, az, 400);
-        setState({ texture: maskToTexture(m, tile.filled.size), note: `worked out in your browser for a ${el}° sun` });
+        cleanup.push(
+          shadowJob(tile.filled, 'mask', el, az, 400, (r: ShadowReply): void => {
+            if (!alive || r.type !== 'mask') return;
+            setState({ texture: maskToTexture(r.mask, r.size), note: `worked out in your browser for a ${el}° sun` });
+          }),
+        );
       }, 120);
       cleanup.push((): void => window.clearTimeout(t));
     };

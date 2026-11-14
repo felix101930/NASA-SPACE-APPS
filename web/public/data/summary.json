@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_utc": "2026-11-14T23:17:14Z",
+  "generated_utc": "2026-11-14T23:27:23Z",
   "pipeline_version": "match-0.1.0",
   "sources": [
    {
@@ -98,13 +98,13 @@
   "runtimes": {
    "moon_ref_s": 0.0,
    "earth_feats_s": 0.0,
-   "matching_s": 0.5,
+   "matching_s": 0.7,
    "windows_s": 0.0,
    "patchiness_s": 0.0,
    "weight_stability_s": 0.9,
    "classifier_s": 0.0,
    "synthetic_tests_s": 0.0,
-   "total_s": 1.5
+   "total_s": 1.7
   }
  },
  "ranking": [

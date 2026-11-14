@@ -421,6 +421,7 @@ export default function Walk(): JSX.Element {
       <StepBar
         regions={core.regions}
         regionId={region.id}
+        ranking={core.summary?.ranking}
         onRegion={setRegion}
         step2={{ state: step2, value: drawing && route.length < 2 ? 'Drawing: click the map' : (routeLabel ?? 'Not chosen yet') }}
         step3={{ state: step3, value: step3Value }}

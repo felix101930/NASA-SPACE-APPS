@@ -144,9 +144,8 @@ def sentence(metric: str, patch: str, ratio: float | None, earth_spread: float, 
     if patch == "similar":
         return f"Varies about as much as the Moon site {sp}"
     if patch == "smoother":
-        how = "hardly at all by comparison" if ratio < 0.1 else f"about {ratio:.1f}× as much"
-        return f"Smoother than the Moon site: varies {how} {sp}"
-    return f"Patchier than the Moon site: varies about {ratio:.1f}× as much {sp}"
+        return f"Smoother than the Moon site: varies less across its area {sp}"
+    return f"Patchier than the Moon site: varies more across its area {sp}"
 
 
 def compare(metric: str, moon_blocks: list[float] | None, earth_blocks: list[float] | None) -> dict:

@@ -2,10 +2,11 @@ import { useEffect, useState, type JSX } from 'react';
 import { HAZARDS, ROW_NAME, distanceFit } from '../content';
 import { Fit, HazardGlyph } from '../components/Glyphs';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
-import { Term, Why } from '../components/Term';
+import { Why } from '../components/Term';
+import { InfoTip } from '../components/InfoTip';
 import { loadOptionalJson } from '../data/loader';
 import { useApp, type CoreData } from '../store';
-import { HAZARD_IDS, isTransectsFile, type HazardId, type Match, type Meta, type RankingRow } from '../types/contract';
+import { HAZARD_IDS, isObj, isTransectsFile, type HazardId, type Match, type Meta, type RankingRow } from '../types/contract';
 import { CreditsPanel } from '../components/Credits';
 import { buildCredits, hasNasademCheck } from '../lib/credits';
 import { parseMethodExtras } from '../lib/methodExtras';
@@ -27,6 +28,47 @@ const GAP_METRIC: Record<HazardId, { metric: string; label: string; fmt: (v: num
   shadow: { metric: 'shadow_frac_el3', label: 'shadow', fmt: (v: number): string => `~${fmtNum(v * 100, 0)} pts` },
   texture: { metric: 'empty_cell_frac_el3', label: 'blank ground', fmt: (v: number): string => `~${fmtNum(v * 100, 0)} pts` },
 };
+
+/** Each ranking cell's headline measure, shown as the real-unit gap between the Moon region and its #1 Earth match. */
+const CELL_GAP: Record<HazardId, { metric: string; text: (d: number) => string; what: string }> = {
+  shadow: {
+    metric: 'shadow_frac_el3',
+    text: (d: number): string => `within ${pts(d)} of shadow`,
+    what: 'percentage points of ground in shadow at a 3° sun, averaged over all sun directions',
+  },
+  rim: {
+    metric: 'jump1km_p95_m',
+    text: (d: number): string => `drops within ${Math.max(1, Math.round(d))} m`,
+    what: 'height change over 1 km, 95th percentile (the big drops)',
+  },
+  texture: {
+    metric: 'empty_cell_frac_el3',
+    text: (d: number): string => `within ${pts(d)} featureless`,
+    what: 'percentage points of 1 km squares with nothing for a camera to track (3° sun)',
+  },
+};
+
+/** A share difference (0–1) as percentage points, never "0 pts": under half a point reads "within 1 pt". */
+function pts(d: number): string {
+  const v = Math.max(1, Math.round(d * 100));
+  return `${v} ${v === 1 ? 'pt' : 'pts'}`;
+}
+
+const TIMES_LINE = '× = how far off, compared with how much the Moon region varies within itself (under 0.5 = close)';
+
+/** Real-unit gap of the region's #1 Earth match for this hazard, from matches.json lights; null when missing. */
+function cellGap(core: CoreData, row: RankingRow, h: HazardId): string | null {
+  // per_hazard_best_site is a pipeline extra (not in the core contract); fall back to the rank-1 match.
+  const sites: unknown = 'per_hazard_best_site' in row ? row.per_hazard_best_site : null;
+  const raw: unknown = isObj(sites) ? sites[h] : null;
+  const best = typeof raw === 'string' ? raw : null;
+  const pool = core.matches.filter((m: Match): boolean => m.region_id === row.region_id && m.hazard === h);
+  const m = pool.find((x: Match): boolean => x.site_id === best) ?? pool.find((x: Match): boolean => x.rank === 1);
+  const l = m?.lights.find((x) => x.metric === CELL_GAP[h].metric);
+  if (!l) return null;
+  const d = Math.abs(l.earth - l.moon);
+  return Number.isFinite(d) ? CELL_GAP[h].text(d) : null;
+}
 
 function median(xs: number[]): number | null {
   if (!xs.length) return null;
@@ -169,8 +211,17 @@ export function Summary(): JSX.Element {
       <section className="panel" aria-labelledby="grid-h">
         <div className="panel-head">
           <h2 id="grid-h">Best Earth match, region by danger</h2>
-          <span className="caption">
-            Gap in × the Moon region’s <Term id="typicalSpread">typical spread</Term>
+          <span className="caption why-row">
+            Gap between the Moon region and its best Earth match
+            <InfoTip label="What do the gaps mean?" title="Reading a cell">
+              <p>
+                <strong>Shadow:</strong> {CELL_GAP.shadow.what}. <strong>Rim:</strong> {CELL_GAP.rim.what}. <strong>Texture:</strong>{' '}
+                {CELL_GAP.texture.what}.
+              </p>
+              <p>
+                Close / Partial / Far sums up every measure of that danger. Hover a cell for its × figure: {TIMES_LINE}.
+              </p>
+            </InfoTip>
           </span>
           {sample && <SampleChip what="This ranking" />}
         </div>
@@ -202,17 +253,19 @@ export function Summary(): JSX.Element {
                   {HAZARD_IDS.map((h: HazardId) => {
                     const d = r.per_hazard_best_distance?.[h];
                     const f = distanceFit(d);
+                    const gap = cellGap(core, r, h);
+                    const word = f ? (f === 'green' ? 'close' : f === 'amber' ? 'partial' : 'far') : 'no data';
                     return (
                       <td key={h}>
                         <button
                           type="button"
                           className="fit-cell"
-                          title={`${HAZARDS[h].name}: best Earth match ${fmtSpread(d)} the Moon region’s typical spread away (0× = identical)`}
-                          aria-label={`${regionName(r.region_id)}, ${HAZARDS[h].name}: ${f ? (f === 'green' ? 'close' : f === 'amber' ? 'partial' : 'far') : 'no data'}, ${fmtSpread(d)}. Open Earth matches.`}
+                          title={`${HAZARDS[h].name}: best Earth match ${gap ?? 'gap not available'} (${CELL_GAP[h].what}). ${fmtSpread(d)} · ${TIMES_LINE}.`}
+                          aria-label={`${regionName(r.region_id)}, ${HAZARDS[h].name}: ${word}${gap ? `, ${gap}` : ''} (${fmtSpread(d)} spread). Open Earth matches.`}
                           onClick={(): void => open(r.region_id, h)}
                         >
                           {f ? <Fit fit={f} /> : <span className="faint">—</span>}
-                          <span className="fit-dist">{fmtSpread(d)}</span>
+                          {gap && <span className="fit-dist">{gap}</span>}
                         </button>
                       </td>
                     );
@@ -228,6 +281,16 @@ export function Summary(): JSX.Element {
               <strong>How close?</strong> Typical gap of the #1 Earth match: {close.gaps.map((g) => g.text).join(', ')} · {close.nClose} of {close.n}{' '}
               close
             </span>
+          </div>
+        )}
+        {summary.patchiness && summary.patchiness.n_top1 > 0 && (
+          <div className="why-row sum-close sum-patch">
+            <span>
+              {summary.patchiness.n_similar_headline} of {summary.patchiness.n_top1} also vary about as much as their Moon site
+            </span>
+            <InfoTip label="What does ‘vary as much’ mean?" title="Patchiness">
+              <p>We also check whether the Earth square varies across its 25 patches as much as the Moon site does.</p>
+            </InfoTip>
           </div>
         )}
       </section>

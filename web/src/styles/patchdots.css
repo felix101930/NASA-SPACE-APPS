@@ -153,3 +153,10 @@
     display: none;
   }
 }
+
+/* The one-line patchiness sentence beside a match (matches.json patchiness_summary.text). */
+.patch-line {
+  margin: 0;
+  font-size: var(--fs-label);
+  color: var(--text-2);
+}
