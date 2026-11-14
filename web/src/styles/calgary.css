@@ -96,9 +96,10 @@
 .cg-bar > span {
   display: block;
   height: 100%;
-  border-radius: 0 4px 4px 0;
+  width: 100%;
   background: var(--text-2);
-  transition: width 240ms var(--ease-out);
+  transform-origin: left center;
+  transition: transform 240ms var(--ease-out);
 }
 
 .cg-cov-table tr:hover .cg-bar > span {
@@ -277,5 +278,421 @@
   }
   .cg-cov-table th[scope='row'] {
     width: 92px;
+  }
+}
+
+/* ================================================================ planner, map filters, comparison (Calgary) */
+
+/* Pins on these maps carry a number only; keep the active pin round. */
+.cg-map .pin[aria-current='true'],
+.ab-map .pin[aria-current='true'] {
+  min-width: 30px;
+}
+
+/* ---------------------------------------------------------------- planner card */
+
+.cg-plan {
+  gap: 12px;
+}
+
+.cg-plan-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cg-plan-empty .caption {
+  margin: 0;
+}
+
+.cg-chip-n {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.cg-plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.cg-plan-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cg-plan-head .caption {
+  margin: 0;
+}
+
+.cg-plan-name {
+  margin: 0;
+  font-size: var(--fs-h3);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.cg-reach[data-reached='true'] {
+  color: var(--text);
+  border-color: var(--text-3);
+}
+
+.cg-reach[data-reached='false'] {
+  color: var(--sun);
+  border-color: rgba(243, 181, 74, 0.55);
+  border-style: dashed;
+}
+
+.cg-plan-route {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cg-plan-where {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--text-3);
+}
+
+.cg-plan-park {
+  margin: -8px 0 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cg-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cg-facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.cg-facts dt {
+  font-size: var(--fs-caption);
+  color: var(--text-3);
+}
+
+.cg-facts dd {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cg-plan-stop {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: var(--fs-label);
+  color: var(--text);
+}
+
+.cg-routes {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.cg-route {
+  min-width: 28px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.cg-plan-moon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--fs-label);
+  color: var(--text);
+}
+
+.cg-plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------------- map: tooltip, start label, filters */
+
+.cg-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 240px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  color: var(--text-2);
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.cg-tip[hidden] {
+  display: none;
+}
+
+.cg-tip strong {
+  color: var(--text);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.cg-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.cg-start-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--sun);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1.5px var(--sun);
+}
+
+.cg-start-label {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.cg-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cg-filters > .caption {
+  margin: 0;
+}
+
+.cg-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+}
+
+.cg-filter-row > .caption {
+  margin-right: 4px;
+}
+
+.cg-need-btn[aria-pressed='true'],
+.cg-gap-btn[aria-pressed='true'] {
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
+  font-weight: 600;
+}
+
+.cg-gap-btn[aria-pressed='true'] {
+  background: var(--sun);
+  border-color: var(--sun);
+  color: var(--sun-ink);
+}
+
+.cg-gap-key {
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1.5px dashed var(--sun);
+}
+
+.cg-gap-btn[aria-pressed='true'] .cg-gap-key {
+  border-color: var(--sun-ink);
+}
+
+.cg-route-key {
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--sun);
+}
+
+.chip-button:focus-visible,
+.cg-cmp-item:focus-visible,
+.cg-unreached-btn:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- with vs without the Equity Index */
+
+.cg-cmp-line {
+  margin: 0;
+  font-size: var(--fs-label);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.cg-cmp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.cg-cmp-title {
+  margin: 0 0 8px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.cg-cmp-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cg-cmp-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 18px 12px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-label);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 140ms var(--ease-out),
+    background 140ms var(--ease-out);
+}
+
+.cg-cmp-item:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-3);
+}
+
+.cg-cmp-n {
+  color: var(--text-3);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.cg-cmp-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cg-cmp-need {
+  color: var(--text-3);
+  font-size: var(--fs-caption);
+}
+
+.cg-unreached-btn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cg-unreached-btn:hover .cg-unreached-name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- Alberta: map / satellite */
+
+.ab-base {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.ab-base-credit {
+  position: absolute;
+  left: 10px;
+  top: 48px;
+  z-index: 2;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(10, 11, 14, 0.75);
+  color: var(--text-2);
+  font-size: 11px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-cmp-item {
+    transition: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .cg-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cg-cmp-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
