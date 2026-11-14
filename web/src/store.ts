@@ -23,7 +23,7 @@ export const SCREENS: { id: ScreenId; label: string; short: string }[] = [
   { id: 'region', label: 'Earth matches', short: 'Earth' },
   { id: 'terrain', label: '3D side by side', short: '3D' },
   { id: 'walk', label: 'Astronaut walk', short: 'Walk' },
-  { id: 'summary', label: 'Summary & validation', short: 'Summary' },
+  { id: 'summary', label: 'Summary', short: 'Summary' },
   { id: 'alberta', label: 'Alberta & Calgary', short: 'Alberta' },
 ];
 
