@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_utc": "2026-11-14T20:01:43Z",
+  "generated_utc": "2026-11-14T21:13:27Z",
   "pipeline_version": "match-0.1.0",
   "sources": [
    {
@@ -82,11 +82,11 @@
    "partial": false,
    "sig": "9d99bc590ba72fe6"
   },
-  "ranking_method": "rehearsability = 1 / (1 + mean best distance + 0.5 × Σ max(0, best distance − 1.0)) over the 3 hazards; distance 1 ≈ one Moon-region IQR off",
+  "ranking_method": "rehearsability = 1 / (1 + mean best distance + 0.5 × Σ max(0, best distance − 0.5)) over the 3 hazards; distance 1 ≈ one Moon-region IQR off",
   "runtimes": {
    "moon_ref_s": 0.0,
    "earth_feats_s": 0.0,
-   "matching_s": 1.3,
+   "matching_s": 1.2,
    "windows_s": 0.0,
    "weight_stability_s": 2.6,
    "classifier_s": 0.0,
@@ -111,13 +111,13 @@
     "texture": "S01222"
    },
    "weakest_hazard": "rim",
-   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: 84 km SE of Pica, 0.37 Moon-IQRs off)."
+   "reason": "All three dangers have a close Earth match; the weakest is rim height jumps (best: 84 km SE of Pica, Chile, 0.37 × the Moon region's normal variation away)."
   },
   {
    "region_id": "nobile_rim_2",
    "rank": 2,
    "region_name": "Nobile Rim 2",
-   "rehearsability": 0.7882,
+   "rehearsability": 0.7797,
    "per_hazard_best_distance": {
     "shadow": 0.192,
     "rim": 0.5276,
@@ -129,13 +129,13 @@
     "texture": "S04676"
    },
    "weakest_hazard": "rim",
-   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: 289 km E of Kamenskoye, 0.53 Moon-IQRs off)."
+   "reason": "Close Earth matches for low-sun shadows and camera-navigation texture; only a partial match for rim height jumps (best: 289 km E of Kamenskoye, Russia, 0.53 × the Moon region's normal variation away)."
   },
   {
    "region_id": "mons_mouton_plateau",
    "rank": 3,
    "region_name": "Mons Mouton Plateau",
-   "rehearsability": 0.7806,
+   "rehearsability": 0.7762,
    "per_hazard_best_distance": {
     "shadow": 0.1887,
     "rim": 0.5147,
@@ -147,7 +147,7 @@
     "texture": "S01100"
    },
    "weakest_hazard": "rim",
-   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: 84 km SE of Pica, 0.51 Moon-IQRs off)."
+   "reason": "Close Earth matches for low-sun shadows and camera-navigation texture; only a partial match for rim height jumps (best: 84 km SE of Pica, Chile, 0.51 × the Moon region's normal variation away)."
   },
   {
    "region_id": "haworth",
@@ -165,31 +165,13 @@
     "texture": "S03631"
    },
    "weakest_hazard": "shadow",
-   "reason": "All three hazards have a close Earth match; the weakest is low-sun shadows (best: 48 km NW of Mosgiel, 0.45 Moon-IQRs off)."
-  },
-  {
-   "region_id": "mons_mouton",
-   "rank": 5,
-   "region_name": "Mons Mouton",
-   "rehearsability": 0.7446,
-   "per_hazard_best_distance": {
-    "shadow": 0.3311,
-    "rim": 0.6343,
-    "texture": 0.0638
-   },
-   "per_hazard_best_site": {
-    "shadow": "S00356",
-    "rim": "S02302",
-    "texture": "S02247"
-   },
-   "weakest_hazard": "rim",
-   "reason": "All three hazards have a close Earth match; the weakest is rim height jumps (best: 18 km SE of Deder, 0.63 Moon-IQRs off)."
+   "reason": "All three dangers have a close Earth match; the weakest is low-sun shadows (best: 48 km NW of Mosgiel, New Zealand, 0.45 × the Moon region's normal variation away)."
   },
   {
    "region_id": "nobile_rim_1",
-   "rank": 6,
+   "rank": 5,
    "region_name": "Nobile Rim 1",
-   "rehearsability": 0.7301,
+   "rehearsability": 0.7203,
    "per_hazard_best_distance": {
     "shadow": 0.5371,
     "rim": 0.4932,
@@ -201,13 +183,31 @@
     "texture": "S01331"
    },
    "weakest_hazard": "shadow",
-   "reason": "All three hazards have a close Earth match; the weakest is low-sun shadows (best: 18 km SW of Bustamante, 0.54 Moon-IQRs off)."
+   "reason": "Close Earth matches for rim height jumps and camera-navigation texture; only a partial match for low-sun shadows (best: 18 km SW of Bustamante, Mexico, 0.54 × the Moon region's normal variation away)."
+  },
+  {
+   "region_id": "mons_mouton",
+   "rank": 6,
+   "region_name": "Mons Mouton",
+   "rehearsability": 0.7091,
+   "per_hazard_best_distance": {
+    "shadow": 0.3311,
+    "rim": 0.6343,
+    "texture": 0.0638
+   },
+   "per_hazard_best_site": {
+    "shadow": "S00356",
+    "rim": "S02302",
+    "texture": "S02247"
+   },
+   "weakest_hazard": "rim",
+   "reason": "Close Earth matches for low-sun shadows and camera-navigation texture; only a partial match for rim height jumps (best: 18 km SE of Deder, Ethiopia, 0.63 × the Moon region's normal variation away)."
   },
   {
    "region_id": "de_gerlache_rim_2",
    "rank": 7,
    "region_name": "de Gerlache Rim 2",
-   "rehearsability": 0.6791,
+   "rehearsability": 0.6024,
    "per_hazard_best_distance": {
     "shadow": 0.8748,
     "rim": 0.3252,
@@ -219,13 +219,13 @@
     "texture": "S02247"
    },
    "weakest_hazard": "shadow",
-   "reason": "All three hazards have a close Earth match; the weakest is low-sun shadows (best: 30 km W of Calama, 0.87 Moon-IQRs off)."
+   "reason": "Close Earth matches for rim height jumps and camera-navigation texture; only a partial match for low-sun shadows (best: 30 km W of Calama, Chile, 0.87 × the Moon region's normal variation away)."
   },
   {
    "region_id": "malapert_massif",
    "rank": 8,
    "region_name": "Malapert Massif",
-   "rehearsability": 0.6021,
+   "rehearsability": 0.5187,
    "per_hazard_best_distance": {
     "shadow": 1.1212,
     "rim": 0.5341,
@@ -237,13 +237,13 @@
     "texture": "S02247"
    },
    "weakest_hazard": "shadow",
-   "reason": "No close Earth match for low-sun shadows; weakest is low-sun shadows (best: 109 km SE of Bor-Udzuur, 1.12 Moon-IQRs off)."
+   "reason": "Close Earth match for camera-navigation texture; only a partial match for low-sun shadows and rim height jumps; weakest is low-sun shadows (best: 109 km SE of Bor-Udzuur, Mongolia, 1.12 × the Moon region's normal variation away)."
   },
   {
    "region_id": "cabeus_b_peak",
    "rank": 9,
    "region_name": "Peak near Cabeus B",
-   "rehearsability": 0.3768,
+   "rehearsability": 0.3418,
    "per_hazard_best_distance": {
     "shadow": 2.3014,
     "rim": 0.5436,
@@ -255,7 +255,7 @@
     "texture": "S04188"
    },
    "weakest_hazard": "shadow",
-   "reason": "No close Earth match for low-sun shadows; weakest is low-sun shadows (best: 109 km SE of Bor-Udzuur, 2.30 Moon-IQRs off)."
+   "reason": "Close Earth match for camera-navigation texture; only a partial match for rim height jumps; only a far match for low-sun shadows; weakest is low-sun shadows (best: 109 km SE of Bor-Udzuur, Mongolia, 2.30 × the Moon region's normal variation away)."
   }
  ],
  "validation": {
@@ -275,12 +275,13 @@
    "decoy_median_pct": 60.3,
    "screen_report_auc_original13": 0.803,
    "screen_report_auc_with_heldout_documented": 0.803,
-   "recomputed_stage1_auc_original13": 0.803,
+   "recomputed_stage1_auc_original13": 0.795,
    "recomputed_stage1_n": {
     "known": 13,
-    "decoy": 9
+    "decoy": 9,
+    "heldout_documented": 7
    },
-   "heldout_documented_note": "7 held-out documented analogs exist but none has a stage-1 rank yet; AUC uses the original 13 only",
+   "recomputed_stage1_auc_with_heldout_documented": 0.822,
    "final_30m_auc": 0.726,
    "final_30m_n": {
     "known": 13,
@@ -672,7 +673,7 @@
   "where_it_fails": [
    "Boulders smaller than ~30 m are invisible: both worlds are compared on a 30 m grid",
    "Earth skylight fills shadows; lunar shadows are pitch black, so shadow contrast is understated on Earth",
-   "Vegetation and buildings sit inside the Copernicus surface model; we mask them with ESA WorldCover (DSM-safe filter) but low shrubs and grass remain",
+   "Vegetation and buildings sit inside the Copernicus surface model (elevation data that includes trees and buildings); we mask them with ESA WorldCover but low shrubs and grass remain",
    "Atmospheric refraction near the horizon: windows with the sun below 1° are refraction-sensitive (a few tenths of a degree can shift them by minutes)",
    "Low sun lasts minutes on Earth but days on the Moon, so rehearsal windows are short",
    "The Earth search covers only ~5.8% of the planet's bare land (a seeded sample of 15 km windows), so better analogs may exist unsampled",

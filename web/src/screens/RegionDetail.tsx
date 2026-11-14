@@ -5,6 +5,8 @@ import { CoordBadge } from '../components/DangerProfile';
 import { Fit, FitGlyph, HazardGlyph, VerdictGlyph, type VerdictKind } from '../components/Glyphs';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
 import { localSolarTime } from '../lib/solar';
+import { placeName } from '../lib/placeName';
+import { fmtRock, plainNote } from '../lib/plain';
 import { matchesFor, useApp, useRegion, type CoreData } from '../store';
 import { HAZARD_IDS, type EarthSite, type HazardId, type Light, type Match, type RehearsalWindow } from '../types/contract';
 
@@ -71,9 +73,14 @@ function Verdict({ kind, title, items, empty }: { kind: VerdictKind; title: stri
       </h4>
       {items.length ? (
         <ul>
-          {items.map((t: string) => (
-            <li key={t}>{t}</li>
-          ))}
+          {items.map((t: string) => {
+            const n = plainNote(t);
+            return (
+              <li key={t} title={n.title}>
+                {n.text}
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <p className="caption">{empty}</p>
@@ -110,14 +117,20 @@ function SiteCard({
   onToggle: () => void;
   onCompare: () => void;
 }): JSX.Element {
+  const place = placeName(site);
+  const rock = fmtRock(site.rock.lith);
   return (
     <article className="site-card" data-active={active}>
       <button type="button" className="site-card-head" onClick={onToggle} aria-expanded={active}>
         <span className="rank">{match.rank}</span>
         <span className="site-card-title">
-          <span className="site-name">{site.name}</span>
+          <span className="site-name" title={place.title}>
+            {place.label}
+          </span>
           <span className="caption">
-            {site.country} · {site.category.replace(/_/g, ' ')} · {site.rock.lith}
+            {place.region ? `${place.region} · ` : ''}
+            {site.category.replace(/_/g, ' ')}
+            {rock ? ` · ${rock}` : ''}
             {site.rock.anorthosite ? ' · anorthosite' : ''}
           </span>
         </span>
@@ -193,7 +206,7 @@ function SiteCard({
 function resultLine(regionName: string, hazard: HazardId, best: Match | undefined, site: EarthSite | undefined): string {
   if (!best || !site) return `No Earth match yet for ${regionName}, ${HAZARDS[hazard].name.toLowerCase()}.`;
   const c = countFits(best);
-  return `${regionName} → ${site.name} reproduces ${c.green} of ${best.lights.length} ${HAZARD_NOUN[hazard]} metrics`;
+  return `${regionName} → ${placeName(site).label} reproduces ${c.green} of ${best.lights.length} ${HAZARD_NOUN[hazard]} metrics`;
 }
 
 export function RegionDetail(): JSX.Element {
@@ -215,7 +228,7 @@ export function RegionDetail(): JSX.Element {
       list.flatMap((m: Match): MapPoint[] => {
         const s = core.siteById.get(m.site_id);
         return s
-          ? [{ id: s.id, lat: s.lat, lon: s.lon, label: String(m.rank), title: `#${m.rank} ${s.name}`, active: s.id === activeId }]
+          ? [{ id: s.id, lat: s.lat, lon: s.lon, label: String(m.rank), title: `#${m.rank} ${placeName(s).title}`, active: s.id === activeId }]
           : [];
       }),
     [list, core, activeId],
@@ -239,15 +252,15 @@ export function RegionDetail(): JSX.Element {
         result={resultLine(region.name, hazard, best, best ? core.siteById.get(best.site_id) : undefined)}
         method={
           <p>
-            For each hazard, the three Earth sites whose terrain and light reproduce it most closely. Each metric is compared with the Moon
-            region’s own spread (its interquartile range) and marked close, partial or far. There is no overall “% Moon-like” score, on
+            For each of the 3 dangers, the three Earth sites whose terrain and light reproduce it most closely. Each metric is compared
+            with the Moon region’s normal variation (its interquartile range) and marked close, partial or far. There is no overall “% Moon-like” score, on
             purpose.
           </p>
         }
       />
 
       <div className="tabs-row">
-        <div className="tabs" role="tablist" aria-label="Hazard">
+        <div className="tabs" role="tablist" aria-label="Danger">
           {HAZARD_IDS.map((h: HazardId) => (
             <button key={h} type="button" role="tab" className="tab" aria-selected={h === hazard} onClick={(): void => setHazard(h)}>
               <HazardGlyph hazard={h} />
@@ -277,7 +290,7 @@ export function RegionDetail(): JSX.Element {
           <EarthMap points={points} onSelect={onSelect} fitKey={`${regionId}:${hazard}`} />
         </div>
         <div className="site-list">
-          {list.length === 0 && <p className="muted">No matches for this region and hazard in matches.json.</p>}
+          {list.length === 0 && <p className="muted">No matches for this region and danger in matches.json.</p>}
           {list.map((m: Match) => {
             const site = core.siteById.get(m.site_id);
             if (!site) {

@@ -7,7 +7,7 @@ import { heightsFromSlopes } from '../../lib/match';
 import type { Region, TransectItem } from '../../types/contract';
 import type { ResultRow } from '../../workers/dtw.worker';
 import { matchQuality, type Findback } from './findback';
-import { fmtKm, fmtLatLon, headingWord, placeLabel, type SiteInfo } from './place';
+import { fmtKm, fmtLatLon, headingWord, sitePlace, type SiteInfo } from './place';
 import { TwinChart } from './ProfileChart';
 import { TwinMap, type TwinPath } from './TwinMap';
 
@@ -47,7 +47,7 @@ const nf = new Intl.NumberFormat('en-US');
 export function Results(props: ResultsProps): JSX.Element {
   const { region, data, dataErr, busy, stale, query, found, sel } = props;
   const current = found[sel] ?? null;
-  const place = (id: string): ReturnType<typeof placeLabel> => placeLabel(data?.sites.get(id), id);
+  const place = (id: string): ReturnType<typeof sitePlace> => sitePlace(data?.sites.get(id), id);
 
   const path = useMemo(
     (): TwinPath | null =>
@@ -56,7 +56,7 @@ export function Results(props: ResultsProps): JSX.Element {
             key: `${current.row.i}:${current.row.reversed ? 'r' : 'f'}`,
             start: [current.item.lon0, current.item.lat0],
             end: [current.item.lon1, current.item.lat1],
-            label: placeLabel(data?.sites.get(current.item.site_id), current.item.site_id).full,
+            label: sitePlace(data?.sites.get(current.item.site_id), current.item.site_id).label,
           }
         : null,
     [current, data],
@@ -109,10 +109,11 @@ export function Results(props: ResultsProps): JSX.Element {
 
       <div className="wk-twin-head">
         <p className="wk-rank">{sel === 0 ? `Best of ${nf.format(data.n)} Earth paths` : `Runner-up ${sel + 1} of ${found.length}`}</p>
-        <h2 id="wk-twin-title" title={p.full}>
-          {p.full}
+        <h2 id="wk-twin-title" title={p.title}>
+          {p.label}
         </h2>
         <p className="caption">
+          {p.region ? `${p.region} · ` : ''}
           {fmtLatLon(current.item.lat0, current.item.lon0)} · a straight {fmtKm(current.item.length_m)} walk heading {heading}
         </p>
         {quality && (
@@ -168,7 +169,7 @@ export function Results(props: ResultsProps): JSX.Element {
         moonSlopes={query.slopes}
         earthSlopes={current.slopes}
         moonLabel={`Moon · ${region.name}`}
-        earthLabel={`Earth · ${p.short}`}
+        earthLabel={`Earth · ${p.label}`}
       />
 
 
@@ -195,8 +196,8 @@ export function Results(props: ResultsProps): JSX.Element {
                 <tr key={`${f.row.i}`} data-active={i === sel} onClick={(): void => props.onSel(i)}>
                   <td className="r">{i + 1}</td>
                   <td>
-                    <button type="button" className="row-btn" aria-pressed={i === sel} title={fp.remote ? fp.full : undefined} onClick={(): void => props.onSel(i)}>
-                      {fp.short}
+                    <button type="button" className="row-btn" aria-pressed={i === sel} title={fp.title} onClick={(): void => props.onSel(i)}>
+                      {fp.label}
                     </button>
                   </td>
                   <td className="r">{fmtKm(f.item.length_m)}</td>
@@ -207,7 +208,7 @@ export function Results(props: ResultsProps): JSX.Element {
             })}
           </tbody>
         </table>
-        <p className="caption">{props.note} “Remote” places are more than 100 km from the nearest named town; hover for the exact spot.</p>
+        <p className="caption">{props.note} Hover a place for its region and exact coordinates.</p>
       </div>
 
       <div className="wk-actions">

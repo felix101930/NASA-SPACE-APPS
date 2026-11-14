@@ -2,6 +2,7 @@
 import type { JSX } from 'react';
 import { Fit, SunGlyph, VerdictGlyph, type VerdictKind } from '../../components/Glyphs';
 import type { LightRow, Match, RehearsalWindow } from '../../types/contract';
+import { plainNote } from '../../lib/plain';
 import {
   compass,
   fmtMinutes,
@@ -124,8 +125,8 @@ export function EvidenceTable({ match, regionName, placeLabel }: { match: Match;
         </table>
       </div>
       <p className="t3-footnote">
-        “Close” means the Earth value sits inside the Moon’s typical spread (the Moon value ± half its interquartile range across the
-        tile); “Partial” is within twice that; “Far” is beyond it.
+        “Close” means the Earth value sits inside the Moon’s typical spread (the middle half of values across the tile, centred on the
+        Moon value); “Partial” is within twice that; “Far” is beyond it.
       </p>
     </section>
   );
@@ -144,9 +145,14 @@ function NoteBox({ kind, title, items, empty }: { kind: VerdictKind; title: stri
       </h3>
       {items.length ? (
         <ul>
-          {items.map((t: string) => (
-            <li key={t}>{t}</li>
-          ))}
+          {items.map((t: string) => {
+            const n = plainNote(t);
+            return (
+              <li key={t} title={n.title}>
+                {n.text}
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <p className="t3-note-empty">{empty}</p>
@@ -174,20 +180,32 @@ export function WindowsList({
   placeLabel,
   activeIndex,
   onPick,
+  open,
+  onOpenChange,
 }: {
   windows: RehearsalWindow[];
   placeLabel: string;
   activeIndex: number | null;
   onPick: (i: number) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }): JSX.Element {
   return (
-    <section className="t3-section" aria-labelledby="t3-windows-h">
-      <div className="t3-section-head t3-section-head-col">
-        <h2 id="t3-windows-h">When to go</h2>
-        <p className="t3-section-sub">
-          Times when the sun at {placeLabel} sits as low as it does at the lunar south pole. Pick one to light both views with that sun.
-        </p>
-      </div>
+    <details
+      id="t3-all-dates"
+      className="t3-section t3-dates"
+      open={open}
+      onToggle={(e): void => onOpenChange(e.currentTarget.open)}
+    >
+      <summary className="t3-dates-summary">
+        <h2>All rehearsal dates</h2>
+        <span className="t3-section-sub">
+          {windows.length ? `${windows.length} ${windows.length === 1 ? 'date' : 'dates'} in the next year` : 'none in the next year'}
+        </span>
+      </summary>
+      <p className="t3-section-sub">
+        Times when the sun at {placeLabel} sits as low as it does at the lunar south pole. Pick one to light both views with that sun.
+      </p>
       {windows.length === 0 ? (
         <p className="t3-note-empty">No low-sun windows were found for this site in the search period.</p>
       ) : (
@@ -214,6 +232,6 @@ export function WindowsList({
           })}
         </ul>
       )}
-    </section>
+    </details>
   );
 }

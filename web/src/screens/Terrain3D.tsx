@@ -5,7 +5,10 @@ import { TERRAIN_KM } from '../components/terrainGeometry';
 import { mapToPixel } from '../lib/terrain';
 import { matchesFor, useApp, useRegion, type CoreData } from '../store';
 import { HAZARD_IDS, type EarthSite, type HazardId, type LightRow, type Match, type Region, type RehearsalWindow, type ShadowMask } from '../types/contract';
-import { buildVerdict, compass, HAZARD_TAB, pct0, type Verdict } from './terrain3d/copy';
+import { HAZARDS } from '../content';
+import { avgNote, avgShadowAt, dirWord } from '../lib/shadow';
+import { fmtLatLon, placeName, type PlaceName } from '../lib/placeName';
+import { buildVerdict, compass, fmtMinutes, HAZARD_TAB, pct0, windowDate, windowMinutes, windowTime, type Verdict } from './terrain3d/copy';
 import {
   moonRimSegs,
   useAnnotations,
@@ -18,7 +21,6 @@ import {
   type ShadowShare,
 } from './terrain3d/data';
 import { EvidenceTable, NotesBoxes, WindowsList } from './terrain3d/Evidence';
-import { placeName, type PlaceName } from './terrain3d/places';
 import { Pane } from './terrain3d/Scene';
 import './terrain3d/terrain3d.css';
 
@@ -33,7 +35,40 @@ const NO_MASKS: ShadowMask[] = [];
 
 function sitePlace(site: EarthSite, match: Match | null): PlaceName {
   const name = match && 'site_name' in match && typeof match.site_name === 'string' ? match.site_name : site.name;
-  return placeName(name, site.country, site.lat, site.lon);
+  const regionLabel = 'region_label' in site && typeof site.region_label === 'string' ? site.region_label : null;
+  return placeName({ name, country: site.country, lat: site.lat, lon: site.lon, region_label: regionLabel });
+}
+
+const SHORT_DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+
+function shortDate(w: RehearsalWindow): string {
+  const d = new Date(w.start_utc);
+  return Number.isNaN(d.getTime()) ? w.start_utc.slice(0, 10) : SHORT_DATE.format(d);
+}
+
+/** Index of the next window from now (windows are searched from today), else the first one. */
+function nextWindowIndex(windows: RehearsalWindow[]): number {
+  const now = Date.now();
+  const i = windows.findIndex((w: RehearsalWindow): boolean => new Date(w.start_utc).getTime() >= now);
+  return i >= 0 ? i : windows.length ? 0 : -1;
+}
+
+function median(v: number[]): number | null {
+  if (!v.length) return null;
+  const s = [...v].sort((a: number, b: number): number => a - b);
+  const k = Math.floor(s.length / 2);
+  return s.length % 2 ? s[k] : (s[k - 1] + s[k]) / 2;
+}
+
+/** "On Earth this low sun lasts about 3 minutes; at the Moon's pole it lasts for days." */
+function lowSunInsight(windows: RehearsalWindow[], site: EarthSite): string | null {
+  const mins = windows.map(windowMinutes).filter((m: number | null): m is number => m !== null && Number.isFinite(m));
+  const m = median(mins);
+  if (m === null) return null;
+  if (m >= 60) {
+    return `At ${Math.abs(site.lat).toFixed(0)}° ${site.lat >= 0 ? 'N' : 'S'} the sun skims the horizon, so this low sun lasts about ${fmtMinutes(m)} here, far longer than at most Earth sites; at the Moon’s pole it lasts for days.`;
+  }
+  return `On Earth this low sun lasts about ${fmtMinutes(m)}; at the Moon’s pole it lasts for days.`;
 }
 
 /** Grid azimuth of true north on a UTM Earth tile (pipeline extra; 0 when absent). */
@@ -152,7 +187,7 @@ function Pickers({
               >
                 <HazardGlyph hazard={h} />
                 <span>{HAZARD_TAB[h].name}</span>
-                <span className="t3-hz-mission">{HAZARD_TAB[h].mission}</span>
+                <span className="t3-hz-mission">{HAZARDS[h].mission}</span>
               </button>
             ))}
           </div>
@@ -177,7 +212,7 @@ function Pickers({
               <span className="t3-chip-rank">#{c.match?.rank ?? '–'}</span>
               <span className="t3-chip-text">
                 <span className="t3-chip-name">{c.place.label}</span>
-                <span className="t3-chip-sub">{c.place.sub ?? 'remote site · hover for exact spot'}</span>
+                <span className="t3-chip-sub">{c.place.region ?? fmtLatLon(c.site.lat, c.site.lon)}</span>
               </span>
             </button>
           ))}
@@ -229,6 +264,7 @@ export default function Terrain3D(): JSX.Element {
   const sweep = useSunSweep();
   const [lift, setLift] = useState<boolean>(false);
   const [activeWindow, setActiveWindow] = useState<{ key: string; el: number; az: number } | null>(null);
+  const [datesOpen, setDatesOpen] = useState<boolean>(false);
 
   // Deep links (Earth matches, Walk) set a site; if it is a pick for another danger in this region, follow it.
   useEffect((): void => {
@@ -315,9 +351,13 @@ export default function Terrain3D(): JSX.Element {
   };
   const activeW = activeIdx >= 0 ? windows[activeIdx] : null;
 
-  // Per-hazard readouts and captions.
+  // Per-hazard readouts and captions. Live shadow shares are for ONE sun direction; the profile and table
+  // values are averaged over all directions, so every single-direction figure says so and shows the average.
   const elTxt = `${el.toFixed(el % 1 ? 1 : 0)}°`;
   const sunFrom = `from the ${compass(az)} of the tile`;
+  const moonAvg = avgShadowAt(el, region.hazards.shadow.metrics, region.extras);
+  const earthAvg = avgShadowAt(el, site.metrics);
+  const oneSun = `sun from the ${dirWord(az)} at ${elTxt}`;
   let moonReadout: ReactNode;
   let earthReadout: ReactNode;
   let earthNote: ReactNode = null;
@@ -329,9 +369,8 @@ export default function Terrain3D(): JSX.Element {
     earthReadout = <Readout big={eTop ? `${Math.round(eTop.absDh)} m` : '…'} small="biggest height change over 1 km" />;
     caption = (
       <>
-        <strong>Orange lines:</strong> the three biggest height changes over 1 km on each tile, found with the same scan (every point, 16
-        directions, picks at least 1.5 km apart). The dot marks the high end. A drop like this is what Hakuto-R’s software rejected as sensor
-        error.
+        <strong>Orange lines</strong> = the three biggest height changes over 1 km on each view; the dot marks the high end. A drop like this
+        is what Hakuto-R’s software rejected as a sensor error.
       </>
     );
   } else if (hazard === 'texture') {
@@ -343,29 +382,41 @@ export default function Terrain3D(): JSX.Element {
     earthNote = <>Pipeline figure. Which Earth squares are empty isn’t mapped yet, so only the 1 km grid is drawn here.</>;
     caption = (
       <>
-        <strong>Pink squares on the Moon:</strong> 1 km squares where a camera finds no landmark at a 3° sun from at least half of 8 sun
-        directions; stronger pink means empty from more of them. Too little surface texture is what left Ingenuity’s navigation with too little to work with.
+        <strong>Pink</strong> = squares where a camera finds nothing to track (what tripped up Ingenuity). Darker pink = worse.
       </>
     );
   } else {
-    moonReadout = <Readout big={shareBig(moonShare)} small={`at a ${elTxt} sun`} />;
-    earthReadout = <Readout big={shareBig(earthShare)} small={`at the same ${elTxt} sun`} />;
-    caption = (
+    moonReadout = <Readout big={shareBig(moonShare)} small={`${oneSun}${moonAvg !== null ? ` · ${pct0(moonAvg)} averaged over all directions` : ''}`} />;
+    earthReadout = <Readout big={shareBig(earthShare)} small={`same sun${earthAvg !== null ? ` · ${pct0(earthAvg)} averaged over all directions` : ''}`} />;
+    caption = earthShare ? (
       <>
-        <strong>
-          {moonShare ? `${pct0(moonShare.frac)} of ${region.name} is dark at a ${elTxt} sun` : `Measuring the shadow at a ${elTxt} sun…`}
-        </strong>
-        {moonShare ? ' — long low-sun shadows like these are a danger IM-2 faced. ' : ' '}
-        {earthShare ? `Under the same sun, ${pct0(earthShare.frac)} of ${place.label} is dark.` : ''}
+        Long low-sun shadows like these were one of the things IM-2 faced. Under the same sun, {pct0(earthShare.frac)} of {place.label} is
+        dark{earthAvg !== null ? ` ${avgNote(earthAvg)}` : ''}.
       </>
-    );
+    ) : null;
   }
-  const darkNote =
-    hazard === 'shadow'
-      ? null
-      : moonShare
-        ? `Black ground is real shadow: at this ${elTxt} sun ${pct0(moonShare.frac)} of ${region.name} gets no direct light.`
-        : null;
+  const darkNote = moonShare ? (
+    <>
+      <strong>Black</strong> = real shadow: at a {elTxt} sun from the {dirWord(az)} of the tile, {pct0(moonShare.frac)} of {region.name} gets no
+      light{moonAvg !== null ? ` ${avgNote(moonAvg)}` : ''}.
+    </>
+  ) : (
+    <>Measuring the shadow at a {elTxt} sun…</>
+  );
+
+  // When to go: the next window, chips beside the sun presets, and the full list on demand.
+  const nextIdx = nextWindowIndex(windows);
+  const nextW = nextIdx >= 0 ? windows[nextIdx] : null;
+  const insight = lowSunInsight(windows, site);
+  const openDates = (): void => {
+    setDatesOpen(true);
+    window.requestAnimationFrame((): void =>
+      document.getElementById('t3-all-dates')?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      }),
+    );
+  };
 
   return (
     <div className="t3">
@@ -391,6 +442,29 @@ export default function Terrain3D(): JSX.Element {
         )}
       </div>
 
+      {match && (
+        <div className="t3-when">
+          {nextW ? (
+            <p className="t3-when-line">
+              <SunGlyph size={14} />
+              <span>
+                <strong>Next chance to see this on site:</strong> {windowDate(nextW)}, {windowTime(nextW)} · sun {nextW.sun_el.toFixed(1)}° from
+                the {dirWord(nextW.sun_az)}
+                {windowMinutes(nextW) !== null ? ` · lasts ~${fmtMinutes(windowMinutes(nextW) ?? 0)}` : ''}
+              </span>
+              {windows.length > 1 && (
+                <button type="button" className="link-btn t3-when-more" aria-controls="t3-all-dates" onClick={openDates}>
+                  {windows.length - 1} more {windows.length - 1 === 1 ? 'date' : 'dates'} ▾
+                </button>
+              )}
+            </p>
+          ) : (
+            <p className="t3-when-line">No low-sun window at this site in the next year (for example, polar night at this latitude).</p>
+          )}
+          {insight && <p className="t3-when-insight">{insight}</p>}
+        </div>
+      )}
+
       <div className="t3-sunbar">
         <div className="t3-sunbar-main">
           <span className="t3-pick-label" id="t3-sun-label">
@@ -410,6 +484,27 @@ export default function Terrain3D(): JSX.Element {
               </button>
             ))}
           </div>
+          {windows.length > 0 && (
+            <div className="t3-sun-presets t3-sun-dates" role="group" aria-label="Light both views with the sun of a rehearsal date at the Earth site">
+              <span className="t3-sun-dates-label">On site:</span>
+              {windows.slice(0, 4).map((w: RehearsalWindow, i: number) => (
+                <button
+                  key={`${w.start_utc}-${i}`}
+                  type="button"
+                  aria-pressed={activeIdx === i}
+                  title={`${windowDate(w)}, ${windowTime(w)} · sun ${w.sun_el.toFixed(1)}° from the ${dirWord(w.sun_az)}`}
+                  onClick={(): void => pickWindow(i)}
+                >
+                  {shortDate(w)}
+                </button>
+              ))}
+              {windows.length > 4 && (
+                <button type="button" onClick={openDates} aria-controls="t3-all-dates">
+                  …
+                </button>
+              )}
+            </div>
+          )}
           <button type="button" className="btn btn-primary t3-sweep" aria-pressed={sweep.sweeping} onClick={sweep.sweeping ? sweep.stop : sweep.start}>
             <SunGlyph />
             {sweep.sweeping ? 'Stop the sweep' : 'Sweep the sun'}
@@ -520,7 +615,7 @@ export default function Terrain3D(): JSX.Element {
           world="Earth"
           name={place.label}
           nameTitle={place.title}
-          sub={`${place.sub ? `${place.sub} · ` : ''}30 m heights · 15 × 15 km`}
+          sub={`${place.region ? `${place.region} · ` : ''}30 m heights · 15 × 15 km`}
           upNote="up = north"
           tile={earth.tile}
           error={earth.error}
@@ -540,10 +635,20 @@ export default function Terrain3D(): JSX.Element {
       </div>
 
       <div className="t3-caption">
-        <p>
-          {caption}
-          {darkNote ? <span className="t3-caption-dark"> {darkNote}</span> : null}
-        </p>
+        <div className="t3-caption-lines">
+          {hazard === 'shadow' ? (
+            <>
+              <p>{darkNote}</p>
+              {caption && <p>{caption}</p>}
+            </>
+          ) : (
+            <>
+              {caption && <p>{caption}</p>}
+              <p>{darkNote}</p>
+            </>
+          )}
+          {walk && walk.regionId === region.id && <p className="t3-caption-dark">The white line is your drawn walk.</p>}
+        </div>
         <label className="check t3-lift">
           <input type="checkbox" checked={lift} onChange={(e): void => setLift(e.target.checked)} />
           Show terrain in shadow
@@ -556,18 +661,34 @@ export default function Terrain3D(): JSX.Element {
           uses the same direction measured from the top of its tile.
         </p>
       )}
-      <p className="t3-fine">
-        Same scale on both: 15 × 15 km, 30 m grid, the same vertical exaggeration and one sun. Drag either view; the other follows. The dark
-        percentages are worked out in your browser from true heights (90 m steps). Heights are drawn exaggerated, so the 3D sun is raised by
-        the same factor: shadows cover the same ground they would on the real terrain.
-        {walk && walk.regionId === region.id ? ' The white line is your drawn walk.' : ''}
-      </p>
+      <details className="t3-more t3-drawn">
+        <summary>How this is drawn</summary>
+        <div className="t3-drawn-body">
+          <p>
+            Same 15 km area, same scale, same sun. Drag one view and the other follows. Heights are exaggerated so the shape is easy to see,
+            but the shadows still fall where they would on the real ground.
+          </p>
+          <p className="t3-fine">
+            Both views use a 30 m grid. The dark percentages are worked out in your browser from true heights in 90 m steps, for the one sun
+            direction shown; the profile and table figures are averaged over all sun directions. Pink squares are 1 km squares with no camera
+            landmark at a 3° sun from at least half of 8 sun directions. Orange lines come from a scan of every point in 16 directions, with
+            picks at least 1.5 km apart. Because heights are exaggerated, the 3D sun is raised by the same factor.
+          </p>
+        </div>
+      </details>
 
       {match && (
         <>
           <EvidenceTable match={match} regionName={region.name} placeLabel={place.label} />
           <NotesBoxes match={match} />
-          <WindowsList windows={windows.slice(0, 6)} placeLabel={place.label} activeIndex={activeIdx >= 0 ? activeIdx : null} onPick={pickWindow} />
+          <WindowsList
+            windows={windows}
+            placeLabel={place.label}
+            activeIndex={activeIdx >= 0 ? activeIdx : null}
+            onPick={pickWindow}
+            open={datesOpen}
+            onOpenChange={setDatesOpen}
+          />
         </>
       )}
     </div>

@@ -451,7 +451,7 @@ function overviewResult(regions: Region[]): string {
   const hardest = sorted[0];
   const easiest = sorted[sorted.length - 1];
   const of3 = (n: number): string => (n === 3 ? 'all 3' : `${n} of 3`);
-  return `${hardest.name} is high-danger on ${of3(countLevel(hardest, 'high'))} hazards; ${easiest.name} is low on ${of3(countLevel(easiest, 'low'))}`;
+  return `${hardest.name} is high-danger on ${of3(countLevel(hardest, 'high'))} dangers; ${easiest.name} is low on ${of3(countLevel(easiest, 'low'))}`;
 }
 
 export function MoonOverview(): JSX.Element {
@@ -488,12 +488,13 @@ export function MoonOverview(): JSX.Element {
         method={
           <>
             <p>
-              Each region is a 15 × 15 km tile of the 20 m LOLA elevation model, resampled to 30 m. For each hazard we measure the terrain
-              directly: cast shadow at 1°, 3° and 5° sun; height jumps along 1 km tracks in 16 directions; camera keypoints on a low-sun
-              hillshade; slope at a 30 m baseline.
+              Each region is a 15 × 15 km tile of the 20 m LOLA elevation model, resampled to 30 m. We measure 3 dangers plus slope
+              directly from the terrain: cast shadow at 1°, 3° and 5° sun (averaged over all sun directions); height jumps along 1 km tracks
+              in 16 directions; camera keypoints on a low-sun hillshade; and slope at a 30 m baseline, which matters for walking and
+              touchdown.
             </p>
             <p>
-              The danger level is the tercile of a score that combines a hazard’s metrics, ranked across the nine regions. It says how a
+              The danger level is the tercile of a score that combines a danger’s metrics, ranked across the nine regions. It says how a
               region compares with the other eight, not whether it is safe.
             </p>
           </>

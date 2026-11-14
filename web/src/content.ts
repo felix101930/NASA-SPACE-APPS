@@ -44,9 +44,9 @@ const pct = (v: number): string => `${(v * 100).toFixed(1)}%`;
 const m = (v: number): string => `${v.toFixed(0)} m`;
 
 export const METRICS: Record<string, MetricInfo> = {
-  shadow_frac_el1: { label: 'Shadowed area, sun at 1°', unit: '%', fmt: pct, help: 'Share of the 15 × 15 km tile in cast shadow' },
-  shadow_frac_el3: { label: 'Shadowed area, sun at 3°', unit: '%', fmt: pct, help: 'Share of the tile in cast shadow' },
-  shadow_frac_el5: { label: 'Shadowed area, sun at 5°', unit: '%', fmt: pct, help: 'Share of the tile in cast shadow' },
+  shadow_frac_el1: { label: 'Shadowed area, sun at 1°', unit: '%', fmt: pct, help: 'Share of the 15 × 15 km tile in cast shadow, averaged over all sun directions' },
+  shadow_frac_el3: { label: 'Shadowed area, sun at 3°', unit: '%', fmt: pct, help: 'Share of the tile in cast shadow, averaged over all sun directions' },
+  shadow_frac_el5: { label: 'Shadowed area, sun at 5°', unit: '%', fmt: pct, help: 'Share of the tile in cast shadow, averaged over all sun directions' },
   shadow_frac_timeweighted: {
     label: 'Shadowed area, time-weighted',
     unit: '%',
@@ -87,6 +87,20 @@ export const LEVEL_LABEL: Record<Level, string> = { low: 'Low', med: 'Medium', h
 
 export const LIGHT_LABEL: Record<Light, string> = { green: 'Close', amber: 'Partial', red: 'Far' };
 
+/**
+ * One definition of a best match's overall fit, shared with pipeline/match/summary.py: distance in multiples of the
+ * Moon region's normal variation (IQR); under 0.5 close, under 1.5 partial, 1.5 or more far.
+ */
+export const CLOSE_DISTANCE = 0.5;
+export const PARTIAL_DISTANCE = 1.5;
+
+export function distanceFit(d: number | null | undefined): Light | null {
+  if (typeof d !== 'number' || !Number.isFinite(d)) return null;
+  if (d < CLOSE_DISTANCE) return 'green';
+  if (d < PARTIAL_DISTANCE) return 'amber';
+  return 'red';
+}
+
 export interface FailureStory {
   mission: string;
   year: string;
@@ -102,7 +116,7 @@ export const FAILURES: FailureStory[] = [
     mission: 'Hakuto-R Mission 1',
     year: '2023',
     hazard: 'rim',
-    body: 'The lander passed over a crater-rim cliff ~3 km high. Its software rejected the altitude jump as sensor error and believed it had landed while ~5 km up.',
+    body: 'Hakuto-R crossed a crater-rim cliff about 3 km high. Its software rejected the sudden altitude jump as a sensor error and estimated it was on the surface while still about 5 km up.',
     sourceLabel: 'ispace, 26 May 2023',
     sourceUrl: 'https://www.ispace-inc.com/2023/05/26/ispace-announces-results-of-the-hakuto-r-mission-1-lunar-landing/',
   },
@@ -110,19 +124,22 @@ export const FAILURES: FailureStory[] = [
     mission: 'IM-2 Athena',
     year: '2025',
     hazard: 'shadow',
-    body: 'Intuitive Machines said on its May 2025 earnings call that altimeter noise and long low-sun shadows contributed; its optical navigation’s reference imagery didn’t capture how craters look at low altitude.',
-    sourceLabel: 'Intuitive Machines earnings call, May 2025, as reported by The Register (14 May 2025)',
-    sourceUrl: '',
+    body: 'Intuitive Machines’ CEO said altimeter signal noise, long shadows from low-angle sunlight, and navigation imagery taken from 100 km that didn’t match how craters look lower down all contributed.',
+    sourceLabel: 'Intuitive Machines earnings call, 13 May 2025, as reported by The Register (14 May 2025)',
+    sourceUrl: 'https://www.theregister.com/2025/05/14/intuitive_machines_postmortem/',
   },
   {
     mission: 'Ingenuity, flight 72',
     year: '2024',
     hazard: 'texture',
-    body: 'NASA’s investigation: “Lack of surface texture gave the navigation system too little information to work with”, over steep, relatively featureless sand ripples.',
+    body: 'NASA’s most likely explanation is that a lack of surface texture over steep, relatively featureless sand ripples gave Ingenuity’s navigation system too little information to work with.',
     sourceLabel: 'NASA JPL, 11 Dec 2024',
     sourceUrl: 'https://www.jpl.nasa.gov/news/nasa-performs-first-aircraft-accident-investigation-on-another-world/',
   },
 ];
+
+export const FAILURES_HEADING = 'Three missions where terrain and lighting fooled the navigation';
+export const FOURTH_MEASURE = 'A fourth measure, slope, matters for walking and touchdown.';
 
 // ---------------------------------------------------------------------------------------------
 // Headline numbers and labels used by the redesigned screens
@@ -140,7 +157,7 @@ export interface Headline {
 }
 
 export const HEADLINE: Record<ProfileRowId, Headline> = {
-  shadow: { key: 'shadow_frac_el3', value: (v: number): string => `${Math.round(v * 100)}%`, unit: 'of the ground in shadow, sun at 3°' },
+  shadow: { key: 'shadow_frac_el3', value: (v: number): string => `${Math.round(v * 100)}%`, unit: 'of the ground in shadow at a 3° sun, averaged over all sun directions' },
   rim: { key: 'jump1km_p95_m', value: (v: number): string => `${Math.round(v)} m`, unit: 'height jump over 1 km (95th percentile)' },
   texture: {
     key: 'empty_cell_frac_el3',

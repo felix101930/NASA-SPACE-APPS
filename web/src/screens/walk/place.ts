@@ -1,33 +1,16 @@
-// Place names for Earth walk sites, with the remote-name rule used across the app's lists.
+// Place helpers for Earth walk sites. Naming goes through the app-wide rule in lib/placeName.ts.
+import { placeName, type PlaceName } from '../../lib/placeName';
 
 export interface SiteInfo {
   name: string;
   country: string | null;
+  lat?: number | null;
+  lon?: number | null;
 }
 
-export interface PlaceLabel {
-  /** What to show in tight lists. */
-  short: string;
-  /** The precise name (for tooltips and the verdict). */
-  full: string;
-  /** True when the short form hides a far-off reference town. */
-  remote: boolean;
-}
-
-const OFFSET = /^(\d+)\s*km\s+(N|NE|E|SE|S|SW|W|NW|NNE|ENE|ESE|SSE|SSW|WSW|WNW|NNW)\s+of\s+(.+)$/i;
-
-/**
- * "105 km SW of Pond Inlet" reads as a precise place, but more than 100 km from the reference town it
- * mostly says "nowhere near anything". Lists then show the country, with the precise name in a tooltip.
- */
-export function placeLabel(site: SiteInfo | undefined, fallbackId: string): PlaceLabel {
-  if (!site) return { short: `Earth square ${fallbackId}`, full: `Earth square ${fallbackId}`, remote: false };
-  const full = site.country && !site.name.endsWith(site.country) ? `${site.name}, ${site.country}` : site.name;
-  const m = OFFSET.exec(site.name);
-  if (m && Number(m[1]) > 100) {
-    return { short: site.country ? `Remote ${site.country}` : `Remote area near ${m[3]}`, full, remote: true };
-  }
-  return { short: full, full, remote: false };
+/** The app-wide place name for a walk site: precise name always, wider region only as secondary text. */
+export function sitePlace(site: SiteInfo | undefined, fallbackId: string): PlaceName {
+  return placeName(site, fallbackId);
 }
 
 /** Compass word for the direction of travel from (lat0, lon0) to (lat1, lon1). */

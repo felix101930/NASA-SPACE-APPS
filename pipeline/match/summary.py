@@ -19,12 +19,26 @@ from pipeline.match.matches import TERM_WEIGHTS, TOP_K, top_k
 
 log = logging.getLogger("pipeline.match.summary")
 
-CLOSE_DISTANCE = 1.0          # best match within ~1 Moon-region IQR on average = "close"
+# One definition of close / partial / far, shared with the web app (Summary.tsx distFit):
+# best-match distance (in Moon-region IQR units) < 0.5 close, < 1.5 partial, >= 1.5 far.
+CLOSE_DISTANCE = 0.5
+PARTIAL_DISTANCE = 1.5
 GAP_PENALTY = 0.5             # extra cost per unit of distance beyond CLOSE_DISTANCE, per hazard
 N_WEIGHT_DRAWS = 200
 WEIGHT_JITTER = 0.20
 WEIGHT_SEED = 20261115
 HAZARD_WORDS = {"shadow": "low-sun shadows", "rim": "rim height jumps", "texture": "camera-navigation texture"}
+
+
+def fit_class(d: float | None) -> str:
+    """'close' | 'partial' | 'far' for a best-match distance (missing = far), same bands as the web app."""
+    if d is None or not finite(d):
+        return "far"
+    return "close" if d < CLOSE_DISTANCE else "partial" if d < PARTIAL_DISTANCE else "far"
+
+
+def _words(items: list[str]) -> str:
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
 
 
 # ------------------------------------------------------------------ ranking
@@ -47,19 +61,28 @@ def ranking(matches: list[dict], regions: list[dict]) -> list[dict]:
         score = rehearsability(dist)
         avail = {h: v for h, v in dist.items() if v is not None}
         weakest = max(avail, key=avail.get) if avail else None
-        far = [h for h, v in dist.items() if v is None or v > CLOSE_DISTANCE]
+        fits = {h: fit_class(v) for h, v in dist.items()}
         if weakest is None:
             reason = "No Earth site could be scored for this region."
         else:
             w = b[weakest]
             site = w.get("site_name") or w["site_id"]
-            if not far:
-                reason = (f"All three hazards have a close Earth match; the weakest is {HAZARD_WORDS[weakest]} "
-                          f"(best: {site}, {dist[weakest]:.2f} Moon-IQRs off).")
+            if w.get("country") and not site.endswith(w["country"]):
+                site = f"{site}, {w['country']}"   # same "precise name, country" label as web/src/lib/placeName.ts
+            off = f"best: {site}, {dist[weakest]:.2f} × the Moon region's normal variation away"
+            partial = [HAZARD_WORDS[h] for h in HAZARDS if fits[h] == "partial"]
+            far = [HAZARD_WORDS[h] for h in HAZARDS if fits[h] == "far"]
+            if not partial and not far:
+                reason = f"All three dangers have a close Earth match; the weakest is {HAZARD_WORDS[weakest]} ({off})."
             else:
-                miss = ", ".join(HAZARD_WORDS[h] for h in far)
-                reason = (f"No close Earth match for {miss}; weakest is {HAZARD_WORDS[weakest]} "
-                          f"(best: {site}, {dist[weakest]:.2f} Moon-IQRs off).")
+                close = [HAZARD_WORDS[h] for h in HAZARDS if fits[h] == "close"]
+                gaps = ([f"close Earth match{'es' if len(close) > 1 else ''} for {_words(close)}"] if close else []) + \
+                       ([f"only a partial match for {_words(partial)}"] if partial else []) + \
+                       ([f"only a far match for {_words(far)}"] if far else [])
+                lead = "; ".join(gaps)
+                lead = lead[0].upper() + lead[1:]
+                reason = (f"{lead} ({off})." if len(partial) + len(far) == 1 and (partial or far)[0] == HAZARD_WORDS[weakest]
+                          else f"{lead}; weakest is {HAZARD_WORDS[weakest]} ({off}).")
         rows.append({"region_id": rid, "region_name": names[rid], "rehearsability": round(score, 4),
                      "per_hazard_best_distance": dist,
                      "per_hazard_best_site": {h: (b[h]["site_id"] if h in b else None) for h in HAZARDS},
@@ -273,8 +296,8 @@ def where_it_fails() -> list[str]:
     return [
         "Boulders smaller than ~30 m are invisible: both worlds are compared on a 30 m grid",
         "Earth skylight fills shadows; lunar shadows are pitch black, so shadow contrast is understated on Earth",
-        "Vegetation and buildings sit inside the Copernicus surface model; we mask them with ESA WorldCover "
-        "(DSM-safe filter) but low shrubs and grass remain",
+        "Vegetation and buildings sit inside the Copernicus surface model (elevation data that includes trees and "
+        "buildings); we mask them with ESA WorldCover but low shrubs and grass remain",
         "Atmospheric refraction near the horizon: windows with the sun below 1° are refraction-sensitive "
         "(a few tenths of a degree can shift them by minutes)",
         "Low sun lasts minutes on Earth but days on the Moon, so rehearsal windows are short",

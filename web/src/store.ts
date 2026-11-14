@@ -62,6 +62,7 @@ export function buildCore(
     { file: 'matches.json', meta: matches.value.meta },
   ];
   if (summary) metas.push({ file: 'summary.json', meta: summary.value.meta });
+  if (method) metas.push({ file: 'method.json', meta: method.value.meta });
   return {
     regions: regions.value.regions,
     regionsOrigin: regions.origin,

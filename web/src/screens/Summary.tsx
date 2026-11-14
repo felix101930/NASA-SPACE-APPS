@@ -1,17 +1,17 @@
 import { useEffect, useState, type JSX, type ReactNode } from 'react';
-import { HAZARDS, ROW_NAME, VALIDATION_TARGETS, meetsTarget, type ValidationTarget } from '../content';
+import { HAZARDS, ROW_NAME, VALIDATION_TARGETS, distanceFit, meetsTarget, type ValidationTarget } from '../content';
 import { Fit, HazardGlyph, VerdictGlyph } from '../components/Glyphs';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
 import { loadOptionalJson } from '../data/loader';
 import { useApp, type CoreData } from '../store';
-import { HAZARD_IDS, isTransectsFile, type HazardId, type Light, type Meta, type RankingRow, type Source } from '../types/contract';
+import { HAZARD_IDS, isTransectsFile, type HazardId, type Light, type Meta, type RankingRow } from '../types/contract';
+import { CreditsPanel } from '../components/Credits';
+import { buildCredits, hasNasademCheck } from '../lib/credits';
+import { featureName } from '../lib/plain';
 
-/** Best-match distance (in Moon-spread units) to a fit class: under 0.5 close, over 1.5 far. */
+/** Best-match distance to a fit class (shared bands; see distanceFit in content.ts). */
 function distFit(d: number | undefined): Light | null {
-  if (typeof d !== 'number' || !Number.isFinite(d)) return null;
-  if (d < 0.5) return 'green';
-  if (d < 1.5) return 'amber';
-  return 'red';
+  return distanceFit(d);
 }
 
 /** Lifts dots that would overlap their neighbour onto a second row, so all nine stay visible. */
@@ -31,49 +31,29 @@ function fmt(v: number | undefined, d: number = 2): string {
   return typeof v === 'number' && Number.isFinite(v) ? v.toFixed(d) : '—';
 }
 
-function Credits({ metas }: { metas: { file: string; meta: Meta }[] }): JSX.Element {
-  const seen = new Map<string, { s: Source; files: string[] }>();
-  for (const { file, meta } of metas) {
-    for (const s of meta.sources) {
-      const key = `${s.name}|${s.url}`;
-      const hit = seen.get(key);
-      if (hit) hit.files.push(file);
-      else seen.set(key, { s, files: [file] });
-    }
-  }
+function Credits({ metas, nasadem }: { metas: { file: string; meta: Meta }[]; nasadem: boolean }): JSX.Element {
   const versions = Array.from(new Set(metas.map((m) => m.meta.pipeline_version))).join(', ');
   return (
-    <section className="panel panel-pad credits" aria-labelledby="credits-h">
-      <h2 id="credits-h">Data credits and licences</h2>
-      <p className="caption">
-        Collected from the <code>meta.sources</code> block of every loaded file. Pipeline version: {versions || 'unknown'}.
-      </p>
-      <ul>
-        {Array.from(seen.values()).map(({ s, files }) => (
-          <li key={`${s.name}|${s.url}`}>
-            <strong>
-              {s.url ? (
-                <a href={s.url} target="_blank" rel="noreferrer">
-                  {s.name}
-                </a>
-              ) : (
-                s.name
-              )}
-            </strong>
-            {s.licence ? ` · ${s.licence}` : ''}
-            {s.citation ? ` · ${s.citation}` : ''} <span className="faint">({files.join(', ')})</span>
-          </li>
-        ))}
-        <li>
-          <strong>Basemap</strong> · OpenFreeMap (dark style), OpenMapTiles, © OpenStreetMap contributors (ODbL)
-        </li>
-        <li>
-          <strong>Failure accounts</strong> · ispace (26 May 2023); Intuitive Machines earnings call, May 2025, via The Register; NASA JPL
-          (11 Dec 2024)
-        </li>
-      </ul>
-    </section>
+    <CreditsPanel
+      id="credits-h"
+      credits={buildCredits(metas, { nasadem })}
+      intro={<>Every source the results on these screens depend on, merged with the sources each data file lists. Pipeline version: {versions || 'unknown'}.</>}
+    >
+      <li>
+        <strong>Failure accounts</strong> · ispace (26 May 2023); Intuitive Machines earnings call (13 May 2025), as reported by The Register (14 May
+        2025); NASA JPL (11 Dec 2024)
+      </li>
+    </CreditsPanel>
   );
+}
+
+/** Plain-language list of the classifier's most telling features, with importances in a tooltip. */
+function topFeatures(list: (string | { feature: string; importance: number })[]): { text: string; title: string } {
+  const items = list.slice(0, 3).map((f) => (typeof f === 'string' ? { feature: f, importance: null } : f));
+  return {
+    text: items.map((f) => featureName(f.feature)).join(', '),
+    title: items.map((f) => `${f.feature}${typeof f.importance === 'number' ? ` (${f.importance.toFixed(3)})` : ''}`).join(', '),
+  };
 }
 
 /** A 0–1 scale with the target zone shaded and this value marked. */
@@ -105,6 +85,7 @@ function ValueWithChip({ sample, children }: { sample: boolean; children: ReactN
 function Check({
   title,
   help,
+  term,
   value,
   digits = 2,
   target,
@@ -114,6 +95,8 @@ function Check({
   sample: boolean;
   title: string;
   help: string;
+  /** Technical name of the statistic, shown as a tooltip. */
+  term?: string;
   value: number | undefined;
   digits?: number;
   target: ValidationTarget;
@@ -125,7 +108,9 @@ function Check({
       <div className="val-head">
         <div>
           <h3>{title}</h3>
-          <p className="caption">{help}</p>
+          <p className="caption" title={term}>
+            {help}
+          </p>
         </div>
         <ValueWithChip sample={sample}>{fmt(value, digits)}</ValueWithChip>
       </div>
@@ -161,12 +146,13 @@ export function Summary(): JSX.Element {
   const summary = core.summary;
   const regionName = (id: string): string => core.regions.find((r) => r.id === id)?.name ?? id;
   const metas = walkMeta ? [...core.metas, { file: 'walk/transects.json', meta: walkMeta }] : core.metas;
+  const nasadem = hasNasademCheck(core.method?.file);
 
   if (!summary) {
     return (
       <div>
         <div className="error-box">summary.json is not available yet from the pipeline or the sample set.</div>
-        <Credits metas={metas} />
+        <Credits metas={metas} nasadem={nasadem} />
       </div>
     );
   }
@@ -204,8 +190,9 @@ export function Summary(): JSX.Element {
         }
         method={
           <p>
-            Regions are ranked by how close the best Earth match comes for each hazard. Distances are in units of the Moon region’s own
-            spread (interquartile range): under 0.5 is close, 0.5 to 1.5 partial, over 1.5 far.
+            Regions are ranked by how close the best Earth match comes for each of the 3 dangers. Distances are in multiples of the Moon
+            region’s normal variation (its interquartile range): under 0.5 is close, 0.5 to 1.5 partial, 1.5 or more far. The same bands
+            colour the grid and word the reasons.
           </p>
         }
       />
@@ -213,7 +200,7 @@ export function Summary(): JSX.Element {
       <div className="summary-layout">
         <section className="panel" aria-labelledby="grid-h">
           <div className="panel-head">
-            <h2 id="grid-h">Best Earth match, region by hazard</h2>
+            <h2 id="grid-h">Best Earth match, region by danger</h2>
             <span className="caption">Easiest to hardest. Select a cell to open its Earth matches.</span>
             {sample && <SampleChip what="This ranking" />}
           </div>
@@ -251,7 +238,7 @@ export function Summary(): JSX.Element {
                           <button
                             type="button"
                             className="fit-cell"
-                            title={`${HAZARDS[h].name}: best match ${fmt(d)} spreads away`}
+                            title={`${HAZARDS[h].name}: best match ${fmt(d)} × the Moon region’s normal variation away (0 = identical)`}
                             aria-label={`${regionName(r.region_id)}, ${HAZARDS[h].name}: ${f ? (f === 'green' ? 'close' : f === 'amber' ? 'partial' : 'far') : 'no data'}. Open Earth matches.`}
                             onClick={(): void => open(r.region_id, h)}
                           >
@@ -278,7 +265,8 @@ export function Summary(): JSX.Element {
           </div>
           <Check
             title="Shadows vs NASA PGDA illumination"
-            help={v.shadow_vs_pgda?.note || 'Pearson correlation between our shadow fraction and PGDA’s.'}
+            help="Agreement with NASA’s map (1 = perfect): our shadow share against NASA PGDA’s illumination map."
+            term={v.shadow_vs_pgda?.note ? `Pearson correlation. ${v.shadow_vs_pgda.note}` : 'Pearson correlation'}
             value={v.shadow_vs_pgda?.pearson_r}
             target={VALIDATION_TARGETS.shadow_r}
             sample={sample}
@@ -294,14 +282,16 @@ export function Summary(): JSX.Element {
           </Check>
           <Check
             title="Known analogs rank above decoys"
-            help="Held-out analog sites should beat dune fields, farmland and forest (ROC-AUC)."
+            help="Chance a known analog outranks a decoy such as dune fields, farmland or forest (0.50 = coin flip)."
+            term="ROC-AUC"
             value={v.known_vs_decoy_auc}
             target={VALIDATION_TARGETS.decoy_auc}
             sample={sample}
           />
           <Check
             title="Top 3 stay put when weights move ±20%"
-            help="Overlap of each top-3 list under perturbed weights (Jaccard index)."
+            help="How much the top 3 stay the same when the weights are nudged (1 = identical lists)."
+            term="Jaccard index"
             value={v.weight_stability_jaccard}
             target={VALIDATION_TARGETS.jaccard}
             sample={sample}
@@ -332,9 +322,9 @@ export function Summary(): JSX.Element {
             <div className="val-block">
               <div className="val-head">
                 <div>
-                  <h3>Can a classifier tell Moon from Earth tiles?</h3>
-                  <p className="caption">
-                    Two-sample test per region. Near 0.5: hard to tell apart; near 1: easy. Shown for context, no target.
+                  <h3>Can a computer tell Moon from Earth terrain?</h3>
+                  <p className="caption" title="Classifier two-sample test (AUC), per region">
+                    0.5 = it can’t tell them apart; 1 = it always can. One dot per region. Shown for context, no target.
                   </p>
                 </div>
                 {sample && <SampleChip what="These values" />}
@@ -367,7 +357,9 @@ export function Summary(): JSX.Element {
                   ))}
                 </dl>
                 {v.classifier_two_sample.top_features.length > 0 && (
-                  <p className="caption">Most telling features: {v.classifier_two_sample.top_features.join(', ')}</p>
+                  <p className="caption" title={topFeatures(v.classifier_two_sample.top_features).title}>
+                    What gives the Earth terrain away most: {topFeatures(v.classifier_two_sample.top_features).text}
+                  </p>
                 )}
               </details>
             </div>
@@ -382,7 +374,7 @@ export function Summary(): JSX.Element {
           </div>
         </section>
       </div>
-      <Credits metas={metas} />
+      <Credits metas={metas} nasadem={nasadem} />
     </div>
   );
 }

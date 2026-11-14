@@ -15,6 +15,7 @@ import { HazardGlyph, SunGlyph, type HazardKey } from './Glyphs';
 import { Loading } from './Loading';
 import { SafeCanvas } from './SafeCanvas';
 import { TERRAIN_KM, terrainHeightAt, useTerrainGeometry } from './terrainGeometry';
+import { avgShadowAt, singleSunShadow } from '../lib/shadow';
 
 export type ExploreLayer = 'shadow' | 'rim' | 'texture' | 'slope' | 'safe';
 
@@ -382,8 +383,16 @@ export default function ExploreRegion({ region, origin, layers, onToggle, onAvai
   }, [data, masks.length]);
   useEffect((): void => onAvailable(available), [available, onAvailable]);
 
+  // One sun direction; the profile's figure is averaged over all directions, so show both.
   const maskNote = maskRef
-    ? `${note ? Math.round(note.frac * 100) : '?'}% in shadow · sun ${maskRef.el}° from ${AZ_WORD[maskRef.az] ?? `${maskRef.az}°`}`
+    ? note
+      ? singleSunShadow(
+          note.frac,
+          maskRef.el,
+          `from ${AZ_WORD[maskRef.az] ?? `${maskRef.az}°`}`,
+          avgShadowAt(maskRef.el, region.hazards.shadow.metrics, region.extras),
+        )
+      : `Shadow with the sun from ${AZ_WORD[maskRef.az] ?? `${maskRef.az}°`} at ${maskRef.el}°`
     : null;
   const steep = data?.annotations?.steep_mask_summary;
   const tags = useMemo((): Tag3D[] => (data ? buildTags(data, layers, maskNote) : []), [data, layers, maskNote]);

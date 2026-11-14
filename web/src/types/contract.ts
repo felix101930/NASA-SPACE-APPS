@@ -159,7 +159,8 @@ export interface Validation {
   shadow_vs_pgda: { pearson_r: number; mae: number; bias: number; n_px: number; note: string };
   known_vs_decoy_auc: number;
   weight_stability_jaccard: number;
-  classifier_two_sample: { per_region_auc: Record<string, number>; top_features: string[] };
+  /** top_features: older files list names; current ones list {feature, importance}. */
+  classifier_two_sample: { per_region_auc: Record<string, number>; top_features: (string | { feature: string; importance: number })[] };
   synthetic_tests: { name: string; passed: boolean }[];
   where_it_fails: string[];
 }
@@ -276,6 +277,8 @@ export interface MethodFile {
     decoys: MethodValSite[];
   };
   points: MethodPoint[];
+  /** NASADEM cross-check; null or absent until the Earth stage writes it. */
+  nasadem_check?: unknown;
   example: {
     region_id: string;
     hazard: HazardId | string;

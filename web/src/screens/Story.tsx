@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { FAILURES, HAZARDS, type FailureStory } from '../content';
+import { FAILURES, FAILURES_HEADING, FOURTH_MEASURE, HAZARDS, type FailureStory } from '../content';
 import { useApp } from '../store';
 import type { HazardId } from '../types/contract';
 import { HazardGlyph } from '../components/Glyphs';
@@ -118,9 +118,9 @@ export function Story(): JSX.Element {
         <h1>Moon on Earth</h1>
         <p className="story-lead">Finding Earth places that stand in for the Moon’s south pole.</p>
         <p>
-          We profile NASA’s nine candidate regions near the lunar south pole for the terrain and light that matter: steep ground, long
-          low-sun shadows, sudden height jumps and smooth ground a camera can’t track. Then we search Earth for places with the same
-          fingerprint, so crews and machines can rehearse there first.
+          We profile NASA’s nine candidate regions near the lunar south pole for 3 dangers (long low-sun shadows, sudden height jumps
+          at crater rims, and smooth ground a camera can’t track) plus slope for walking. Then we search Earth for places with the same
+          terrain measurements, so crews and machines can rehearse there first.
         </p>
         <p>
           <button
@@ -138,12 +138,16 @@ export function Story(): JSX.Element {
         </p>
       </section>
 
-      <h2 className="section-title">Why these four: three missions the ground fooled</h2>
-      <section className="failures" aria-label="Three missions fooled by terrain and light">
+      <h2 className="section-title">{FAILURES_HEADING}</h2>
+      <section className="failures" aria-label={FAILURES_HEADING}>
         {FAILURES.map((f) => (
           <FailureCard key={f.mission} f={f} />
         ))}
       </section>
+      <p className="failures-fourth">
+        <HazardGlyph hazard="slope" />
+        {FOURTH_MEASURE}
+      </p>
 
       <Explainer />
 

@@ -12,6 +12,8 @@ import { ScreenHead } from '../components/ScreenHead';
 import { SlopeChart } from '../components/SlopeChart';
 import { useApp } from '../store';
 import { HAZARD_IDS, type HazardId, type Meta } from '../types/contract';
+import { CreditsPanel } from '../components/Credits';
+import { buildCredits, type CreditArea } from '../lib/credits';
 import {
   isAlbertaFile,
   isOverlaysGeo,
@@ -151,46 +153,14 @@ function fileDate(meta: Meta | undefined): string {
   return d && !Number.isNaN(d.getTime()) ? d.toISOString().slice(0, 10) : 'date not recorded';
 }
 
-function Credits({ metas }: { metas: { file: string; meta: Meta | undefined }[] }): JSX.Element {
-  const seen = new Map<string, { name: string; url: string; licence: string; files: string[]; date: string }>();
-  for (const { file, meta } of metas) {
-    for (const s of meta?.sources ?? []) {
-      const hit = seen.get(s.name);
-      if (hit) hit.files.push(file);
-      else
-        seen.set(s.name, {
-          name: s.name,
-          url: s.url,
-          licence: s.licence || 'City of Calgary Open Data Terms of Use',
-          files: [file],
-          date: fileDate(meta),
-        });
-    }
-  }
+function Credits({ metas, area }: { metas: { file: string; meta: Meta | undefined }[]; area: CreditArea }): JSX.Element {
+  const dates = Array.from(new Set(metas.map((m) => fileDate(m.meta)))).join(', ');
   return (
-    <section className="panel panel-pad credits" aria-labelledby="ab-credits-h">
-      <h2 id="ab-credits-h">Data credits and licences</h2>
-      <p className="caption">
-        From the <code>meta.sources</code> block of each file. Dates are when our pipeline generated the file from the source; the files
-        don’t record a separate download date.
-      </p>
-      <ul>
-        {Array.from(seen.values()).map((s) => (
-          <li key={s.name}>
-            <strong>
-              {s.url ? (
-                <a href={s.url} target="_blank" rel="noreferrer">
-                  {s.name}
-                </a>
-              ) : (
-                s.name
-              )}
-            </strong>{' '}
-            · {s.licence} · file generated {s.date} <span className="faint">({s.files.join(', ')})</span>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <CreditsPanel
+      id="ab-credits-h"
+      credits={buildCredits(metas, { areas: [area], nasadem: false })}
+      intro={<>Every source this tab’s results depend on, merged with the sources each data file lists. Files generated {dates}.</>}
+    />
   );
 }
 
@@ -369,6 +339,16 @@ function AlbertaMap({ data, hazard }: { data: AlbertaData; hazard: HazardId }): 
   );
 }
 
+/** Plain names for the Alberta metric labels; the technical label stays in the tooltip. */
+function plainAlbertaLabel(label: string): string {
+  const rough = /^Roughness \S+\((\d+) m\), RMS height difference$/.exec(label);
+  if (rough) return `Bumpiness over ${rough[1]} m`;
+  const sh = /^Shadowed azimuths at sun elevation (\d+)° \(local horizon, 90 m\)$/.exec(label);
+  if (sh) return `Shadow at a ${sh[1]}° sun, averaged over all sun directions`;
+  if (/^1 km height jump, P95/.test(label)) return 'Height jump over 1 km (worst 5%)';
+  return label;
+}
+
 function LightsTable({ lights }: { lights: AlbertaLight[] }): JSX.Element {
   return (
     <table className="data-table">
@@ -383,7 +363,7 @@ function LightsTable({ lights }: { lights: AlbertaLight[] }): JSX.Element {
       <tbody>
         {lights.map((l: AlbertaLight) => (
           <tr key={l.component}>
-            <td title={l.gap}>{l.label}</td>
+            <td title={plainAlbertaLabel(l.label) !== l.label ? `${l.label} · ${l.gap}` : l.gap}>{plainAlbertaLabel(l.label)}</td>
             <td className="r">{fmtUnit(l.moon, l.unit)}</td>
             <td className="r">{fmtUnit(l.alberta, l.unit)}</td>
             <td>
@@ -447,7 +427,7 @@ function AlbertaPanel({ data, hazard, setHazard }: { data: AlbertaData; hazard: 
       </section>
 
       <section>
-        <div className="tabs" role="tablist" aria-label="Hazard">
+        <div className="tabs" role="tablist" aria-label="Danger">
           {HAZARD_IDS.map((h: HazardId) => (
             <button key={h} type="button" role="tab" className="tab" aria-selected={h === hazard} onClick={(): void => setHazard(h)}>
               <HazardGlyph hazard={h} />
@@ -477,8 +457,8 @@ function AlbertaPanel({ data, hazard, setHazard }: { data: AlbertaData; hazard: 
                   </p>
                 )}
                 <p className="caption">
-                  Distance {top.distance.toFixed(2)}
-                  {gs ? `; the world’s best is ${gs.best_distance.toFixed(2)} (lower is closer)` : ''}
+                  Distance {top.distance.toFixed(2)} (0 = identical terrain
+                  {gs ? `; the world’s best match scores ${gs.best_distance.toFixed(2)}` : ''})
                 </p>
               </div>
             </div>
@@ -492,7 +472,7 @@ function AlbertaPanel({ data, hazard, setHazard }: { data: AlbertaData; hazard: 
             )}
           </div>
         ) : (
-          <p className="muted">No eligible Alberta window for this hazard.</p>
+          <p className="muted">No eligible Alberta window for this danger.</p>
         )}
         <p className="caption">
           Honest limit: forested Rockies come close on terrain
@@ -657,8 +637,15 @@ function CalgaryMap({ data, walk }: { data: CalgaryData; walk: CalgaryWalk | nul
   );
 }
 
+/** One threshold for "Calgary match", used by the headline count and the per-route label: typical slope mismatch under 1°. */
+const CALGARY_MATCH_DEG = 1;
+
+function isCalgaryMatch(dtwDeg: number | undefined): boolean {
+  return typeof dtwDeg === 'number' && dtwDeg < CALGARY_MATCH_DEG;
+}
+
 export function calgaryResult(presets: CalgaryPreset[]): string {
-  const ok = (p: CalgaryPreset): boolean => (p.match.recommended?.dtw_deg ?? Infinity) < 1;
+  const ok = (p: CalgaryPreset): boolean => isCalgaryMatch(p.match.recommended?.dtw_deg);
   const gentle = presets.filter((p: CalgaryPreset): boolean => p.kind === 'gentle');
   const steep = presets.filter((p: CalgaryPreset): boolean => p.kind === 'steeper');
   const nSteep = steep.filter(ok).length;
@@ -670,7 +657,7 @@ function NeedChip({ category }: { category: string | null | undefined }): JSX.El
   return (
     <span className="chip need-chip" data-need={category}>
       <span className="need-swatch" data-need={category} aria-hidden="true" />
-      {category} need for access to amenities
+      {category} need for access to amenities (Calgary Equity Index 2024)
     </span>
   );
 }
@@ -748,14 +735,14 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
         {row && walk ? (
           <section className="cg-match">
             <p className="caption">
-              {row.dtw_deg < 1.5 ? 'Calgary match' : 'Closest Calgary path (not a match)'}
+              {isCalgaryMatch(row.dtw_deg) ? 'Calgary match' : 'Closest Calgary path (not a match)'}
               {!pick && preset?.match.tie_break_applied && (row.access_category === 'High' || row.access_category === 'Highest')
                 ? ' · picked among near-ties for higher need for access to amenities'
                 : ''}
             </p>
             <h3 className="ab-best-name">{placeName}</h3>
             <p className="muted">
-              {row.dtw_deg < 1.5
+              {isCalgaryMatch(row.dtw_deg)
                 ? `This route’s slope profile matches the Moon route at about 20–30 m scale, with a typical slope mismatch of ${row.dtw_deg.toFixed(2)}°.`
                 : `This is the closest city path, but its slope profile does not match this Moon route: the typical slope mismatch is ${row.dtw_deg.toFixed(1)}°.`}{' '}
               {(walk.length_m / 1000).toFixed(2)} km, climb {walk.climb_m.toFixed(0)} m.
@@ -871,7 +858,7 @@ export default function AlbertaCalgary(): JSX.Element {
           tab === 'alberta' ? (
             <p>
               Every 15 km window that touches Alberta ({ab.data ? nf.format(ab.data.file.coverage.n_windows) : 'about 3,000'}) gets the same
-              90 m fingerprint as the Moon regions and the global Earth screen, so distances and ranks are directly comparable. Only windows
+              90 m terrain measurements as the Moon regions and the global Earth screen, so distances and ranks are directly comparable. Only windows
               bare enough for the elevation data to see the ground are eligible.
             </p>
           ) : (
@@ -919,7 +906,7 @@ export default function AlbertaCalgary(): JSX.Element {
                     <span className="pin-key" aria-hidden="true">
                       1
                     </span>
-                    Best for this hazard
+                    Best for this danger
                   </span>
                   <span className="legend-item">
                     <span className="pin-key pin-key-dashed" aria-hidden="true">
@@ -931,7 +918,7 @@ export default function AlbertaCalgary(): JSX.Element {
               </div>
               <AlbertaPanel data={ab.data} hazard={hazard} setHazard={setHazard} />
             </div>
-            <Credits metas={[{ file: 'alberta.json', meta: ab.data.file.meta }]} />
+            <Credits area="alberta" metas={[{ file: 'alberta.json', meta: ab.data.file.meta }]} />
           </>
         ))}
 
@@ -946,6 +933,7 @@ export default function AlbertaCalgary(): JSX.Element {
               <CalgaryPanel data={cg.data} />
             </div>
             <Credits
+              area="calgary"
               metas={[
                 { file: 'walks.json', meta: cg.data.walks.meta },
                 { file: 'presets.json', meta: cg.data.presets.meta },

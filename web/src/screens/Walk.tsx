@@ -7,14 +7,14 @@ import { useApp, useRegion, type CoreData } from '../store';
 import { isEarthSitesFile, isPresetsFile, isTransectsFile, type EarthSite, type PresetRoute, type TransectItem, type TransectsFile } from '../types/contract';
 import type { InitMsg, QueryMsg, ResultRow, WorkerReply } from '../workers/dtw.worker';
 import { heightsFromSlopes, netRise } from '../lib/match';
-import { isFindbackRaw, parseFindback, type Findback } from './walk/findback';
+import { isFindbackRaw, matchQuality, parseFindback, type Findback } from './walk/findback';
 import type { SiteInfo } from './walk/place';
 import { buildReadyRoutes, fromPresets, routeLength, type ReadyRoute } from './walk/routes';
 import { StepBar, type StepState } from './walk/StepBar';
 import { RouteChooser } from './walk/RouteChooser';
 import { Results, type Found } from './walk/Results';
 import { HowItWorks } from './walk/HowItWorks';
-import { placeLabel } from './walk/place';
+import { sitePlace } from './walk/place';
 import './walk/walk.css';
 
 const nf = new Intl.NumberFormat('en-US');
@@ -46,11 +46,11 @@ function loadWalkData(): Promise<WalkData> {
       const presets = await loadJsonFrom('walk/presets.json', isPresetsFile, t.origin); // same origin as the transects only
       const sites = new Map<string, SiteInfo>();
       if (t.value.sites) {
-        for (const [id, st] of Object.entries(t.value.sites)) sites.set(id, { name: st.name, country: st.country ?? null });
+        for (const [id, st] of Object.entries(t.value.sites)) sites.set(id, { name: st.name, country: st.country ?? null, lat: st.lat ?? null, lon: st.lon ?? null });
       } else {
         const es = await loadJsonFrom('earth_sites.json', isEarthSitesFile, t.origin);
         (es?.value.sites ?? []).forEach((st: EarthSite): void => {
-          sites.set(st.id, { name: st.name, country: null });
+          sites.set(st.id, { name: st.name, country: st.country ?? null, lat: st.lat, lon: st.lon });
         });
       }
       const P = t.value.points;
@@ -355,11 +355,17 @@ export default function Walk(): JSX.Element {
   const searchBlock = route.length < 2 ? 'Place at least two points' : routeLen < 200 ? 'Make the route at least 200 m long' : !data ? 'Loading Earth paths…' : null;
 
   const best = found[0] ?? null;
-  const placeOf = (id: string): ReturnType<typeof placeLabel> => placeLabel(data?.sites.get(id), id);
+  const placeOf = (id: string): ReturnType<typeof sitePlace> => sitePlace(data?.sites.get(id), id);
+  const fb = data?.findback ?? null;
+  const bestQuality = best
+    ? matchQuality(best.row.dist, searched?.matcher === 'dtw' ? (fb?.dtwSpread ?? null) : (fb?.euclidSpread ?? null), fb?.nRoutes ?? null)
+    : null;
+  // Only a close twin "is" the route's twin; partial and loose ones are the closest stand-in we found.
+  const twinLead = bestQuality && bestQuality.fit !== 'green' ? 'The closest Earth stand-in for your route is' : 'Your route’s twin is';
   const nPaths = data ? nf.format(data.transects.n) : '22,000';
 
   const verdict = best
-    ? `Your route’s twin is ${placeOf(best.item.site_id).full}: heights within ${best.rmsHeight.toFixed(0)} m, slopes within ${best.rmsSlope.toFixed(1)}°`
+    ? `${twinLead} ${placeOf(best.item.site_id).label}: heights within ${best.rmsHeight.toFixed(0)} m, slopes within ${best.rmsSlope.toFixed(1)}°`
     : busy
       ? `Searching ${nPaths} Earth paths for the same ups and downs…`
       : `Pick a route on ${region.name}; we find the Earth path with the same ups and downs`;
@@ -369,7 +375,7 @@ export default function Walk(): JSX.Element {
   const step3Value = busy
     ? 'Searching…'
     : best && !stale
-      ? placeOf(best.item.site_id).short
+      ? placeOf(best.item.site_id).label
       : route.length >= 2 && data
         ? 'Press “Find its Earth twin”'
         : 'Waiting for a route';

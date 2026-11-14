@@ -1,11 +1,12 @@
 // Plain-language text for the 3D comparison screen, always computed from the loaded data.
-import { metricInfo } from '../../content';
+import { HAZARDS, distanceFit, metricInfo } from '../../content';
 import type { HazardId, LightRow, Match, RehearsalWindow } from '../../types/contract';
 
+/** Tab names and danger phrases; the mission label always comes from HAZARDS[].mission. */
 export const HAZARD_TAB: Record<HazardId, { name: string; mission: string; danger: string }> = {
-  shadow: { name: 'Shadow', mission: 'IM-2', danger: 'low-sun shadow danger' },
-  rim: { name: 'Rim jump', mission: 'Hakuto-R', danger: 'cliff-edge height-jump danger' },
-  texture: { name: 'Texture', mission: 'Ingenuity', danger: 'camera-texture danger' },
+  shadow: { name: 'Shadow', mission: HAZARDS.shadow.mission, danger: 'low-sun shadow danger' },
+  rim: { name: 'Rim jump', mission: HAZARDS.rim.mission, danger: 'cliff-edge height-jump danger' },
+  texture: { name: 'Texture', mission: HAZARDS.texture.mission, danger: 'camera-texture danger' },
 };
 
 /** The metric that best states each danger in one number. */
@@ -63,7 +64,7 @@ export function statClause(l: LightRow, regionName: string): string {
   const e = fmtValue(l.metric, l.earth);
   const m = fmtValue(l.metric, l.moon);
   const el = /^shadow_frac_el(\d+)$/.exec(l.metric);
-  if (el) return `${e} of it lies in shadow at a ${el[1]}° sun, vs ${m} of ${regionName}`;
+  if (el) return `${e} of it lies in shadow at a ${el[1]}° sun, vs ${m} of ${regionName} (both averaged over all sun directions)`;
   switch (l.metric) {
     case 'shadow_frac_timeweighted':
       return `${e} of it lies in shadow over a low-sun day, vs ${m} of ${regionName}`;
@@ -94,9 +95,10 @@ export interface Verdict {
 export function buildVerdict(match: Match, placeLabel: string, regionName: string, nScreened: number | null): Verdict | null {
   const l = verdictLight(match);
   if (!l) return null;
-  const close = l.light !== 'red';
+  // Only an overall Close fit (same bands as the Summary grid) "matches"; Partial and Far are stand-ins.
+  const close = distanceFit(match.distance) === 'green';
   const danger = HAZARD_TAB[match.hazard].danger;
-  const lead = close ? `${placeLabel} matches ${regionName}’s ${danger}` : `${placeLabel} is the closest Earth stand-in we found for ${regionName}’s ${danger}`;
+  const lead = close ? `${placeLabel} matches ${regionName}’s ${danger}` : `${placeLabel} is the closest Earth stand-in for ${regionName}’s ${danger}`;
   const rank =
     nScreened && nScreened > 0 ? `#${match.rank} pick from ${nScreened.toLocaleString('en-US')} Earth squares screened` : `#${match.rank} pick`;
   return { lead, stat: statClause(l, regionName), rank, close };

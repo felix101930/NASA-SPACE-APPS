@@ -863,6 +863,15 @@ code {
   gap: 24px;
 }
 
+.failures-fourth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-label);
+}
+
 .failure {
   display: flex;
   flex-direction: column;
@@ -3100,4 +3109,73 @@ code {
   *::after {
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ---------- Credits (footer line on every screen, full panel on Summary / Alberta) ---------- */
+
+.credits-sub {
+  font-size: var(--fs-label);
+  color: var(--text-2);
+  margin-top: 8px;
+}
+
+.footer-credits {
+  flex: 1 1 420px;
+  min-width: 0;
+}
+
+.footer-credits > summary {
+  cursor: pointer;
+  list-style: none;
+  line-height: 1.5;
+}
+
+.footer-credits > summary::-webkit-details-marker {
+  display: none;
+}
+
+.footer-credits-more {
+  color: var(--text-2);
+  text-decoration: underline;
+  text-decoration-color: var(--text-3);
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.footer-credits > summary:hover .footer-credits-more {
+  color: var(--text);
+}
+
+.footer-credits ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-2);
+}
+
+.footer-credits a {
+  color: var(--text);
+}
+
+.t3-when-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin: 0 0 12px;
+  color: var(--text-2);
+  font-size: var(--fs-label);
+}
+
+.t3-when-line strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.t3-when-insight {
+  margin: 4px 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-label);
 }

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type JSX } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
+import { singleSunShadow } from '../../lib/shadow';
 import type { LoadedTile } from '../../data/tiles';
 import { computeShadowMask, hillshade, type Grid } from '../../lib/terrain';
 import { useTerrainGeometry } from '../terrainGeometry';
@@ -269,12 +270,23 @@ function RimProfile({ rim }: { rim: RimLine }): JSX.Element {
 
 const OVERLAY_TEXT: Record<Overlay, string> = {
   slope: 'Steepness: brighter is steeper (30° and more is white).',
-  shadow: 'Blue: ground in shadow when the sun sits 3° above the horizon.',
+  shadow: 'Blue: ground in shadow when the sun sits 3° above the horizon, shining from the east (one sun direction).',
   rim: 'Orange line: a sudden drop at a crater rim, the kind of cliff that confused Hakuto-R.',
   texture: 'Pink dots: points a navigation camera could lock on to. Empty patches are hard to track.',
 };
 
-export default function MoonTile3D({ tile, overlay, regionName }: { tile: LoadedTile; overlay: Overlay; regionName: string }): JSX.Element {
+export default function MoonTile3D({
+  tile,
+  overlay,
+  regionName,
+  avgShadow,
+}: {
+  tile: LoadedTile;
+  overlay: Overlay;
+  regionName: string;
+  /** Direction-averaged shadow share at 3° from the region profile, for comparison. */
+  avgShadow: number | null;
+}): JSX.Element {
   const an = useMemo((): Analysis => analyse(tile.filled), [tile]);
   const n = tile.filled.size;
   const [textures, setTextures] = useState<Partial<Record<Overlay, THREE.CanvasTexture>>>({});
@@ -322,7 +334,7 @@ export default function MoonTile3D({ tile, overlay, regionName }: { tile: Loaded
         )}
         {overlay === 'shadow' && (
           <span className="caption ex-sun">
-            <SunGlyph /> Sun from the east · {Math.round(an.shadowFrac * 100)}% of this tile in shadow
+            <SunGlyph /> {singleSunShadow(an.shadowFrac, 3, 'from the east', avgShadow)}
           </span>
         )}
         {overlay === 'texture' && (

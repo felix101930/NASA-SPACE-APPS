@@ -2,6 +2,8 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type JSX } from 'react';
 import { loadTile, type LoadedTile } from '../../data/tiles';
 import { metricInfo } from '../../content';
+import { avgShadowAt } from '../../lib/shadow';
+import { placeName } from '../../lib/placeName';
 import { useApp } from '../../store';
 import { type MethodFile, type MethodFunnelRow, type MethodPoint, type MethodValSite } from '../../types/contract';
 import { HazardGlyph, type HazardKey } from '../Glyphs';
@@ -55,7 +57,7 @@ const OVERLAYS: { id: Overlay; label: string }[] = [
   { id: 'texture', label: 'Camera texture' },
 ];
 
-function useExampleTile(regionId: string | null): { tile: LoadedTile | null; name: string } {
+function useExampleTile(regionId: string | null): { tile: LoadedTile | null; name: string; avgShadow3: number | null } {
   const core = useApp((s) => s.core);
   const region = core
     ? (core.regions.find((r) => r.id === regionId) ?? core.regions.find((r) => r.id === 'malapert_massif') ?? core.regions[0])
@@ -73,7 +75,7 @@ function useExampleTile(regionId: string | null): { tile: LoadedTile | null; nam
       alive = false;
     };
   }, [region, core]);
-  return { tile, name: region?.name ?? '' };
+  return { tile, name: region?.name ?? '', avgShadow3: region ? avgShadowAt(3, region.hazards.shadow.metrics) : null };
 }
 
 function OverlayButtons({ overlay, onPick }: { overlay: Overlay; onPick: (o: Overlay) => void }): JSX.Element {
@@ -208,7 +210,7 @@ function WorldDots({ points, phase, active }: { points: MethodPoint[]; phase: 's
 }
 
 // ------------------------------------------------------------------------------------------------
-// Step 4: fingerprints
+// Step 4: terrain measurements
 // ------------------------------------------------------------------------------------------------
 
 function Fingerprint({ method, siteName, regionName }: { method: MethodFile; siteName: string; regionName: string }): JSX.Element {
@@ -337,7 +339,7 @@ function StripPlot({ method }: { method: MethodFile }): JSX.Element {
       </svg>
       <p className="caption">
         Where each site’s best match ranks among all Earth squares; left is better. Lines mark the middle site of each group. A known site
-        beats a decoy {Math.round(v.auc * 100)} times in 100 (AUC {v.auc.toFixed(2)}).
+        beats a decoy <span title={`ROC-AUC ${v.auc.toFixed(2)}`}>{Math.round(v.auc * 100)} times in 100</span> (50 would be a coin flip).
       </p>
     </div>
   );
@@ -358,7 +360,7 @@ const STEPS: Step[] = [
     title: 'Turn a Moon site into numbers',
     short: 'Measure',
     body: (): string =>
-      'We measure the 4 dangers that hurt real landers: steep ground, long shadows from a low sun, sudden drops at crater rims, and smooth ground a camera can’t track.',
+      'We measure 3 dangers that hurt real landers (long shadows from a low sun, sudden drops at crater rims, and smooth ground a camera can’t track) plus slope for walking.',
   },
   {
     title: 'Sample bare land across Earth',
@@ -373,7 +375,7 @@ const STEPS: Step[] = [
       'Our elevation data sees treetops and rooftops, so those squares would fake the terrain. Only bare ground stays in.',
   },
   {
-    title: 'Compare fingerprints',
+    title: 'Compare terrain measurements',
     short: 'Compare',
     body: (): string => 'Every square gets the same numbers as the Moon site. The closer the numbers, the better the match.',
   },
@@ -415,7 +417,8 @@ export function Explainer(): JSX.Element {
 
   const siteName = useMemo((): string => {
     if (!m) return '';
-    return core?.siteById.get(m.example.site_id)?.name ?? m.example.site_id;
+    const site = core?.siteById.get(m.example.site_id);
+    return site ? placeName(site).label : m.example.site_id;
   }, [m, core]);
   const regionName = useMemo((): string => {
     if (!m) return '';
@@ -430,7 +433,7 @@ export function Explainer(): JSX.Element {
     visual =
       near && ex.tile ? (
         <Suspense fallback={<Loading label="Loading the 3D view…" />}>
-          <MoonTile3D tile={ex.tile} overlay={overlay} regionName={ex.name} />
+          <MoonTile3D tile={ex.tile} overlay={overlay} regionName={ex.name} avgShadow={ex.avgShadow3} />
         </Suspense>
       ) : (
         <Loading label="Loading a Moon tile…" />

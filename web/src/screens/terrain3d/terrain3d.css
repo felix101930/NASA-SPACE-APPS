@@ -908,3 +908,100 @@
     display: none;
   }
 }
+
+/* ---------- Caption lines, "How this is drawn", when to go ---------- */
+
+.t3-caption-lines {
+  flex: 1 1 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.t3-caption .t3-caption-lines p {
+  flex: none;
+}
+
+.t3-drawn {
+  margin-top: 12px;
+}
+
+.t3-drawn-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 4px 0;
+  color: var(--text-2);
+  max-width: 110ch;
+}
+
+.t3-drawn-body .t3-fine {
+  margin-top: 0;
+}
+
+.t3-when {
+  margin: -4px 0 16px;
+}
+
+.t3-when .t3-when-line {
+  margin: 0;
+}
+
+.t3-when .glyph {
+  align-self: center;
+  color: var(--sun);
+}
+
+.t3-when-more {
+  font-size: var(--fs-label);
+}
+
+.t3-sun-dates {
+  align-items: stretch;
+}
+
+.t3-sun-dates .t3-sun-dates-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px 0 12px;
+  font-size: var(--fs-label);
+  color: var(--text-3);
+  background: var(--surface-2);
+  border-right: 1px solid var(--line-strong);
+}
+
+.t3-sun-dates .t3-sun-dates-label + button {
+  border-left: 0;
+}
+
+.t3-dates > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  cursor: pointer;
+  list-style: none;
+  margin-bottom: 12px;
+}
+
+.t3-dates > summary::-webkit-details-marker {
+  display: none;
+}
+
+.t3-dates > summary h2 {
+  font-size: var(--fs-h3);
+}
+
+.t3-dates > summary h2::after {
+  content: ' ▾';
+  color: var(--text-3);
+  font-size: var(--fs-label);
+}
+
+.t3-dates[open] > summary h2::after {
+  content: ' ▴';
+}
+
+.t3-dates > p {
+  margin-bottom: 12px;
+}

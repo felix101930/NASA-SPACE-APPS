@@ -14,6 +14,8 @@ import {
   type SummaryFile,
 } from './types/contract';
 import { Loading } from './components/Loading';
+import { FooterCredits } from './components/Credits';
+import { buildCredits, hasNasademCheck } from './lib/credits';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Story } from './screens/Story';
 import { MoonOverview } from './screens/MoonOverview';
@@ -228,10 +230,7 @@ export function App(): JSX.Element {
       </main>
       <footer className="footer">
         <span>Moon on Earth · NASA Space Apps 2026 · Earth analogs for the Artemis south-pole candidate regions</span>
-        <span>
-          Moon: LOLA / PGDA · Earth: Copernicus GLO-30, ESA WorldCover, Macrostrat · Calgary: City of Calgary Open Data, Equity Index 2024,
-          NRCan HRDEM · Maps © OpenStreetMap, OpenFreeMap
-        </span>
+        <FooterCredits credits={buildCredits(core?.metas ?? [], { nasadem: hasNasademCheck(core?.method?.file) })} />
       </footer>
     </div>
   );
