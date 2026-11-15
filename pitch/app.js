@@ -769,8 +769,14 @@ const anchors = [0, ...CAPS.map(c => B[c.beat].s + B[c.beat].l * Math.min(.98, c
   at('money', .55), at('tally', .62), at('people', .7), at('gaps', .5)].sort((a, b) => a - b);
 // gaps and next steps, after the live demo (text from the team's pipeline_frame.json)
 fetch('assets/data/pipeline_frame.json').then(r => r.json()).then(P => {
-  const col = (k, n, t, cls = '') => `<div class="${cls}"><h3><span>${n}</span>${t}</h3><ul>${(P[k] || []).map(x => `<li>${x}</li>`).join('')}</ul></div>`;
-  document.getElementById('pipe-in').innerHTML = col('gaps', '01', 'What we haven’t solved', 'gap') + col('next', '02', 'What we do next');
+  // items are {t: title, d: detail} (plain strings still work)
+  const item = (x, i) => typeof x === 'string'
+    ? `<li><span class="pn">${String(i + 1).padStart(2, '0')}</span><span class="pt">${x}</span></li>`
+    : `<li><span class="pn">${String(i + 1).padStart(2, '0')}</span><span class="pt">${x.t}</span><span class="pd">${x.d}</span></li>`;
+  const col = (k, label, cls) => `<div class="pcol ${cls}"><h3>${label}</h3><ul>${(P[k] || []).map(item).join('')}</ul></div>`;
+  document.getElementById('pipe-in').innerHTML =
+    `<header class="phead"><div class="pkick">Rehearse here · what’s next</div><h2>Honest about the gaps.<br><em>Clear</em> on what’s next.</h2></header>`
+    + col('gaps', 'What we haven’t solved', 'gap') + col('next', 'What we do next', 'next');
 }).catch(() => {});
 const goto = dir => {
   const u = uNow(); const list = dir > 0 ? anchors.filter(a => a > u + 0.03) : anchors.filter(a => a < u - 0.03).reverse();

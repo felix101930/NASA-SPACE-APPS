@@ -14,14 +14,36 @@
     "No prior analog study found in the catalogs and literature we checked"
   ],
   "gaps": [
-    "Shape and light only: not gravity, vacuum, dust or soil",
-    "A classifier can still tell our matches from the Moon",
-    "Small test set, and no site has been visited yet"
+    {
+      "t": "Shape and light only",
+      "d": "Not gravity, vacuum, dust or soil."
+    },
+    {
+      "t": "30 m terrain",
+      "d": "Too coarse to see boulders and small craters."
+    },
+    {
+      "t": "Not visited yet",
+      "d": "A computer can still tell our matches from the real Moon."
+    }
   ],
   "next": [
-    "Visit Kohler Coulee at low sun with cameras and a drone",
-    "Run Kohler through the same catalog novelty check",
-    "Run the same pipeline on Mars landing sites"
+    {
+      "t": "Ingest sharper data",
+      "d": "LRO camera terrain at 2–5 m for the Moon, 1–2 m lidar and ArcticDEM for Earth, so boulders and small craters count."
+    },
+    {
+      "t": "Search every bare square",
+      "d": "From a 15% sample to all of Earth’s bare land, refreshed as new satellite data arrives."
+    },
+    {
+      "t": "Field-test Kohler Coulee",
+      "d": "Cameras and a drone at low sun, to check real shadows against our model."
+    },
+    {
+      "t": "Take it to Mars",
+      "d": "Run the same pipeline on Mars landing sites with NASA’s MOLA and HiRISE terrain."
+    }
   ],
   "sources": "NASA LOLA (PGDA), NASADEM, MODIS, HLS (GIBS) + GLO-30, WorldCover"
 }
