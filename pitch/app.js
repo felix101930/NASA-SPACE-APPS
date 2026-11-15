@@ -37,7 +37,7 @@ const HOT = 3; // Mons Mouton Plateau: Athena's point lies inside this box
 const BEATS = [
   ['open', 1.4], ['descent', 1.6], ['photo', 2.4], ['athena', 1.0], ['lowsun', 1.6], ['money', 1.4], ['tally', 1.3],
   ['people', 3.6], ['regions', 1.7], ['slope', 0.01], ['turn', 0.8], ['earth', 1.4], ['handoff', 1.1],
-  ['outro', 3.4], ['close', 1.3],
+  ['outro', 3.4], ['close', 2.6],
 ];
 const B = {}; let acc = 0;
 for (const [n, l] of BEATS) { B[n] = { s: acc, l, e: acc + l }; acc += l; }
@@ -57,10 +57,10 @@ const CAPS = [
   { beat: 'turn', a: .06, b: .97, html: 'You can’t rehearse<br>on the Moon.' },
   { beat: 'earth', a: .74, b: .995, html: 'So we found<br>where <em>you can.</em>', src: 'Kohler Coulee · NASA HLS satellite image, 9 Oct 2025 · Copernicus GLO-30 terrain' },
   { beat: 'handoff', a: .10, b: .98, cls: 'center', html: 'Let us show you.' },
-  { beat: 'outro', a: .05, b: .31, html: 'Next time,<br>we land safely.' },
+  { beat: 'outro', a: .05, b: .31, html: 'Next time,<br>we land safely<br>on the Moon.' },
   { beat: 'outro', a: .40, b: .62, html: 'Gotcha.<br>This is <em>Alberta.</em>', src: 'Same hills, same camera, real colours · NRCan HRDEM lidar + Sentinel-2, 9 Oct 2025' },
   { beat: 'outro', a: .70, b: .985, html: 'Kohler Coulee.<br>100 km south of Calgary.', src: 'Best Alberta match to the shadows at Mons Mouton Plateau · the world’s best is in Chile' },
-  { beat: 'close', a: .18, b: 1.01, html: 'Rehearse here.<br>Land there.' },
+  { beat: 'close', a: .62, b: 1.2, html: 'Rehearse here.<br>Land there.' },   // once the zoom-out reaches the whole Earth; stays to the very end
 ];
 
 /* ---------------------------------------------------------------- helpers */
@@ -583,6 +583,60 @@ async function init() {
   earth.add(new THREE.Mesh(new THREE.SphereGeometry(RE * 1.045, 64, 32), halo));
   earth.traverse(o => { o.frustumCulled = false; });
 
+  /* closing zoom-out: the whole Earth centred on Kohler Coulee (its own scene, in Earth radii) */
+  const KC = [50.18, -113.91];
+  const kPhi = (KC[1] + 180) * D2R, kTh = (90 - KC[0]) * D2R;   // SphereGeometry's equirectangular layout
+  const kN = new THREE.Vector3(-Math.cos(kPhi) * Math.sin(kTh), Math.cos(kTh), Math.sin(kPhi) * Math.sin(kTh));
+  const zScene = new THREE.Scene(); zScene.background = new THREE.Color(0x000000);
+  const zMat = earthMaterial(day, water);
+  // Alberta in daylight, sun from the north-west so the ocean glint falls on land (no glint there), not the Pacific
+  const kEast = new THREE.Vector3().crossVectors(kN, new THREE.Vector3(0, 1, 0)).normalize();
+  zMat.uniforms.L.value.copy(kN).applyAxisAngle(kEast, .55).applyAxisAngle(new THREE.Vector3(0, 1, 0), -.25).normalize();
+  zScene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 192, 96), zMat));
+  const zHalo = halo.clone(); zHalo.uniforms.L.value.copy(zMat.uniforms.L.value);
+  zScene.add(new THREE.Mesh(new THREE.SphereGeometry(1.045, 96, 48), zHalo));
+  const zoomOut = { scene: zScene, cam: new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 1e-5, 50), n: kN };
+  // sharper ground for the zoom-out: NASA Blue Marble Next Generation tiles from GIBS (EPSG:4326, 512 px; a level-z tile
+  // spans 288/2^z degrees), stitched into one texture per level and laid over the globe with soft edges and the globe's light
+  const bmng = async (z, r0, r1, c0, c1, fadeLo, fadeHi) => {
+    const span = 288 / 2 ** z, nc = c1 - c0 + 1, nr = r1 - r0 + 1;
+    const cv = document.createElement('canvas'); cv.width = nc * 512; cv.height = nr * 512;
+    const g2 = cv.getContext('2d');
+    const ok = await Promise.all(Array.from({ length: nc * nr }, (_, i) => new Promise(res => {
+      const r = r0 + Math.floor(i / nc), c = c0 + (i % nc), im = new Image();
+      im.onload = () => { g2.drawImage(im, (c - c0) * 512, (r - r0) * 512); res(true); };
+      im.onerror = () => { missing.push(`bmng/z${z}_${r}_${c}.jpg`); res(false); };
+      im.src = `assets/img/earth/bmng/z${z}_${r}_${c}.jpg`;
+    })));
+    if (!ok.some(Boolean)) return null;
+    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    const mat = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false,
+      uniforms: { map: { value: t }, L: { value: zMat.uniforms.L.value }, fade: { value: 1 } },
+      vertexShader: EARTH_VS,
+      fragmentShader: `uniform sampler2D map; uniform vec3 L; uniform float fade; varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+#include <logdepthbuf_pars_fragment>
+void main(){
+#include <logdepthbuf_fragment>
+  vec3 n = normalize(vN); float d = max(dot(n, L), 0.);
+  float rim = pow(1. - max(dot(n, vV), 0.), 3.);
+  vec3 col = texture2D(map, vUv).rgb * (d * 1.5 + .015) + vec3(.3, .55, 1.) * rim * (.1 + d) * .6;
+  float e = min(min(vUv.x, 1. - vUv.x), min(vUv.y, 1. - vUv.y));
+  gl_FragColor = vec4(col, fade * smoothstep(0., .15, e));
+#include <tonemapping_fragment>
+#include <colorspace_fragment>
+}`,
+    });
+    const lonW = -180 + c0 * span, latN = 90 - r0 * span;
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(1.0004, 128, 96, (lonW + 180) * D2R, nc * span * D2R, (90 - latN) * D2R, nr * span * D2R), mat);
+    mesh.renderOrder = z;   // the finer level draws on top
+    zScene.add(mesh);
+    return { mat, fadeLo, fadeHi };
+  };
+  // 2 km/px over western North America (135-90 W, 63-36 N), 500 m/px around Kohler (121.5-108 W, 56.25-42.75 N);
+  // each fades out (km of altitude) once the camera is high enough for the next level to look sharp
+  zoomOut.patches = (await Promise.all([bmng(5, 3, 5, 5, 9, 2500, 6000), bmng(7, 15, 20, 26, 31, 500, 1200)])).filter(Boolean);
+
   /* Earth ground (its own scene, metres) and the Artemis IV inset (its own canvas) */
   const ground = satTex ? buildGround(abRaw, satTex, astro, makeWalker) : null;
   const launch = buildLaunch(document.getElementById('sls'), slsBuf, moon);
@@ -590,7 +644,7 @@ async function init() {
   const MM = new THREE.Vector3(TILE_C[0], heightTile(TILE_C[0], TILE_C[1]), TILE_C[1]);
   const RC = new THREE.Vector3(-5, 0, -60);
   const G = new THREE.Vector3(0, -R_MOON, 0);
-  state = { plate, plateMat, tile, tileMat, globe, globeMats, lroG, astroG, A, WALK_DIR, labels, MM, RC, G, EP, earth, ground, launch, heightTile, heightPlate, stars, steepPct,
+  state = { zoomOut, plate, plateMat, tile, tileMat, globe, globeMats, lroG, astroG, A, WALK_DIR, labels, MM, RC, G, EP, earth, ground, launch, heightTile, heightPlate, stars, steepPct,
     walkT: 0, walkLast: 0, walkPos: A.clone() };
 
   document.getElementById('demo-link').href = DEMO_URL;
@@ -608,6 +662,7 @@ async function init() {
     renderer.compile(scn, cam);
   };
   warm(scene, camera);
+  warm(zScene, zoomOut.cam);
   if (ground) warm(ground.scene, ground.cam);
   launch.warm();
   // the three photos shown full screen are decoded here too, not on their first appearance
@@ -698,15 +753,33 @@ const goto = dir => {
   if (!list.length) return;
   // presenter mode: one steady speed (about 3.2 s per beat unit), never under 3 s, never a rapid jump
   const dist = Math.abs(list[0] - u);
-  lenis.scrollTo((list[0] / TOTAL) * lenis.limit, { duration: clamp(dist * 3.2, 3, 8), easing: t => .5 - .5 * Math.cos(Math.PI * t) });
+  lenis.scrollTo((list[0] / TOTAL) * lenis.limit, { duration: clamp(dist * 3.2, 3, 8) / speed, easing: t => .5 - .5 * Math.cos(Math.PI * t) });
 };
 window.__go = u => lenis.scrollTo((u / TOTAL) * lenis.limit, { immediate: true });
 window.__B = B;
+
+// presenter speed (1×, 1.5×, 2×): scales click durations and the wheel; remembered per browser
+const SPEEDS = [1, 1.5, 2];
+let speed = 1;
+const speedBtns = [...document.querySelectorAll('#speed button')];
+const setSpeed = s => {
+  if (!SPEEDS.includes(s)) return;
+  speed = s;
+  // Lenis copies wheelMultiplier into its VirtualScroll at construction, so set it there too (that copy is the one read per wheel event)
+  lenis.options.wheelMultiplier = 0.8 * s;
+  if (lenis.virtualScroll?.options) lenis.virtualScroll.options.wheelMultiplier = 0.8 * s;
+  speedBtns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.speed === s)));
+  try { localStorage.setItem('pitch-speed', String(s)); } catch (_) {}
+};
+try { setSpeed(+localStorage.getItem('pitch-speed') || 1); } catch (_) { setSpeed(1); }
+speedBtns.forEach(b => b.addEventListener('click', () => { setSpeed(+b.dataset.speed); b.blur(); }));
+
 addEventListener('keydown', e => {
   if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); goto(1); }
   if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); goto(-1); }
+  if (!e.ctrlKey && !e.metaKey && !e.altKey && ['1', '2', '3'].includes(e.key)) setSpeed(SPEEDS[+e.key - 1]);
 });
-addEventListener('click', e => { if (!e.target.closest('a')) goto(1); });
+addEventListener('click', e => { if (!e.target.closest('a, button')) goto(1); });
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); setH(); });
 
 /* ---------------------------------------------------------------- DOM refs */
@@ -715,13 +788,16 @@ const photo = $('photo'), photoInner = $('photo-inner'), rings = [...document.qu
 const money = $('money'), moneyNum = $('money-num'), moneyLine = $('money-line'), moneySrc = $('money-src');
 const pin = $('athena-pin'), flash = $('flash'), dip = $('dip'), launchEl = $('launch');
 const gauge = $('gauge'), gNeedle = $('g-needle'), gVal = $('g-val'), gOk = $('g-ok'), gBad = $('g-bad');
-const tally = $('tally'), outro = $('outro'), oReal = $('o-real'), oPull = $('o-pull');
+const tally = $('tally'), outro = $('outro'), oMoonCard = $('o-mooncard'), oReal = $('o-real'), oPull = $('o-pull');
 const PULL = Array.from({ length: 24 }, (_, i) => `assets/img/outro/pull_${String(i).padStart(2, '0')}.jpg`);
 // keep the frames alive so swapping src only ever goes to a frame that has loaded (decoding all 24 up front was
 // tried and stalled the main thread for up to 3 s when the decodes resolved together mid-pitch)
 const PULL_IMG = PULL.map(src => { const im = new Image(); im.src = src; return im; });
+// instead, decode them one at a time in the background after load, so no swap has to decode mid-pull
+PULL_IMG.reduce((p, im) => p.then(() => new Promise(r => setTimeout(r, 150))).then(() => im.decode().catch(() => {})),
+  new Promise(r => setTimeout(r, 4000)));
 let pullIdx = -1;
-const hud2 = $('hud-l2'), hud3 = $('hud-l3'), railFill = $('rail-fill'), hint = $('hint'), handoff = $('handoff'), credits = $('credits');
+const hud2 = $('hud-l2'), hud3 = $('hud-l3'), railFill = $('rail-fill'), hint = $('hint'), handoff = $('handoff'), credits = $('credits'), speedEl = $('speed');
 
 function arc(a0, a1) { // degrees 0..25 mapped to 180..0 on the gauge
   const p = d => { const th = Math.PI * (1 - d / 25); return [160 + 140 * Math.cos(th), 160 - 140 * Math.sin(th)]; };
@@ -945,13 +1021,26 @@ function update(time) {
   const ou = local(u, 'outro');
   const oOp = u >= B.outro.s ? sstep(0, .05, ou) : 0;
   outro.style.opacity = oOp;
+  // closing zoom-out: altitude (km) over Kohler Coulee, from the last pull frame (~20 km) to the whole Earth
+  const inClose = u >= B.close.s;
+  // (^.6: rise quickly through the low altitudes where the Blue Marble is soft, slow down near the whole Earth)
+  const zoomH = inClose ? Math.exp(lerp(Math.log(20), Math.log(22000), Math.pow(sstep(0, .72, cl), .6))) : 0;
   if (oOp > 0) {
-    const pullT = u >= B.close.s ? 1 : sstep(.64, 1, ou);
-    oReal.style.opacity = sstep(.32, .42, ou);
+    const pullT = inClose ? 1 : sstep(.64, 1, ou);
+    oMoonCard.style.opacity = inClose ? 0 : 1;
+    oReal.style.opacity = inClose ? 0 : sstep(.32, .42, ou);
+    outro.style.background = inClose ? 'transparent' : '';
     const k = Math.round(pullT * 23);
     // only swap to a frame that has finished loading; otherwise hold the current one
     if (k !== pullIdx && (PULL_IMG[k].complete || pullIdx < 0)) { pullIdx = k; oPull.src = PULL[k]; }
-    oPull.style.opacity = pullT > 0 ? 1 : 0;
+    // in the close, the last frame shrinks with the altitude and fades into the globe beneath it
+    const s = inClose ? 20 / zoomH : 1;
+    // soft edges grow in as it shrinks: full frame at s = 1, a soft oval (no hard rectangle edges) by s = .4
+    const me = sstep(.4, 1, s);
+    const mask = inClose ? `radial-gradient(ellipse ${lerp(50, 72, me).toFixed(1)}% ${lerp(50, 72, me).toFixed(1)}% at 50% 50%, #000 ${lerp(30, 100, me).toFixed(1)}%, transparent 100%)` : '';
+    oPull.style.maskImage = oPull.style.webkitMaskImage = mask;
+    oPull.style.transform = inClose ? `scale(${s.toFixed(4)})` : '';
+    oPull.style.opacity = pullT > 0 ? (inClose ? sstep(.06, .3, s) : 1) : 0;
   }
 
   /* captions */
@@ -972,7 +1061,10 @@ function update(time) {
   const ho = local(u, 'handoff');
   const hOp = inBeat(u, 'handoff') ? sstep(.25, .45, ho) * (1 - sstep(.9, 1, ho)) : 0;
   handoff.style.opacity = hOp; handoff.style.pointerEvents = hOp > .5 ? 'auto' : 'none';
-  credits.style.opacity = inBeat(u, 'close') ? sstep(.6, .9, cl) : 0;
+  credits.style.opacity = inBeat(u, 'close') ? sstep(.74, .86, cl) : 0;
+  // the speed control shares the bottom-left corner with the credits, so it steps aside before they fade in
+  const spOp = inBeat(u, 'close') ? 1 - sstep(.6, .72, cl) : 1;
+  speedEl.style.opacity = spOp; speedEl.style.visibility = spOp < .02 ? 'hidden' : 'visible';
 
   /* HUD */
   hud2.textContent = `Sun el ${el.toFixed(1)}° · az ${az.toFixed(0)}°`;
@@ -985,7 +1077,16 @@ function update(time) {
   hint.style.opacity = u < .15 ? 1 : 0;
   $('hud').style.opacity = u >= B.outro.s ? 0 : 1;   // the readout would give away the Kohler reveal
 
-  if (onGround) {
+  if (zoomH > 0) {
+    // closing zoom-out over the Blue Marble, Kohler Coulee kept in the centre (the Moon and ground are not drawn)
+    const Z = S.zoomOut;
+    if (Z.cam.aspect !== camera.aspect) { Z.cam.aspect = camera.aspect; Z.cam.updateProjectionMatrix(); }
+    Z.cam.position.copy(Z.n).multiplyScalar(1 + zoomH / 6371); Z.cam.lookAt(0, 0, 0);
+    for (const p of Z.patches) p.mat.uniforms.fade.value = 1 - sstep(p.fadeLo, p.fadeHi, zoomH);
+    renderer.render(Z.scene, Z.cam);
+  } else if (oOp > .999) {
+    // the outro images cover the whole screen: skip the 3D render (it was drawing the grass ground underneath)
+  } else if (onGround) {
     // Earth ground: astronaut keeps walking; camera pulls back and the scene dims under "Let us show you"
     const G = S.ground;
     G.update(Math.min(S.walkT * .7, 14), sstep(B.handoff.s, B.close.e, u), camera.aspect);

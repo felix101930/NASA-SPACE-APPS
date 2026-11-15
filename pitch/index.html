@@ -60,7 +60,8 @@
 
 <!-- outro: Kohler Coulee -->
 <div id="outro" aria-hidden="true">
-  <img id="o-moon" src="assets/img/outro/moon.jpg" alt=""><img id="o-real" src="assets/img/outro/real.jpg" alt=""><img id="o-pull" alt="">
+  <div id="o-mooncard"><img id="o-moon" src="assets/img/outro/moon.jpg" alt=""><div id="o-grain"></div><div id="o-earth"></div></div>
+  <img id="o-real" src="assets/img/outro/real.jpg" alt=""><img id="o-pull" alt="">
 </div>
 
 
@@ -94,6 +95,11 @@
 </div>
 <div id="rail"><div id="rail-fill"></div></div>
 <div id="hint">Scroll, or press →</div>
+<div id="speed" role="group" aria-label="Playback speed (keys 1, 2, 3)">
+  <button type="button" data-speed="1" aria-label="Speed 1×" aria-pressed="true">1×</button>
+  <button type="button" data-speed="1.5" aria-label="Speed 1.5×" aria-pressed="false">1.5×</button>
+  <button type="button" data-speed="2" aria-label="Speed 2×" aria-pressed="false">2×</button>
+</div>
 
 <!-- demo handoff + close -->
 <div id="handoff">
@@ -109,7 +115,7 @@
 <div id="scroll"></div>
 
 <footer id="credits">
-  Terrain: NASA LOLA (PGDA product 90, Barker et al. 2023), Earth site: Copernicus GLO-30 via team pipeline · Kohler Coulee outro: NRCan HRDEM lidar (4 m) + Sentinel-2 L2A (9 Oct 2025) · Earth ground image: NASA HLS (HLSS30 v2.0, 9 Oct 2025); near-ground grass drawn by computer · Earth globe: NASA Blue Marble · Moon model: NASA SVS 14959 · LRO, astronaut and SLS models: NASA 3D Resources · Athena photo: Intuitive Machines · Loss estimate: ours, 95% of NASA’s $145M IM-2 total (SpacePolicyOnline), from ~12 of ~240 planned hours (NASA PRIME-1 briefing) · Sources: Intuitive Machines (May 2025), NASA OIG IG-22-003 (2021) and HLS audit (Mar 2026), NASA Artemis IV page. Vertical relief ×1.5.
+  Terrain: NASA LOLA (PGDA product 90, Barker et al. 2023), Earth site: Copernicus GLO-30 via team pipeline · Kohler Coulee outro: NRCan HRDEM lidar (4 m) + Sentinel-2 L2A (9 Oct 2025) · Earth ground image: NASA HLS (HLSS30 v2.0, 9 Oct 2025); near-ground grass drawn by computer · Earth globe: NASA Blue Marble; zoom-out over Alberta: NASA Blue Marble Next Generation (Stöckli et al. 2005, via NASA GIBS) · Earth in the lunar sky: NASA Apollo 8 photo AS08-14-2383 (1968) · Moon model: NASA SVS 14959 · LRO, astronaut and SLS models: NASA 3D Resources · Athena photo: Intuitive Machines · Loss estimate: ours, 95% of NASA’s $145M IM-2 total (SpacePolicyOnline), from ~12 of ~240 planned hours (NASA PRIME-1 briefing) · Sources: Intuitive Machines (May 2025), NASA OIG IG-22-003 (2021) and HLS audit (Mar 2026), NASA Artemis IV page. Vertical relief ×1.5.
 </footer>
 
 <script type="module" src="app.js"></script>
