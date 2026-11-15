@@ -1,0 +1,5 @@
+matcher,top1,top5,median_rank,rmse_m_median,max_slope_diff_median,seconds_per_route
+dtw_10pct,0.397,0.633,3.000,14.467,6.583,0.206
+euclid_height,0.717,0.887,1.000,10.635,6.459,0.047
+euclid_height_slope,0.630,0.813,1.000,10.784,4.430,0.217
+matrix_profile,0.150,0.193,506.000,20.082,2.152,0.803
