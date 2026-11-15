@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState, type JSX } from 'react';
 import { loadJson, loadJsonFrom, onMockUsed, type Loaded, type Origin } from './data/loader';
-import { buildCore, SCREENS, useApp, type ScreenId } from './store';
+import { buildCore, SCREENS, screenFromLocation, useApp, type ScreenId } from './store';
 import {
   isEarthSitesFile,
   isMatchesFile,
@@ -189,16 +189,16 @@ export function App(): JSX.Element {
         if (!cancelled) useApp.getState().setLoadError(e instanceof Error ? e.message : String(e));
       }
     })();
+    // Back/forward buttons (path routing).
     const onHash = (): void => {
-      const h = window.location.hash.replace('#/', '');
-      const found = SCREENS.find((s) => s.id === h);
-      if (found) useApp.getState().setScreen(found.id);
+      const found = screenFromLocation();
+      if (found && found !== useApp.getState().screen) useApp.setState({ screen: found });
     };
-    window.addEventListener('hashchange', onHash);
+    window.addEventListener('popstate', onHash);
     return (): void => {
       cancelled = true;
       off();
-      window.removeEventListener('hashchange', onHash);
+      window.removeEventListener('popstate', onHash);
     };
   }, []);
 

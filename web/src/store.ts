@@ -124,9 +124,24 @@ interface AppState {
   setWalk: (w: WalkState | null) => void;
 }
 
+/** Path routing (/summary). Old hash links (#/summary) still work and are rewritten to the clean path. */
+export function screenFromLocation(): ScreenId | null {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  const fromHash = window.location.hash.startsWith('#/') ? window.location.hash.slice(2) : '';
+  const path = window.location.pathname.startsWith(base) ? window.location.pathname.slice(base.length) : window.location.pathname;
+  const id = (fromHash || path.replace(/^\/+|\/+$/g, '')).split('/')[0];
+  return SCREENS.some((s: { id: ScreenId }): boolean => s.id === id) ? (id as ScreenId) : null;
+}
+
+export function screenPath(screen: ScreenId): string {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  return `${base}/${screen === 'story' ? '' : screen}`;
+}
+
 function initialScreen(): ScreenId {
-  const h = window.location.hash.replace('#/', '');
-  return SCREENS.some((s: { id: ScreenId }): boolean => s.id === h) ? (h as ScreenId) : 'story';
+  const s = screenFromLocation() ?? 'story';
+  if (window.location.hash.startsWith('#/')) window.history.replaceState(null, '', screenPath(s));
+  return s;
 }
 
 export const useApp = create<AppState>()((set) => ({
@@ -143,7 +158,8 @@ export const useApp = create<AppState>()((set) => ({
   shadowMode: 'realtime',
   walk: null,
   setScreen: (screen: ScreenId): void => {
-    if (window.location.hash !== `#/${screen}`) window.history.replaceState(null, '', `#/${screen}`);
+    const path = screenPath(screen);
+    if (window.location.pathname !== path || window.location.hash) window.history.pushState(null, '', path);
     set({ screen });
   },
   setCore: (core: CoreData): void => {

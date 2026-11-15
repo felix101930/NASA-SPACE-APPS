@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 // Base path is configurable for GitHub Pages (e.g. BASE_PATH=/NASA-SPACE-APPS/) or Vercel (default "/").
-const base: string = process.env.BASE_PATH ?? './';
+const base: string = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({
   base,
