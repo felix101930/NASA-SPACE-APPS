@@ -125,6 +125,56 @@ function buildRows(core: CoreData, tags: AnalogTagsFile | null): Row[] {
 
 /* ---------------------------------------------------------------- component */
 
+interface SplitItem {
+  key: NoveltyGroup;
+  label: string;
+}
+
+const SPLIT: readonly SplitItem[] = [
+  { key: 'new', label: 'New: no prior analog study found' },
+  { key: 'studied_region', label: 'In a region already studied' },
+  { key: 'near_known', label: '50 to 100 km from a known analog' },
+  { key: 'established', label: 'Already an established analog' },
+];
+
+/** The headline novelty figure, large, with how all the sites split. */
+function NewStat({ nv }: { nv: AnalogTagsFile['novelty'] }): JSX.Element {
+  return (
+    <div className="an-stat">
+      <div className="an-stat-figure" aria-label={`${nv.counts.new} of ${nv.total} sites are new analogs`}>
+        <span className="an-stat-n">{nv.counts.new}</span>
+        <span className="an-stat-of">of {nv.total}</span>
+      </div>
+      <div className="an-stat-body">
+        <div className="an-stat-title">
+          Earth sites are new analogs
+          <InfoTip label="How we checked" title="New analogs" align="end">
+            <p>
+              Checked against {nv.checked}. Of {nv.total} sites: {nv.counts.established} are already established analogs,{' '}
+              {nv.counts.near_known} lie 50 to 100 km from one, {nv.counts.studied_region} sit inside a region already studied as an analog, and{' '}
+              {nv.counts.new} have no prior analog study we could find.
+            </p>
+          </InfoTip>
+        </div>
+        <p className="an-stat-text">No prior analog study found for them in the catalogues and literature we checked.</p>
+        <div className="an-split" role="img" aria-label={SPLIT.map((g: SplitItem): string => `${nv.counts[g.key]} ${g.label}`).join(', ')}>
+          {SPLIT.map((g: SplitItem) => (
+            <span key={g.key} className="an-split-seg" data-kind={g.key} style={{ flexGrow: nv.counts[g.key] }} />
+          ))}
+        </div>
+        <ul className="an-split-key">
+          {SPLIT.map((g: SplitItem) => (
+            <li key={g.key} data-kind={g.key}>
+              <span className="an-split-dot" aria-hidden="true" />
+              <strong>{nv.counts[g.key]}</strong> {g.label}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 /** `onMeta` hands the file's sources to the page credits. */
 export function AnalogList({ core, onMeta }: { core: CoreData; onMeta?: (m: Meta) => void }): JSX.Element | null {
   const setRegion = useApp((s) => s.setRegion);
@@ -155,24 +205,8 @@ export function AnalogList({ core, onMeta }: { core: CoreData; onMeta?: (m: Meta
   return (
     <section className="sum-section" aria-labelledby="analogs-h">
       <h2 id="analogs-h">Earth analogs we found</h2>
+      {nv && <NewStat nv={nv} />}
       <SearchScope core={core} />
-      {nv && (
-        <div className="an-lead">
-          <span>
-            <strong>
-              {nv.counts.new} of {nv.total}
-            </strong>{' '}
-            sites are new: no prior analog study found in the catalogues and literature we checked.
-          </span>
-          <InfoTip label="How we checked" title="New analogs">
-            <p>
-              Checked against {nv.checked}. Of {nv.total} sites: {nv.counts.established} are already established analogs,{' '}
-              {nv.counts.near_known} lie 50 to 100 km from one, {nv.counts.studied_region} sit inside a region already studied as an analog, and{' '}
-              {nv.counts.new} have no prior analog study we could find.
-            </p>
-          </InfoTip>
-        </div>
-      )}
       {tags && (
         <p className="caption an-sub">
           {nInside} of {rows.length} sit inside a protected area, so a rehearsal there may need a permit.

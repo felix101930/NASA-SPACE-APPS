@@ -186,3 +186,127 @@
     min-width: 140px;
   }
 }
+
+/* Headline novelty stat: the biggest figure on the Summary page. Neutral tones only (gold is sunlight). */
+.an-stat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 32px;
+  margin: 12px 0 24px;
+  padding: 24px 28px;
+  border: 1px solid var(--line-strong);
+  border-left: 4px solid var(--text);
+  border-radius: 8px;
+  background: var(--surface-2);
+  max-width: 1100px;
+}
+
+.an-stat-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.an-stat-n {
+  font-size: 88px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.an-stat-of {
+  font-size: var(--fs-h1);
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.an-stat-body {
+  flex: 1;
+  min-width: 260px;
+}
+
+.an-stat-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.an-stat-text {
+  margin: 0 0 16px;
+  font-size: var(--fs-body);
+  color: var(--text-2);
+}
+
+.an-split {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  max-width: 560px;
+}
+
+.an-split-seg[data-kind='new'],
+.an-split-key li[data-kind='new'] .an-split-dot {
+  background: var(--text);
+}
+
+.an-split-seg[data-kind='studied_region'],
+.an-split-key li[data-kind='studied_region'] .an-split-dot {
+  background: var(--text-3);
+}
+
+.an-split-seg[data-kind='near_known'],
+.an-split-key li[data-kind='near_known'] .an-split-dot {
+  background: var(--fit-far);
+}
+
+.an-split-seg[data-kind='established'],
+.an-split-key li[data-kind='established'] .an-split-dot {
+  background: var(--line-strong);
+}
+
+.an-split-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+}
+
+.an-split-key li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.an-split-key strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.an-split-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+@media (max-width: 600px) {
+  .an-stat {
+    padding: 20px;
+  }
+  .an-stat-n {
+    font-size: 64px;
+  }
+}
