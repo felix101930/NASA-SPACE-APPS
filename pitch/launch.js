@@ -88,7 +88,9 @@ export function buildLaunch(canvas, buf, moonModel) {
   let w = 0, h = 0;
   function render(p) {
     if (canvas.clientWidth !== w || canvas.clientHeight !== h) {
-      w = canvas.clientWidth; h = canvas.clientHeight; R.setSize(w, h, false); cam.aspect = w / h;
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      R.setPixelRatio(Math.min(devicePixelRatio, 1.5, Math.sqrt(4.2e6 / Math.max(1, w * h))));   // same budget as the main view
+      R.setSize(w, h, false); cam.aspect = w / h;
       // full screen on a wide display: keep the rocket in the right half, clear of the title
       if (w / h > 1.2) cam.setViewOffset(w, h, -w * .2, 0, w, h); else cam.clearViewOffset();
       cam.updateProjectionMatrix();

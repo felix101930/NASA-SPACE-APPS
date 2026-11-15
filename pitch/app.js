@@ -110,7 +110,11 @@ const mean = a => { let s = 0; for (const v of a) s += v; return s / a.length; }
 /* ---------------------------------------------------------------- renderer */
 const canvas = document.getElementById('gl');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, logarithmicDepthBuffer: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 1.6));
+// drawing-buffer budget: a 4K projector at full density would be 8+ million pixels a frame; cap it so every scene
+// keeps a smooth frame rate on any screen (the browser scales the canvas up)
+const MAX_PX = 4.2e6;
+const pixelRatio = () => Math.min(devicePixelRatio, 1.6, Math.sqrt(MAX_PX / Math.max(1, innerWidth * innerHeight)));
+renderer.setPixelRatio(pixelRatio());
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
@@ -468,6 +472,8 @@ document.body.appendChild(splitUI);
 
 /* ---------------------------------------------------------------- main */
 let state;
+let posReady = false; // true once init() has resumed the saved slide; only then is the position saved again
+let rewarm = null;   // set by init(): re-upload textures and recompile after a lost WebGL context comes back
 async function init() {
   const [plateRaw, tileRaw, abRaw, moon, lro, astro, slsBuf, satTex, day, water] = await Promise.all([
     bin('assets/data/polar_768.f32'), bin('assets/data/mons_mouton.bin'), bin('assets/data/AB_073_027.bin'),
@@ -679,11 +685,14 @@ void main(){
     });
     renderer.compile(scn, cam);
   };
-  warm(scene, camera);
-  warm(zScene, zoomOut.cam);
-  if (ground) warm(ground.scene, ground.cam);
-  if (flyup) warm(flyup.scene, flyup.cam);
-  launch.warm();
+  rewarm = () => {
+    warm(scene, camera);
+    warm(zScene, zoomOut.cam);
+    if (ground) warm(ground.scene, ground.cam);
+    if (flyup) warm(flyup.scene, flyup.cam);
+    launch.warm();
+  };
+  rewarm();
   // the three photos shown full screen are decoded here too, not on their first appearance
   await Promise.all([...document.querySelectorAll('#outro img[src], #photo img')].map(im => im.decode().catch(() => {})));
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -695,6 +704,10 @@ void main(){
     w.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:30;font:11px var(--mono, monospace);color:#fc3d21;background:#000c;padding:4px 8px;pointer-events:none';
     document.body.appendChild(w);
   }
+  // a reload in the same tab (Cmd+R, or the automatic one after a lost WebGL context) resumes on the same slide
+  const resumeAt = readPos();
+  if (resumeAt > 0) window.__go(resumeAt);
+  posReady = true;
   document.getElementById('loader').classList.add('done');
   setTimeout(() => document.getElementById('loader').remove(), 1400);
 }
@@ -807,10 +820,67 @@ speedBtns.forEach(b => b.addEventListener('click', () => { setSpeed(+b.dataset.s
 addEventListener('keydown', e => {
   if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); goto(1); }
   if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); goto(-1); }
+  if (e.key === 'Home') { e.preventDefault(); window.__go(0); }
   if (!e.ctrlKey && !e.metaKey && !e.altKey && ['1', '2', '3'].includes(e.key)) setSpeed(SPEEDS[+e.key - 1]);
 });
 addEventListener('click', e => { if (!e.target.closest('a, button')) goto(1); });
-addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); setH(); });
+/* Screen changes (plugging in a projector, mirroring, moving the window to another display): one debounced resize
+   that keeps the presenter on the same slide (the scroll height depends on the window height) and re-applies the
+   pixel budget, including when only the pixel density changes. */
+let resizeT = 0;
+const onResize = () => {
+  clearTimeout(resizeT);
+  resizeT = setTimeout(() => {
+    const u = uNow();
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    renderer.setPixelRatio(pixelRatio()); renderer.setSize(innerWidth, innerHeight);
+    setH();
+    if (typeof lenis.resize === 'function') lenis.resize();
+    window.__go(u);
+    requestAnimationFrame(() => window.__go(u));
+  }, 120);
+};
+addEventListener('resize', onResize);
+const watchDpr = () => matchMedia(`(resolution: ${devicePixelRatio}dppx)`).addEventListener('change', () => { onResize(); watchDpr(); }, { once: true });
+watchDpr();
+
+/* Lost WebGL context: a display reconfiguration (HDMI plugged in, GPU reset) can make the browser drop the 3D
+   context, which freezes or blanks the 3D while the captions carry on. three.js restores it if the browser hands
+   it back; if that hasn't happened within 2.5 s, reload onto the same slide (at most 3 times a minute). */
+const glNote = document.createElement('div');
+glNote.textContent = 'Reconnecting graphics…';
+glNote.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:40;font:11px var(--mono, monospace);letter-spacing:.08em;text-transform:uppercase;color:#9a968e;background:#000c;padding:6px 10px;border-radius:4px;opacity:0;transition:opacity .3s;pointer-events:none';
+document.body.appendChild(glNote);
+let lostT = 0;
+const onLost = () => {
+  savePos();
+  glNote.style.opacity = 1;
+  clearTimeout(lostT);
+  lostT = setTimeout(() => { if (reloadAllowed()) location.reload(); else glNote.textContent = 'Graphics lost: press Cmd+R to resume'; }, 2500);
+};
+const onRestored = () => { clearTimeout(lostT); glNote.style.opacity = 0; if (rewarm) rewarm(); };
+for (const c of [canvas, document.getElementById('sls')]) {
+  if (!c) continue;
+  c.addEventListener('webglcontextlost', onLost);
+  c.addEventListener('webglcontextrestored', onRestored);
+}
+
+/* Where the presenter is, kept for this tab only: a reload resumes there, a fresh tab starts at the top. */
+function savePos() {
+  if (!posReady) return;   // still loading: keep the saved slide for init() to resume
+  try { sessionStorage.setItem('pitch-u', String(uNow())); } catch { /* storage blocked: no resume */ }
+}
+function readPos() { try { const v = parseFloat(sessionStorage.getItem('pitch-u') || ''); return Number.isFinite(v) ? v : 0; } catch { return 0; } }
+function reloadAllowed() {
+  try {
+    const now = Date.now(), recent = JSON.parse(sessionStorage.getItem('pitch-reloads') || '[]').filter(t => now - t < 60000);
+    if (recent.length >= 3) return false;
+    sessionStorage.setItem('pitch-reloads', JSON.stringify([...recent, now]));
+    return true;
+  } catch { return false; }
+}
+setInterval(savePos, 500);
+addEventListener('pagehide', savePos);
 
 /* ---------------------------------------------------------------- DOM refs */
 const $ = id => document.getElementById(id);
