@@ -149,3 +149,50 @@ export function lowSunWindow(w: RehearsalWindow): boolean {
   const flagged = 'refraction_sensitive' in w && w.refraction_sensitive === true;
   return flagged || w.sun_el < 1;
 }
+
+/** "06:35 local solar time" (the window's start), else the full window time. */
+export function windowStart(w: RehearsalWindow): string {
+  const t = windowTime(w);
+  const m = /^(\d{1,2}:\d{2})\s*[–-]\s*\d{1,2}:\d{2}\s*(.*)$/.exec(t);
+  return m ? `${m[1]}${m[2] ? ` ${m[2]}` : ''}` : t;
+}
+
+// ------------------------------------------------------------------------------------------------
+// Date fit: one rehearsal date's sun on both tiles
+// ------------------------------------------------------------------------------------------------
+
+/** Moon and Earth dark shares under one date's sun; `gap` is in whole points, from the figures as shown. */
+export interface DateFit {
+  moon: number;
+  earth: number;
+  gap: number;
+}
+
+/** A date reproduces the Moon's shadow closely when the shown figures are at most this many points apart. */
+export const CLOSE_GAP_PTS = 10;
+
+export function dateFit(moon: number | null, earth: number | null): DateFit | null {
+  if (moon === null || earth === null || !Number.isFinite(moon) || !Number.isFinite(earth)) return null;
+  return { moon, earth, gap: Math.abs(Math.round(earth * 100) - Math.round(moon * 100)) };
+}
+
+/** Index of the date whose sun gives the closest Moon and Earth figures (earliest on a tie); -1 until all are known. */
+export function bestDateIndex(fits: (DateFit | null)[]): number {
+  if (!fits.length || fits.some((f: DateFit | null): boolean => f === null)) return -1;
+  let best = -1;
+  let bd = Infinity;
+  fits.forEach((f: DateFit | null, i: number): void => {
+    if (!f) return;
+    const d = Math.abs(f.earth - f.moon);
+    if (d < bd - 1e-9) {
+      bd = d;
+      best = i;
+    }
+  });
+  return best;
+}
+
+/** "Moon 48% · Earth 50%" */
+export function fitText(f: DateFit): string {
+  return `Moon ${pct0(f.moon)} · Earth ${pct0(f.earth)}`;
+}

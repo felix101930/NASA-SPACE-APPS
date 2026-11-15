@@ -1,13 +1,26 @@
 // Below the 3D panes: the basic numbers behind the match, what doesn't match, what can't be tested, and when to go.
 import type { JSX } from 'react';
-import { headlineLight, PatchFor } from '../../components/PatchFor';
 import { SunGlyph, VerdictGlyph, type VerdictKind } from '../../components/Glyphs';
 import { InfoTip } from '../../components/InfoTip';
 import { Why } from '../../components/Term';
 import { isObj, type LightRow, type Match, type Region, type RehearsalWindow } from '../../types/contract';
 import { plainNote } from '../../lib/plain';
 import { fmtNum, fmtStat } from '../../lib/units';
-import { compass, fmtMinutes, fmtValue, lightLabel, lightUsedToRank, lowSunWindow, verdictLight, windowDate, windowMinutes, windowPartOfDay, windowTime } from './copy';
+import {
+  compass,
+  fitText,
+  fmtMinutes,
+  fmtValue,
+  lightLabel,
+  lightUsedToRank,
+  lowSunWindow,
+  verdictLight,
+  windowDate,
+  windowMinutes,
+  windowPartOfDay,
+  windowTime,
+  type DateFit,
+} from './copy';
 
 // ------------------------------------------------------------------------------------------------
 // "How sure?" inputs
@@ -136,7 +149,6 @@ export function EvidenceTable({ match, region, placeLabel, agreement }: Evidence
           </tbody>
         </table>
       </div>
-      <PatchFor light={headlineLight(match)} hazard={match.hazard} />
       {match.patchiness_summary?.text && <p className="t3-patch-line">{match.patchiness_summary.text}</p>}
     </section>
   );
@@ -197,6 +209,8 @@ export function WindowsList({
   windows,
   placeLabel,
   activeIndex,
+  fits,
+  bestIndex,
   onPick,
   open,
   onOpenChange,
@@ -204,6 +218,9 @@ export function WindowsList({
   windows: RehearsalWindow[];
   placeLabel: string;
   activeIndex: number | null;
+  /** Moon and Earth dark shares under each date's sun (null while working out). */
+  fits: (DateFit | null)[];
+  bestIndex: number;
   onPick: (i: number) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -222,7 +239,7 @@ export function WindowsList({
         </span>
       </summary>
       <div className="why-row t3-section-sub">
-        <span>Times when the sun at {placeLabel} sits as low as at the lunar south pole. Pick one to light both views.</span>
+        <span>Times when the sun at {placeLabel} sits as low as at the lunar south pole. ★ = closest shadow to the Moon’s. Pick one to light both views.</span>
         <Why id="refraction" />
       </div>
       {windows.length === 0 ? (
@@ -232,10 +249,14 @@ export function WindowsList({
           {windows.map((w: RehearsalWindow, i: number) => {
             const mins = windowMinutes(w);
             const part = windowPartOfDay(w);
+            const fit = fits[i] ?? null;
             return (
               <li key={`${w.start_utc}-${i}`}>
                 <button type="button" className="t3-window" aria-pressed={activeIndex === i} onClick={(): void => onPick(i)}>
-                  <span className="t3-window-date">{windowDate(w)}</span>
+                  <span className="t3-window-date">
+                    {windowDate(w)}
+                    {i === bestIndex ? ' ★' : ''}
+                  </span>
                   <span className="t3-window-time">
                     {windowTime(w)}
                     {part ? ` · ${part}` : ''}
@@ -246,6 +267,7 @@ export function WindowsList({
                     {mins !== null ? ` · ${fmtMinutes(mins)}` : ''}
                     {lowSunWindow(w) ? ' · below 1°: refraction-sensitive' : ''}
                   </span>
+                  <span className="t3-window-fit">{fit ? `${fitText(fit)} dark` : '…'}</span>
                 </button>
               </li>
             );

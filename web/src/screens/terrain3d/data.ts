@@ -251,29 +251,56 @@ function getShadowWorker(): Worker {
   return w;
 }
 
-/** Runs one shadow job off the main thread. The grid is copied to the worker once per Grid object. */
+/** Runs one shadow job off the main thread. The grid is copied to the worker once per Grid object (again if the
+ * worker has since dropped it: it keeps only the last few tiles). */
 function shadowJob(g: Grid, type: 'frac' | 'mask', el: number, az: number, maxDist: number, done: (r: ShadowReply) => void): () => void {
   const w = getShadowWorker();
-  let key = gridKeys.get(g);
-  if (key === undefined) {
-    key = nextGridKey++;
-    gridKeys.set(g, key);
-    const msg: ShadowRequest = { type: 'grid', key, data: g.data.slice(), size: g.size, res: g.res };
-    w.postMessage(msg);
-  }
-  const id = nextJob++;
-  jobs.set(id, done);
-  const req: ShadowRequest = { type, id, key, el, az, maxDist };
-  w.postMessage(req);
+  let cancelled = false;
+  let id = 0;
+  const send = (retry: boolean): void => {
+    let key = gridKeys.get(g);
+    if (key === undefined) {
+      key = nextGridKey++;
+      gridKeys.set(g, key);
+      const msg: ShadowRequest = { type: 'grid', key, data: g.data.slice(), size: g.size, res: g.res };
+      w.postMessage(msg);
+    }
+    id = nextJob++;
+    jobs.set(id, (r: ShadowReply): void => {
+      if (cancelled) return;
+      if (r.type === 'error' && retry) {
+        gridKeys.delete(g);
+        send(false);
+        return;
+      }
+      done(r);
+    });
+    const req: ShadowRequest = { type, id, key, el, az, maxDist };
+    w.postMessage(req);
+  };
+  send(true);
   return (): void => {
+    cancelled = true;
     jobs.delete(id);
   };
 }
 
 const READOUT_MIN_MS = 250;
 
+const readoutGrids = new WeakMap<LoadedTile, Grid>();
+
+/** The 90 m readout grid for a tile, shared by the live readout and the per-date figures (so they agree exactly). */
+function readoutGrid(tile: LoadedTile): Grid {
+  let g = readoutGrids.get(tile);
+  if (!g) {
+    g = downsample(tile.filled, READOUT_STEP);
+    readoutGrids.set(tile, g);
+  }
+  return g;
+}
+
 export function useShadowShare(tile: LoadedTile | null, el: number, az: number): ShadowShare | null {
-  const small = useMemo((): Grid | null => (tile ? downsample(tile.filled, READOUT_STEP) : null), [tile]);
+  const small = useMemo((): Grid | null => (tile ? readoutGrid(tile) : null), [tile]);
   const [share, setShare] = useState<ShadowShare | null>(null);
   const smallRef = useRef<Grid | null>(small);
   const want = useRef<{ el: number; az: number } | null>(null);
@@ -327,6 +354,69 @@ export function useShadowShare(tile: LoadedTile | null, el: number, az: number):
     [],
   );
   return share;
+}
+
+// ------------------------------------------------------------------------------------------------
+// Per-date shadow shares: each rehearsal date's sun on both tiles (same grid and method as the live readout)
+// ------------------------------------------------------------------------------------------------
+
+/** A sun for the panes: elevation and azimuth from the tile's top, already rounded as the panes use them. */
+export interface SunDir {
+  el: number;
+  az: number;
+}
+
+/** Moon and Earth dark shares for one sun; null until worked out. */
+export interface DatePair {
+  moon: number | null;
+  earth: number | null;
+}
+
+const fracCache = new WeakMap<Grid, Map<string, number>>();
+
+function sunKey(d: SunDir): string {
+  return `${d.el}|${d.az}`;
+}
+
+function cachedFrac(g: Grid | null, d: SunDir): number | null {
+  return g ? (fracCache.get(g)?.get(sunKey(d)) ?? null) : null;
+}
+
+/** Dark share on both tiles for each sun in `dirs`, worked out off the main thread and cached per tile and sun. */
+export function useDateShares(moonTile: LoadedTile | null, earthTile: LoadedTile | null, dirs: SunDir[]): DatePair[] {
+  const moonGrid = useMemo((): Grid | null => (moonTile ? readoutGrid(moonTile) : null), [moonTile]);
+  const earthGrid = useMemo((): Grid | null => (earthTile ? readoutGrid(earthTile) : null), [earthTile]);
+  const [version, setVersion] = useState<number>(0);
+  useEffect((): (() => void) => {
+    const cancels: (() => void)[] = [];
+    for (const g of [moonGrid, earthGrid]) {
+      if (!g) continue;
+      let cache = fracCache.get(g);
+      if (!cache) {
+        cache = new Map<string, number>();
+        fracCache.set(g, cache);
+      }
+      const store = cache;
+      for (const d of dirs) {
+        const k = sunKey(d);
+        if (store.has(k)) continue;
+        cancels.push(
+          shadowJob(g, 'frac', d.el, d.az, g.size, (r: ShadowReply): void => {
+            if (r.type !== 'frac') return;
+            store.set(k, r.frac);
+            setVersion((v: number): number => v + 1);
+          }),
+        );
+      }
+    }
+    return (): void => cancels.forEach((f: () => void): void => f());
+  }, [moonGrid, earthGrid, dirs]);
+  return useMemo(
+    (): DatePair[] => dirs.map((d: SunDir): DatePair => ({ moon: cachedFrac(moonGrid, d), earth: cachedFrac(earthGrid, d) })),
+    // `version` re-reads the cache after each reply.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [moonGrid, earthGrid, dirs, version],
+  );
 }
 
 // ------------------------------------------------------------------------------------------------

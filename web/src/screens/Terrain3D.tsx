@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
 import { HazardGlyph, SunGlyph } from '../components/Glyphs';
 import { SampleChip } from '../components/ScreenHead';
 import { TERRAIN_KM } from '../components/terrainGeometry';
@@ -6,38 +6,48 @@ import { mapToPixel } from '../lib/terrain';
 import { matchesFor, useApp, useRegion, type CoreData } from '../store';
 import { HAZARD_IDS, type EarthSite, type HazardId, type LightRow, type Match, type Region, type RehearsalWindow, type ShadowMask } from '../types/contract';
 import { HAZARDS } from '../content';
-import { avgShadowAt, dirWord } from '../lib/shadow';
+import { dirWord } from '../lib/shadow';
 import { fmtLatLon, placeName, type PlaceName } from '../lib/placeName';
 import { InfoTip } from '../components/InfoTip';
 import { Select } from '../components/Select';
 import { regionOptions } from '../lib/regionOptions';
 import { Term, Why } from '../components/Term';
 import {
+  bestDateIndex,
   buildVerdict,
+  CLOSE_GAP_PTS,
   compass,
+  dateFit,
+  fitText,
   fmtMinutes,
   HAZARD_TAB,
   lowSunWindow,
   pct0,
   windowDate,
   windowMinutes,
-  windowTime,
+  windowStart,
+  type DateFit,
   type Verdict,
+  verdictLight,
 } from './terrain3d/copy';
 import {
   moonRimSegs,
   useAnnotations,
   useCellTexture,
+  useDateShares,
   useEarthRimSegs,
   useMaskTexture,
   useShadowShare,
   useSiteStillListed,
   useTile,
+  type DatePair,
   type RimSeg,
   type ShadowShare,
+  type SunDir,
 } from './terrain3d/data';
 import { EvidenceTable, nasademAgreement, NotesBoxes, WindowsList } from './terrain3d/Evidence';
 import { Pane } from './terrain3d/Scene';
+import { DropZoneLegend, type DropZoneStats } from './terrain3d/DropZoneLayer';
 import type { PatchLayerData } from './terrain3d/PatchLayer';
 import { headlineLight } from '../components/PatchFor';
 import { PatchLegend } from '../components/PatchGrid';
@@ -67,13 +77,6 @@ function shortDate(w: RehearsalWindow): string {
   return Number.isNaN(d.getTime()) ? w.start_utc.slice(0, 10) : SHORT_DATE.format(d);
 }
 
-/** Index of the next window from now (windows are searched from today), else the first one. */
-function nextWindowIndex(windows: RehearsalWindow[]): number {
-  const now = Date.now();
-  const i = windows.findIndex((w: RehearsalWindow): boolean => new Date(w.start_utc).getTime() >= now);
-  return i >= 0 ? i : windows.length ? 0 : -1;
-}
-
 function median(v: number[]): number | null {
   if (!v.length) return null;
   const s = [...v].sort((a: number, b: number): number => a - b);
@@ -101,6 +104,31 @@ function trueNorthGridAz(site: EarthSite): number {
 /** A geographic sun azimuth at the Earth site, as an azimuth from the tile's top (grid +y). */
 function gridAzFor(site: EarthSite, geoAz: number): number {
   return (((geoAz + trueNorthGridAz(site)) % 360) + 360) % 360;
+}
+
+/** The panes' sun for a rehearsal date: its height (kept within the slider) and its bearing as a tile azimuth. */
+function windowSun(site: EarthSite, w: RehearsalWindow): SunDir {
+  return {
+    el: Math.round(Math.min(30, Math.max(0.5, w.sun_el)) * 10) / 10,
+    az: Math.round(gridAzFor(site, w.sun_az) * 10) / 10,
+  };
+}
+
+const NO_WINDOWS: RehearsalWindow[] = [];
+const CHIP_COUNT = 3;
+
+/** The dates on the chips: the 3 closest fits once known (else the first 3), in date order. */
+function chipIndices(fits: (DateFit | null)[], ready: boolean): number[] {
+  const all = fits.map((_f: DateFit | null, i: number): number => i);
+  if (!ready) return all.slice(0, CHIP_COUNT);
+  const gapOf = (i: number): number => {
+    const f = fits[i];
+    return f ? Math.abs(f.earth - f.moon) : Infinity;
+  };
+  return [...all]
+    .sort((a: number, b: number): number => gapOf(a) - gapOf(b) || a - b)
+    .slice(0, CHIP_COUNT)
+    .sort((a: number, b: number): number => a - b);
 }
 
 function siteMetric(site: EarthSite, key: string): number | null {
@@ -298,11 +326,6 @@ function shareBig(s: ShadowShare | null): string {
   return s ? `${pct0(s.frac)} dark` : '…';
 }
 
-/** "at a 3° sun (50% averaged over all directions)": the marker shows the direction, so no direction words. */
-function atSun(elTxt: string, avg: number | null): string {
-  return `at a ${elTxt} sun${avg !== null ? ` (${pct0(avg)} averaged over all directions)` : ''}`;
-}
-
 export default function Terrain3D(): JSX.Element {
   const core = useApp((s) => s.core) as CoreData;
   const region = useRegion();
@@ -322,8 +345,16 @@ export default function Terrain3D(): JSX.Element {
   const sweeping = sweep.state.phase !== 'idle';
   const [lift, setLift] = useState<boolean>(false);
   const [showPatches, setShowPatches] = useState<boolean>(false);
+  // "Show big-drop zones": on whenever the Rim jump tab is selected; one colour max (the larger P99) for both panes.
+  const [showDrops, setShowDrops] = useState<boolean>(false);
+  useEffect((): void => setShowDrops(hazard === 'rim'), [hazard]);
+  const [dzStats, setDzStats] = useState<{ moon: DropZoneStats | null; earth: DropZoneStats | null }>({ moon: null, earth: null });
+  const onMoonDz = useCallback((st: DropZoneStats): void => setDzStats((o) => ({ ...o, moon: st })), []);
+  const onEarthDz = useCallback((st: DropZoneStats): void => setDzStats((o) => ({ ...o, earth: st })), []);
+  const dzScaleMax = Math.max(dzStats.moon?.fieldP99 ?? 0, dzStats.earth?.fieldP99 ?? 0);
   const [activeWindow, setActiveWindow] = useState<{ key: string; el: number; az: number } | null>(null);
   const [datesOpen, setDatesOpen] = useState<boolean>(false);
+  const [autoKey, setAutoKey] = useState<string | null>(null);
 
   // A stale selection (e.g. a site from an older pipeline run kept in memory) falls back to this region × danger's
   // #1 match, so the 3D view never asks for a tile that no longer exists.
@@ -374,6 +405,16 @@ export default function Terrain3D(): JSX.Element {
 
   const moon = useTile(region?.tile ?? null, core.regionsOrigin);
   const earth = useTile(site?.tile ?? null, core.sitesOrigin);
+
+  // Each rehearsal date's sun on both tiles: Earth at that date's sun, the Moon with the same height and direction
+  // from its tile's top. The date whose figures are closest is the best date to rehearse.
+  const windows: RehearsalWindow[] = match?.windows ?? NO_WINDOWS;
+  const dirs = useMemo((): SunDir[] => (site ? windows.map((w: RehearsalWindow): SunDir => windowSun(site, w)) : []), [site, windows]);
+  const earthTileHere = earth.tile && site && earth.tile.ref.path === site.tile.path ? earth.tile : null;
+  const datePairs = useDateShares(moon.tile, earthTileHere, dirs);
+  const fits = useMemo((): (DateFit | null)[] => datePairs.map((p: DatePair): DateFit | null => dateFit(p.moon, p.earth)), [datePairs]);
+  const bestIdx = bestDateIndex(fits);
+  const matchKey = site && match ? `${site.id}:${match.hazard}` : null;
   const stillListed = useSiteStillListed(site?.id ?? null, earth.error !== null, core.sitesOrigin);
   const ann = useAnnotations(region, core.regionsOrigin);
   const moonShare = useShadowShare(moon.tile, el, az);
@@ -399,6 +440,16 @@ export default function Terrain3D(): JSX.Element {
     return [mapToPixel(it.x0, it.y0, ref.origin_x, ref.origin_y, ref.res_m), mapToPixel(it.x1, it.y1, ref.origin_x, ref.origin_y, ref.res_m)];
   }, [walk, site]);
 
+  // On load and whenever the match changes, light both panes with the best date (once; later picks are the user's).
+  useEffect((): void => {
+    if (!matchKey || bestIdx < 0 || autoKey === matchKey || sweeping) return;
+    const d = dirs[bestIdx];
+    if (!d) return;
+    setSun(d.el, d.az);
+    setActiveWindow({ key: `${matchKey}:${bestIdx}`, el: d.el, az: d.az });
+    setAutoKey(matchKey);
+  }, [matchKey, bestIdx, autoKey, sweeping, dirs, setSun]);
+
   if (!region || !site || !current) {
     return (
       <div className="t3">
@@ -408,7 +459,17 @@ export default function Terrain3D(): JSX.Element {
   }
 
   const place = current.place;
-  const verdict: Verdict | null = match ? buildVerdict(match, place.label, region.name, nScreened(core)) : null;
+  const verdictBase: Verdict | null = match ? buildVerdict(match, place.label, region.name, nScreened(core)) : null;
+  const bestW = bestIdx >= 0 ? (windows[bestIdx] ?? null) : null;
+  const bestFit = bestIdx >= 0 ? (fits[bestIdx] ?? null) : null;
+  const ready = bestIdx >= 0;
+  const closeDate = bestFit !== null && bestFit.gap <= CLOSE_GAP_PTS;
+  // A shadow headline states the best date's figures, not the all-directions average the site was chosen on.
+  const shadowHeadline = match ? /^shadow_frac_el\d+$/.test(verdictLight(match)?.metric ?? '') : false;
+  const verdict: Verdict | null =
+    verdictBase && shadowHeadline
+      ? { ...verdictBase, stat: bestFit && bestW ? `${fitText(bestFit)} dark on ${shortDate(bestW)}` : '…' }
+      : verdictBase;
   const realtime = mode === 'realtime';
   const extentOf = (size: number, res: number): number => {
     const v = size * res * TERRAIN_KM;
@@ -416,28 +477,23 @@ export default function Terrain3D(): JSX.Element {
   };
 
   // Windows: geographic azimuth at the Earth site -> azimuth from the top of the (north-up) Earth tile.
-  const windows: RehearsalWindow[] = match?.windows ?? [];
   const winKey = (i: number): string => `${site.id}:${match?.hazard ?? ''}:${i}`;
   const activeIdx =
     activeWindow && Math.abs(activeWindow.el - el) < 0.01 && Math.abs(activeWindow.az - az) < 0.01
       ? windows.findIndex((_w: RehearsalWindow, i: number): boolean => winKey(i) === activeWindow.key)
       : -1;
   const pickWindow = (i: number): void => {
-    const w = windows[i];
-    if (!w) return;
+    const d = dirs[i];
+    if (!d) return;
     sweep.stop();
-    const gAz = Math.round(gridAzFor(site, w.sun_az) * 10) / 10;
-    const gEl = Math.round(Math.min(30, Math.max(0.5, w.sun_el)) * 10) / 10;
-    setSun(gEl, gAz);
-    setActiveWindow({ key: winKey(i), el: gEl, az: gAz });
+    setSun(d.el, d.az);
+    setActiveWindow({ key: winKey(i), el: d.el, az: d.az });
   };
   const activeW = activeIdx >= 0 ? windows[activeIdx] : null;
+  const activeFit = activeIdx >= 0 ? (fits[activeIdx] ?? null) : null;
 
-  // Per-hazard readouts. Live shadow shares are for ONE sun direction (the marker shows which); the profile and
-  // table values are averaged over all directions, so every single-direction figure also shows the average.
+  // Per-hazard readouts. Live shadow shares are for the ONE sun shown (a date's sun, or a preset height).
   const elTxt = `${el.toFixed(el % 1 ? 1 : 0)}°`;
-  const moonAvg = avgShadowAt(el, region.hazards.shadow.metrics, region.extras);
-  const earthAvg = avgShadowAt(el, site.metrics);
   let moonReadout: ReactNode;
   let earthReadout: ReactNode;
   let earthNote: ReactNode = null;
@@ -489,10 +545,8 @@ export default function Terrain3D(): JSX.Element {
       </>
     );
   } else {
-    moonReadout = <Readout big={shareBig(moonShare)} small={atSun(elTxt, moonAvg)} />;
-    earthReadout = (
-      <Readout big={shareBig(earthShare)} small={`same sun${earthAvg !== null ? ` (${pct0(earthAvg)} averaged over all directions)` : ''}`} />
-    );
+    moonReadout = <Readout big={shareBig(moonShare)} small={activeW ? `${shortDate(activeW)} sun · ${elTxt}` : `at a ${elTxt} sun`} />;
+    earthReadout = <Readout big={shareBig(earthShare)} small="same sun" />;
     caption = (
       <>
         <span>
@@ -504,11 +558,10 @@ export default function Terrain3D(): JSX.Element {
     );
   }
 
-  // When to go: the next window, chips beside the sun presets, and the full list on demand.
-  const nextIdx = nextWindowIndex(windows);
-  const nextW = nextIdx >= 0 ? windows[nextIdx] : null;
+  // When to go: the best date, chips beside the sun presets, and the full list on demand.
   const insight = lowSunInsight(windows, site);
-  const anyLow = windows.slice(0, 3).some(lowSunWindow);
+  const chips = chipIndices(fits, ready);
+  const anyLow = chips.some((i: number): boolean => lowSunWindow(windows[i]));
   const openDates = (): void => {
     setDatesOpen(true);
     window.requestAnimationFrame((): void =>
@@ -552,34 +605,49 @@ export default function Terrain3D(): JSX.Element {
 
       {match && (
         <div className="t3-when">
-          {nextW ? (
-            <div className="t3-when-line why-row">
+          {windows.length === 0 ? (
+            <p className="t3-when-line">No low-sun window here in the next year (e.g. polar night).</p>
+          ) : (
+            <div className="t3-when-line why-row" role="status">
               <SunGlyph size={14} />
-              <span>
-                <strong>
-                  <Term id="rehearsalWindow">Next on site:</Term>
-                </strong>{' '}
-                {windowDate(nextW)}, {windowTime(nextW)} · sun {nextW.sun_el.toFixed(1)}° {compass(nextW.sun_az)}
-                {windowMinutes(nextW) !== null ? ` · ~${fmtMinutes(windowMinutes(nextW) ?? 0)}` : ''}
-              </span>
-              {lowSunWindow(nextW) && (
+              {!ready || !bestW || !bestFit ? (
+                <span>
+                  <strong>
+                    <Term id="rehearsalWindow">Best date to see this on site:</Term>
+                  </strong>{' '}
+                  …
+                </span>
+              ) : closeDate ? (
+                <span>
+                  <strong>
+                    <Term id="rehearsalWindow">Best date to see this on site:</Term>
+                  </strong>{' '}
+                  {shortDate(bestW)}, {windowStart(bestW)} · sun {bestW.sun_el.toFixed(1)}°
+                  {windowMinutes(bestW) !== null ? ` · ~${fmtMinutes(windowMinutes(bestW) ?? 0)}` : ''}
+                </span>
+              ) : (
+                <span>
+                  No date reproduces the Moon’s shadow closely here — closest: {shortDate(bestW)} ({fitText(bestFit)})
+                </span>
+              )}
+              {bestW && lowSunWindow(bestW) && (
                 <span className="flag-note">
                   below 1° <Why id="refraction" />
                 </span>
               )}
-              {insight && (
-                <InfoTip label="How long does this low sun last?" title="Minutes on Earth, days on the Moon">
-                  <p>{insight}</p>
-                </InfoTip>
-              )}
+              <InfoTip label="Why this date?" title="One day, one sun direction">
+                <p>
+                  We chose this site on shadow averaged over all sun directions, because the Moon’s polar sun circles the horizon. A rehearsal
+                  happens on one day, so we pick the date whose sun direction matches best.
+                </p>
+                {insight && <p>{insight}</p>}
+              </InfoTip>
               {windows.length > 1 && (
                 <button type="button" className="link-btn t3-when-more" aria-controls="t3-all-dates" onClick={openDates}>
                   +{windows.length - 1} {windows.length - 1 === 1 ? 'date' : 'dates'} ▾
                 </button>
               )}
             </div>
-          ) : (
-            <p className="t3-when-line">No low-sun window here in the next year (e.g. polar night).</p>
           )}
         </div>
       )}
@@ -606,20 +674,27 @@ export default function Terrain3D(): JSX.Element {
           {windows.length > 0 && (
             <div className="t3-sun-presets t3-sun-dates" role="group" aria-label="Light both views with the sun of a rehearsal date at the Earth site">
               <span className="t3-sun-dates-label">Dates:</span>
-              {windows.slice(0, 3).map((w: RehearsalWindow, i: number) => (
-                <button
-                  key={`${w.start_utc}-${i}`}
-                  type="button"
-                  aria-pressed={activeIdx === i}
-                  data-low={lowSunWindow(w) || undefined}
-                  title={`${windowDate(w)}, ${windowTime(w)} · sun ${w.sun_el.toFixed(1)}° from the ${dirWord(w.sun_az)}${lowSunWindow(w) ? ' · below 1°: refraction-sensitive' : ''}`}
-                  onClick={(): void => pickWindow(i)}
-                >
-                  {shortDate(w)}
-                  {lowSunWindow(w) ? ' *' : ''}
-                </button>
-              ))}
-              {windows.length > 3 && (
+              {chips.map((i: number) => {
+                const w = windows[i];
+                const fit = fits[i] ?? null;
+                return (
+                  <button
+                    key={`${w.start_utc}-${i}`}
+                    type="button"
+                    className="t3-date-chip"
+                    aria-pressed={activeIdx === i}
+                    data-low={lowSunWindow(w) || undefined}
+                    data-best={i === bestIdx || undefined}
+                    onClick={(): void => pickWindow(i)}
+                  >
+                    {shortDate(w)}
+                    {i === bestIdx ? ' ★' : ''}
+                    {lowSunWindow(w) ? ' *' : ''}
+                    <span className="t3-date-tip">{fit ? `${fitText(fit)} dark` : '…'}</span>
+                  </button>
+                );
+              })}
+              {windows.length > chips.length && (
                 <button type="button" onClick={openDates} aria-controls="t3-all-dates">
                   …
                 </button>
@@ -793,11 +868,12 @@ export default function Terrain3D(): JSX.Element {
           lift={lift}
           shadeMap={moonMask.texture}
           cellMap={moonCells}
-          rim={moonRim}
+          rim={showDrops ? null : moonRim}
           path={moonPath}
           readout={moonReadout}
           note={!realtime && moonMask.note ? `Shadows: ${moonMask.note}` : null}
           patches={moonPatches}
+          dropZones={{ visible: showDrops, scaleMax: dzScaleMax, onStats: onMoonDz }}
         />
         <Pane
           id="earth"
@@ -816,11 +892,12 @@ export default function Terrain3D(): JSX.Element {
           lift={lift}
           shadeMap={earthMask.texture}
           cellMap={earthCells}
-          rim={hazard === 'rim' ? earthRim : null}
+          rim={hazard === 'rim' && !showDrops ? earthRim : null}
           path={earthPath}
           readout={earthReadout}
           note={earthNote ?? (!realtime && earthMask.note ? `Shadows: ${earthMask.note}` : null)}
           patches={earthPatches}
+          dropZones={{ visible: showDrops, scaleMax: dzScaleMax, onStats: onEarthDz }}
         />
       </div>
 
@@ -836,8 +913,13 @@ export default function Terrain3D(): JSX.Element {
               <PatchLegend scaleMin={pair.scaleMin} scaleMax={pair.scaleMax} unit={pair.unit} hazard={hazard} />
             </div>
           )}
+          {showDrops && dzScaleMax > 0 && <DropZoneLegend scaleMax={dzScaleMax} />}
         </div>
         <div className="t3-toggles">
+          <label className="check t3-lift">
+            <input type="checkbox" checked={showDrops} onChange={(e): void => setShowDrops(e.target.checked)} />
+            Show big-drop zones
+          </label>
           <label className="check t3-lift" title={pair ? undefined : 'No patch values for this site'}>
             <input type="checkbox" checked={showPatches && pair !== null} disabled={!pair} onChange={(e): void => setShowPatches(e.target.checked)} />
             Show the 25 patches
@@ -854,6 +936,7 @@ export default function Terrain3D(): JSX.Element {
           <span>
             Sun of {windowDate(activeW)} on site: {activeW.sun_el.toFixed(1)}°, from {Math.round(activeW.sun_az)}° (north = 0°). The Moon view
             uses the same angle from its tile’s top.
+            {hazard !== 'shadow' && activeFit ? ` ${fitText(activeFit)} dark.` : ''}
           </span>
           {lowSunWindow(activeW) && (
             <span className="flag-note">
@@ -871,7 +954,7 @@ export default function Terrain3D(): JSX.Element {
           </p>
           <p className="t3-fine">
             Both views use a 30 m grid. The dark percentages are worked out in your browser from true heights in 90 m steps, for the one sun
-            direction shown; the profile and table figures are averaged over all sun directions. Pink squares are 1 km squares with no camera
+            direction shown. Pink squares are 1 km squares with no camera
             landmark at a 3° sun from at least half of 8 sun directions. Orange lines come from a scan of every point in 16 directions, with
             picks at least 1.5 km apart.
           </p>
@@ -891,6 +974,8 @@ export default function Terrain3D(): JSX.Element {
             windows={windows}
             placeLabel={place.label}
             activeIndex={activeIdx >= 0 ? activeIdx : null}
+            fits={fits}
+            bestIndex={bestIdx}
             onPick={pickWindow}
             open={datesOpen}
             onOpenChange={setDatesOpen}

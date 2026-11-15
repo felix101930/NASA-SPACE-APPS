@@ -1,5 +1,5 @@
 // One 3D pane: terrain, one sun, and the hazard overlay. Both panes share camera, sun and exaggeration.
-import { useEffect, useMemo, useRef, type JSX, type MutableRefObject, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type JSX, type MutableRefObject, type ReactNode } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Line, OrbitControls } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
@@ -10,6 +10,7 @@ import { TERRAIN_KM, tileToScene, useTerrainGeometry } from '../../components/te
 import { SunMarker, sunGeometry, sunPosition } from '../../components/SunMarker';
 import type { LoadedTile } from '../../data/tiles';
 import type { RimSeg } from './data';
+import { DropZoneLabels, DropZoneLayer, type DropZoneLabelData, type DropZoneStats } from './DropZoneLayer';
 import { PATCH_TINT_OPACITY, PatchLabelProjector, PatchLabels, PatchLines, patchAnchors, usePatchTexture, type PatchLayerData } from './PatchLayer';
 
 const KM = TERRAIN_KM;
@@ -326,6 +327,8 @@ export interface PaneProps {
   note?: ReactNode;
   /** "Show the 25 patches": values on the scale shared by both panes, or null when off. */
   patches?: PatchLayerData | null;
+  /** "Show big-drop zones": on/off, the colour max shared by both panes, and where to report this pane's stats. */
+  dropZones?: { visible: boolean; scaleMax: number; onStats: (s: DropZoneStats) => void } | null;
 }
 
 export function Pane(p: PaneProps): JSX.Element {
@@ -333,6 +336,8 @@ export function Pane(p: PaneProps): JSX.Element {
   const shadows = p.realtime;
   const tagEls = useRef<Map<string, HTMLSpanElement>>(new Map());
   const patchEls = useRef<(HTMLSpanElement | null)[]>([]);
+  const dzEls = useRef<(HTMLSpanElement | null)[]>([]);
+  const [dzLabels, setDzLabels] = useState<DropZoneLabelData[]>([]);
   const patches = p.patches ?? null;
   const patchMap = usePatchTexture(patches);
   const anchors = useMemo((): [number, number, number][] => (tile && patches ? patchAnchors(tile, p.exag) : []), [tile, patches, p.exag]);
@@ -367,6 +372,19 @@ export function Pane(p: PaneProps): JSX.Element {
           <Sun el={sceneSunEl(p.el, p.exag)} az={p.az} shadows={shadows} extent={p.extentKm} />
           <SunMarker el={p.el} az={p.az} extent={p.extentKm} baseY={baseY} />
           <TerrainMesh tile={tile} exag={p.exag} map={p.realtime ? null : p.shadeMap} emissiveMap={p.cellMap} shadows={shadows} patchMap={patchMap} />
+          {p.dropZones && (
+            <DropZoneLayer
+              dem={tile.raw.data}
+              size={tile.raw.size}
+              resM={tile.raw.res}
+              exaggeration={p.exag}
+              scaleMax={p.dropZones.scaleMax}
+              visible={p.dropZones.visible}
+              onStats={p.dropZones.onStats}
+              onLabels={setDzLabels}
+              labelEls={dzEls}
+            />
+          )}
           {patches && <PatchLines tile={tile} exag={p.exag} />}
           {patches && <PatchLabelProjector anchors={anchors} els={patchEls} />}
           {p.rim && <RimOverlay tile={tile} exag={p.exag} segs={p.rim} />}
@@ -379,6 +397,7 @@ export function Pane(p: PaneProps): JSX.Element {
         </SafeCanvas>
       )}
       {tile && !p.error && patches && <PatchLabels data={patches} els={patchEls} />}
+      {tile && !p.error && p.dropZones?.visible && <DropZoneLabels labels={dzLabels} els={dzEls} />}
       {tile && !p.error && (
         <div className="t3-tags" aria-hidden="true">
           {tags.map((t: Tag3D) => (

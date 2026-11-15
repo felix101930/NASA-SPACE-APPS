@@ -1151,3 +1151,68 @@
   color: var(--text);
   font-weight: 600;
 }
+
+/* ---------- Best date: per-date figures on the chips and in the full list ---------- */
+
+/* The chip group lets the figure pop out above it, so it rounds its own end corners instead of clipping. */
+.t3-sun-dates {
+  overflow: visible;
+}
+
+.t3-sun-dates > :first-child {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.t3-sun-dates > :last-child {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.t3-date-chip {
+  position: relative;
+  white-space: nowrap;
+}
+
+.t3-sun-dates .t3-date-chip[data-best] {
+  color: var(--text);
+}
+
+.t3-date-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 5;
+  padding: 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-3);
+  color: var(--text);
+  font-size: var(--fs-caption);
+  font-weight: 400;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 140ms var(--ease-out);
+}
+
+.t3-date-chip:hover .t3-date-tip,
+.t3-date-chip:focus-visible .t3-date-tip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t3-date-tip {
+    transition: none;
+    transform: translate(-50%, 0);
+  }
+}
+
+.t3-window-fit {
+  margin-top: 2px;
+  font-size: var(--fs-caption);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
