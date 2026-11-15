@@ -1,4 +1,4 @@
-import { useEffect, useState, type JSX } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { HAZARDS, distanceFit } from '../content';
 import { FitGlyph, HazardGlyph } from '../components/Glyphs';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
@@ -18,6 +18,7 @@ import {
   type RankingRow,
 } from '../types/contract';
 import { CreditsPanel } from '../components/Credits';
+import { AnalogList } from '../components/AnalogList';
 import { buildCredits, hasNasademCheck } from '../lib/credits';
 import { parseMethodExtras } from '../lib/methodExtras';
 import { parseBootstrap, parseWalkTest } from '../lib/validationExtras';
@@ -172,6 +173,8 @@ export function Summary(): JSX.Element {
   const setHazard = useApp((s) => s.setHazard);
   const setScreen = useApp((s) => s.setScreen);
   const [walkMeta, setWalkMeta] = useState<Meta | null>(null);
+  const [analogMeta, setAnalogMeta] = useState<Meta | null>(null);
+  const onAnalogMeta = useCallback((m: Meta): void => setAnalogMeta(m), []);
   useEffect((): void => {
     loadOptionalJson('walk/transects.json', isTransectsFile)
       .then((r): void => setWalkMeta(r?.value.meta ?? null))
@@ -180,7 +183,11 @@ export function Summary(): JSX.Element {
 
   const summary = core.summary;
   const regionName = (id: string): string => core.regions.find((r) => r.id === id)?.name ?? id;
-  const metas = walkMeta ? [...core.metas, { file: 'walk/transects.json', meta: walkMeta }] : core.metas;
+  const metas = [
+    ...core.metas,
+    ...(walkMeta ? [{ file: 'walk/transects.json', meta: walkMeta }] : []),
+    ...(analogMeta ? [{ file: 'analog_tags.json', meta: analogMeta }] : []),
+  ];
   const nasadem = hasNasademCheck(core.method?.file);
 
   if (!summary) {
@@ -347,6 +354,8 @@ export function Summary(): JSX.Element {
           </div>
         )}
       </section>
+
+      <AnalogList core={core} onMeta={onAnalogMeta} />
 
       <section className="sum-section" aria-labelledby="sure-h">
         <h2 id="sure-h">How sure are we?</h2>

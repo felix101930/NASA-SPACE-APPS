@@ -1,0 +1,1021 @@
+{
+ "meta": {
+  "generated_utc": "2026-11-15T15:08:50Z",
+  "pipeline_version": "match-0.1.0",
+  "sources": [
+   {
+    "name": "World Database on Protected and Conserved Areas (WDPCA), polygon layer",
+    "url": "https://www.protectedplanet.net/",
+    "licence": "WDPA Terms of Use (non-commercial, attribution): https://www.protectedplanet.net/en/legal",
+    "citation": "UNEP-WCMC and IUCN (2026), Protected Planet: The World Database on Protected and Conserved Areas (WDPCA) [On-line], November 2026, Cambridge, UK: UNEP-WCMC and IUCN. www.protectedplanet.net"
+   },
+   {
+    "name": "Analog novelty check (this project's pipeline team review)",
+    "url": "",
+    "licence": "n/a",
+    "citation": "Team Kinetic, 14 Nov 2026: USGS TADP, USGS PAAD, NASA Planetary Analog Explorer, data/analogs/known_analogs.json and a literature search."
+   }
+  ],
+  "notes": [
+   "protected.centre_inside: the site's centre point lies inside a WDPCA polygon; square_overlaps: any part of its 15 km square does. Point-only WDPCA records (no boundary) are not tested.",
+   "novelty groups: established = an analog already studied at this place; near_known = 50-100 km from one; studied_region = inside a region studied as an analog; new = no prior analog study found in the catalogues and literature checked."
+  ]
+ },
+ "n_sites": 57,
+ "novelty": {
+  "counts": {
+   "established": 9,
+   "near_known": 8,
+   "studied_region": 7,
+   "new": 33
+  },
+  "total": 57,
+  "per_site_available": false,
+  "checked": "USGS TADP, USGS PAAD, NASA Planetary Analog Explorer, 89 catalogued analogs and a literature search (14 Nov 2026)"
+ },
+ "protected": {
+  "n_centre_inside": 15,
+  "n_square_overlaps": 23
+ },
+ "sites": {
+  "EP080": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 555623785,
+      "name": "Lake Natron GCA",
+      "designation": "Game controlled area",
+      "iucn": "Not Reported",
+      "iso3": "TZA",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     },
+     {
+      "wdpa_id": 555623796,
+      "name": "Ngorongoro Conservation Area",
+      "designation": "Conservation Area",
+      "iucn": "Not Reported",
+      "iso3": "TZA",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 2010,
+      "name": "Ngorongoro Conservation Area",
+      "designation": "World Heritage Site (natural or mixed)",
+      "iucn": "Not Applicable",
+      "iso3": "TZA",
+      "status": "Inscribed",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 900623,
+      "name": "Lake Natron Basin",
+      "designation": "Wetland of International Importance (Ramsar Site)",
+      "iucn": "Not Reported",
+      "iso3": "TZA",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "EP084": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 30043,
+      "name": "Los Flamencos",
+      "designation": "National Reserve",
+      "iucn": "Not Reported",
+      "iso3": "CHL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555543781,
+      "name": "Valle de La Luna y parte de la Sierra de Orbate",
+      "designation": "Nature Sanctuary",
+      "iucn": "Not Reported",
+      "iso3": "CHL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00007": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00014": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 16829,
+      "name": "Los Andes",
+      "designation": "Nature Wildlife Reserve",
+      "iucn": "VI",
+      "iso3": "ARG",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00017": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 2912,
+      "name": "Fish Springs",
+      "designation": "National Wildlife Refuge",
+      "iucn": "IV",
+      "iso3": "USA",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 76851,
+      "name": "Fish Springs",
+      "designation": "Wilderness Study Area",
+      "iucn": "Ib",
+      "iso3": "USA",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00020": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00021": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 555566153,
+      "name": "Brookdale",
+      "designation": "Conservation Covenant",
+      "iucn": "IV",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555637554,
+      "name": "Covenant - Tenure Review - The Wandle - Natural Environment and Landscape",
+      "designation": "Conservation Covenant",
+      "iucn": "IV",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 311389,
+      "name": "Rock and Pillar",
+      "designation": "Stewardship Area",
+      "iucn": "III",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 308077,
+      "name": "Rock and Pillar",
+      "designation": "Scenic Reserve",
+      "iucn": "III",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 311492,
+      "name": "Taieri River / Middlemarch",
+      "designation": "Stewardship Area",
+      "iucn": "III",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00023": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00025": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00027": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 124387,
+      "name": "Volcanoes of Kamchatka",
+      "designation": "World Heritage Site (natural or mixed)",
+      "iucn": "Not Applicable",
+      "iso3": "RUS",
+      "status": "Inscribed",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00028": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 94114,
+      "name": "Llullaillaco",
+      "designation": "National Park",
+      "iucn": "Not Reported",
+      "iso3": "CHL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00030": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00034": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00038": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 313188,
+      "name": "Tarvagatain nuruu",
+      "designation": "National Park",
+      "iucn": "II",
+      "iso3": "MNG",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00041": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 650,
+      "name": "Nationalparken i Nord- og Østg",
+      "designation": "National Park",
+      "iucn": "II",
+      "iso3": "GRL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00042": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00043": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 555606520,
+      "name": "Izzenhood Ranch",
+      "designation": "Izzenhood Ranch",
+      "iucn": "V",
+      "iso3": "USA",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00045": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00046": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00048": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 23,
+      "name": "San Guillermo - Zona de amortiguamiento",
+      "designation": "UNESCO-MAB Biosphere Reserve",
+      "iucn": "Not Applicable",
+      "iso3": "ARG",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     },
+     {
+      "wdpa_id": 555587162,
+      "name": "San Guillermo",
+      "designation": "Provincial Park",
+      "iucn": "II",
+      "iso3": "ARG",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00050": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00063": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00066": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00070": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00071": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00073": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 555565103,
+      "name": "Nevis Cemetery",
+      "designation": "Stewardship Area",
+      "iucn": "III",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555637476,
+      "name": "Barn Creek",
+      "designation": "Scenic Reserve",
+      "iucn": "III",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 311217,
+      "name": "Old Woman Range",
+      "designation": "Stewardship Area",
+      "iucn": "III",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 311322,
+      "name": "Remarkables",
+      "designation": "Stewardship Area",
+      "iucn": "III",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555566844,
+      "name": "Nevis Face & Middle Block",
+      "designation": "Conservation Covenant",
+      "iucn": "IV",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     },
+     {
+      "wdpa_id": 555637459,
+      "name": "Ben Nevis",
+      "designation": "Scenic Reserve",
+      "iucn": "III",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555637585,
+      "name": "Covenant - Tenure Review - Ben Nevis - Valley floor to summit Hector Mountains, Nevis Burn and Schoolhouse Creek",
+      "designation": "Conservation Covenant",
+      "iucn": "IV",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555637586,
+      "name": "Covenant - Tenure Review - Ben Nevis - Doolans Saddle towards Kawarau River",
+      "designation": "Conservation Covenant",
+      "iucn": "IV",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555637599,
+      "name": "Tenure Review - Craigroy - Nevis Valley Landscape",
+      "designation": "Conservation Covenant",
+      "iucn": "IV",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555566055,
+      "name": "Kopuwai",
+      "designation": "Stewardship Area",
+      "iucn": "III",
+      "iso3": "NZL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00080": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 109002,
+      "name": "Lagunas Altoandinas y Puneñas de Catamarca",
+      "designation": "Wetland of International Importance (Ramsar Site)",
+      "iucn": "Not Reported",
+      "iso3": "ARG",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00084": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00087": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00090": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00097": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00100": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00103": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 555512003,
+      "name": "Putorana Plateau",
+      "designation": "World Heritage Site (natural or mixed)",
+      "iucn": "Not Applicable",
+      "iso3": "RUS",
+      "status": "Inscribed",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00106": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00107": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 183329,
+      "name": "Knutshø",
+      "designation": "Protected Landscape",
+      "iucn": "V",
+      "iso3": "NOR",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555720239,
+      "name": "Dovrefjell-Sunndalsfjella, Knutshø og tilliggende landskapsvernområder",
+      "designation": "Emerald Network",
+      "iucn": "Not Reported",
+      "iso3": "NOR",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00108": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00109": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00112": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00115": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 555709397,
+      "name": "CHaunskaya guba",
+      "designation": "State Natural Zakaznik",
+      "iucn": "IV",
+      "iso3": "RUS",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00116": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 5082,
+      "name": "Laguna Blanca",
+      "designation": "UNESCO-MAB Biosphere Reserve",
+      "iucn": "Not Applicable",
+      "iso3": "ARG",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00123": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 2175,
+      "name": "de Salinas y Aguada Blanca",
+      "designation": "National Reserve",
+      "iucn": "VI",
+      "iso3": "PER",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00131": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00133": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00145": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00149": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00156": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 3013,
+      "name": "Lauca (RB)",
+      "designation": "UNESCO-MAB Biosphere Reserve",
+      "iucn": "Not Applicable",
+      "iso3": "CHL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 86,
+      "name": "Lauca",
+      "designation": "National Park",
+      "iucn": "Not Reported",
+      "iso3": "CHL",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00160": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 17114,
+      "name": "Oshtran Kuh",
+      "designation": "Protected Area",
+      "iucn": "V",
+      "iso3": "IRN",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00164": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00174": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00184": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00189": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00196": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 555587169,
+      "name": "Andino Norpatagónica",
+      "designation": "UNESCO-MAB Biosphere Reserve",
+      "iucn": "Not Applicable",
+      "iso3": "ARG",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 61824,
+      "name": "Nahuel Huapi",
+      "designation": "National Reserve",
+      "iucn": "VI",
+      "iso3": "ARG",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 97478,
+      "name": "Rio Limay",
+      "designation": "Protected Nature Area - Protected Landscape",
+      "iucn": "V",
+      "iso3": "ARG",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00199": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00213": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 5082,
+      "name": "Laguna Blanca",
+      "designation": "UNESCO-MAB Biosphere Reserve",
+      "iucn": "Not Applicable",
+      "iso3": "ARG",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00221": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  },
+  "R00233": {
+   "protected": {
+    "centre_inside": true,
+    "square_overlaps": true,
+    "areas": [
+     {
+      "wdpa_id": 31255,
+      "name": "Saltfjellet",
+      "designation": "Protected Landscape",
+      "iucn": "V",
+      "iso3": "NOR",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     },
+     {
+      "wdpa_id": 555534964,
+      "name": "Laisälven",
+      "designation": "Special Areas of Conservation (Habitats Directive)",
+      "iucn": "Not Reported",
+      "iso3": "SWE",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555733535,
+      "name": "Laisälven",
+      "designation": "Natura 2000 SCI",
+      "iucn": "Not Assigned",
+      "iso3": "SWE",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 18948,
+      "name": "Saltfjellet-Svartisen",
+      "designation": "National Park",
+      "iucn": "II",
+      "iso3": "NOR",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": false
+     },
+     {
+      "wdpa_id": 555719902,
+      "name": "Saltfjellet-Svartisen med tilliggende landskapsvernområder og naturreservat",
+      "designation": "Emerald Network",
+      "iucn": "Not Reported",
+      "iso3": "NOR",
+      "status": "Designated",
+      "type": "PA",
+      "covers_centre": true
+     }
+    ]
+   },
+   "novelty": null
+  },
+  "R00240": {
+   "protected": {
+    "centre_inside": false,
+    "square_overlaps": false,
+    "areas": []
+   },
+   "novelty": null
+  }
+ }
+}

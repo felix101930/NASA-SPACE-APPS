@@ -100,7 +100,7 @@ function TopBar(): JSX.Element {
         <span className="brand-text">Moon on Earth</span>
       </button>
       <nav className="stepper" aria-label="Story steps">
-        {SCREENS.map((s, i) => (
+        {SCREENS.filter((s) => s.id !== 'alberta').map((s, i) => (
           <button key={s.id} className="step" aria-current={screen === s.id ? 'step' : undefined} onClick={(): void => setScreen(s.id)}>
             <span className="step-n">{i + 1}</span>
             <span className="step-label">{s.label}</span>
@@ -108,6 +108,13 @@ function TopBar(): JSX.Element {
           </button>
         ))}
       </nav>
+      {/* Alberta & Calgary is a local add-on, not a step in the story: far right, no number */}
+      {SCREENS.filter((s) => s.id === 'alberta').map((s) => (
+        <button key={s.id} className="step step-extra" aria-current={screen === s.id ? 'page' : undefined} onClick={(): void => setScreen(s.id)}>
+          <span className="step-label">{s.label}</span>
+          <span className="step-short">{s.short}</span>
+        </button>
+      ))}
       <div className="topbar-right">{mockFiles.length > 0 && <SampleDataChip files={mockFiles} />}</div>
     </header>
   );

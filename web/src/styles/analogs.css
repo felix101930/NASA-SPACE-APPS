@@ -1,0 +1,123 @@
+/* Summary: list of Earth analog sites with protected-area and new/known tags. Tokens from styles.css only;
+   no gold (gold is sunlight). */
+
+.an-lead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin: 8px 0 4px;
+  max-width: 90ch;
+  font-size: var(--fs-body);
+  color: var(--text-2);
+}
+
+.an-lead strong {
+  color: var(--text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.an-sub {
+  margin: 0 0 12px;
+  max-width: 90ch;
+}
+
+.an-scroll + .an-sub {
+  margin-top: 8px;
+}
+
+.an-scroll {
+  max-height: 460px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-1);
+}
+
+.an-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-label);
+}
+
+.an-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-weight: 500;
+  text-align: left;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.an-table tbody th,
+.an-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  text-align: left;
+}
+
+.an-table tbody tr:last-child th,
+.an-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.an-table tbody th {
+  font-weight: 400;
+  min-width: 200px;
+}
+
+.an-name {
+  display: block;
+  color: var(--text);
+}
+
+.an-uses,
+.an-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.an-use {
+  min-height: 26px;
+}
+
+.an-rank {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.an-tag[data-kind='new'] {
+  color: var(--text);
+  border-color: var(--text-2);
+  font-weight: 600;
+}
+
+.an-tag[data-kind='known'] {
+  color: var(--text-3);
+}
+
+.an-tag[data-kind='protected'] {
+  color: var(--text);
+}
+
+.an-area {
+  flex-basis: 100%;
+  max-width: 32ch;
+}
+
+@media (max-width: 720px) {
+  .an-table thead th:nth-child(3),
+  .an-table td:nth-child(3) {
+    display: none;
+  }
+  .an-table tbody th {
+    min-width: 140px;
+  }
+}

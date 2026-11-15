@@ -303,7 +303,8 @@ code {
   color: var(--text);
 }
 
-.step[aria-current='step'] {
+.step[aria-current='step'],
+.step[aria-current='page'] {
   color: var(--text);
   font-weight: 600;
   border-bottom-color: var(--text);
@@ -320,6 +321,11 @@ code {
 
 .step[aria-current='step'] .step-n {
   color: var(--text-2);
+}
+
+.step-extra {
+  border-left: 1px solid var(--line);
+  padding-left: 20px;
 }
 
 .topbar-right {
