@@ -115,6 +115,7 @@ Every step is cached and idempotent: re-running it skips work that's already don
 | 6 | `python -m pipeline.walkval` | Runs the walk matcher's hidden-copy validation | ~3 min |
 | 7 | `python -m pipeline.match all` | Picks the final top 3 per region × danger, finds rehearsal windows, and writes the ranking and the validation summary | ~5 min |
 | 7b | `python -m pipeline.match.analog_tags` | Tags each analog site with any protected area it lies in (Protected Planet WDPCA) and the new-vs-known groups for the Summary page's analog list | seconds (cached) |
+| 7c | `python -m pipeline.match.alberta_standing` | Scores Alberta's 30 m sites with the final-round matcher and ranks them against the sites measured in detail worldwide (`alberta/standing.json`, used on the Alberta page) | ~1 min |
 | 8 | `python -m pipeline.publish_lite` | Writes the committed 60 m lite copies of the Earth tiles the site can show (`web/public/data/earth_lite/`) | seconds |
 
 Each step's sub-steps are listed by `--help`, for example `python -m pipeline.earth --help` (pool, screen, adaptive, documented, refine, rank, stage2, nasadem, transects, report).

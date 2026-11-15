@@ -233,3 +233,10 @@ Definitions:
   `Census tract <NAME>`. `nearest_suitable.dist_km` is straight-line, tract centroid → route start.
 - Coverage depends on where City pathways exist and on the 2,762-route sample; "not covered" means no suitable
   route **in this sample**, not that the neighbourhood has no pathways.
+
+## `alberta/standing.json` (written by `pipeline/match/alberta_standing.py`)
+Every Alberta site with a 30 m tile, scored with the final-round matcher (`pipeline.match.matches`: the same terms, weights, Moon IQR scales, shape and brightness features) for every region × danger.
+- `rows[]`: `{site_id, region_id, hazard, distance, rank_measured, n_measured, rank_picks, n_picks, world_best_distance, world_best_site, missing_terms}`.
+- `rank_measured` = 1 + the number of sites measured in detail (`earth_sites.json`, 324) that are strictly closer for that region × danger. `rank_picks` is the same among the sites in `matches.json` (57). A `rank_picks` of `n_picks + 1` means it is behind every pick.
+- Alberta sites are scored but not added to the candidate pool: this is where they *would* stand, and `matches.json` is unchanged.
+- The stage-1 figure in `alberta.json` (`global_screen.alberta_best_rank_among_global`, for example #347 of 6,139) is a different, coarser comparison: 90 m fingerprints against every eligible screened window.

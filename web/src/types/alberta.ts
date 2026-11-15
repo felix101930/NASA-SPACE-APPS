@@ -361,3 +361,57 @@ export function isEquityFile(v: unknown): v is EquityFile {
     Array.isArray(v.uncaptured_highest.tracts)
   );
 }
+
+// ------------------------------------------------------------------ alberta/standing.json (pipeline/match/alberta_standing.py)
+
+/** One Alberta site scored with the final-round (30 m) matcher for one region x danger. */
+export interface StandingRow {
+  site_id: string;
+  region_id: string;
+  hazard: HazardId;
+  /** Hazard distance in Moon-region IQR units (< 0.5 close, < 1.5 partial). */
+  distance: number | null;
+  /** 1 + number of sites measured in detail that are strictly closer. */
+  rank_measured: number | null;
+  n_measured: number;
+  /** The same among the sites that won a top-3 slot. */
+  rank_picks: number | null;
+  n_picks: number;
+  /** Distance of the world's #1 match for the same region x danger (matches.json). */
+  world_best_distance: number | null;
+}
+
+export interface StandingFile {
+  meta: Meta;
+  n_measured_sites: number;
+  n_pick_sites: number;
+  rows: StandingRow[];
+}
+
+const isNumOrNull = (v: unknown): v is number | null => v === null || typeof v === 'number';
+
+function isStandingRow(v: unknown): v is StandingRow {
+  return (
+    isObj(v) &&
+    typeof v.site_id === 'string' &&
+    typeof v.region_id === 'string' &&
+    typeof v.hazard === 'string' &&
+    isNumOrNull(v.distance) &&
+    isNumOrNull(v.rank_measured) &&
+    typeof v.n_measured === 'number' &&
+    isNumOrNull(v.rank_picks) &&
+    typeof v.n_picks === 'number' &&
+    isNumOrNull(v.world_best_distance)
+  );
+}
+
+export function isStandingFile(v: unknown): v is StandingFile {
+  return (
+    isObj(v) &&
+    isMeta(v.meta) &&
+    typeof v.n_measured_sites === 'number' &&
+    typeof v.n_pick_sites === 'number' &&
+    Array.isArray(v.rows) &&
+    v.rows.every(isStandingRow)
+  );
+}

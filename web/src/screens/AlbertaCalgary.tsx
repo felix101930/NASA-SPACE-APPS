@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type JSX } from 'react';
 import { Marker, Popup, type Map as MlMap, type MapLayerMouseEvent } from 'maplibre-gl';
 import { assetUrl, loadFloat32, loadJsonFrom, type Loaded } from '../data/loader';
-import { HAZARDS, ROW_NAME } from '../content';
+import { HAZARDS, ROW_NAME, distanceFit } from '../content';
 import { GeoMap } from '../components/GeoMap';
 import { Fit, HazardGlyph } from '../components/Glyphs';
 import { Loading } from '../components/Loading';
@@ -37,6 +37,7 @@ import { accessPhrase, NEED_FILTER_ORDER, pinElement, type NeedFilter } from './
 import {
   isAlbertaFile,
   isEquityFile,
+  isStandingFile,
   isOverlaysGeo,
   isPresetsFile,
   isWalksFile,
@@ -51,6 +52,8 @@ import {
   type EquityFile,
   type OverlaysGeo,
   type PresetsFile,
+  type StandingFile,
+  type StandingRow,
   type UncapturedTract,
   type WalksFile,
   type WindowsGeo,
@@ -72,6 +75,8 @@ const ALBERTA_BOUNDS: [[number, number], [number, number]] = [
 interface AlbertaData {
   file: AlbertaFile;
   windows: WindowsGeo;
+  /** Final-round (30 m) standing of Alberta's sites among the sites measured in detail; null if not generated. */
+  standing: StandingFile | null;
 }
 
 interface CalgaryData {
@@ -94,11 +99,16 @@ function need<T>(v: Loaded<T> | null, path: string): T {
 function loadAlberta(): Promise<AlbertaData> {
   if (!albertaPromise) {
     albertaPromise = (async (): Promise<AlbertaData> => {
-      const [file, windows] = await Promise.all([
+      const [file, windows, standing] = await Promise.all([
         loadJsonFrom('alberta/alberta.json', isAlbertaFile, 'data'),
         loadJsonFrom('alberta/alberta_windows.geojson', isWindowsGeo, 'data'),
+        loadJsonFrom('alberta/standing.json', isStandingFile, 'data').catch((): null => null),
       ]);
-      return { file: need(file, 'alberta/alberta.json'), windows: need(windows, 'alberta/alberta_windows.geojson') };
+      return {
+        file: need(file, 'alberta/alberta.json'),
+        windows: need(windows, 'alberta/alberta_windows.geojson'),
+        standing: standing?.value ?? null,
+      };
     })();
     albertaPromise.catch((): void => {
       albertaPromise = null;
@@ -253,7 +263,19 @@ function bestByHazard(file: AlbertaFile): HazardBest[] {
   });
 }
 
-export function albertaResult(file: AlbertaFile): string {
+export function standingRow(standing: StandingFile | null, siteId: string, regionId: string, h: HazardId): StandingRow | null {
+  return standing?.rows.find((r: StandingRow): boolean => r.site_id === siteId && r.region_id === regionId && r.hazard === h) ?? null;
+}
+
+export function albertaResult(file: AlbertaFile, standing: StandingFile | null = null): string {
+  // Prefer the final-round (30 m) standing among the sites measured in detail.
+  const fine = HAZARD_IDS.flatMap((h: HazardId): { h: HazardId; name: string; region: string; row: StandingRow }[] => {
+    const b = file.best_per_hazard[h];
+    const row = b ? standingRow(standing, b.id, b.region, h) : null;
+    return b && row && row.rank_measured !== null ? [{ h, name: b.name, region: b.region_name, row }] : [];
+  }).sort((a: { row: StandingRow }, b: { row: StandingRow }): number => (a.row.rank_measured ?? 0) / a.row.n_measured - (b.row.rank_measured ?? 0) / b.row.n_measured)[0];
+  if (fine && fine.row.rank_measured !== null)
+    return `Alberta’s best, ${fine.name.split(' · ')[0]}, ranks #${nf.format(fine.row.rank_measured)} of the ${nf.format(fine.row.n_measured)} sites we measured in detail worldwide for ${HAZARD_NOUN[fine.h]} at ${fine.region}`;
   const ranked = bestByHazard(file).filter((b: HazardBest): boolean => b.rank !== null && b.n !== null);
   ranked.sort((a: HazardBest, b: HazardBest): number => (a.rank ?? 0) / (a.n ?? 1) - (b.rank ?? 0) / (b.n ?? 1));
   const top = ranked[0];
@@ -461,6 +483,10 @@ function AlbertaPanel({ data, hazard, setHazard }: { data: AlbertaData; hazard: 
   const gs = search?.global_screen;
   const site = best ? file.sites[best.id] : undefined;
   const forest = search?.terrain_only_best;
+  const fine = best ? standingRow(data.standing, best.id, best.region, hazard) : null;
+  const allThree = best
+    ? HAZARD_IDS.map((h: HazardId): { h: HazardId; row: StandingRow | null } => ({ h, row: standingRow(data.standing, best.id, best.region, h) }))
+    : [];
   const fails = Object.entries(cov.fail_reason_counts).sort((a: [string, number], b: [string, number]): number => b[1] - a[1]);
   const maxFail = Math.max(...fails.map((f: [string, number]): number => f[1]), 1);
   const treeCloser = file.searches.filter(
@@ -534,19 +560,68 @@ function AlbertaPanel({ data, hazard, setHazard }: { data: AlbertaData; hazard: 
               <div>
                 <p className="caption">Alberta’s closest match · against {best.region_name}</p>
                 <h3 className="ab-best-name">{best.name}</h3>
-                {gs && (
-                  <p className="ab-rank">
-                    #{nf.format(gs.alberta_best_rank_among_global)}{' '}
-                    <span className="muted">of {nf.format(gs.n_eligible)} bare windows worldwide</span>
-                  </p>
+                {fine && fine.rank_measured !== null ? (
+                  <>
+                    <p className="ab-rank">
+                      #{nf.format(fine.rank_measured)} <span className="muted">of {nf.format(fine.n_measured)} sites measured in detail worldwide</span>
+                    </p>
+                    <p className="caption">
+                      It would be #{nf.format(fine.rank_picks ?? 0)} among our {nf.format(fine.n_picks)} picks. Distance{' '}
+                      {(fine.distance ?? 0).toFixed(2)} (0 = identical terrain
+                      {fine.world_best_distance !== null ? `; the world’s best match scores ${fine.world_best_distance.toFixed(2)}` : ''})
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    {gs && (
+                      <p className="ab-rank">
+                        #{nf.format(gs.alberta_best_rank_among_global)}{' '}
+                        <span className="muted">of {nf.format(gs.n_eligible)} bare windows worldwide</span>
+                      </p>
+                    )}
+                    <p className="caption">
+                      Distance {top.distance.toFixed(2)} (0 = identical terrain
+                      {gs ? `; the world’s best match scores ${gs.best_distance.toFixed(2)}` : ''})
+                    </p>
+                  </>
                 )}
-                <p className="caption">
-                  Distance {top.distance.toFixed(2)} (0 = identical terrain
-                  {gs ? `; the world’s best match scores ${gs.best_distance.toFixed(2)}` : ''})
-                </p>
               </div>
             </div>
             {best.park_label && <p className="chip chip-dashed ab-park">Protected area: {best.park_label}</p>}
+            {allThree.some((x: { row: StandingRow | null }): boolean => x.row !== null) && (
+              <table className="data-table ab-standing">
+                <caption className="caption">
+                  {best.name.split(' · ')[0]} against {best.region_name}, all three dangers
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Danger</th>
+                    <th scope="col" className="r">
+                      Rank of {nf.format(allThree.find((x: { row: StandingRow | null }): boolean => x.row !== null)?.row?.n_measured ?? 0)} measured
+                    </th>
+                    <th scope="col" className="r">
+                      Among our {nf.format(allThree.find((x: { row: StandingRow | null }): boolean => x.row !== null)?.row?.n_picks ?? 0)} picks
+                    </th>
+                    <th scope="col">Fit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {allThree.map(({ h, row }: { h: HazardId; row: StandingRow | null }) => {
+                    const fit = distanceFit(row?.distance);
+                    return (
+                      <tr key={h} aria-current={h === hazard ? 'true' : undefined}>
+                        <th scope="row">{ROW_NAME[h]}</th>
+                        <td className="r">{row?.rank_measured != null ? `#${nf.format(row.rank_measured)}` : '–'}</td>
+                        <td className="r">
+                          {row?.rank_picks != null ? (row.rank_picks > row.n_picks ? 'below all' : `#${nf.format(row.rank_picks)}`) : '–'}
+                        </td>
+                        <td>{fit ? <Fit fit={fit} /> : '–'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
             <LightsTable lights={top.lights} />
             {forest && !forest.dsm_pass && forest.distance < top.distance && (
               <p className="ab-note">
@@ -1236,7 +1311,7 @@ export default function AlbertaCalgary(): JSX.Element {
   const result =
     tab === 'alberta'
       ? ab.data
-        ? albertaResult(ab.data.file)
+        ? albertaResult(ab.data.file, ab.data.standing)
         : 'Loading Alberta’s windows…'
       : CALGARY_PURPOSE;
 
