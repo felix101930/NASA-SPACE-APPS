@@ -1,0 +1,60 @@
+/* "Show big-drop zones" (DropZoneLayer.tsx): segment labels over the 3D canvas and the caption key. */
+
+.dz-labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.dz-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border-left: 2px solid var(--hz-rim);
+  background: rgba(10, 11, 14, 0.78);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.3;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.dz-label b {
+  color: var(--hz-rim);
+  font-weight: 600;
+}
+
+.dz-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: var(--fs-caption);
+  color: var(--text-3);
+}
+
+.dz-legend strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.dz-legend-scale {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+}
+
+/* Mirrors dropTint(): no tint below 20% of the scale, then a smooth ramp to hazard orange. */
+.dz-legend-bar {
+  display: inline-block;
+  width: 96px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(90deg, #c4beb3 0%, #c4beb3 20%, #d39a7b 60%, var(--hz-rim) 100%);
+}
