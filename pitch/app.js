@@ -16,7 +16,9 @@ const TILE_W = 15;                    // km, Mons Mouton tile
 const TILE_N = 500;
 const TILE_ORIGIN = [65520, 125520];  // Mons Mouton tile west / north edges (m), from regions.json
 const TILE_C = [(TILE_ORIGIN[0] + 7500) / 1000, -(TILE_ORIGIN[1] - 7500) / 1000];
-const DEMO_URL = new URLSearchParams(location.search).get('demo') || 'http://localhost:5173/';
+// ?demo= overrides; on localhost the button opens the local app, anywhere else the deployed one
+const LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
+const DEMO_URL = new URLSearchParams(location.search).get('demo') || (LOCAL ? 'http://localhost:5173/' : 'https://moon-on-earth.vercel.app/');
 
 const TEX = 'assets/img/earth/';   // three-globe 2.31.0 example images (NASA Blue Marble), served locally
 const ATH = [77.108, -137.993];       // Athena, 84.7906 S 29.1957 E (LROC), in world km
@@ -636,7 +638,8 @@ function keyframes(S) {
     { u: B.athena.e, t: () => S.MM, d: n3(.82, .17, .55), r: 18 },
     { u: B.lowsun.e, t: () => S.MM, d: n3(.86, .15, .49), r: 15 },
     { u: B.money.e, t: () => S.MM, d: n3(.9, .13, .42), r: 13.5 },
-    { u: B.people.s + .45, t: A, d: n3(.45, .10, 1), r: 0.016, o: .004 },
+    { u: B.tally.e, t: () => S.MM, d: n3(.9, .13, .42), r: 13.5 },   // hold through the tally, then
+    { u: B.people.s + .02, t: A, d: n3(.45, .10, 1), r: 0.016, o: .004 },   // hard cut to the astronaut under the dip to black
     { u: at('people', .34), t: A, d: n3(.55, .12, 1), r: 0.016, o: .004 },
     { u: at('people', .46), t: A, d: n3(.55, .12, 1), r: 0.016, o: .004, ly: 38 },   // look up: the next crew comes from up there
     { u: at('people', .93), t: A, d: n3(.58, .13, 1), r: 0.016, o: .004, ly: 40 },   // same distance: the camera only pans up
@@ -671,7 +674,7 @@ function sunAt(u) {
   // returns elevation (deg), azimuth (deg from north, clockwise)
   const k = [
     [0, 4, 72], [B.open.e - .3, 6, 100], [B.descent.s, 8, 120], [B.descent.e, 5, 128], [B.athena.e, 4, 132], [B.lowsun.s + .5, 1.4, 136],
-    [B.money.e, 1.4, 136], [B.people.s, 4.5, 250], [B.people.e, 4.5, 250], [B.regions.s + .9, 1.6, 140],
+    [B.money.e, 1.4, 136], [B.tally.e, 1.4, 136], [B.people.s + .02, 4.5, 250], [B.people.e, 4.5, 250], [B.regions.s + .9, 1.6, 140],
     [B.regions.e, 1.6, 140], [B.turn.s, 4.5, 250],
     [TOTAL, 4.5, 250],
   ];
@@ -904,8 +907,9 @@ function update(time) {
   launchEl.style.opacity = lOp;
   if (lOp > 0) S.launch.render(clamp((pl - .48) / .44));
 
-  /* dip to black from the region overview to the astronaut (the camera cuts while it is dark) */
-  dip.style.opacity = sstep(at('regions', .86), B.regions.e, u) * (1 - sstep(B.turn.s, B.turn.s + .22, u));
+  /* dips to black (the camera cuts while it is dark): tally -> astronaut, region overview -> astronaut */
+  const dipAt = (outS, outE, inS) => sstep(outS, outE, u) * (1 - sstep(inS, inS + .22, u));
+  dip.style.opacity = Math.max(dipAt(at('tally', .86), B.tally.e, B.people.s + .02), dipAt(at('regions', .86), B.regions.e, B.turn.s));
 
   /* white-out between the Earth zoom and the ground */
   flash.style.opacity = inBeat(u, 'earth') ? sstep(.5, .615, ea) * (1 - sstep(.625, .74, ea)) : 0;

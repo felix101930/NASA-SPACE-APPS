@@ -85,8 +85,11 @@ html.lenis,html.lenis body{height:auto}
 #hint{position:fixed;left:50%;bottom:3vh;transform:translateX(-50%);font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;z-index:7;transition:opacity .6s}
 
 /* handoff */
-#handoff{position:fixed;left:50%;top:62vh;transform:translateX(-50%);z-index:8;opacity:0;pointer-events:none}
-#demo-link{display:inline-flex;gap:16px;align-items:center;font:500 22px var(--sans);color:#000;background:var(--ink);padding:18px 34px;border-radius:999px;text-decoration:none;letter-spacing:-.01em}
+#handoff{position:fixed;left:50%;top:60vh;transform:translateX(-50%);z-index:8;opacity:0;pointer-events:none;display:flex;align-items:center;gap:28px}
+#qr{display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;padding:12px 12px 10px;border-radius:14px}
+#qr img{display:block;width:clamp(110px,15vh,170px);height:auto;image-rendering:pixelated}
+#qr span{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:#000;white-space:nowrap}
+#demo-link{display:inline-flex;white-space:nowrap;gap:16px;align-items:center;font:500 22px var(--sans);color:#000;background:var(--ink);padding:18px 34px;border-radius:999px;text-decoration:none;letter-spacing:-.01em}
 #demo-link span{transition:transform .3s}
 #demo-link:hover span{transform:translateX(6px)}
 
