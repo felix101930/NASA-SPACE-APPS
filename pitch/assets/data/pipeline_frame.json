@@ -15,16 +15,16 @@
   ],
   "gaps": [
     {
-      "t": "Shape and light only",
-      "d": "Not gravity, vacuum, dust or soil."
+      "t": "Elevation and light only",
+      "d": "We match the shape of the ground and how sunlight falls on it, not gravity, vacuum, dust or soil."
     },
     {
-      "t": "30 m terrain",
-      "d": "Too coarse to see boulders and small craters."
+      "t": "Elevation at 30 m",
+      "d": "Our height maps are too coarse to show boulders and small craters."
     },
     {
-      "t": "Not visited yet",
-      "d": "A computer can still tell our matches from the real Moon."
+      "t": "Close, not identical",
+      "d": "Our sites recreate the three dangers, but overall the ground still differs from the Moon’s."
     }
   ],
   "next": [
@@ -35,10 +35,6 @@
     {
       "t": "Search every bare square",
       "d": "From a 15% sample to all of Earth’s bare land, refreshed as new satellite data arrives."
-    },
-    {
-      "t": "Field-test Kohler Coulee",
-      "d": "Cameras and a drone at low sun, to check real shadows against our model."
     },
     {
       "t": "Take it to Mars",
