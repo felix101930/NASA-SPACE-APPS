@@ -131,7 +131,7 @@ def test_std_atmosphere() -> None:
 
 
 def test_gap_text_plain_english() -> None:
-    assert MM.gap_text("shadow_frac_el3", 0.27, 0.31) == "4 pts less shadow at 3° sun"
+    assert MM.gap_text("shadow_frac_el3", 0.27, 0.31) == "4% less of the ground in shadow at 3° sun"
     assert MM.gap_text("slope_p50_deg", 7.0, 10.0) == "slopes 3° gentler"
 
 
