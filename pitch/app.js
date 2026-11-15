@@ -697,13 +697,7 @@ void main(){
   await Promise.all([...document.querySelectorAll('#outro img[src], #photo img')].map(im => im.decode().catch(() => {})));
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-  if (missing.length) {
-    console.warn('Missing textures:', missing);
-    const w = document.createElement('div');
-    w.textContent = `Missing: ${missing.join(', ')}`;
-    w.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:30;font:11px var(--mono, monospace);color:#fc3d21;background:#000c;padding:4px 8px;pointer-events:none';
-    document.body.appendChild(w);
-  }
+  if (missing.length) console.warn('Missing textures:', missing);   // console only: nothing on the projector
   // a reload in the same tab (Cmd+R, or the automatic one after a lost WebGL context) resumes on the same slide
   const resumeAt = readPos();
   if (resumeAt > 0) window.__go(resumeAt);
@@ -791,13 +785,29 @@ fetch('assets/data/pipeline_frame.json').then(r => r.json()).then(P => {
     `<header class="phead"><div class="pkick">Rehearse here · what’s next</div><h2>Honest about the gaps.<br><em>Clear</em> on what’s next.</h2></header>`
     + col('gaps', 'What we haven’t solved', 'gap') + col('next', 'What we do next', 'next');
 }).catch(() => {});
-const goto = dir => {
-  const u = uNow(); const list = dir > 0 ? anchors.filter(a => a > u + 0.03) : anchors.filter(a => a < u - 0.03).reverse();
-  if (!list.length) return;
+// the slide the current presenter move is heading to (null when standing on a slide)
+let goal = null;
+const easeInOut = t => .5 - .5 * Math.cos(Math.PI * t);
+const easeOut = t => 1 - (1 - t) * (1 - t);   // a move that is redirected mid-way keeps its speed instead of pausing
+const moveTo = (target, moving) => {
+  const u = uNow(); goal = target;
   // presenter mode: one steady speed (about 3.2 s per beat unit), never under 3 s, never a rapid jump
-  const dist = Math.abs(list[0] - u);
-  lenis.scrollTo((list[0] / TOTAL) * lenis.limit, { duration: clamp(dist * 3.2, 3, 8) / speed, easing: t => .5 - .5 * Math.cos(Math.PI * t) });
+  lenis.scrollTo((target / TOTAL) * lenis.limit, {
+    duration: clamp(Math.abs(target - u) * 3.2, 3, 8) / speed, easing: moving ? easeOut : easeInOut,
+    onComplete: () => { if (goal === target) goal = null; },
+  });
 };
+const goto = dir => {
+  // a press during a move counts from where that move is going, so every press advances exactly one slide
+  // (it used to aim at the same slide again and restart from a standstill, which looked stuck)
+  const moving = goal !== null && Math.abs(uNow() - goal) > 0.005;
+  if (!moving) goal = null;
+  const from = moving ? goal : uNow();
+  const list = dir > 0 ? anchors.filter(a => a > from + 0.03) : anchors.filter(a => a < from - 0.03).reverse();
+  if (!list.length) return;
+  moveTo(list[0], moving);
+};
+window.__anchors = anchors;
 window.__go = u => lenis.scrollTo((u / TOTAL) * lenis.limit, { immediate: true });
 window.__B = B;
 
@@ -818,6 +828,8 @@ try { setSpeed(+localStorage.getItem('pitch-speed') || 1); } catch (_) { setSpee
 speedBtns.forEach(b => b.addEventListener('click', () => { setSpeed(+b.dataset.speed); b.blur(); }));
 
 addEventListener('keydown', e => {
+  // a held key repeats: one press = one slide, so repeats are ignored (they would race through several slides)
+  if (e.repeat && ['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); return; }
   if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); goto(1); }
   if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); goto(-1); }
   if (e.key === 'Home') { e.preventDefault(); window.__go(0); }
@@ -828,16 +840,19 @@ addEventListener('click', e => { if (!e.target.closest('a, button')) goto(1); })
    that keeps the presenter on the same slide (the scroll height depends on the window height) and re-applies the
    pixel budget, including when only the pixel density changes. */
 let resizeT = 0;
+let lastDpr = devicePixelRatio;
 const onResize = () => {
   clearTimeout(resizeT);
   resizeT = setTimeout(() => {
-    const u = uNow();
+    const u = uNow(), heading = goal;
     camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
     renderer.setPixelRatio(pixelRatio()); renderer.setSize(innerWidth, innerHeight);
+    lastDpr = devicePixelRatio;
     setH();
     if (typeof lenis.resize === 'function') lenis.resize();
     window.__go(u);
-    requestAnimationFrame(() => window.__go(u));
+    // keep the place; if a presenter move was under way, carry on to its slide rather than stopping between two
+    requestAnimationFrame(() => { window.__go(u); if (heading !== null) moveTo(heading, true); });
   }, 120);
 };
 addEventListener('resize', onResize);
@@ -846,19 +861,17 @@ watchDpr();
 
 /* Lost WebGL context: a display reconfiguration (HDMI plugged in, GPU reset) can make the browser drop the 3D
    context, which freezes or blanks the 3D while the captions carry on. three.js restores it if the browser hands
-   it back; if that hasn't happened within 2.5 s, reload onto the same slide (at most 3 times a minute). */
-const glNote = document.createElement('div');
-glNote.textContent = 'Reconnecting graphics…';
-glNote.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:40;font:11px var(--mono, monospace);letter-spacing:.08em;text-transform:uppercase;color:#9a968e;background:#000c;padding:6px 10px;border-radius:4px;opacity:0;transition:opacity .3s;pointer-events:none';
-document.body.appendChild(glNote);
+   it back; if that hasn't happened within 2.5 s, reload onto the same slide (at most 3 times a minute, then every
+   15 s). Nothing is shown on screen: the audience only ever sees the pitch. */
 let lostT = 0;
 const onLost = () => {
   savePos();
-  glNote.style.opacity = 1;
+  console.warn('WebGL context lost; waiting for the browser to restore it');
   clearTimeout(lostT);
-  lostT = setTimeout(() => { if (reloadAllowed()) location.reload(); else glNote.textContent = 'Graphics lost: press Cmd+R to resume'; }, 2500);
+  const retry = () => { if (reloadAllowed()) location.reload(); else lostT = setTimeout(retry, 15000); };
+  lostT = setTimeout(retry, 2500);
 };
-const onRestored = () => { clearTimeout(lostT); glNote.style.opacity = 0; if (rewarm) rewarm(); };
+const onRestored = () => { clearTimeout(lostT); if (rewarm) rewarm(); };
 for (const c of [canvas, document.getElementById('sls')]) {
   if (!c) continue;
   c.addEventListener('webglcontextlost', onLost);
@@ -920,6 +933,7 @@ const project = (p, el) => {
 /* ---------------------------------------------------------------- frame */
 const _v = new THREE.Vector3();
 function frame(time) {
+  if (devicePixelRatio !== lastDpr) { lastDpr = devicePixelRatio; onResize(); }
   lenis.raf(time);
   requestAnimationFrame(frame);
   update(time);
