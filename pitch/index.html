@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rehearse Here</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;500;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+} }
+</script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<!-- the Athena photo, driven by scroll -->
+<div id="photo" aria-hidden="true">
+  <div id="photo-inner">
+    <img src="assets/img/athena.jpg" alt="">
+    <svg id="feet" viewBox="0 0 1536 806" preserveAspectRatio="none">
+      <circle class="ring" cx="582" cy="96" r="44"/>
+      <circle class="ring" cx="1018" cy="204" r="44"/>
+    </svg>
+  </div>
+  <div id="photo-credit">Photo: Intuitive Machines, March 2025</div>
+</div>
+
+<!-- loss -->
+<div id="money" aria-hidden="true">
+  <div id="money-num">$0</div>
+  <div id="money-line">Lost when Athena tipped over.</div>
+  <div id="money-src">Our estimate: 95% of NASA’s $145M · it worked 12 of 240 planned hours</div>
+</div>
+
+<!-- Athena crosshair -->
+<div id="athena-pin" class="pin big" aria-hidden="true"><i></i><b></b><div class="pin-t"><strong>Athena</strong><span>On its side · 6 Mar 2025</span></div></div>
+
+<!-- Artemis IV launch inset -->
+<div id="launch" aria-hidden="true">
+  <canvas id="sls"></canvas>
+  <div id="launch-t">ARTEMIS IV</div>
+  <div id="launch-src">NASA Space Launch System · model: NASA 3D Resources</div>
+</div>
+
+<!-- lander tally -->
+<div id="tally" aria-hidden="true">
+  <div class="t-head">Since 2019, <b>12</b> landers tried.</div>
+  <div class="t-row"><i class="lander up"></i><i class="lander crash"></i><i class="lander crash"></i><i class="lander up"></i><i class="lander crash"></i><i class="lander up"></i><i class="lander side"></i><i class="lander side"></i><i class="lander up"></i><i class="lander up"></i><i class="lander side"></i><i class="lander crash"></i></div>
+  <div class="t-key"><span class="k up"></span>Upright <span class="k side"></span>Not upright <span class="k crash"></span>Crashed</div>
+  <div class="t-line">Only <em>5</em> stayed upright.</div>
+  <div class="t-src">Moon landings that began powered descent, Jan 2019 – Jun 2025 · CNSA, ISRO, JAXA, NASA, ispace, Intuitive Machines</div>
+</div>
+
+<!-- pipeline frame (after the live demo) -->
+<div id="pipe" aria-hidden="true"><div id="pipe-in"></div></div>
+
+<!-- outro: Kohler Coulee -->
+<div id="outro" aria-hidden="true">
+  <img id="o-moon" src="assets/img/outro/moon.jpg" alt=""><img id="o-real" src="assets/img/outro/real.jpg" alt=""><img id="o-pull" alt="">
+</div>
+
+<div id="flash" aria-hidden="true"></div>
+
+<!-- slope gauge -->
+<div id="gauge" aria-hidden="true">
+  <svg viewBox="0 0 320 180">
+    <path class="g-track" d="M20 160 A140 140 0 0 1 300 160"/>
+    <path id="g-ok" class="g-ok" d=""/>
+    <path id="g-bad" class="g-bad" d=""/>
+    <line id="g-needle" x1="160" y1="160" x2="160" y2="40"/>
+    <text id="g-val" x="160" y="150" text-anchor="middle">0°</text>
+    <text class="g-lab" x="20" y="176">0°</text>
+    <text class="g-lab" x="300" y="176" text-anchor="end">25°</text>
+  </svg>
+  <div id="g-limit">Lander limit 8°</div>
+</div>
+
+<div id="labels"></div>
+
+<!-- captions -->
+<div id="captions"></div>
+
+<!-- HUD -->
+<div id="hud">
+  <div id="hud-l1">LOLA 20 m · PGDA</div>
+  <div id="hud-l2">SUN EL —</div>
+  <div id="hud-l3">ALT —</div>
+</div>
+<div id="rail"><div id="rail-fill"></div></div>
+<div id="hint">Scroll, or press →</div>
+
+<!-- demo handoff + close -->
+<div id="handoff">
+  <a id="demo-link" href="#" target="_blank" rel="noopener">Live demo <span>→</span></a>
+</div>
+
+<div id="loader"><div id="loader-t">Acquiring signal</div><div id="loader-bar"><i></i></div></div>
+
+<div id="scroll"></div>
+
+<footer id="credits">
+  Terrain: NASA LOLA (PGDA product 90, Barker et al. 2023), Earth site: Copernicus GLO-30 via team pipeline · Kohler Coulee outro: NRCan HRDEM lidar (4 m) + Sentinel-2 L2A (9 Oct 2025) · Earth ground image: NASA HLS (HLSS30 v2.0, 9 Oct 2025); near-ground grass drawn by computer · Earth globe: NASA Blue Marble · Moon model: NASA SVS 14959 · LRO, astronaut and SLS models: NASA 3D Resources · Athena photo: Intuitive Machines · Loss estimate: ours, 95% of NASA’s $145M IM-2 total (SpacePolicyOnline), from ~12 of ~240 planned hours (NASA PRIME-1 briefing) · Sources: Intuitive Machines (May 2025), NASA OIG IG-22-003 (2021) and HLS audit (Mar 2026), NASA Artemis IV page. Vertical relief ×1.5.
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
