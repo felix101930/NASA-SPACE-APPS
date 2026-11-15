@@ -18,7 +18,7 @@ const TILE_ORIGIN = [65520, 125520];  // Mons Mouton tile west / north edges (m)
 const TILE_C = [(TILE_ORIGIN[0] + 7500) / 1000, -(TILE_ORIGIN[1] - 7500) / 1000];
 const DEMO_URL = new URLSearchParams(location.search).get('demo') || 'http://localhost:5174/';
 
-const TEX = 'https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/';
+const TEX = 'assets/img/earth/';   // three-globe 2.31.0 example images (NASA Blue Marble), served locally
 const ATH = [77.108, -137.993];       // Athena, 84.7906 S 29.1957 E (LROC), in world km
 
 /* the nine Artemis candidate landing regions: axis-aligned boxes in polar stereographic metres (USGS A3 outlines) */
@@ -76,12 +76,13 @@ let loaded = 0; const toLoad = 8;
 const tick = () => { loaded++; loaderBar.style.width = `${(loaded / toLoad) * 100}%`; };
 const bin = async (url) => { const r = await fetch(url); if (!r.ok) throw new Error(url); const b = await r.arrayBuffer(); tick(); return new Float32Array(b); };
 const gltf = new GLTFLoader();
-const draco = new DRACOLoader(); draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/libs/draco/gltf/');
+const draco = new DRACOLoader(); draco.setDecoderPath('assets/vendor/draco/');
 gltf.setDRACOLoader(draco);
 const glb = url => new Promise((res, rej) => gltf.load(url, g => { tick(); res(g.scene); }, undefined, rej));
 const texL = new THREE.TextureLoader(); texL.setCrossOrigin('anonymous');
-// a missing texture must not stop the pitch
-const tex = url => new Promise(res => texL.load(url, t => res(t), undefined, () => res(null)));
+// a missing texture must not stop the pitch, but it must be visible before going on stage
+const missing = [];
+const tex = url => new Promise(res => texL.load(url, t => res(t), undefined, () => { missing.push(url.split('/').pop()); res(null); }));
 const raw = async url => { const r = await fetch(url); if (!r.ok) throw new Error(url); return r.arrayBuffer(); };
 
 /** Flip rows so row 0 is south (texture v = 0), convert m -> km. */
@@ -393,7 +394,7 @@ void main(){ vUv = uv; vN = normalize(mat3(modelMatrix) * normal); vec4 wp = mod
 }`;
 function earthMaterial(day, water) {
   return new THREE.ShaderMaterial({
-    uniforms: { day: { value: day }, water: { value: water }, hasTex: { value: day ? 1 : 0 }, L: { value: new THREE.Vector3(.55, .35, .76).normalize() } },
+    uniforms: { day: { value: day }, water: { value: water }, hasTex: { value: day && water ? 1 : 0 }, L: { value: new THREE.Vector3(.55, .35, .76).normalize() } },
     vertexShader: EARTH_VS,
     fragmentShader: `uniform sampler2D day; uniform sampler2D water; uniform float hasTex; uniform vec3 L; varying vec2 vUv; varying vec3 vN; varying vec3 vV;
 #include <logdepthbuf_pars_fragment>
@@ -591,6 +592,33 @@ async function init() {
     walkT: 0, walkLast: 0, walkPos: A.clone() };
 
   document.getElementById('demo-link').href = DEMO_URL;
+
+  /* upload every texture and compile every shader now, behind the loader, so nothing stalls or flashes the first
+     time it comes on screen (three.js otherwise does both lazily on first draw) */
+  document.getElementById('loader-t').textContent = 'Warming up';
+  const warm = (scn, cam) => {
+    scn.traverse(o => {
+      for (const m of [].concat(o.material || [])) {
+        for (const v of Object.values(m)) if (v && v.isTexture) renderer.initTexture(v);
+        if (m.uniforms) for (const u of Object.values(m.uniforms)) if (u.value && u.value.isTexture) renderer.initTexture(u.value);
+      }
+    });
+    renderer.compile(scn, cam);
+  };
+  warm(scene, camera);
+  if (ground) warm(ground.scene, ground.cam);
+  launch.warm();
+  // the three photos shown full screen are decoded here too, not on their first appearance
+  await Promise.all([...document.querySelectorAll('#outro img[src], #photo img')].map(im => im.decode().catch(() => {})));
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  if (missing.length) {
+    console.warn('Missing textures:', missing);
+    const w = document.createElement('div');
+    w.textContent = `Missing: ${missing.join(', ')}`;
+    w.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:30;font:11px var(--mono, monospace);color:#fc3d21;background:#000c;padding:4px 8px;pointer-events:none';
+    document.body.appendChild(w);
+  }
   document.getElementById('loader').classList.add('done');
   setTimeout(() => document.getElementById('loader').remove(), 1400);
 }
@@ -686,7 +714,9 @@ const pin = $('athena-pin'), flash = $('flash'), launchEl = $('launch');
 const gauge = $('gauge'), gNeedle = $('g-needle'), gVal = $('g-val'), gOk = $('g-ok'), gBad = $('g-bad');
 const tally = $('tally'), pipe = $('pipe'), outro = $('outro'), oReal = $('o-real'), oPull = $('o-pull');
 const PULL = Array.from({ length: 24 }, (_, i) => `assets/img/outro/pull_${String(i).padStart(2, '0')}.jpg`);
-PULL.forEach(src => { const im = new Image(); im.src = src; });
+// keep the frames alive so swapping src only ever goes to a frame that has loaded (decoding all 24 up front was
+// tried and stalled the main thread for up to 3 s when the decodes resolved together mid-pitch)
+const PULL_IMG = PULL.map(src => { const im = new Image(); im.src = src; return im; });
 let pullIdx = -1;
 fetch('assets/data/pipeline_frame.json').then(r => r.json()).then(P => {
   const col = (k, n, t, cls = '') => `<div class="${cls}"><h3><span>${n}</span>${t}</h3><ul>${(P[k] || []).map(x => `<li>${x}</li>`).join('')}</ul></div>`;
@@ -918,7 +948,8 @@ function update(time) {
     const pullT = u >= B.close.s ? 1 : sstep(.64, 1, ou);
     oReal.style.opacity = sstep(.32, .42, ou);
     const k = Math.round(pullT * 23);
-    if (k !== pullIdx) { pullIdx = k; oPull.src = PULL[k]; }
+    // only swap to a frame that has finished loading; otherwise hold the current one
+    if (k !== pullIdx && (PULL_IMG[k].complete || pullIdx < 0)) { pullIdx = k; oPull.src = PULL[k]; }
     oPull.style.opacity = pullT > 0 ? 1 : 0;
   }
 

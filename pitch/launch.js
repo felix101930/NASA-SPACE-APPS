@@ -61,7 +61,14 @@ export function buildLaunch(canvas, buf, moonModel) {
 
   // the Moon, ahead and up-right
   const moon = new THREE.Group(); scene.add(moon);
-  { const m = moonModel.clone(true); m.traverse(o => { if (o.isMesh) o.material = new THREE.MeshStandardMaterial({ map: o.material.map || null, color: o.material.map ? 0xffffff : 0x9a9894, roughness: 1 }); });
+  // this inset is its own WebGL context, so it gets its own 2048 copy of the Moon map instead of a second 4096 upload
+  const small = map => {
+    if (!map || !map.image || !map.image.width) return map || null;
+    const c = document.createElement('canvas'); c.width = Math.min(2048, map.image.width); c.height = Math.round(c.width * map.image.height / map.image.width);
+    c.getContext('2d').drawImage(map.image, 0, 0, c.width, c.height);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = map.colorSpace; t.flipY = map.flipY; t.anisotropy = 4; return t;
+  };
+  { const m = moonModel.clone(true); m.traverse(o => { if (o.isMesh) o.material = new THREE.MeshStandardMaterial({ map: small(o.material.map), color: o.material.map ? 0xffffff : 0x9a9894, roughness: 1 }); });
     moon.add(m); moon.scale.setScalar(520 / 1737.4); }
 
   // flight path: pitch over toward the Moon; distance grows as p^2
@@ -112,5 +119,10 @@ export function buildLaunch(canvas, buf, moonModel) {
     starsMat.opacity = sstep(.08, .3, p);
     R.render(scene, cam);
   }
-  return { render };
+  // upload textures and compile shaders up front (called behind the loader)
+  function warm() {
+    scene.traverse(o => { if (o.material && o.material.map) R.initTexture(o.material.map); });
+    R.compile(scene, cam);
+  }
+  return { render, warm };
 }

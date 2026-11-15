@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rehearse Here</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;500;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%23fc3d21'/%3E%3C/svg%3E">
+<!-- everything is served locally so the pitch runs with no internet (three r169, Lenis 1.1.13, Google Fonts latin subsets) -->
+<link rel="stylesheet" href="assets/vendor/fonts/fonts.css">
 <link rel="stylesheet" href="style.css">
 <script type="importmap">
 { "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+  "three": "./assets/vendor/three/three.module.js",
+  "three/addons/": "./assets/vendor/three/addons/"
 } }
 </script>
-<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="assets/vendor/lenis.min.js"></script>
 </head>
 <body>
 <canvas id="gl"></canvas>
