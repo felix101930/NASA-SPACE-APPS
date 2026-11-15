@@ -693,6 +693,21 @@ void main(){
     launch.warm();
   };
   rewarm();
+  /* Pre-draw the whole pitch once, behind the loader. On Macs, Chrome draws WebGL through Metal, which builds each
+     GPU pipeline only the first time it is actually drawn with (renderer.compile() above is not enough). Without
+     this, the first visit to some scenes stalled mid-pitch: Athena -> low sun froze for about 4 s, the tally,
+     launch, Earth and outro scenes for 0.2-1.4 s. Every scene state is drawn and finished here instead. */
+  document.getElementById('loader-t').textContent = 'Preparing scenes';
+  {
+    const gls = [renderer.getContext(), document.getElementById('sls').getContext('webgl2') || document.getElementById('sls').getContext('webgl')];
+    let n = 0;
+    for (let k = 0; k <= TOTAL + 1e-6; k += 0.05) {
+      uForce = k; update(performance.now());
+      for (const g of gls) if (g) g.finish();
+      if (++n % 40 === 0) await new Promise(r => setTimeout(r, 0));   // let the loader keep animating
+    }
+    uForce = null;
+  }
   // the three photos shown full screen are decoded here too, not on their first appearance
   await Promise.all([...document.querySelectorAll('#outro img[src], #photo img')].map(im => im.decode().catch(() => {})));
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -1071,7 +1086,9 @@ function update(time) {
     rings.forEach(r => r.style.strokeDashoffset = 280);
     photoInner.style.filter = `blur(${(z * .6).toFixed(2)}px)`;
   }
-  photo.style.opacity = pOpac;
+  // never fully opaque: at 99.5% it looks the same, but Chrome keeps compositing the 3D canvas underneath. When it
+  // was 100%, Chrome stopped drawing the canvas, and bringing it back as the photo faded stalled for 1-6 s.
+  photo.style.opacity = Math.min(pOpac, .995);
 
   /* money */
   const mo = local(u, 'money');
@@ -1184,7 +1201,8 @@ function update(time) {
     C.el.style.opacity = 1;
     C.words.forEach((w, i) => {
       const k = clamp(rin * 1.6 - i * .12) * rout;
-      w.style.opacity = k; w.style.transform = `translateY(${(1 - k) * 0.5}em)`; w.style.filter = `blur(${((1 - k) * 8).toFixed(1)}px)`;
+      // fade and rise only: a live blur on every word was dozens of filter passes over the 3D view each frame
+      w.style.opacity = k; w.style.transform = `translateY(${(1 - k) * 0.5}em)`;
     });
     if (C.srcEl) C.srcEl.style.opacity = clamp(rin * 1.2 - .4) * rout;
   }
