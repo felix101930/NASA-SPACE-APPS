@@ -5,7 +5,6 @@ import { CoordBadge } from '../components/DangerProfile';
 import { Fit, FitGlyph, HazardGlyph, VerdictGlyph, type VerdictKind } from '../components/Glyphs';
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
 import { InfoTip } from '../components/InfoTip';
-import { headlineLight, PatchFor } from '../components/PatchFor';
 import { PatchPair } from '../components/PatchPair';
 import { agreementLine, nasademAgreement } from './terrain3d/Evidence';
 import { Select, type SelectOption } from '../components/Select';
@@ -279,7 +278,7 @@ function SiteCard({
       {active && (
         <div className="site-card-body">
           {match.patchiness_summary?.text && <p className="patch-line">{match.patchiness_summary.text}</p>}
-          <details className="verdict-details">
+          <details className="verdict-details" open>
             <summary>Metric by metric and in words</summary>
             <div className="list-lede">
               <span className="why-row">
@@ -334,7 +333,6 @@ function SiteCard({
               </tbody>
             </table>
           </section>
-          <PatchFor light={headlineLight(match)} hazard={match.hazard} />
           <div className="verdicts">
               <Verdict kind="match" title="Matches" items={match.matches_text} empty="No metric is within the Moon region’s spread." />
               <Verdict kind="mismatch" title="Doesn’t match" items={match.mismatches_text} empty="Every measured metric is close." />
