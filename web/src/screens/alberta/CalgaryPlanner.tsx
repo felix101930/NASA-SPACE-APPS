@@ -1,11 +1,12 @@
-// "Plan a Moon walk near you": pick a neighbourhood (map click or the Select) and get its nearest suitable route,
-// the Moon region it climbs like, and the bus or train stop it starts from.
+// "Find a Moon walk near you": pick a neighbourhood (map click, a pin or the Select) and get its nearest suitable route,
+// the Moon route it copies (side by side), and the bus or train stop it starts from.
 import { useMemo, type JSX } from 'react';
 import { InfoTip } from '../../components/InfoTip';
 import { Select, type SelectOption } from '../../components/Select';
-import { SlopeChart } from '../../components/SlopeChart';
-import type { CalgaryPreset, CalgaryWalk, EquityEvent, OverlaysGeo } from '../../types/alberta';
+import type { CalgaryPreset, CalgaryWalk, OverlaysGeo } from '../../types/alberta';
+import { MoonTwin } from './MoonTwin';
 import { minutesWalk, publicRoutes, routeNumber, titleCase, WALK_M_PER_MIN, type PlannerIndex, type PlanOption } from './planner';
+import { accessPhrase } from './shared';
 
 const NONE = '';
 
@@ -43,11 +44,11 @@ export function neighbourhoodOptions(overlays: OverlaysGeo, reached: Set<string>
     const n = count.get(r.name) ?? 1;
     const k = (seen.get(r.name) ?? 0) + 1;
     seen.set(r.name, k);
-    const status = reached ? (reached.has(r.ctuid) ? ' · reached' : ' · not yet reached') : '';
+    const status = reached ? (reached.has(r.ctuid) ? ' · Moon walk near a bus stop' : ' · no Moon walk near a stop yet') : '';
     opts.push({
       value: `${r.ctuid}|${r.name}`,
       label: n > 1 ? `${r.name} · area ${k} of ${n}` : r.name,
-      hint: `${r.category ?? 'Unrecorded'} need${status}`,
+      hint: `${accessPhrase(r.category)}${status}`,
     });
   });
   return opts;
@@ -63,7 +64,7 @@ function NeedChip({ category }: { category: string | null }): JSX.Element | null
   return (
     <span className="chip need-chip" data-need={category}>
       <span className="need-swatch" data-need={category} aria-hidden="true" />
-      {category} need
+      {accessPhrase(category)}
     </span>
   );
 }
@@ -75,15 +76,15 @@ export interface CalgaryPlannerProps {
   pts: number;
   presets: CalgaryPreset[];
   index: PlannerIndex | null;
-  topEvents: EquityEvent[];
   selectValue: string;
   onSelect: (value: string) => void;
-  onEvent: (rank: number) => void;
   ctuid: string | null;
   plan: PlanOption[];
   optionIdx: number;
   onNext: () => void;
   onShow: () => void;
+  /** The route is already fully on the map at a useful zoom: the zoom button is not needed. */
+  routeInView: boolean;
 }
 
 export function CalgaryPlanner(p: CalgaryPlannerProps): JSX.Element {
@@ -105,16 +106,12 @@ export function CalgaryPlanner(p: CalgaryPlannerProps): JSX.Element {
   return (
     <section className="cg-plan" aria-labelledby="cg-plan-h">
       <div className="cg-h">
-        <h3 id="cg-plan-h">Plan a Moon walk near you</h3>
+        <h3 id="cg-plan-h">Find a Moon walk near you</h3>
         <InfoTip label="What counts as a Moon walk" title="What counts as a Moon walk" align="end">
           <div className="infotip-body">
             <p>
-              A City pathway route that <strong>starts within 400 m of an active bus or train stop</strong> and whose slope profile matches one of 18
-              Moon routes (NASA LOLA) with under 1° typical mismatch.
-            </p>
-            <p>
-              Need comes from the <strong>Calgary Equity Index 2024</strong> (access to amenities; higher = greater need). We use it to prioritise
-              free outreach, not to rank neighbourhoods.
+              A City pathway route that <strong>starts within 400 m of an active bus or train stop</strong> and has the same ups and downs as
+              one of 18 Moon routes (NASA LOLA): under 1° typical slope mismatch.
             </p>
             <p className="caption">
               Minutes assume {WALK_M_PER_MIN} m per minute (4.8 km/h). Distances are straight-line. Not an accessibility rating.
@@ -122,29 +119,8 @@ export function CalgaryPlanner(p: CalgaryPlannerProps): JSX.Element {
           </div>
         </InfoTip>
       </div>
-      <Select
-        className="field"
-        labelClassName="field-label"
-        label="Neighbourhood"
-        value={p.selectValue}
-        options={options}
-        onChange={p.onSelect}
-      />
-      {!p.ctuid && (
-        <div className="cg-plan-empty">
-          <p className="caption">Type to search, or tap the map. Or start with a top spot:</p>
-          <div className="chip-row">
-            {p.topEvents.map((e: EquityEvent) => (
-              <button key={e.rank} type="button" className="chip chip-button" onClick={(): void => p.onEvent(e.rank)}>
-                <span className="cg-chip-n" aria-hidden="true">
-                  {e.rank}
-                </span>
-                {e.communities || e.place}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <Select className="field" labelClassName="field-label" label="Neighbourhood" value={p.selectValue} options={options} onChange={p.onSelect} />
+      {!p.ctuid && <p className="caption cg-plan-hint">Type to search, or tap a pin or a neighbourhood on the map.</p>}
       {p.ctuid && !p.index && (
         <p className="caption" role="status">
           Matching 2,762 routes to the Moon…
@@ -158,11 +134,10 @@ export function CalgaryPlanner(p: CalgaryPlannerProps): JSX.Element {
               <NeedChip category={tract?.category ?? null} />
               {isReached !== null && (
                 <span className="chip cg-reach" data-reached={isReached}>
-                  {isReached ? 'Reached' : 'Not yet reached'}
+                  {isReached ? 'Has a Moon walk near a bus stop' : 'No Moon walk near a bus stop yet'}
                 </span>
               )}
             </div>
-            <p className="caption">Need for access to amenities (Calgary Equity Index 2024)</p>
           </div>
 
           {walk && opt && preset && dtw !== null ? (
@@ -203,30 +178,16 @@ export function CalgaryPlanner(p: CalgaryPlannerProps): JSX.Element {
                   )}
                 </p>
               )}
-              <div className="cg-plan-moon">
-                <span>
-                  Climbs like <strong>{preset.region_name}</strong> <span className="muted">· Moon, {preset.kind} route</span>
-                </span>
-                <InfoTip label="How close is the match?" title="How close is the match?" align="end">
-                  <div className="infotip-body">
-                    <p>
-                      Typical slope mismatch <strong>{dtw.toFixed(2)}°</strong> against the Moon’s {preset.region_name} {preset.kind} route (
-                      {(preset.length_m / 1000).toFixed(1)} km).
-                    </p>
-                    <p>The slope profile matches at about 20–30 m scale. Steep Moon routes have no city equivalent.</p>
-                  </div>
-                </InfoTip>
-              </div>
-              <SlopeChart
-                title="Slope along the route"
-                moon={preset.slope_deg}
-                earth={earth}
-                moonLabel={`Moon · ${preset.region_name}`}
-                earthLabel={`Calgary · ${place}`}
-              />
               <div className="cg-plan-actions">
-                <button type="button" className="btn btn-primary" onClick={p.onShow}>
-                  Show on map
+                <button
+                  type="button"
+                  className="btn btn-primary cg-zoom-btn"
+                  aria-disabled={p.routeInView}
+                  onClick={(): void => {
+                    if (!p.routeInView) p.onShow();
+                  }}
+                >
+                  {p.routeInView ? 'Route in view on the map' : 'Zoom to this route'}
                 </button>
                 {p.plan.length > 1 && (
                   <button type="button" className="btn" onClick={p.onNext}>
@@ -234,6 +195,21 @@ export function CalgaryPlanner(p: CalgaryPlannerProps): JSX.Element {
                   </button>
                 )}
               </div>
+              <div className="cg-plan-moon">
+                <span>
+                  Copies a Moon route on <strong>{preset.region_name}</strong>
+                </span>
+                <InfoTip label="How close is the match?" title="How close is the match?" align="end">
+                  <div className="infotip-body">
+                    <p>
+                      Typical slope mismatch <strong>{dtw.toFixed(2)}°</strong> against the Moon’s {preset.region_name} {preset.kind} route (
+                      {(preset.length_m / 1000).toFixed(1)} km).
+                    </p>
+                    <p>The ups and downs match at about 20–30 m scale. Steep Moon routes have no city equivalent.</p>
+                  </div>
+                </InfoTip>
+              </div>
+              <MoonTwin preset={preset} walk={walk} walks={p.walks} earth={earth} place={place} />
             </div>
           ) : (
             <p className="muted">No suitable route found in our sample.</p>

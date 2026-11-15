@@ -15,8 +15,28 @@ export const NEED_FILTER_ORDER: NeedCategory[] = ['Highest', 'High', 'Moderate',
 
 export type NeedFilter = NeedCategory | 'All';
 
+/** Plain words for an Equity Index Accessibility & Amenities category (higher category = amenities harder to reach). */
+const ACCESS_WORDS: Record<NeedCategory, string> = {
+  Highest: 'Amenities hardest to reach',
+  High: 'Amenities hard to reach',
+  Moderate: 'Amenities middling to reach',
+  Low: 'Amenities easier to reach',
+  Lowest: 'Amenities easiest to reach',
+};
+
+export function isNeedCategory(v: string | null | undefined): v is NeedCategory {
+  return v === 'Highest' || v === 'High' || v === 'Moderate' || v === 'Low' || v === 'Lowest';
+}
+
+export function accessPhrase(category: string | null | undefined): string {
+  return isNeedCategory(category) ? ACCESS_WORDS[category] : 'Not scored by the Equity Index';
+}
+
+/** The two groups where amenities are hardest to reach (top two of the City's five). */
+export const HARDEST: ReadonlySet<string> = new Set(['Highest', 'High']);
+
 export function needPhrase(category: string | null | undefined): string {
-  return category ? `${category} need for access to amenities` : 'Need not recorded';
+  return accessPhrase(category);
 }
 
 export function pinElement(label: string, title: string, active: boolean, dashed = false): HTMLButtonElement {

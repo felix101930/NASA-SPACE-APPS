@@ -9,33 +9,28 @@ import { GeoMap } from '../components/GeoMap';
 import { Fit, HazardGlyph } from '../components/Glyphs';
 import { Loading } from '../components/Loading';
 import { ScreenHead } from '../components/ScreenHead';
-import { SlopeChart } from '../components/SlopeChart';
-import { useApp } from '../store';
 import { HAZARD_IDS, type HazardId, type Meta } from '../types/contract';
 import { CreditsPanel } from '../components/Credits';
 import { InfoTip } from '../components/InfoTip';
-import { Select, type SelectOption } from '../components/Select';
-import { regionOptions } from '../lib/regionOptions';
 import { buildCredits, type Credit, type CreditArea } from '../lib/credits';
 import '../styles/calgary.css';
 import { CalgaryMap, type MapPin } from './alberta/CalgaryMap';
 import { CalgaryPlanner, ctuidOfOption } from './alberta/CalgaryPlanner';
-import { EquityCompare } from './alberta/EquityCompare';
+import { EquityCompare, equityResult, type EquityResult } from './alberta/EquityCompare';
+import { RouteThumb, useTwinGeom } from './alberta/MoonTwin';
 import {
   buildPlannerIndex,
   needPercentiles,
   planFor,
   rankEvents,
-  routeNumber,
   titleCase,
-  WALK_M_PER_MIN,
   type EventPick,
   type PlannerIndex,
   type PlanOption,
   type PreferredNearest,
   type TractInfo,
 } from './alberta/planner';
-import { NEED_FILTER_ORDER, needPhrase, pinElement, type NeedFilter } from './alberta/shared';
+import { accessPhrase, NEED_FILTER_ORDER, pinElement, type NeedFilter } from './alberta/shared';
 import {
   isAlbertaFile,
   isEquityFile,
@@ -52,7 +47,6 @@ import {
   type EquityEvent,
   type EquityFile,
   type OverlaysGeo,
-  type PresetMatchRow,
   type PresetsFile,
   type UncapturedTract,
   type WalksFile,
@@ -193,7 +187,7 @@ function screenCredits(metas: { file: string; meta: Meta | undefined }[], area: 
         c.name = `City of Calgary Open Data: ${cityNames.join(', ')}`;
         c.licence = stripUrl(city[0].licence);
       } else if (c.key === 'equity' && eq) {
-        c.name = 'Calgary Equity Index 2024 (ArcGIS FeatureServer, Accessibility & Amenities domain; higher score = greater need)';
+        c.name = 'Calgary Equity Index 2024 (ArcGIS FeatureServer, Accessibility & Amenities domain; higher score = amenities harder to reach)';
         c.url = eq.url;
         c.licence = stripUrl(eq.licence);
       } else if (c.key === 'hrdem' && hr) {
@@ -597,17 +591,138 @@ export function calgaryHeadline(equity: EquityFile | null, presets: CalgaryPrese
   return `${hi.n_covered} of ${hi.n_tracts} highest-need neighbourhoods have a Moon walk starting within 400 m of a bus or train stop`;
 }
 
-function NeedChip({ category }: { category: string | null | undefined }): JSX.Element | null {
-  if (!category) return null;
+/** The one-sentence purpose of the Calgary tab (the screen headline). */
+export const CALGARY_PURPOSE =
+  'We found Calgary pathways with the same ups and downs as Moon routes, then used the City’s Equity Index to choose where free Moon-walk events should go.';
+
+const SHORT_ACCESS: Record<string, string> = { Highest: 'Hardest', High: 'Hard', Moderate: 'Middling', Low: 'Easier', Lowest: 'Easiest' };
+
+// ---------------------------------------------------------------------------- intro: three steps + one result
+
+/** The route that illustrates steps 1–2: event #1 and the Moon route it copies (else the first preset's match). */
+function exampleRoute(data: CalgaryData): { preset: CalgaryPreset; walk: CalgaryWalk } | null {
+  const items = data.walks.items;
+  const presets = data.presets.presets;
+  const e = data.equity?.top_events[0];
+  if (e?.moon_match) {
+    const walk = items.find((w: CalgaryWalk): boolean => w.id === e.route_id);
+    const preset = presets.find((p: CalgaryPreset): boolean => p.region === e.moon_match?.region && p.kind === e.moon_match?.kind);
+    if (walk && preset) return { preset, walk };
+  }
+  for (const p of presets) {
+    const id = p.match.recommended?.id;
+    const walk = id ? items.find((w: CalgaryWalk): boolean => w.id === id) : undefined;
+    if (walk) return { preset: p, walk };
+  }
+  return null;
+}
+
+function BusStopIcon(): JSX.Element {
   return (
-    <span className="chip need-chip" data-need={category}>
-      <span className="need-swatch" data-need={category} aria-hidden="true" />
-      {needPhrase(category)}
+    <svg className="cg-step-icon" viewBox="0 0 48 48" aria-hidden="true">
+      <rect x="0" y="0" width="48" height="48" rx="6" className="cg-step-icon-bg" />
+      <line x1="17" y1="12" x2="17" y2="40" className="cg-step-icon-pole" />
+      <rect x="9" y="8" width="16" height="12" rx="2.5" className="cg-step-icon-sign" />
+      <text x="17" y="17.5" textAnchor="middle" className="cg-step-icon-text">
+        BUS
+      </text>
+      <rect x="27" y="22" width="14" height="18" rx="2" fill="var(--need-5)" />
+      <rect x="31" y="27" width="6" height="6" rx="1" className="cg-step-icon-door" />
+    </svg>
+  );
+}
+
+function StepThumb({ data, world }: { data: CalgaryData; world: 'moon' | 'calgary' }): JSX.Element | null {
+  const ex = useMemo(() => exampleRoute(data), [data]);
+  if (!ex) return null;
+  return <StepThumbInner preset={ex.preset} walk={ex.walk} walks={data.walks.items} world={world} />;
+}
+
+function StepThumbInner({
+  preset,
+  walk,
+  walks,
+  world,
+}: {
+  preset: CalgaryPreset;
+  walk: CalgaryWalk;
+  walks: CalgaryWalk[];
+  world: 'moon' | 'calgary';
+}): JSX.Element | null {
+  const g = useTwinGeom(preset, walk, walks);
+  return (
+    <span className="cg-step-thumb">
+      <RouteThumb g={g} world={world} px={64} />
     </span>
   );
 }
 
-// ---------------------------------------------------------------------------- equity view
+function CalgaryIntro({ data, result }: { data: CalgaryData; result: EquityResult | null }): JSX.Element {
+  const ex = useMemo(() => exampleRoute(data), [data]);
+  const exPlace = ex ? (ex.walk.park?.split(';')[0].trim() ?? (ex.walk.tract?.communities ? titleCase(ex.walk.tract.communities.split(',')[0]) : '')) : '';
+  return (
+    <section className="cg-intro" aria-label="How it works and the result">
+      <ol className="cg-steps">
+        <li className="cg-step">
+          <StepThumb data={data} world="moon" />
+          <span className="cg-step-text">
+            <strong>Moon route</strong>
+            {ex && <span className="cg-step-sub">{ex.preset.region_name}</span>}
+          </span>
+        </li>
+        <li className="cg-step">
+          <StepThumb data={data} world="calgary" />
+          <span className="cg-step-text">
+            <strong>Calgary path, same slopes</strong>
+            {exPlace && <span className="cg-step-sub">{exPlace}</span>}
+          </span>
+        </li>
+        <li className="cg-step">
+          <BusStopIcon />
+          <span className="cg-step-text">
+            <strong>Near a bus stop, where amenities are hardest to reach</strong>
+          </span>
+        </li>
+      </ol>
+      <div className="cg-result">
+        {result ? <ResultLine r={result} /> : data.equity ? <p className="cg-result-text muted">Ranking event spots…</p> : <p className="cg-result-text">{calgaryResult(data.presets.presets)}.</p>}
+      </div>
+    </section>
+  );
+}
+
+function ResultLine({ r }: { r: EquityResult }): JSX.Element {
+  const withPart = r.withIndex === r.n ? `all ${r.n}` : `${r.withIndex} of ${r.n}`;
+  const better = r.withIndex > r.withoutIndex;
+  return (
+    <div className="cg-result-text">
+      With the City’s Equity Index, <strong>{withPart}</strong> suggested events go to neighbourhoods where amenities are hardest to reach.{' '}
+      {better ? (
+        <>
+          Without it, only <strong>{r.withoutIndex} of {r.n}</strong> would.
+        </>
+      ) : (
+        <>
+          Without it, <strong>{r.withoutIndex} of {r.n}</strong> would.
+        </>
+      )}{' '}
+      <InfoTip label="How this is counted" title="How this is counted" align="end">
+        <div className="infotip-body">
+          <p>
+            <strong>Hardest to reach</strong> = High or Highest on the Calgary Equity Index 2024 Accessibility &amp; Amenities domain (the top two of
+            the City’s five groups; a higher score means more barriers).
+          </p>
+          <p>
+            Each list picks the best Moon walk per neighbourhood with starts at least 2 km apart. With the index, how hard amenities are to reach is
+            multiplied in; without it, only closeness to transit and slope match count.
+          </p>
+        </div>
+      </InfoTip>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------- "See the numbers"
 
 type CoverageBasis = 'tracts' | 'people';
 
@@ -617,7 +732,7 @@ function CoverageChart({ rows }: { rows: EquityCoverageRow[] }): JSX.Element {
     <div className="cg-cov">
       <div className="cg-cov-head">
         <span className="caption" id="cg-cov-cap">
-          Share with a route (by need for access to amenities)
+          Share with a Moon walk near a bus stop, by how hard amenities are to reach
         </span>
         <div className="seg seg-sm" role="group" aria-labelledby="cg-cov-cap">
           <button type="button" aria-pressed={basis === 'tracts'} onClick={(): void => setBasis('tracts')}>
@@ -630,12 +745,12 @@ function CoverageChart({ rows }: { rows: EquityCoverageRow[] }): JSX.Element {
       </div>
       <table className="cg-cov-table">
         <caption className="sr-only">
-          Share of census tracts (neighbourhoods) or residents, per Equity Index need category, with at least one Moon-walk route that starts
-          within 400 m of an active transit stop.
+          Share of census tracts (neighbourhoods) or residents, per Equity Index Accessibility &amp; Amenities group, with at least one Moon-walk
+          route that starts within 400 m of an active transit stop.
         </caption>
         <thead className="sr-only">
           <tr>
-            <th scope="col">Need for access to amenities</th>
+            <th scope="col">How hard amenities are to reach</th>
             <th scope="col">Share covered</th>
             <th scope="col">Covered of total</th>
           </tr>
@@ -649,13 +764,13 @@ function CoverageChart({ rows }: { rows: EquityCoverageRow[] }): JSX.Element {
                 : `${nf.format(Math.round(r.population_covered / 1000))}k of ${nf.format(Math.round(r.population / 1000))}k`;
             const tip =
               basis === 'tracts'
-                ? `${r.category} need: ${r.n_covered} of ${r.n_tracts} neighbourhoods (${pct.toFixed(0)}%) have a suitable route; ${r.n_suitable_routes} suitable routes in total`
-                : `${r.category} need: ${nf.format(r.population_covered)} of ${nf.format(r.population)} residents (${pct.toFixed(0)}%) live in a neighbourhood with a suitable route`;
+                ? `${accessPhrase(r.category)}: ${r.n_covered} of ${r.n_tracts} neighbourhoods (${pct.toFixed(0)}%) have a Moon walk near a bus stop`
+                : `${accessPhrase(r.category)}: ${nf.format(r.population_covered)} of ${nf.format(r.population)} residents (${pct.toFixed(0)}%) live in a neighbourhood with one`;
             return (
               <tr key={r.category} title={tip}>
                 <th scope="row">
                   <span className="need-swatch" data-need={r.category} aria-hidden="true" />
-                  {r.category}
+                  {SHORT_ACCESS[r.category] ?? r.category}
                 </th>
                 <td className="cg-bar-cell">
                   <span className="cg-bar" aria-hidden="true">
@@ -678,24 +793,18 @@ function EquityInfo({ equity }: { equity: EquityFile }): JSX.Element {
   const lo = Math.min(...tot);
   const hi = Math.max(...tot);
   return (
-    <InfoTip label="What is the Calgary Equity Index and how do we use it?" title="Calgary Equity Index 2024" align="end">
+    <InfoTip label="What is the Calgary Equity Index?" title="Calgary Equity Index 2024" align="end">
       <div className="infotip-body">
         <p>
           The City of Calgary scores each of its 288 census tracts on access to amenities, economic opportunity, health, belonging and
-          environment. <strong>A higher score means greater need</strong>: more barriers to equity. The City sorts tracts into five equal groups,
-          Lowest to Highest.
+          environment. <strong>A higher score means more barriers</strong>. The City sorts tracts into five equal groups.
         </p>
         <p>
-          We use the <strong>Accessibility &amp; Amenities</strong> score to decide where free Moon-walk events should go first: neighbourhoods
-          where getting to parks, shops and services is harder.
-        </p>
-        <p>
-          A neighbourhood counts as reached when one of our routes starts within 400 m of an active bus or train stop and its slope profile
-          matches a Moon route (under 1° typical mismatch).
+          We use the <strong>Accessibility &amp; Amenities</strong> score: how hard it is to get to parks, shops and services.
         </p>
         <p className="caption">
-          Check on the City’s overall Total Equity Score: coverage is {lo.toFixed(0)}–{hi.toFixed(0)}% in every group, so the gap above is
-          specific to access to amenities.
+          Check on the City’s overall Total Equity Score: coverage is {lo.toFixed(0)}–{hi.toFixed(0)}% in every group, so the gap is specific to
+          access to amenities.
         </p>
       </div>
     </InfoTip>
@@ -709,15 +818,30 @@ const REASON_SHORT: Record<string, string> = {
   other: '',
 };
 
-function UncapturedList({ equity, onOpen }: { equity: EquityFile; onOpen: (ctuid: string) => void }): JSX.Element | null {
+function UncapturedList({
+  equity,
+  onOpen,
+  outlined,
+  onOutline,
+}: {
+  equity: EquityFile;
+  onOpen: (ctuid: string) => void;
+  outlined: boolean;
+  onOutline: () => void;
+}): JSX.Element | null {
   const u = equity.uncaptured_highest;
   if (!u.tracts.length) return null;
   return (
-    <details className="cg-unreached">
-      <summary>
-        {u.n} highest-need neighbourhoods not yet reached
-        <span className="muted"> · plan for them</span>
-      </summary>
+    <section className="cg-unreached" aria-labelledby="cg-unr-h">
+      <div className="cg-h">
+        <h4 id="cg-unr-h" className="cg-sub">
+          {u.n} neighbourhoods where amenities are hardest to reach have no Moon walk near a bus stop yet
+        </h4>
+      </div>
+      <button type="button" className="chip chip-button cg-gap-btn" aria-pressed={outlined} onClick={onOutline}>
+        <span className="cg-gap-key" aria-hidden="true" />
+        {outlined ? 'Outlined on the map' : 'Outline them on the map'}
+      </button>
       <ul>
         {u.tracts.map((t: UncapturedTract) => (
           <li key={t.ctuid}>
@@ -725,198 +849,94 @@ function UncapturedList({ equity, onOpen }: { equity: EquityFile; onOpen: (ctuid
               <span className="cg-unreached-name">{t.communities || t.tract}</span>
               <span className="muted">
                 {REASON_SHORT[t.reason] ?? ''}
-                {t.nearest_suitable ? ` · nearest route ${t.nearest_suitable.dist_km.toFixed(1)} km` : ''}
+                {t.nearest_suitable ? ` · nearest Moon walk ${t.nearest_suitable.dist_km.toFixed(1)} km` : ''}
               </span>
             </button>
           </li>
         ))}
       </ul>
-    </details>
+    </section>
   );
 }
 
-function EquityView({
-  equity,
+function NumbersView({
+  data,
   compare,
   tracts,
   onOpen,
   onPick,
+  needFilter,
+  setNeedFilter,
+  outlined,
+  onOutline,
 }: {
-  equity: EquityFile;
+  data: CalgaryData;
   compare: { withNeed: EventPick[]; withoutNeed: EventPick[] } | null;
   tracts: Map<string, TractInfo> | null;
   onOpen: (ctuid: string) => void;
   onPick: (p: EventPick) => void;
+  needFilter: NeedFilter;
+  setNeedFilter: (f: NeedFilter) => void;
+  outlined: boolean;
+  onOutline: () => void;
 }): JSX.Element {
-  const g = equity.gap;
+  const equity = data.equity;
+  const filterOpts: NeedFilter[] = ['All', ...NEED_FILTER_ORDER];
   return (
-    <>
-      <section aria-labelledby="cg-cov-h">
-        <div className="cg-h">
-          <h3 id="cg-cov-h">Who can reach a free Moon walk</h3>
-          <EquityInfo equity={equity} />
-        </div>
-        <CoverageChart rows={equity.coverage} />
-        <p className="cg-gap">
-          <strong>{g.high_need.pct_covered.toFixed(0)}%</strong> of higher-need neighbourhoods vs{' '}
-          <strong>{g.low_need.pct_covered.toFixed(0)}%</strong> of lower-need ones.
-        </p>
-      </section>
-      {compare && tracts ? (
-        <EquityCompare withNeed={compare.withNeed} withoutNeed={compare.withoutNeed} tracts={tracts} onPick={onPick} />
-      ) : (
-        <p className="caption" role="status">
-          Ranking event locations…
-        </p>
-      )}
-      <UncapturedList equity={equity} onOpen={onOpen} />
-    </>
-  );
-}
-
-// ---------------------------------------------------------------------------- matcher view
-
-function MatcherView({ data, onWalk }: { data: CalgaryData; onWalk: (w: CalgaryWalk | null) => void }): JSX.Element {
-  const storeRegion = useApp((s) => s.regionId);
-  const regions = useMemo((): { id: string; name: string }[] => {
-    const m = new Map<string, string>();
-    data.presets.presets.forEach((p: CalgaryPreset): void => {
-      m.set(p.region, p.region_name);
-    });
-    return Array.from(m.entries()).map(([id, name]: [string, string]) => ({ id, name }));
-  }, [data]);
-  const [region, setRegion] = useState<string>(regions.some((r) => r.id === storeRegion) ? storeRegion : (regions[0]?.id ?? ''));
-  const ranking = useApp((s) => s.core?.summary?.ranking);
-  const regionOpts = useMemo((): SelectOption<string>[] => regionOptions(regions, ranking), [regions, ranking]);
-  const [kind, setKind] = useState<'gentle' | 'steeper'>('gentle');
-  const preset = data.presets.presets.find((p: CalgaryPreset): boolean => p.region === region && p.kind === kind) ?? null;
-  const [pick, setPick] = useState<string | null>(null);
-  useEffect((): void => setPick(null), [region, kind]);
-  const row: PresetMatchRow | null = (pick ? preset?.match.top.find((t) => t.id === pick) : null) ?? preset?.match.recommended ?? null;
-  const walkById = useMemo(
-    (): Map<string, CalgaryWalk> => new Map(data.walks.items.map((w: CalgaryWalk): [string, CalgaryWalk] => [w.id, w])),
-    [data],
-  );
-  const walk = row ? (walkById.get(row.id) ?? null) : null;
-  useEffect((): void => onWalk(walk), [walk, onWalk]);
-  const P = data.walks.bin.shape[1];
-  const earthSlopes = useMemo(
-    (): number[] | null => (walk ? Array.from(data.rows.subarray(walk.row * P, (walk.row + 1) * P)) : null),
-    [walk, data, P],
-  );
-  const placeName = walk?.park?.split(';')[0].trim() ?? (walk?.tract?.communities ? titleCase(walk.tract.communities) : null) ?? row?.id ?? '';
-  const steepGap = preset ? preset.slope_gap_deg : 0;
-
-  return (
-    <>
-      <p className="caption">{calgaryResult(data.presets.presets)}.</p>
-      <div className="cg-controls">
-        <Select
-          className="field"
-          labelClassName="field-label"
-          label="Moon region"
-          value={region}
-          options={regionOpts}
-          onChange={setRegion}
-        />
-        <div className="field">
-          <span className="field-label" id="cg-kind">
-            Moon route
-          </span>
-          <div className="seg" role="group" aria-labelledby="cg-kind">
-            <button type="button" aria-pressed={kind === 'gentle'} onClick={(): void => setKind('gentle')}>
-              Gentle
-            </button>
-            <button type="button" aria-pressed={kind === 'steeper'} onClick={(): void => setKind('steeper')}>
-              Steeper
-            </button>
+    <details className="cg-numbers">
+      <summary>See the numbers</summary>
+      <div className="cg-numbers-body">
+        {equity && (
+          <section aria-labelledby="cg-cov-h" className="cg-num-sec">
+            <div className="cg-h">
+              <h4 id="cg-cov-h" className="cg-sub">
+                Who has a Moon walk near a bus stop
+              </h4>
+              <EquityInfo equity={equity} />
+            </div>
+            <CoverageChart rows={equity.coverage} />
+            <p className="cg-gap">
+              <strong>{equity.gap.high_need.pct_covered.toFixed(0)}%</strong> of neighbourhoods where amenities are hardest to reach vs{' '}
+              <strong>{equity.gap.low_need.pct_covered.toFixed(0)}%</strong> where they are easiest.
+            </p>
+          </section>
+        )}
+        {equity &&
+          (compare && tracts ? (
+            <EquityCompare withNeed={compare.withNeed} withoutNeed={compare.withoutNeed} tracts={tracts} onPick={onPick} />
+          ) : (
+            <p className="caption" role="status">
+              Ranking event spots…
+            </p>
+          ))}
+        {equity && <UncapturedList equity={equity} onOpen={onOpen} outlined={outlined} onOutline={onOutline} />}
+        <section className="cg-num-sec" aria-labelledby="cg-filter-h">
+          <h4 id="cg-filter-h" className="cg-sub">
+            Show on the map
+          </h4>
+          <div className="cg-filter-row" role="group" aria-labelledby="cg-filter-h">
+            {filterOpts.map((c: NeedFilter) => (
+              <button
+                key={c}
+                type="button"
+                className="chip chip-button cg-need-btn"
+                aria-pressed={needFilter === c}
+                onClick={(): void => setNeedFilter(c)}
+                title={c === 'All' ? 'All neighbourhoods' : accessPhrase(c)}
+              >
+                {c !== 'All' && <span className="need-swatch" data-need={c} aria-hidden="true" />}
+                {c === 'All' ? 'All' : SHORT_ACCESS[c]}
+              </button>
+            ))}
           </div>
-        </div>
+        </section>
+        <p className="caption">Moon routes: {calgaryResult(data.presets.presets)}.</p>
       </div>
-      {preset && (
-        <p className="caption">
-          {preset.region_name}, {kind} route: {(preset.length_m / 1000).toFixed(1)} km, average slope {preset.mean_abs_slope_deg.toFixed(1)}°,
-          steepest {preset.max_slope_deg.toFixed(1)}°, climb {preset.climb_m.toFixed(0)} m.
-        </p>
-      )}
-      {row && walk ? (
-        <section className="cg-match">
-          <p className="caption">
-            {isCalgaryMatch(row.dtw_deg) ? 'Calgary match' : 'Closest Calgary path (not a match)'}
-            {!pick && preset?.match.tie_break_applied && (row.access_category === 'High' || row.access_category === 'Highest')
-              ? ' · picked among near-ties for higher need for access to amenities'
-              : ''}
-          </p>
-          <h3 className="ab-best-name">{placeName}</h3>
-          <p className="muted">
-            {isCalgaryMatch(row.dtw_deg)
-              ? `Slope profile matches at about 20–30 m scale: ${row.dtw_deg.toFixed(2)}° typical mismatch.`
-              : `Closest city path, but not a match: ${row.dtw_deg.toFixed(1)}° typical slope mismatch.`}{' '}
-            {(walk.length_m / 1000).toFixed(2)} km, climb {walk.climb_m.toFixed(0)} m.
-          </p>
-          <div className="chip-row">
-            <NeedChip category={walk.tract?.access_category ?? row.access_category} />
-          </div>
-          {walk.near_stop && (
-            <p className="cg-stop">
-              <strong>Nearest stop:</strong> {walk.near_stop.name}, {Math.round(walk.near_stop.dist_m)} m from the start (
-              {Math.max(1, Math.ceil(walk.near_stop.dist_m / WALK_M_PER_MIN))} min walk)
-              {walk.near_stop.routes.length ? (
-                <span className="muted"> · routes {walk.near_stop.routes.map(routeNumber).join(', ')}</span>
-              ) : null}
-            </p>
-          )}
-          <SlopeChart
-            title="Slope along the route"
-            moon={preset?.slope_deg ?? []}
-            earth={earthSlopes}
-            moonLabel={`Moon · ${preset?.region_name ?? ''}`}
-            earthLabel={`Calgary · ${placeName}`}
-          />
-          {(kind === 'steeper' || steepGap > 3) && steepGap > 1 && (
-            <p className="ab-note">
-              No city path is this steep. The closest Calgary walk is {steepGap.toFixed(1)}° gentler on average, so it only echoes the rhythm of
-              this route.
-            </p>
-          )}
-        </section>
-      ) : (
-        <p className="muted">No Calgary match for this route.</p>
-      )}
-      {preset && preset.match.top.length > 0 && (
-        <section>
-          <h4 className="section-label">Other close paths</h4>
-          <table className="data-table result-list">
-            <thead>
-              <tr>
-                <th>Path</th>
-                <th className="r">Slope mismatch</th>
-                <th>Need for access to amenities</th>
-              </tr>
-            </thead>
-            <tbody>
-              {preset.match.top.map((t: PresetMatchRow) => (
-                <tr key={t.id} data-active={t.id === row?.id} onClick={(): void => setPick(t.id)}>
-                  <td>
-                    <button type="button" className="row-btn" aria-pressed={t.id === row?.id} onClick={(): void => setPick(t.id)}>
-                      {t.park?.split(';')[0].trim() ?? (t.communities ? titleCase(t.communities) : t.id)}
-                    </button>
-                  </td>
-                  <td className="r">{t.dtw_deg.toFixed(2)}°</td>
-                  <td>{t.access_category ?? '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      )}
-    </>
+    </details>
   );
 }
 
 // ---------------------------------------------------------------------------- panel
-
-type CalgaryMode = 'plan' | 'equity' | 'match';
 
 let plannerPromise: Promise<PlannerIndex> | null = null;
 
@@ -955,14 +975,15 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
   const equity = data.equity;
   const items = data.walks.items;
   const ix = usePlannerIndex(data);
-  const [mode, setMode] = useState<CalgaryMode>('plan');
   const [ctuid, setCtuid] = useState<string | null>(null);
   const [selectValue, setSelectValue] = useState<string>('');
   const [optIdx, setOptIdx] = useState<number>(0);
   const [fitKey, setFitKey] = useState<number>(0);
+  const [zoomKey, setZoomKey] = useState<number>(0);
+  const [routeInView, setRouteInView] = useState<boolean>(false);
   const [needFilter, setNeedFilter] = useState<NeedFilter>('All');
   const [unreachedOnly, setUnreachedOnly] = useState<boolean>(false);
-  const [matchWalk, setMatchWalk] = useState<CalgaryWalk | null>(null);
+  const mapColRef = useRef<HTMLDivElement | null>(null);
 
   const indexById = useMemo((): Map<string, number> => new Map(items.map((w: CalgaryWalk, k: number): [string, number] => [w.id, k])), [items]);
   const preferred = useMemo((): Map<string, PreferredNearest> => {
@@ -982,6 +1003,10 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
     const pct = needPercentiles(data.overlays);
     return { withNeed: rankEvents(ix, items, pct, true), withoutNeed: rankEvents(ix, items, pct, false) };
   }, [ix, items, data.overlays]);
+  const result = useMemo(
+    (): EquityResult | null => (compare && ix && equity ? equityResult(compare.withNeed, compare.withoutNeed, ix.tracts) : null),
+    [compare, ix, equity],
+  );
 
   const pins = useMemo((): MapPin[] => {
     if (!equity) return [];
@@ -990,13 +1015,12 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
       const w = k !== undefined ? items[k] : undefined;
       if (!w || !w.coords.length) return [];
       const [lat, lon] = w.coords[0];
-      return [{ rank: e.rank, lonLat: [lon, lat], title: `Event location ${e.rank}: ${e.place}. Open in the planner.` }];
+      return [{ rank: e.rank, lonLat: [lon, lat], title: `Suggested event ${e.rank}: ${e.place}. Show its Moon walk.` }];
     });
   }, [equity, indexById, items]);
 
   const openTract = useCallback(
     (id: string, opts: { fit: boolean; walkIndex?: number; value?: string }): void => {
-      setMode('plan');
       setCtuid(id);
       setSelectValue(opts.value ?? firstOptionValue(ix, data, id));
       let at = 0;
@@ -1017,25 +1041,31 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
     [equity, openTract, indexById],
   );
   const onMapTract = useCallback((id: string): void => openTract(id, { fit: false }), [openTract]);
-  const showOnMap = (): void => {
-    setFitKey((k: number): number => k + 1);
-    const box = document.querySelector('.cg-map');
-    if (box && box.getBoundingClientRect().bottom < 0) box.scrollIntoView({ block: 'nearest' });
-    else if (box && box.getBoundingClientRect().top > window.innerHeight) box.scrollIntoView({ block: 'nearest' });
+  /** Zoom to the route (with a pulse) and bring the map on screen below the sticky header if it is not. */
+  const zoomToRoute = (): void => {
+    setZoomKey((k: number): number => k + 1);
+    const box = mapColRef.current?.querySelector<HTMLElement>('.cg-map');
+    if (!box) return;
+    const r = box.getBoundingClientRect();
+    const head = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 60;
+    if (r.top < head + 8 || r.bottom > window.innerHeight) {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      box.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+    }
   };
 
-  const walk = mode === 'match' ? matchWalk : planWalk;
-  const activePin = mode !== 'match' && planWalk ? (equity?.top_events.find((e: EquityEvent): boolean => e.route_id === planWalk.id)?.rank ?? null) : null;
-  const filterOpts: NeedFilter[] = ['All', ...NEED_FILTER_ORDER];
+  const activePin = planWalk ? (equity?.top_events.find((e: EquityEvent): boolean => e.route_id === planWalk.id)?.rank ?? null) : null;
 
   return (
     <>
-      <div>
+      <CalgaryIntro data={data} result={result} />
+      <div className="ab-layout cg-layout" role="tabpanel">
+      <div className="cg-map-col" ref={mapColRef}>
         <CalgaryMap
           overlays={data.overlays}
           walks={items}
-          walk={walk}
-          selectedTract={mode === 'match' ? null : ctuid}
+          walk={planWalk}
+          selectedTract={ctuid}
           pins={pins}
           activePin={activePin}
           onPin={onPin}
@@ -1045,106 +1075,67 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
           unreachedIds={unreachedIds}
           reached={reached}
           fitKey={fitKey}
+          zoomKey={zoomKey}
+          onRouteInView={setRouteInView}
         />
-        <div className="cg-filters">
-          <div className="cg-filter-row" role="group" aria-labelledby="cg-need-cap">
-            <span className="caption" id="cg-need-cap">
-              Need for access to amenities
-            </span>
-            {filterOpts.map((c: NeedFilter) => (
-              <button
-                key={c}
-                type="button"
-                className="chip chip-button cg-need-btn"
-                aria-pressed={needFilter === c}
-                onClick={(): void => setNeedFilter(c)}
-              >
-                {c !== 'All' && <span className="need-swatch" data-need={c} aria-hidden="true" />}
-                {c}
-              </button>
-            ))}
-          </div>
-          <div className="cg-filter-row">
-            {unreachedIds.length > 0 && (
-              <button
-                type="button"
-                className="chip chip-button cg-gap-btn"
-                aria-pressed={unreachedOnly}
-                onClick={(): void => setUnreachedOnly((v: boolean): boolean => !v)}
-              >
-                <span className="cg-gap-key" aria-hidden="true" />
-                Highest need, not yet reached · {unreachedIds.length}
-              </button>
-            )}
-            {pins.length > 0 && (
-              <span className="legend-item">
-                <span className="pin-key" aria-hidden="true">
-                  1
-                </span>
-                Top 5 event spots
-              </span>
-            )}
+        <div className="cg-legend">
+          <span className="legend-item">
+            <span className="cg-ramp-key" aria-hidden="true" />
+            Brighter = amenities harder to reach <span className="muted">(Calgary Equity Index 2024)</span>
+          </span>
+          {pins.length > 0 && (
             <span className="legend-item">
-              <span className="cg-route-key" aria-hidden="true" />
-              Selected route
+              <span className="pin-key" aria-hidden="true">
+                1
+              </span>
+              Suggested event
             </span>
-          </div>
-          <p className="caption">Calgary Equity Index 2024 · higher score = greater need · thin lines = all 2,762 pathway routes</p>
+          )}
+          {planWalk && (
+            <span className="legend-item">
+              <span className="mt-key-start" aria-hidden="true" />
+              <span className="cg-route-key" aria-hidden="true" />
+              <span className="mt-key-end" aria-hidden="true" />
+              Moon walk, start to end
+            </span>
+          )}
         </div>
       </div>
       <div className="panel panel-pad ab-panel cg-panel">
-        <div className="seg cg-mode" role="group" aria-label="View">
-          <button type="button" aria-pressed={mode === 'plan'} onClick={(): void => setMode('plan')}>
-            Plan a walk
-          </button>
-          {equity && (
-            <button type="button" aria-pressed={mode === 'equity'} onClick={(): void => setMode('equity')}>
-              Who’s reached
-            </button>
-          )}
-          <button type="button" aria-pressed={mode === 'match'} onClick={(): void => setMode('match')}>
-            Match a Moon route
-          </button>
-        </div>
-        {mode === 'plan' && (
-          <CalgaryPlanner
-            overlays={data.overlays}
-            walks={items}
-            rows={data.rows}
-            pts={data.walks.bin.shape[1]}
-            presets={data.presets.presets}
-            index={ix}
-            topEvents={equity?.top_events ?? []}
-            selectValue={selectValue}
-            onSelect={(v: string): void => {
-              const id = ctuidOfOption(v);
-              if (id) openTract(id, { fit: true, value: v });
-            }}
-            onEvent={onPin}
-            ctuid={ctuid}
-            plan={plan}
-            optionIdx={optIdx}
-            onNext={(): void => {
-              setOptIdx((i: number): number => (plan.length ? (i + 1) % plan.length : 0));
-              setFitKey((k: number): number => k + 1);
-            }}
-            onShow={showOnMap}
-          />
-        )}
-        {mode === 'equity' && equity && (
-          <EquityView
-            equity={equity}
-            compare={compare}
-            tracts={ix?.tracts ?? null}
-            onOpen={(id: string): void => openTract(id, { fit: true })}
-            onPick={(pk: EventPick): void => openTract(pk.ctuid, { fit: true, walkIndex: pk.walkIndex })}
-          />
-        )}
-        {mode === 'match' && <MatcherView data={data} onWalk={setMatchWalk} />}
-        <p className="caption">
-          Slope profiles match at ~20–30 m scale; steep Moon routes have no city equivalent. For outreach, not equipment testing or an
-          accessibility rating.
-        </p>
+        <CalgaryPlanner
+          overlays={data.overlays}
+          walks={items}
+          rows={data.rows}
+          pts={data.walks.bin.shape[1]}
+          presets={data.presets.presets}
+          index={ix}
+          selectValue={selectValue}
+          onSelect={(v: string): void => {
+            const id = ctuidOfOption(v);
+            if (id) openTract(id, { fit: true, value: v });
+          }}
+          ctuid={ctuid}
+          plan={plan}
+          optionIdx={optIdx}
+          onNext={(): void => {
+            setOptIdx((i: number): number => (plan.length ? (i + 1) % plan.length : 0));
+            setFitKey((k: number): number => k + 1);
+          }}
+          onShow={zoomToRoute}
+          routeInView={routeInView}
+        />
+        <NumbersView
+          data={data}
+          compare={compare}
+          tracts={ix?.tracts ?? null}
+          onOpen={(id: string): void => openTract(id, { fit: true })}
+          onPick={(pk: EventPick): void => openTract(pk.ctuid, { fit: true, walkIndex: pk.walkIndex })}
+          needFilter={needFilter}
+          setNeedFilter={setNeedFilter}
+          outlined={unreachedOnly}
+          onOutline={(): void => setUnreachedOnly((v: boolean): boolean => !v)}
+        />
+      </div>
       </div>
     </>
   );
@@ -1167,9 +1158,7 @@ export default function AlbertaCalgary(): JSX.Element {
       ? ab.data
         ? albertaResult(ab.data.file)
         : 'Loading Alberta’s windows…'
-      : cg.data
-        ? calgaryHeadline(cg.data.equity, cg.data.presets.presets)
-        : 'Loading Calgary’s pathways…';
+      : CALGARY_PURPOSE;
 
   return (
     <div>
@@ -1186,8 +1175,9 @@ export default function AlbertaCalgary(): JSX.Element {
           ) : (
             <p>
               {cg.data ? nf.format(cg.data.walks.items.length) : 'About 2,800'} City of Calgary pathway routes get slope profiles from NRCan
-              lidar and are matched to 18 Moon routes (NASA LOLA). A route counts when its slope mismatch is under 1° and it starts within 400 m
-              of an active stop. We count, per Calgary Equity Index 2024 need group, how many neighbourhoods have one.
+              lidar and are matched to 18 Moon routes (NASA LOLA). A route counts when its typical slope mismatch is under 1° and it starts within
+              400 m of an active bus or train stop. The Calgary Equity Index 2024 (Accessibility &amp; Amenities) shows where amenities are hardest
+              to reach; events go there first.
             </p>
           )
         }
@@ -1251,18 +1241,23 @@ export default function AlbertaCalgary(): JSX.Element {
           <Loading label="Loading Calgary’s pathways…" />
         ) : (
           <>
-            <div className="ab-layout" role="tabpanel">
-              <CalgaryPanel data={cg.data} />
-            </div>
-            <Credits
-              area="calgary"
-              metas={[
-                { file: 'walks.json', meta: cg.data.walks.meta },
-                { file: 'presets.json', meta: cg.data.presets.meta },
-                { file: 'calgary_overlays.geojson', meta: cg.data.overlays.meta },
-                ...(cg.data.equity ? [{ file: 'equity.json', meta: cg.data.equity.meta }] : []),
-              ]}
-            />
+            <CalgaryPanel data={cg.data} />
+            <details className="cg-more">
+              <summary>Limits and data credits</summary>
+              <p className="cg-honest">
+                The ups and downs match at about 20–30 m scale; steep Moon routes have no city equivalent. For outreach, not equipment testing
+                or an accessibility rating.
+              </p>
+              <Credits
+                area="calgary"
+                metas={[
+                  { file: 'walks.json', meta: cg.data.walks.meta },
+                  { file: 'presets.json', meta: cg.data.presets.meta },
+                  { file: 'calgary_overlays.geojson', meta: cg.data.overlays.meta },
+                  ...(cg.data.equity ? [{ file: 'equity.json', meta: cg.data.equity.meta }] : []),
+                ]}
+              />
+            </details>
           </>
         ))}
     </div>

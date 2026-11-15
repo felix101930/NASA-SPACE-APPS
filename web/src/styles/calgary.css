@@ -696,3 +696,573 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ================================================================ Calgary tab, first-read structure
+   purpose (screen head) -> three steps + one result -> map | planner -> "See the numbers" -> limits and credits */
+
+/* ---------------------------------------------------------------- three steps + result */
+
+.cg-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 16px 40px;
+  margin-bottom: 20px;
+}
+
+.cg-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  counter-reset: cg-step;
+}
+
+.cg-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  counter-increment: cg-step;
+}
+
+/* Chevron between steps: the order is the point. */
+.cg-step + .cg-step::before {
+  content: '';
+  position: absolute;
+  left: -19px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-top: 1.5px solid var(--text-3);
+  border-right: 1.5px solid var(--text-3);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.cg-step-thumb,
+.cg-step-icon {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+}
+
+.cg-step-thumb .mt-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cg-step-icon-bg {
+  fill: var(--surface-2);
+}
+
+.cg-step-icon-pole {
+  stroke: var(--text-2);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.cg-step-icon-sign {
+  fill: var(--sun);
+}
+
+.cg-step-icon-text {
+  fill: var(--sun-ink);
+  font: 700 6.5px var(--font);
+  letter-spacing: 0.02em;
+}
+
+.cg-step-icon-door {
+  fill: var(--bg);
+}
+
+.cg-step-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cg-step-text strong {
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+.cg-step-text strong::before {
+  content: counter(cg-step) '  ';
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.cg-step-sub {
+  font-size: var(--fs-caption);
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cg-result {
+  padding-left: 24px;
+  border-left: 1px solid var(--line-strong);
+}
+
+.cg-result-text {
+  margin: 0;
+  font-size: var(--fs-h3);
+  line-height: 1.4;
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+
+.cg-result-text strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.cg-result-text .infotip {
+  vertical-align: middle;
+}
+
+/* ---------------------------------------------------------------- map column: one view, one legend */
+
+@media (min-width: 1101px) {
+  /* The whole column sticks, so the map stays beside the planner card while it scrolls. */
+  .cg-map-col {
+    position: sticky;
+    top: calc(var(--header-h) + 16px);
+  }
+  .cg-map-col .geo-map-box {
+    position: relative;
+    top: 0;
+    height: calc(100vh - var(--header-h) - 96px);
+    max-height: 860px;
+  }
+}
+
+.cg-map {
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+
+.cg-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 20px;
+  margin-top: 10px;
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+}
+
+.cg-legend .legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cg-ramp-key {
+  width: 64px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--need-1), var(--need-2), var(--need-3), var(--need-4), var(--need-5));
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.cg-legend .cg-route-key {
+  width: 18px;
+  margin: 0 -2px;
+}
+
+/* ---------------------------------------------------------------- map markers: start (filled), end (hollow), direction */
+
+.cg-end {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid var(--sun);
+  background: var(--bg);
+  box-shadow: 0 0 0 1.5px var(--bg);
+  pointer-events: none;
+}
+
+.cg-arrow {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 10px solid var(--bg);
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px var(--sun));
+}
+
+.cg-start.is-pulse .cg-start-dot,
+.cg-end.is-pulse {
+  animation: cg-pulse 1s var(--ease-out) 1;
+}
+
+@keyframes cg-pulse {
+  0% {
+    box-shadow:
+      0 0 0 1.5px var(--sun),
+      0 0 0 0 rgba(243, 181, 74, 0.7);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1.5px var(--sun),
+      0 0 0 18px rgba(243, 181, 74, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-start.is-pulse .cg-start-dot,
+  .cg-end.is-pulse {
+    animation: none;
+    box-shadow:
+      0 0 0 1.5px var(--sun),
+      0 0 0 6px rgba(243, 181, 74, 0.45);
+  }
+}
+
+/* ---------------------------------------------------------------- planner */
+
+.cg-plan-hint {
+  margin: 0;
+}
+
+.cg-zoom-btn[aria-disabled='true'] {
+  background: var(--surface-1);
+  border-color: var(--line);
+  color: var(--text-3);
+  cursor: default;
+}
+
+.cg-zoom-btn[aria-disabled='true']:hover {
+  background: var(--surface-1);
+  border-color: var(--line);
+}
+
+.cg-sub {
+  margin: 0;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+/* ---------------------------------------------------------------- Moon route | Calgary route twin */
+
+.mt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mt-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mt-fig {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mt-cap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+  color: var(--text-3);
+}
+
+.mt-world {
+  color: var(--text-3);
+}
+
+.mt-cap-text {
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mt-cap-meta {
+  font-variant-numeric: tabular-nums;
+}
+
+.mt-box {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+}
+
+.mt-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mt-wait {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-size: var(--fs-caption);
+  color: var(--text-3);
+}
+
+.mt-casing,
+.mt-chevron-casing {
+  fill: none;
+  stroke: var(--bg);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mt-route,
+.mt-chevron {
+  fill: none;
+  stroke: var(--sun);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mt-chevron {
+  stroke: var(--bg);
+}
+
+.mt-chevron-casing {
+  stroke: var(--sun);
+}
+
+.mt-start {
+  fill: var(--sun);
+  stroke: var(--bg);
+}
+
+.mt-end {
+  fill: var(--bg);
+  stroke: var(--sun);
+}
+
+.mt-yyc-bg {
+  fill: var(--surface-1);
+}
+
+.mt-context polyline {
+  fill: none;
+  stroke: var(--text-3);
+  stroke-opacity: 0.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mt-scale line {
+  stroke: var(--text);
+}
+
+.mt-scale-bg {
+  fill: rgba(10, 11, 14, 0.7);
+}
+
+.mt-scale text {
+  fill: var(--text);
+  font-family: var(--font);
+}
+
+.mt-key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+}
+
+.mt-key-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mt-key .infotip {
+  margin-left: auto;
+}
+
+.mt-key-start,
+.mt-key-end {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sun);
+  box-shadow: 0 0 0 1.5px var(--bg);
+}
+
+.mt-key-end {
+  background: var(--bg);
+  border: 2.5px solid var(--sun);
+}
+
+/* ---------------------------------------------------------------- "See the numbers" and "Limits and data credits" */
+
+.cg-numbers,
+.cg-more {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.cg-more {
+  margin-top: 24px;
+}
+
+.cg-numbers > summary,
+.cg-more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: var(--text);
+  border-radius: 4px;
+}
+
+.cg-more > summary {
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.cg-numbers > summary::-webkit-details-marker,
+.cg-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.cg-numbers > summary::after,
+.cg-more > summary::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  margin-left: 2px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 180ms var(--ease-out);
+}
+
+.cg-numbers[open] > summary::after,
+.cg-more[open] > summary::after {
+  transform: translateY(1px) rotate(225deg);
+}
+
+.cg-numbers > summary:hover,
+.cg-more > summary:hover {
+  color: var(--text);
+}
+
+.cg-numbers > summary:focus-visible,
+.cg-more > summary:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.cg-numbers-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.cg-num-sec,
+.cg-cmp {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cg-numbers .cg-unreached {
+  border-top: 0;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.cg-numbers .cg-unreached ul {
+  margin: 0;
+  width: 100%;
+}
+
+.cg-honest {
+  margin: 12px 0;
+  max-width: 72ch;
+  font-size: var(--fs-label);
+  color: var(--text-2);
+}
+
+.cg-more .credits {
+  margin-top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-numbers > summary::after,
+  .cg-more > summary::after {
+    transition: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .cg-intro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cg-result {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .cg-steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .cg-step + .cg-step::before {
+    left: 28px;
+    top: -9px;
+    transform: rotate(135deg);
+  }
+  .cg-step-thumb,
+  .cg-step-icon {
+    width: 56px;
+    height: 56px;
+  }
+  .cg-result-text {
+    font-size: var(--fs-body);
+  }
+}
