@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>flyup test</title>
+<script type="importmap">
+{ "imports": {
+  "three": "./assets/vendor/three/three.module.js",
+  "three/addons/": "./assets/vendor/three/addons/"
+} }
+</script>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}canvas{display:block;width:100vw;height:100vh}
+#ui{position:fixed;left:8px;top:8px;color:#fff;font:12px monospace;background:#0008;padding:6px;white-space:pre}</style>
+</head><body>
+<div id="ui"><input id="sl" type="range" min="0" max="1" step="0.001" value="0" style="width:300px"> <span id="out"></span></div>
+<script type="module">
+import * as THREE from 'three';
+const { buildFlyup } = await import('./kohler_flyup.js?v=' + Date.now());
+const Q = new URLSearchParams(location.search);
+const W = +Q.get('w') || 0, H = +Q.get('h') || 0;
+const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true, powerPreference: Q.has('lp') ? 'low-power' : 'high-performance', preserveDrawingBuffer: Q.has('shot') || Q.has('cands') });
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const pr = +Q.get('pr') || Math.min(devicePixelRatio, 1.6);
+function size() {
+  if (W) { renderer.setPixelRatio(1); renderer.setSize(W, H, false); }
+  else { renderer.setPixelRatio(pr); renderer.setSize(innerWidth, innerHeight, false); }
+}
+window.__renderer = renderer;
+document.body.appendChild(renderer.domElement); size(); addEventListener('resize', size);
+if (Q.has('noui')) document.getElementById('ui').style.display = 'none';
+const out = document.getElementById('out'), sl = document.getElementById('sl');
+window.__errors = []; addEventListener('error', e => window.__errors.push(String(e.message)));
+
+const t0 = performance.now();
+const [buf, tex] = await Promise.all([
+  fetch('assets/data/AB_073_027.bin').then(r => r.arrayBuffer()),
+  new THREE.TextureLoader().loadAsync('assets/img/kohler_hls_20251009.jpg'),
+]);
+const raw = new Float32Array(buf);
+const tb = performance.now();
+const F = buildFlyup(raw, tex);
+window.__buildMs = performance.now() - tb; window.__F = F; window.__THREE = THREE; window.__raw = raw;
+const aspect = () => { const c = renderer.domElement; return c.width / c.height; };
+let t = +(Q.get('t') || 0), look = Q.has('look') ? +Q.get('look') : 1; sl.value = t;
+if (Q.get('start')) { const [r, c, above, yaw, pitch] = Q.get('start').split(',').map(Number); F._dbg.setStart({ r, c, above, yaw, pitch }); }
+sl.oninput = () => { t = +sl.value; };
+renderer.compile(F.scene, F.cam);
+const anim = Q.has('anim'), dur = +(Q.get('dur') || 4000);
+const times = []; let last = 0, start = 0;
+function frame(now) {
+  if (anim) {
+    if (!start) start = now;
+    const ph = ((now - start) % (2 * dur)) / dur;   // look 0 -> 1 at t = 0, then t 0 -> 1 at look 1
+    look = Math.min(1, ph); t = Math.max(0, ph - 1); sl.value = t;
+    if (last) times.push(now - last); last = now;
+    if (times.length && times.length % 60 === 0) {
+      const s = [...times].sort((a, b) => a - b), avg = times.reduce((a, b) => a + b) / times.length;
+      window.__fps = { frames: times.length, avgFps: +(1000 / avg).toFixed(1), p99ms: +s[Math.floor(s.length * .99)].toFixed(1), maxms: +s[s.length - 1].toFixed(1), buf: renderer.domElement.width + 'x' + renderer.domElement.height };
+    }
+  }
+  F.update(t, aspect(), look);
+  renderer.render(F.scene, F.cam);
+  out.textContent = `look=${look.toFixed(2)} t=${t.toFixed(3)} alt=${(F.cam.position.y).toFixed(0)} pitch=${(F.cam.rotation.x * 180 / Math.PI).toFixed(1)} ` + (window.__fps ? JSON.stringify(window.__fps) : '');
+  if (!Q.has('still')) requestAnimationFrame(frame);
+}
+if (Q.has('cands')) {
+  const cs = Q.get('cands').split(';').map(x => x.split(',').map(Number)), cw = 640, ch = 360, cols = 3;
+  renderer.setPixelRatio(1); renderer.setSize(cw, ch, false);
+  const sheet = document.createElement('canvas'); sheet.width = cw * cols; sheet.height = ch * Math.ceil(cs.length / cols);
+  const cx = sheet.getContext('2d'); cx.font = '16px monospace'; cx.fillStyle = '#ff0';
+  cs.forEach(([r, c, above, yaw, pitch], k) => {
+    F._dbg.setStart({ r, c, above, yaw, pitch }); F.update(0, cw / ch, look); renderer.render(F.scene, F.cam);
+    cx.drawImage(renderer.domElement, (k % cols) * cw, Math.floor(k / cols) * ch);
+    cx.fillText(`${k}: ${r},${c},${above},${yaw},${pitch}`, (k % cols) * cw + 6, Math.floor(k / cols) * ch + 18);
+  });
+  document.body.innerHTML = ''; document.body.appendChild(sheet); sheet.style.cssText = 'width:auto;height:auto';
+  document.body.style.overflow = 'auto';
+} else if (Q.has('check')) { document.body.textContent = JSON.stringify(analyse()); }
+else requestAnimationFrame(frame);
+function analyse() {
+  const { ground, U, yMax, HALF } = F._dbg, cam = F.cam, V = new THREE.Vector3(), P = new THREE.Vector3();
+  const out = [];
+  const asps = (Q.get('asps') || '1.333,1.778,2').split(',').map(Number);
+  for (const asp of asps) for (let i = 0; i <= 100; i++) {
+    const t = i / 100; F.update(t, asp); cam.updateMatrixWorld();
+    const fog = (p) => {   // same as the shader
+      const c = cam.position, d = p.distanceTo(c), Hs = U.uHs.value, a = (c.y - U.uY0.value) / Hs, b = (p.y - U.uY0.value) / Hs, dy = a - b;
+      const od = Math.abs(dy) > 1e-3 ? (Math.exp(-b) - Math.exp(-a)) / dy : Math.exp(-a);
+      let f = 1 - Math.exp(-U.uK.value * d * od);
+      return f;
+    };
+    const pts = [];
+    for (let u = -1; u <= 1.0001; u += 1 / 24) { pts.push([u, 1], [u, -1], [u, .5], [u, 0]); }
+    for (let v = -1; v <= 1.0001; v += 1 / 12) { pts.push([-1, v], [1, v]); }
+    let minOutFog = 1, minExitFog = 1, nExit = 0, minHit = 1e9, maxHitE = 0;
+    for (const [u, v] of pts) {
+      V.set(u, v, .5).unproject(cam).sub(cam.position).normalize();
+      let s = 5, hit = false;
+      while (s < 80000) {
+        P.copy(cam.position).addScaledVector(V, s);
+        if (Math.abs(P.x) > HALF + 37000 || Math.abs(P.z) > HALF + 37000) break;
+        if (P.y < ground(P.x, P.z)) { hit = true; break; }
+        if (P.y > yMax + 1 && V.y >= 0) break;
+        s += Math.max(5, s * .004);
+      }
+      if (hit) { minHit = Math.min(minHit, s); const e = Math.max(Math.abs(P.x), Math.abs(P.z)) / HALF; maxHitE = Math.max(maxHitE, e); if (e > 1) minOutFog = Math.min(minOutFog, fog(P)); }
+      else if (Math.abs(P.x) > HALF + 37000 || Math.abs(P.z) > HALF + 37000) {
+        // left the tile: the terrain right at the edge must already be hazed into the sky colour
+        const x = Math.max(-HALF, Math.min(HALF, P.x)), z = Math.max(-HALF, Math.min(HALF, P.z));
+        nExit++; minExitFog = Math.min(minExitFog, fog(new THREE.Vector3(x, ground(x, z), z)));
+      }
+    }
+    out.push([asp, t, Math.round(cam.position.y - ground(cam.position.x, cam.position.z)), Math.round(cam.position.y), +(cam.rotation.x * 57.3).toFixed(1), nExit, +minExitFog.toFixed(3), Math.round(minHit), +maxHitE.toFixed(3), +minOutFog.toFixed(3)]);
+  }
+  return out;
+}
+requestAnimationFrame(() => requestAnimationFrame(() => { window.__ready = true; document.title = 'ready'; }));
+</script>
+</body></html>
