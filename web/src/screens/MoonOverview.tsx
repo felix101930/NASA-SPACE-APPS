@@ -558,6 +558,12 @@ export function MoonOverview(): JSX.Element {
                   <span className="chip mono">{formatLatLon(region.lat, region.lon)}</span>
                 </div>
               </div>
+              <div className="sun-line">
+                <span>Midday sun: {fmtDeg(region.sun.el_min)}–{fmtDeg(region.sun.el_max)}</span>
+                <InfoTip label="What is midday sun?">
+                  <p>How high the sun gets at midday over a year. The rest of the day it is lower or below the horizon.</p>
+                </InfoTip>
+              </div>
               <DangerProfile
                 region={region}
                 regions={core.regions}
@@ -572,9 +578,9 @@ export function MoonOverview(): JSX.Element {
                 <summary>Sun and data quality here</summary>
                 <div className="method-body">
                   <dl className="dq-list">
-                    <dt>Sun above the horizon</dt>
+                    <dt>Midday sun over a year</dt>
                     <dd>
-                      {fmtDeg(region.sun.el_min)} to {fmtDeg(region.sun.el_max)} elevation ({region.sun.note})
+                      {fmtDeg(region.sun.el_min)}–{fmtDeg(region.sun.el_max)} ({region.sun.note})
                     </dd>
                     {region.illumination && typeof region.illumination.pgda_avg_visibility === 'number' && (
                       <>

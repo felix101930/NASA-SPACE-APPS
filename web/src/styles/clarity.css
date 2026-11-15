@@ -111,3 +111,12 @@
     text-align: left;
   }
 }
+
+.sun-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 12px;
+  color: var(--text-2);
+  font-size: var(--fs-label);
+}

@@ -404,6 +404,18 @@ export default function Terrain3D(): JSX.Element {
   );
 
   const moon = useTile(region?.tile ?? null, core.regionsOrigin);
+
+  // Switching region: if the current sun is higher than this region's midday maximum, drop to the highest preset it reaches.
+  const elMax: number | null = region ? region.sun.el_max : null;
+  const regionKey: string | null = region ? region.id : null;
+  useEffect((): void => {
+    if (elMax === null) return;
+    const cur = useApp.getState();
+    if (cur.sunEl <= elMax + 0.01) return;
+    const allowed = SUN_PRESETS.filter((v: number): boolean => v <= elMax);
+    cur.setSun(allowed.length > 0 ? allowed[allowed.length - 1] : (SUN_PRESETS[0] ?? 1.5), cur.sunAz);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [regionKey]);
   const earth = useTile(site?.tile ?? null, core.sitesOrigin);
 
   // Each rehearsal date's sun on both tiles: Earth at that date's sun, the Moon with the same height and direction
@@ -668,19 +680,27 @@ export default function Terrain3D(): JSX.Element {
             <SunGlyph /> Moon-like low sun
           </span>
           <div className="t3-sun-presets" role="group" aria-labelledby="t3-sun-label">
-            {SUN_PRESETS.map((v: number) => (
-              <button
-                key={v}
-                type="button"
-                aria-pressed={Math.abs(el - v) < 0.01}
-                onClick={(): void => {
-                  setSun(v, az);
-                }}
-              >
-                {v}°
-              </button>
-            ))}
+            {SUN_PRESETS.map((v: number) => {
+              const off: boolean = elMax !== null && v > elMax;
+              return (
+                <button
+                  key={v}
+                  type="button"
+                  aria-pressed={Math.abs(el - v) < 0.01}
+                  aria-disabled={off || undefined}
+                  className={off ? 't3-preset-off' : undefined}
+                  title={off ? `The sun never gets this high at ${region.name} (max ${region.sun.el_max.toFixed(1)}°)` : undefined}
+                  onClick={(): void => {
+                    if (off) return;
+                    setSun(v, az);
+                  }}
+                >
+                  {v}°
+                </button>
+              );
+            })}
           </div>
+          <span className="t3-sun-here">Sun here: up to {region.sun.el_max.toFixed(1)}°</span>
           {windows.length > 0 && (
             <div className="t3-sun-presets t3-sun-dates" role="group" aria-label="Light both views with the sun of a rehearsal date at the Earth site">
               <span className="t3-sun-dates-label">Dates:</span>
