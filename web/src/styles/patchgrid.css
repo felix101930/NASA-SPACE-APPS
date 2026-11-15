@@ -83,6 +83,7 @@
 
 .pgrid__foot {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px;
   min-height: 16px;
@@ -179,19 +180,63 @@
   color: var(--text-2);
 }
 
-.pgpair__result {
+.pgsum {
+  flex: 1 1 280px;
+  min-width: 0;
+  max-width: 460px;
+  align-self: center;
+  border-collapse: collapse;
   font-size: var(--fs-label);
   color: var(--text-2);
 }
 
-.pgpair__result strong {
+.pgsum th,
+.pgsum td {
+  padding: 6px 10px 6px 0;
+  border-bottom: 1px solid var(--border, var(--surface-3));
+  text-align: left;
+  vertical-align: top;
+  font-weight: 400;
+}
+
+.pgsum thead th {
+  color: var(--text-3);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+}
+
+.pgsum tbody th {
   color: var(--text);
   font-weight: 600;
 }
 
-.pgpair__place {
+.pgsum small {
+  display: block;
+  color: var(--text-3);
+  font-size: var(--fs-caption);
+  font-weight: 400;
+}
+
+.pgsum td {
   color: var(--text);
-  white-space: nowrap;
+  font-family: var(--mono);
+}
+
+.pgsum td[data-place] {
+  font-family: inherit;
+  color: var(--text-2);
+}
+
+.pgsum td[data-place] strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.pgsum__note td {
+  padding-top: 0;
+  font-family: inherit;
+  font-size: var(--fs-caption);
+  color: var(--text-2);
 }
 
 @media (max-width: 520px) {

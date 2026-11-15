@@ -282,8 +282,11 @@ function SiteCard({
             <summary>Metric by metric and in words</summary>
             <div className="list-lede">
               <span className="why-row">
-                Gap = this site minus the Moon region. Hover a gap for its <Term id="typicalSpread">× figure</Term>
-                <InfoTip label="Why count differences in the Moon region’s typical spread?" title="Why count differences in the Moon region’s typical spread?">
+                Gap = how far this site is from the Moon region
+                <InfoTip label="What the × figure means" title="What the × figure means">
+                  <p>
+                    <strong>× figure:</strong> a gap of 1× is one typical spread of the Moon region’s own values (the middle half); under 0.5× counts as close. Hover a gap to see it.
+                  </p>
                   <WhyBody id="iqr" />
                   {agree && (
                     <p>

@@ -106,7 +106,6 @@ export function PatchGrid({
               data-active={active === k || undefined}
               data-empty={!ok || undefined}
               style={ok ? { background: patchColor(scaleT(v, scaleMin, scaleMax), hazard), color: luminance(rgb) > 0.32 ? INK_DARK : INK_LIGHT } : undefined}
-              title={`${cellName(k)}: ${fmtPatch(v, unit)}`}
               onMouseEnter={(): void => setActive(k)}
             >
               {md && ok ? fmtPatch(v, unit, true) : null}
@@ -116,7 +115,7 @@ export function PatchGrid({
       </div>
       <div className="pgrid__foot" aria-hidden="true">
         {up && <span className="pgrid__up">↑ {up}</span>}
-        <span className="pgrid__read">{active !== null ? fmtPatch(activeV, unit) : ''}</span>
+        <span className="pgrid__read">{active !== null ? `${cellName(active)}: ${fmtPatch(activeV, unit)}` : ''}</span>
       </div>
       <table className="sr-only">
         <caption>{label}, 25 patches of 3 km (rows top to bottom, columns left to right)</caption>
