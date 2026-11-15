@@ -3,6 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { buildLaunch } from './launch.js';
 import { buildGround } from './earth_ground.js';
+import { buildFlyup } from './kohler_flyup.js';
 
 /* =========================================================================
    Rehearse Here: one continuous descent to the lunar south pole.
@@ -36,8 +37,8 @@ const HOT = 3; // Mons Mouton Plateau: Athena's point lies inside this box
 /* ---------------------------------------------------------------- beats */
 const BEATS = [
   ['open', 1.4], ['descent', 1.6], ['photo', 2.4], ['athena', 1.0], ['lowsun', 1.6], ['money', 1.4], ['tally', 1.3],
-  ['people', 3.6], ['regions', 1.7], ['slope', 0.01], ['turn', 0.8], ['earth', 1.4], ['handoff', 1.1],
-  ['outro', 3.4], ['close', 2.6],
+  ['people', 3.6], ['regions', 1.7], ['slope', 0.01], ['turn', 0.8], ['earth', 1.4], ['handoff', 1.1], ['gaps', 1.6],
+  ['outro', 3.4], ['close', 3.2],
 ];
 const B = {}; let acc = 0;
 for (const [n, l] of BEATS) { B[n] = { s: acc, l, e: acc + l }; acc += l; }
@@ -58,9 +59,9 @@ const CAPS = [
   { beat: 'earth', a: .74, b: .995, html: 'So we found<br>where <em>you can.</em>', src: 'Kohler Coulee · NASA HLS satellite image, 9 Oct 2025 · Copernicus GLO-30 terrain' },
   { beat: 'handoff', a: .10, b: .98, cls: 'center', html: 'Let us show you.' },
   { beat: 'outro', a: .05, b: .31, html: 'Next time,<br>we land safely<br>on the Moon.' },
-  { beat: 'outro', a: .40, b: .62, html: 'Gotcha.<br>This is <em>Alberta.</em>', src: 'Same hills, same camera, real colours · NRCan HRDEM lidar + Sentinel-2, 9 Oct 2025' },
+  { beat: 'outro', a: .40, b: .62, html: 'Gotcha.<br>This is <em>Alberta.</em>', src: 'Same hills, same camera, real colours · Copernicus GLO-30 terrain + NASA HLS image, 9 Oct 2025' },
   { beat: 'outro', a: .70, b: .985, html: 'Kohler Coulee.<br>100 km south of Calgary.', src: 'Best Alberta match to the shadows at Mons Mouton Plateau · the world’s best is in Chile' },
-  { beat: 'close', a: .62, b: 1.2, html: 'Rehearse here.<br>Land there.' },   // once the zoom-out reaches the whole Earth; stays to the very end
+  { beat: 'close', a: .8, b: 1.2, html: 'Rehearse here.<br>Land there.' },   // once Earth and Moon are both in frame; stays to the very end
 ];
 
 /* ---------------------------------------------------------------- helpers */
@@ -595,7 +596,22 @@ async function init() {
   zScene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 192, 96), zMat));
   const zHalo = halo.clone(); zHalo.uniforms.L.value.copy(zMat.uniforms.L.value);
   zScene.add(new THREE.Mesh(new THREE.SphereGeometry(1.045, 96, 48), zHalo));
-  const zoomOut = { scene: zScene, cam: new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 1e-5, 50), n: kN };
+  // the Moon beside the Earth for "Rehearse here. Land there." (drawn larger and closer than true scale so both fit)
+  const kRight = new THREE.Vector3().crossVectors(kN.clone().negate(), new THREE.Vector3(0, 1, 0)).normalize();
+  const zMoon = new THREE.Group();
+  if (moon) {
+    const m = moon.clone(true);
+    // own materials: the opening globe fades its (shared) materials to opacity 0 after the descent
+    m.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.transparent = false; o.material.opacity = 1; o.material.depthWrite = true; o.frustumCulled = false; } });
+    const bb = new THREE.Box3().setFromObject(m);
+    const c = bb.getCenter(new THREE.Vector3()), sz = bb.getSize(new THREE.Vector3()).x;
+    m.position.sub(c); zMoon.add(m); zMoon.scale.setScalar(2 * .42 / sz);
+  }
+  zMoon.position.copy(kRight).multiplyScalar(3.1).addScaledVector(kN, -1.2);
+  zScene.add(zMoon);
+  const zSun = new THREE.DirectionalLight(0xffffff, 3); zSun.position.copy(zMat.uniforms.L.value).multiplyScalar(10);
+  zScene.add(zSun, new THREE.AmbientLight(0xffffff, .04));
+  const zoomOut = { scene: zScene, cam: new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 1e-5, 50), n: kN, right: kRight };
   // sharper ground for the zoom-out: NASA Blue Marble Next Generation tiles from GIBS (EPSG:4326, 512 px; a level-z tile
   // spans 288/2^z degrees), stitched into one texture per level and laid over the globe with soft edges and the globe's light
   const bmng = async (z, r0, r1, c0, c1, fadeLo, fadeHi) => {
@@ -639,12 +655,14 @@ void main(){
 
   /* Earth ground (its own scene, metres) and the Artemis IV inset (its own canvas) */
   const ground = satTex ? buildGround(abRaw, satTex, astro, makeWalker) : null;
+  // the Kohler Coulee outro's live fly-up (same terrain and image as the ground, its own scene)
+  const flyup = satTex ? buildFlyup(abRaw, satTex) : null;
   const launch = buildLaunch(document.getElementById('sls'), slsBuf, moon);
 
   const MM = new THREE.Vector3(TILE_C[0], heightTile(TILE_C[0], TILE_C[1]), TILE_C[1]);
   const RC = new THREE.Vector3(-5, 0, -60);
   const G = new THREE.Vector3(0, -R_MOON, 0);
-  state = { zoomOut, plate, plateMat, tile, tileMat, globe, globeMats, lroG, astroG, A, WALK_DIR, labels, MM, RC, G, EP, earth, ground, launch, heightTile, heightPlate, stars, steepPct,
+  state = { zoomOut, plate, plateMat, tile, tileMat, globe, globeMats, lroG, astroG, A, WALK_DIR, labels, MM, RC, G, EP, earth, ground, flyup, launch, heightTile, heightPlate, stars, steepPct,
     walkT: 0, walkLast: 0, walkPos: A.clone() };
 
   document.getElementById('demo-link').href = DEMO_URL;
@@ -664,6 +682,7 @@ void main(){
   warm(scene, camera);
   warm(zScene, zoomOut.cam);
   if (ground) warm(ground.scene, ground.cam);
+  if (flyup) warm(flyup.scene, flyup.cam);
   launch.warm();
   // the three photos shown full screen are decoded here too, not on their first appearance
   await Promise.all([...document.querySelectorAll('#outro img[src], #photo img')].map(im => im.decode().catch(() => {})));
@@ -746,8 +765,13 @@ setH();
 const uNow = () => (lenis.limit > 0 ? lenis.scroll / lenis.limit : 0) * TOTAL;
 
 // one click per caption, plus money, tally, and a stop on the Artemis IV launch (no caption of their own)
-const anchors = [0, ...CAPS.map(c => B[c.beat].s + B[c.beat].l * (c.a + Math.min(.4, (c.b - c.a) * .55))),
-  at('money', .55), at('tally', .62), at('people', .7)].sort((a, b) => a - b);
+const anchors = [0, ...CAPS.map(c => B[c.beat].s + B[c.beat].l * Math.min(.98, c.a + Math.min(.4, (c.b - c.a) * .55))),
+  at('money', .55), at('tally', .62), at('people', .7), at('gaps', .5)].sort((a, b) => a - b);
+// gaps and next steps, after the live demo (text from the team's pipeline_frame.json)
+fetch('assets/data/pipeline_frame.json').then(r => r.json()).then(P => {
+  const col = (k, n, t, cls = '') => `<div class="${cls}"><h3><span>${n}</span>${t}</h3><ul>${(P[k] || []).map(x => `<li>${x}</li>`).join('')}</ul></div>`;
+  document.getElementById('pipe-in').innerHTML = col('gaps', '01', 'What we haven’t solved', 'gap') + col('next', '02', 'What we do next');
+}).catch(() => {});
 const goto = dir => {
   const u = uNow(); const list = dir > 0 ? anchors.filter(a => a > u + 0.03) : anchors.filter(a => a < u - 0.03).reverse();
   if (!list.length) return;
@@ -789,14 +813,14 @@ const money = $('money'), moneyNum = $('money-num'), moneyLine = $('money-line')
 const pin = $('athena-pin'), flash = $('flash'), dip = $('dip'), launchEl = $('launch');
 const gauge = $('gauge'), gNeedle = $('g-needle'), gVal = $('g-val'), gOk = $('g-ok'), gBad = $('g-bad');
 const tally = $('tally'), outro = $('outro'), oMoonCard = $('o-mooncard'), oReal = $('o-real'), oPull = $('o-pull');
-const PULL = Array.from({ length: 24 }, (_, i) => `assets/img/outro/pull_${String(i).padStart(2, '0')}.jpg`);
-// keep the frames alive so swapping src only ever goes to a frame that has loaded (decoding all 24 up front was
-// tried and stalled the main thread for up to 3 s when the decodes resolved together mid-pitch)
-const PULL_IMG = PULL.map(src => { const im = new Image(); im.src = src; return im; });
-// instead, decode them one at a time in the background after load, so no swap has to decode mid-pull
-PULL_IMG.reduce((p, im) => p.then(() => new Promise(r => setTimeout(r, 150))).then(() => im.decode().catch(() => {})),
-  new Promise(r => setTimeout(r, 4000)));
-let pullIdx = -1;
+// the live fly-up (kohler_flyup.js) ends straight down over Kohler Coulee at this altitude (km); the close's
+// zoom-out starts from it
+const FLY_TOP_KM = 10;   // keep equal to FLYUP_TOP_ALT / 1000 in kohler_flyup.js
+// o-snap: a copy of the fly-up's last frame, taken from the WebGL canvas the moment it is drawn (so it is exactly the
+// frame the close starts from); in the close it shrinks with the altitude over the globe. snapKey = canvas size it
+// was taken at (retaken after a resize). o-pull (pull_23, a still from 20 km) is only the fallback without the fly-up.
+const oSnap = $('o-snap'), snapCtx = oSnap.getContext('2d');
+let snapKey = '';
 const hud2 = $('hud-l2'), hud3 = $('hud-l3'), railFill = $('rail-fill'), hint = $('hint'), handoff = $('handoff'), credits = $('credits'), speedEl = $('speed');
 
 function arc(a0, a1) { // degrees 0..25 mapped to 180..0 on the gauge
@@ -1017,30 +1041,48 @@ function update(time) {
   tally.querySelector('.t-line').style.opacity = sstep(.55, .65, ta);
 
 
-  /* outro: Kohler Coulee as the Moon, then real colours, then pull back to the map */
+  /* outro: Kohler Coulee as the Moon, then real colours, then a live 3D fly-up to the map view */
   const ou = local(u, 'outro');
   const oOp = u >= B.outro.s ? sstep(0, .05, ou) : 0;
   outro.style.opacity = oOp;
-  // closing zoom-out: altitude (km) over Kohler Coulee, from the last pull frame (~20 km) to the whole Earth
   const inClose = u >= B.close.s;
+  // the whole outro is one live scene and one camera: Kohler drawn as the Moon, the same frame turning into real
+  // colours ("Gotcha"), then the fly-up from ou .64. It starts once the black dip from the hand-off is complete (ou .03).
+  const flyOn = !!S.flyup && u >= B.outro.s && ou >= .03 && !inClose;
+  const oLook = sstep(.32, .42, ou);   // 0 = Moon, 1 = real colours (the old real-colour still used the same timing)
+  // linear: buildFlyup's update() eases both ends of the move itself
+  const flyT = inClose ? 1 : clamp((ou - .64) / .36);
+  // closing zoom-out: altitude (km) over Kohler Coulee, from the top of the fly-up to the whole Earth (the fly-up
+  // eases to a stop and this eases off from rest, so the hand-off has no jolt)
   // (^.6: rise quickly through the low altitudes where the Blue Marble is soft, slow down near the whole Earth)
-  const zoomH = inClose ? Math.exp(lerp(Math.log(20), Math.log(22000), Math.pow(sstep(0, .72, cl), .6))) : 0;
+  const h0 = S.flyup ? FLY_TOP_KM : 20;
+  const zoomH = inClose ? Math.exp(lerp(Math.log(h0), Math.log(22000), Math.pow(sstep(0, .6, cl), .6))) : 0;
   if (oOp > 0) {
-    const pullT = inClose ? 1 : sstep(.64, 1, ou);
-    oMoonCard.style.opacity = inClose ? 0 : 1;
-    oReal.style.opacity = inClose ? 0 : sstep(.32, .42, ou);
-    outro.style.background = inClose ? 'transparent' : '';
-    const k = Math.round(pullT * 23);
-    // only swap to a frame that has finished loading; otherwise hold the current one
-    if (k !== pullIdx && (PULL_IMG[k].complete || pullIdx < 0)) { pullIdx = k; oPull.src = PULL[k]; }
-    // in the close, the last frame shrinks with the altitude and fades into the globe beneath it
-    const s = inClose ? 20 / zoomH : 1;
-    // soft edges grow in as it shrinks: full frame at s = 1, a soft oval (no hard rectangle edges) by s = .4
+    const live = flyOn || inClose;   // the 3D canvas shows through the outro
+    if (S.flyup) {
+      // live scene: of the old Moon card only the Apollo 8 Earth stays (over the black sky), fading as the colours come in
+      oMoonCard.classList.add('live');
+      // gone before the sky leaves black (the photo's own black surround would show against a lighter sky)
+      oMoonCard.style.opacity = inClose ? 0 : 1 - sstep(.30, .345, ou);
+      oReal.style.opacity = 0;
+      // dip to black from the hand-off, then the black lifts off the live Moon view
+      outro.style.background = inClose ? 'transparent' : ou < .03 ? '' : `rgba(0,0,0,${(1 - sstep(.03, .09, ou)).toFixed(3)})`;
+    } else {
+      oMoonCard.style.opacity = live ? 0 : 1;
+      oReal.style.opacity = inClose ? 0 : sstep(.32, .42, ou);
+      outro.style.background = live ? 'transparent' : '';
+    }
+    // in the close, the straight-down still (the fly-up's last frame, else pull_23) is scaled by its altitude, starting
+    // at 1 (the exact frame on screen when the close begins), then shrinks with the zoom-out and fades into the globe
+    const still = S.flyup ? oSnap : oPull, other = S.flyup ? oPull : oSnap;
+    const s = inClose ? h0 / zoomH : 1;
+    // soft edges grow in as it shrinks: full frame for s >= 1, a soft oval (no hard rectangle edges) by s = .4
     const me = sstep(.4, 1, s);
     const mask = inClose ? `radial-gradient(ellipse ${lerp(50, 72, me).toFixed(1)}% ${lerp(50, 72, me).toFixed(1)}% at 50% 50%, #000 ${lerp(30, 100, me).toFixed(1)}%, transparent 100%)` : '';
-    oPull.style.maskImage = oPull.style.webkitMaskImage = mask;
-    oPull.style.transform = inClose ? `scale(${s.toFixed(4)})` : '';
-    oPull.style.opacity = pullT > 0 ? (inClose ? sstep(.06, .3, s) : 1) : 0;
+    still.style.maskImage = still.style.webkitMaskImage = mask;
+    still.style.transform = `scale(${s.toFixed(4)})`;
+    still.style.opacity = inClose ? sstep(.06, .3, s) : 0;
+    other.style.opacity = 0;
   }
 
   /* captions */
@@ -1057,11 +1099,15 @@ function update(time) {
     if (C.srcEl) C.srcEl.style.opacity = clamp(rin * 1.2 - .4) * rout;
   }
 
+  /* gaps and next steps */
+  const gp = local(u, 'gaps');
+  $('pipe').style.opacity = inBeat(u, 'gaps') ? sstep(0, .12, gp) * (1 - sstep(.88, 1, gp)) : 0;
+
   /* handoff */
   const ho = local(u, 'handoff');
   const hOp = inBeat(u, 'handoff') ? sstep(.25, .45, ho) * (1 - sstep(.9, 1, ho)) : 0;
   handoff.style.opacity = hOp; handoff.style.pointerEvents = hOp > .5 ? 'auto' : 'none';
-  credits.style.opacity = inBeat(u, 'close') ? sstep(.74, .86, cl) : 0;
+  credits.style.opacity = inBeat(u, 'close') ? sstep(.86, .95, cl) : 0;
   // the speed control shares the bottom-left corner with the credits, so it steps aside before they fade in
   const spOp = inBeat(u, 'close') ? 1 - sstep(.6, .72, cl) : 1;
   speedEl.style.opacity = spOp; speedEl.style.visibility = spOp < .02 ? 'hidden' : 'visible';
@@ -1075,17 +1121,35 @@ function update(time) {
   if (onGround) hud2.textContent = 'Sun el 13.0° · az 230°';
   railFill.style.height = `${(u / TOTAL) * 100}%`;
   hint.style.opacity = u < .15 ? 1 : 0;
-  $('hud').style.opacity = u >= B.outro.s ? 0 : 1;   // the readout would give away the Kohler reveal
+  $('hud').style.opacity = u >= B.gaps.s ? 0 : 1;   // the readout would give away the Kohler reveal
 
-  if (zoomH > 0) {
+  if (flyOn) {
+    // Kohler Coulee: the Moon look, real colours, then the fly-up rising to straight down at FLY_TOP_KM
+    S.flyup.update(flyT, camera.aspect, oLook);
+    renderer.render(S.flyup.scene, S.flyup.cam);
+  } else if (zoomH > 0) {
+    if (S.flyup) {
+      // copy the fly-up's top view into o-snap (drawImage in the same task as the render, so the WebGL buffer is
+      // still there); once per canvas size, then the globe is drawn over it as usual
+      const cv = renderer.domElement, key = `${cv.width}x${cv.height}`;
+      if (key !== snapKey) {
+        S.flyup.update(1, camera.aspect, 1);
+        renderer.render(S.flyup.scene, S.flyup.cam);
+        oSnap.width = cv.width; oSnap.height = cv.height;
+        snapCtx.drawImage(cv, 0, 0);
+        snapKey = key;
+      }
+    }
     // closing zoom-out over the Blue Marble, Kohler Coulee kept in the centre (the Moon and ground are not drawn)
     const Z = S.zoomOut;
     if (Z.cam.aspect !== camera.aspect) { Z.cam.aspect = camera.aspect; Z.cam.updateProjectionMatrix(); }
-    Z.cam.position.copy(Z.n).multiplyScalar(1 + zoomH / 6371); Z.cam.lookAt(0, 0, 0);
+    // after the whole Earth, pull back and slide right until the Moon is in frame too
+    const mv = sstep(.6, .82, cl), side = Z.right.clone().multiplyScalar(1.5 * mv);
+    Z.cam.position.copy(Z.n).multiplyScalar(lerp(1 + zoomH / 6371, 6.8, mv)).add(side); Z.cam.lookAt(side);
     for (const p of Z.patches) p.mat.uniforms.fade.value = 1 - sstep(p.fadeLo, p.fadeHi, zoomH);
     renderer.render(Z.scene, Z.cam);
   } else if (oOp > .999) {
-    // the outro images cover the whole screen: skip the 3D render (it was drawing the grass ground underneath)
+    // the outro stills cover the whole screen (ou < .64): skip the 3D render (it was drawing the grass ground underneath)
   } else if (onGround) {
     // Earth ground: astronaut keeps walking; camera pulls back and the scene dims under "Let us show you"
     const G = S.ground;
