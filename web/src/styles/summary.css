@@ -81,3 +81,73 @@
   gap: 6px;
   font-variant-numeric: tabular-nums;
 }
+
+/* Data we used: plain-language table above the full credits */
+.du-lead {
+  margin: 4px 0 12px;
+}
+
+.du-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-1);
+  max-width: 1100px;
+}
+
+.du-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-label);
+}
+
+.du-table thead th {
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-weight: 500;
+  text-align: left;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.du-table tbody th,
+.du-table td {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.du-table tbody th {
+  font-weight: 400;
+  color: var(--text);
+  min-width: 220px;
+}
+
+.du-table td {
+  color: var(--text-2);
+}
+
+.du-table .du-from {
+  white-space: nowrap;
+}
+
+.du-table .du-group th {
+  padding-top: 14px;
+  color: var(--text-3);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.du-table tbody:last-child tr:last-child th,
+.du-table tbody:last-child tr:last-child td {
+  border-bottom: 0;
+}
+
+@media (max-width: 720px) {
+  .du-table .du-from {
+    white-space: normal;
+  }
+}

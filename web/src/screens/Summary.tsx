@@ -19,6 +19,7 @@ import {
 } from '../types/contract';
 import { CreditsPanel } from '../components/Credits';
 import { AnalogList } from '../components/AnalogList';
+import { DataUsed } from '../components/DataUsed';
 import { buildCredits, hasNasademCheck } from '../lib/credits';
 import { parseMethodExtras } from '../lib/methodExtras';
 import { parseBootstrap, parseWalkTest } from '../lib/validationExtras';
@@ -379,6 +380,8 @@ export function Summary(): JSX.Element {
           ))}
         </ul>
       </section>
+
+      <DataUsed />
 
       <Credits metas={metas} nasadem={nasadem} />
     </div>

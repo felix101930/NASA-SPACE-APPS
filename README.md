@@ -146,21 +146,32 @@ data/          small committed inputs (candidate and documented analog lists, re
 docs/          method, data contracts, research notes
 ```
 
-## Main data sources
-- **Moon:** NASA LRO LOLA south-pole DEM, PGDA product 90 (Barker et al. 2023); PGDA illumination product 69 (Mazarico et al. 2011); LOLA 1064 nm albedo; USGS LGRS region extents.
-- **Earth:**
-  - Copernicus DEM GLO-30 and GLO-90 (ESA, DLR, Airbus);
-  - NASA NASADEM, used as a cross-check;
-  - ESA WorldCover 2021;
-  - NASA MODIS MCD43C3 albedo;
-  - Macrostrat (CC-BY 4.0);
-  - NASA GIBS imagery.
-- **Canada:**
-  - CSA RADARSAT and EODMS;
-  - CSA Open Data, including the LEAD analog record;
-  - NRCan HRDEM;
-  - City of Calgary Open Data (Open Government Licence – City of Calgary);
-  - Calgary Equity Index 2024.
+## Data we used
+Every dataset is free and public. The website's Summary page shows the same table.
+
+| Data | From | What we used it for |
+|---|---|---|
+| **Moon** | | |
+| Moon south-pole terrain (LRO LOLA, 20 m; PGDA product 90, Barker et al. 2023) | NASA | Heights for all 9 regions. Every danger (shadows, rim drops, camera texture, slope) is measured from it. |
+| Artemis candidate regions (NASA map, USGS LGRS outlines) | NASA, USGS | Where the 9 regions are and their outlines. |
+| **Earth** | | |
+| Earth terrain (Copernicus DEM GLO-30 and GLO-90) | ESA, Airbus | Heights for every Earth square, measured exactly like the Moon. |
+| Land cover (ESA WorldCover 2021) | ESA | Keeps only bare ground: trees, crops and buildings would fake the terrain. |
+| Ground brightness (MODIS MCD43C3) | NASA | How bright the ground is, compared with the Moon region. |
+| Rock type (Macrostrat, CC-BY 4.0) | University of Wisconsin | What each Earth site is made of. |
+| Satellite images (GIBS, HLS) | NASA | The pictures of each Earth site. |
+| Protected areas (Protected Planet WDPCA) | UNEP-WCMC, IUCN | Flags sites inside parks and reserves, where a rehearsal may need a permit. |
+| Place names and maps (GeoNames, Natural Earth, OpenStreetMap) | Open data projects | Names such as "154 km E of Taltal" and the map backgrounds. |
+| **Checks** | | |
+| Moon sunlight map (LOLA illumination, PGDA product 69, Mazarico et al. 2011) | NASA | Checks our computed Moon shadows against NASA's own. |
+| Second Earth terrain (NASADEM) | NASA | Cross-checks the Copernicus heights. |
+| Known analog sites (USGS TADP and PAAD, NASA Planetary Analog Explorer, published studies) | USGS, NASA, research papers | Tests the method (real training sites must beat decoys) and tells new sites from known ones. |
+| Sun position (Astropy) | Astropy project | Finds the dates and times when the sun is at the right height. |
+| **Alberta & Calgary** | | |
+| Calgary terrain (HRDEM lidar, 1 m) | Natural Resources Canada | Heights along Calgary's pathways. |
+| City of Calgary Open Data (pathways, parks, transit stops; Open Government Licence – City of Calgary) | City of Calgary | The paths we match Moon walks to, and how close they are to a bus or train. |
+| Calgary Equity Index 2024 | City of Calgary | Which neighbourhoods need access to amenities most. |
+| Canadian protected areas (CPCAD) | Environment and Climate Change Canada | Park labels for Alberta sites. |
 
 Full citations and licences are listed in each output file's `meta.sources` and in the web app's credits.
 
