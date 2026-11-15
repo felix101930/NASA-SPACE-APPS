@@ -36,7 +36,7 @@ const HOT = 3; // Mons Mouton Plateau: Athena's point lies inside this box
 /* ---------------------------------------------------------------- beats */
 const BEATS = [
   ['open', 1.4], ['descent', 1.6], ['photo', 2.4], ['athena', 1.0], ['lowsun', 1.6], ['money', 1.4], ['tally', 1.3],
-  ['people', 3.6], ['regions', 1.7], ['slope', 0.01], ['turn', 1.0], ['earth', 2.2], ['handoff', 1.1],
+  ['people', 3.6], ['regions', 1.7], ['slope', 0.01], ['turn', 0.8], ['earth', 1.4], ['handoff', 1.1],
   ['outro', 3.4], ['close', 1.3],
 ];
 const B = {}; let acc = 0;
