@@ -175,6 +175,29 @@ Every dataset is free and public. The website's Summary page shows the same tabl
 
 Full citations and licences are listed in each output file's `meta.sources` and in the web app's credits.
 
+## AI usage disclosure
+We used AI tools during NASA Space Apps 2026, as the challenge rules require us to declare. Every scientific result in this project comes from NASA and partner data processed by our own pipeline. No result, number, or image of the Moon or Earth was produced by AI.
+
+**Tools used**
+
+| Tool | Used for |
+|---|---|
+| **Claude Code** (Anthropic, model Claude Opus 5.5) | Writing and debugging code for the data pipeline (`pipeline/`), the web app (`web/`) and the pitch site (`pitch/`); drafting documentation (README, METHOD, RESULTS, data contracts); help wording the pitch script |
+| **Claude Code design skills** (`.claude/skills/`: impeccable, apple-design, ui-ux-review) | Guidance on UI layout, typography, colour contrast and accessibility reviews |
+
+**Code and data**
+- **Code:** much of the code was written with Claude Code and then reviewed, run and tested by our team. Commits made with AI help carry a `Co-Authored-By: Claude Opus 5.5` line in their commit message (63 of our first 71 commits).
+- **Data:** none of our data is AI-generated. All terrain, shadow, illumination and match results come from the sources in [Data we used](#data-we-used) and our pipeline.
+- **Checks:** every published number is traced to a pipeline output file (see the sources table in `pitch/SCRIPT.md`), and our Moon shadows are validated against NASA's own illumination map (r = 0.98).
+
+**Images, video and audio**
+- **No AI-generated images, video or audio** are used in the web app or the pitch.
+- 3D terrain is rendered from real elevation data (NASA LOLA, Copernicus DEM, NRCan HRDEM).
+- The near-ground grass in the pitch outro is drawn procedurally by code, not by an AI image model.
+- Models and photos come from NASA 3D Resources, NASA SVS, NASA Blue Marble and NASA HLS, as credited on screen.
+
+**NASA branding:** AI was not used to create, use or modify any NASA logo, flag, insignia or mission identifier.
+
 ## Honest limits
 - The 30 m terrain can't see boulders or small craters.
 - Shadows are matched by geometry only, but sky light fills Earth's shadows.
