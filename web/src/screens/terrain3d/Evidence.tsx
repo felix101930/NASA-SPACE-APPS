@@ -28,7 +28,7 @@ export function nasademAgreement(method: unknown): Record<string, number> {
 }
 
 /** "A second elevation dataset agrees r 0.96–1.00 on shadow, drop and slope; texture is less certain (r 0.62)." */
-function agreementLine(agreement: Record<string, number>): string | null {
+export function agreementLine(agreement: Record<string, number>): string | null {
   const solid = Object.entries(agreement)
     .filter(([k]: [string, number]): boolean => k.startsWith('shadow') || k.startsWith('jump') || k.startsWith('slope'))
     .map(([, v]: [string, number]): number => v);

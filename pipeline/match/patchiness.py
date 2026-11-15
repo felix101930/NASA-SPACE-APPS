@@ -126,7 +126,7 @@ def _round_for(metric: str) -> int:
 def fmt_spread(metric: str, v: float) -> str:
     if metric in FRACTION_METRICS:
         x = 100 * v
-        return f"{x:.0f} pts" if x >= 9.5 or x == 0 else f"{x:.1f} pts"
+        return f"{x:.0f}% of the ground" if x >= 9.5 or x == 0 else f"{x:.1f}% of the ground"
     if metric.endswith("_m"):
         return f"{v:.0f} m"
     if metric == "fast_per_km2_el3":

@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_utc": "2026-11-14T23:27:22Z",
+  "generated_utc": "2026-11-15T00:20:52Z",
   "pipeline_version": "match-0.1.0",
   "sources": [
    {
@@ -619,7 +619,7 @@
     "spread_ratio": 11.961,
     "earth_spread": 0.24279,
     "moon_spread": 0.0203,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24 pts vs Moon 2.0 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24% of the ground vs Moon 2.0% of the ground)"
    }
   },
   {
@@ -1067,7 +1067,7 @@
     "spread_ratio": 11.734,
     "earth_spread": 0.23818,
     "moon_spread": 0.0203,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24 pts vs Moon 2.0 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24% of the ground vs Moon 2.0% of the ground)"
    }
   },
   {
@@ -1515,7 +1515,7 @@
     "spread_ratio": 9.418,
     "earth_spread": 0.19118,
     "moon_spread": 0.0203,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 19 pts vs Moon 2.0 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 19% of the ground vs Moon 2.0% of the ground)"
    }
   },
   {
@@ -3124,7 +3124,7 @@
     "spread_ratio": 1.833,
     "earth_spread": 0.15278,
     "moon_spread": 0.08333,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 15 pts vs Moon 8.3 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 15% of the ground vs Moon 8.3% of the ground)"
    }
   },
   {
@@ -3414,7 +3414,7 @@
     "spread_ratio": 4.333,
     "earth_spread": 0.36111,
     "moon_spread": 0.08333,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 36 pts vs Moon 8.3 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 36% of the ground vs Moon 8.3% of the ground)"
    }
   },
   {
@@ -3704,7 +3704,7 @@
     "spread_ratio": 3.833,
     "earth_spread": 0.31944,
     "moon_spread": 0.08333,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 32 pts vs Moon 8.3 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 32% of the ground vs Moon 8.3% of the ground)"
    }
   },
   {
@@ -4151,7 +4151,7 @@
     "spread_ratio": 1.838,
     "earth_spread": 0.12859,
     "moon_spread": 0.06995,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 13 pts vs Moon 7.0 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 13% of the ground vs Moon 7.0% of the ground)"
    }
   },
   {
@@ -4597,7 +4597,7 @@
     "spread_ratio": 3.754,
     "earth_spread": 0.2626,
     "moon_spread": 0.06995,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 26 pts vs Moon 7.0 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 26% of the ground vs Moon 7.0% of the ground)"
    }
   },
   {
@@ -5008,7 +5008,7 @@
     "spread_ratio": 3.225,
     "earth_spread": 0.2256,
     "moon_spread": 0.06995,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 23 pts vs Moon 7.0 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 23% of the ground vs Moon 7.0% of the ground)"
    }
   },
   {
@@ -6620,7 +6620,7 @@
     "spread_ratio": 0.727,
     "earth_spread": 0.11111,
     "moon_spread": 0.15278,
-    "text": "Varies about as much as the Moon site (Earth spread 11 pts vs Moon 15 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 11% of the ground vs Moon 15% of the ground)"
    }
   },
   {
@@ -6910,7 +6910,7 @@
     "spread_ratio": 2.0,
     "earth_spread": 0.30556,
     "moon_spread": 0.15278,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 31 pts vs Moon 15 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 31% of the ground vs Moon 15% of the ground)"
    }
   },
   {
@@ -7201,7 +7201,7 @@
     "spread_ratio": 0.545,
     "earth_spread": 0.08333,
     "moon_spread": 0.15278,
-    "text": "Smoother than the Moon site: varies less across its area (Earth spread 8.3 pts vs Moon 15 pts)"
+    "text": "Smoother than the Moon site: varies less across its area (Earth spread 8.3% of the ground vs Moon 15% of the ground)"
    }
   },
   {
@@ -7648,7 +7648,7 @@
     "spread_ratio": 3.046,
     "earth_spread": 0.19118,
     "moon_spread": 0.06276,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 19 pts vs Moon 6.3 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 19% of the ground vs Moon 6.3% of the ground)"
    }
   },
   {
@@ -8095,7 +8095,7 @@
     "spread_ratio": 3.795,
     "earth_spread": 0.23818,
     "moon_spread": 0.06276,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24 pts vs Moon 6.3 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24% of the ground vs Moon 6.3% of the ground)"
    }
   },
   {
@@ -8543,7 +8543,7 @@
     "spread_ratio": 3.869,
     "earth_spread": 0.24279,
     "moon_spread": 0.06276,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24 pts vs Moon 6.3 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24% of the ground vs Moon 6.3% of the ground)"
    }
   },
   {
@@ -10163,7 +10163,7 @@
     "spread_ratio": 1.556,
     "earth_spread": 0.19444,
     "moon_spread": 0.125,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 19 pts vs Moon 12 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 19% of the ground vs Moon 12% of the ground)"
    }
   },
   {
@@ -10453,7 +10453,7 @@
     "spread_ratio": 2.333,
     "earth_spread": 0.29167,
     "moon_spread": 0.125,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 29 pts vs Moon 12 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 29% of the ground vs Moon 12% of the ground)"
    }
   },
   {
@@ -10744,7 +10744,7 @@
     "spread_ratio": 1.333,
     "earth_spread": 0.16667,
     "moon_spread": 0.125,
-    "text": "Varies about as much as the Moon site (Earth spread 17 pts vs Moon 12 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 17% of the ground vs Moon 12% of the ground)"
    }
   },
   {
@@ -11192,7 +11192,7 @@
     "spread_ratio": 0.734,
     "earth_spread": 0.12408,
     "moon_spread": 0.16905,
-    "text": "Varies about as much as the Moon site (Earth spread 12 pts vs Moon 17 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 12% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -11640,7 +11640,7 @@
     "spread_ratio": 1.331,
     "earth_spread": 0.22506,
     "moon_spread": 0.16905,
-    "text": "Varies about as much as the Moon site (Earth spread 23 pts vs Moon 17 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 23% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -12064,7 +12064,7 @@
     "spread_ratio": 0.925,
     "earth_spread": 0.15633,
     "moon_spread": 0.16905,
-    "text": "Varies about as much as the Moon site (Earth spread 16 pts vs Moon 17 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 16% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -13687,7 +13687,7 @@
     "spread_ratio": 0.687,
     "earth_spread": 0.15278,
     "moon_spread": 0.22222,
-    "text": "Varies about as much as the Moon site (Earth spread 15 pts vs Moon 22 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 15% of the ground vs Moon 22% of the ground)"
    }
   },
   {
@@ -13977,7 +13977,7 @@
     "spread_ratio": 0.5,
     "earth_spread": 0.11111,
     "moon_spread": 0.22222,
-    "text": "Smoother than the Moon site: varies less across its area (Earth spread 11 pts vs Moon 22 pts)"
+    "text": "Smoother than the Moon site: varies less across its area (Earth spread 11% of the ground vs Moon 22% of the ground)"
    }
   },
   {
@@ -14267,7 +14267,7 @@
     "spread_ratio": 1.125,
     "earth_spread": 0.25,
     "moon_spread": 0.22222,
-    "text": "Varies about as much as the Moon site (Earth spread 25 pts vs Moon 22 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 25% of the ground vs Moon 22% of the ground)"
    }
   },
   {
@@ -14715,7 +14715,7 @@
     "spread_ratio": 0.872,
     "earth_spread": 0.10442,
     "moon_spread": 0.11982,
-    "text": "Varies about as much as the Moon site (Earth spread 10 pts vs Moon 12 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 10% of the ground vs Moon 12% of the ground)"
    }
   },
   {
@@ -15139,7 +15139,7 @@
     "spread_ratio": 1.384,
     "earth_spread": 0.16585,
     "moon_spread": 0.11982,
-    "text": "Varies about as much as the Moon site (Earth spread 17 pts vs Moon 12 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 17% of the ground vs Moon 12% of the ground)"
    }
   },
   {
@@ -15587,7 +15587,7 @@
     "spread_ratio": 1.883,
     "earth_spread": 0.2256,
     "moon_spread": 0.11982,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 23 pts vs Moon 12 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 23% of the ground vs Moon 12% of the ground)"
    }
   },
   {
@@ -17197,7 +17197,7 @@
     "spread_ratio": 1.417,
     "earth_spread": 0.23611,
     "moon_spread": 0.16667,
-    "text": "Varies about as much as the Moon site (Earth spread 24 pts vs Moon 17 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 24% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -17487,7 +17487,7 @@
     "spread_ratio": 1.833,
     "earth_spread": 0.30556,
     "moon_spread": 0.16667,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 31 pts vs Moon 17 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 31% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -17778,7 +17778,7 @@
     "spread_ratio": 1.0,
     "earth_spread": 0.16667,
     "moon_spread": 0.16667,
-    "text": "Varies about as much as the Moon site (Earth spread 17 pts vs Moon 17 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 17% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -18203,7 +18203,7 @@
     "spread_ratio": 0.538,
     "earth_spread": 0.05472,
     "moon_spread": 0.10179,
-    "text": "Smoother than the Moon site: varies less across its area (Earth spread 5.5 pts vs Moon 10 pts)"
+    "text": "Smoother than the Moon site: varies less across its area (Earth spread 5.5% of the ground vs Moon 10% of the ground)"
    }
   },
   {
@@ -18651,7 +18651,7 @@
     "spread_ratio": 1.878,
     "earth_spread": 0.19118,
     "moon_spread": 0.10179,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 19 pts vs Moon 10 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 19% of the ground vs Moon 10% of the ground)"
    }
   },
   {
@@ -19098,7 +19098,7 @@
     "spread_ratio": 0.85,
     "earth_spread": 0.08652,
     "moon_spread": 0.10179,
-    "text": "Varies about as much as the Moon site (Earth spread 8.7 pts vs Moon 10 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 8.7% of the ground vs Moon 10% of the ground)"
    }
   },
   {
@@ -20720,7 +20720,7 @@
     "spread_ratio": 0.778,
     "earth_spread": 0.19444,
     "moon_spread": 0.25,
-    "text": "Varies about as much as the Moon site (Earth spread 19 pts vs Moon 25 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 19% of the ground vs Moon 25% of the ground)"
    }
   },
   {
@@ -21010,7 +21010,7 @@
     "spread_ratio": 0.556,
     "earth_spread": 0.13889,
     "moon_spread": 0.25,
-    "text": "Smoother than the Moon site: varies less across its area (Earth spread 14 pts vs Moon 25 pts)"
+    "text": "Smoother than the Moon site: varies less across its area (Earth spread 14% of the ground vs Moon 25% of the ground)"
    }
   },
   {
@@ -21278,7 +21278,7 @@
     "spread_ratio": 1.0,
     "earth_spread": 0.25,
     "moon_spread": 0.25,
-    "text": "Varies about as much as the Moon site (Earth spread 25 pts vs Moon 25 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 25% of the ground vs Moon 25% of the ground)"
    }
   },
   {
@@ -21725,7 +21725,7 @@
     "spread_ratio": 1.164,
     "earth_spread": 0.12802,
     "moon_spread": 0.11002,
-    "text": "Varies about as much as the Moon site (Earth spread 13 pts vs Moon 11 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 13% of the ground vs Moon 11% of the ground)"
    }
   },
   {
@@ -22148,7 +22148,7 @@
     "spread_ratio": 1.356,
     "earth_spread": 0.14915,
     "moon_spread": 0.11002,
-    "text": "Varies about as much as the Moon site (Earth spread 15 pts vs Moon 11 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 15% of the ground vs Moon 11% of the ground)"
    }
   },
   {
@@ -22596,7 +22596,7 @@
     "spread_ratio": 0.984,
     "earth_spread": 0.10829,
     "moon_spread": 0.11002,
-    "text": "Varies about as much as the Moon site (Earth spread 11 pts vs Moon 11 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 11% of the ground vs Moon 11% of the ground)"
    }
   },
   {
@@ -24206,7 +24206,7 @@
     "spread_ratio": 2.875,
     "earth_spread": 0.31944,
     "moon_spread": 0.11111,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 32 pts vs Moon 11 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 32% of the ground vs Moon 11% of the ground)"
    }
   },
   {
@@ -24496,7 +24496,7 @@
     "spread_ratio": 3.125,
     "earth_spread": 0.34722,
     "moon_spread": 0.11111,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 35 pts vs Moon 11 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 35% of the ground vs Moon 11% of the ground)"
    }
   },
   {
@@ -24786,7 +24786,7 @@
     "spread_ratio": 2.0,
     "earth_spread": 0.22222,
     "moon_spread": 0.11111,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 22 pts vs Moon 11 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 22% of the ground vs Moon 11% of the ground)"
    }
   },
   {
@@ -25233,7 +25233,7 @@
     "spread_ratio": 5.724,
     "earth_spread": 0.24279,
     "moon_spread": 0.04242,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24 pts vs Moon 4.2 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24% of the ground vs Moon 4.2% of the ground)"
    }
   },
   {
@@ -25644,7 +25644,7 @@
     "spread_ratio": 7.23,
     "earth_spread": 0.30669,
     "moon_spread": 0.04242,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 31 pts vs Moon 4.2 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 31% of the ground vs Moon 4.2% of the ground)"
    }
   },
   {
@@ -26054,7 +26054,7 @@
     "spread_ratio": 4.797,
     "earth_spread": 0.20347,
     "moon_spread": 0.04242,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 20 pts vs Moon 4.2 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 20% of the ground vs Moon 4.2% of the ground)"
    }
   },
   {
@@ -27676,7 +27676,7 @@
     "spread_ratio": 6.8,
     "earth_spread": 0.47222,
     "moon_spread": 0.06944,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 47 pts vs Moon 6.9 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 47% of the ground vs Moon 6.9% of the ground)"
    }
   },
   {
@@ -27965,7 +27965,7 @@
     "spread_ratio": 3.0,
     "earth_spread": 0.20833,
     "moon_spread": 0.06944,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 21 pts vs Moon 6.9 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 21% of the ground vs Moon 6.9% of the ground)"
    }
   },
   {
@@ -28254,7 +28254,7 @@
     "spread_ratio": 3.4,
     "earth_spread": 0.23611,
     "moon_spread": 0.06944,
-    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24 pts vs Moon 6.9 pts)"
+    "text": "Patchier than the Moon site: varies more across its area (Earth spread 24% of the ground vs Moon 6.9% of the ground)"
    }
   },
   {
@@ -28656,7 +28656,7 @@
     "spread_ratio": 0.847,
     "earth_spread": 0.14529,
     "moon_spread": 0.17145,
-    "text": "Varies about as much as the Moon site (Earth spread 15 pts vs Moon 17 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 15% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -29057,7 +29057,7 @@
     "spread_ratio": 1.267,
     "earth_spread": 0.21729,
     "moon_spread": 0.17145,
-    "text": "Varies about as much as the Moon site (Earth spread 22 pts vs Moon 17 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 22% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -29505,7 +29505,7 @@
     "spread_ratio": 0.842,
     "earth_spread": 0.14435,
     "moon_spread": 0.17145,
-    "text": "Varies about as much as the Moon site (Earth spread 14 pts vs Moon 17 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 14% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -31128,7 +31128,7 @@
     "spread_ratio": 1.333,
     "earth_spread": 0.22222,
     "moon_spread": 0.16667,
-    "text": "Varies about as much as the Moon site (Earth spread 22 pts vs Moon 17 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 22% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -31419,7 +31419,7 @@
     "spread_ratio": 0.917,
     "earth_spread": 0.15278,
     "moon_spread": 0.16667,
-    "text": "Varies about as much as the Moon site (Earth spread 15 pts vs Moon 17 pts)"
+    "text": "Varies about as much as the Moon site (Earth spread 15% of the ground vs Moon 17% of the ground)"
    }
   },
   {
@@ -31711,7 +31711,7 @@
     "spread_ratio": 0.583,
     "earth_spread": 0.09722,
     "moon_spread": 0.16667,
-    "text": "Smoother than the Moon site: varies less across its area (Earth spread 10 pts vs Moon 17 pts)"
+    "text": "Smoother than the Moon site: varies less across its area (Earth spread 10% of the ground vs Moon 17% of the ground)"
    }
   }
  ],

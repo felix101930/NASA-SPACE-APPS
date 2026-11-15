@@ -6,10 +6,11 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import { SafeCanvas } from '../../components/SafeCanvas';
 import { Loading } from '../../components/Loading';
-import { TERRAIN_KM, terrainHeightAt, useTerrainGeometry } from '../../components/terrainGeometry';
+import { TERRAIN_KM, tileToScene, useTerrainGeometry } from '../../components/terrainGeometry';
 import { SunMarker, sunGeometry, sunPosition } from '../../components/SunMarker';
 import type { LoadedTile } from '../../data/tiles';
 import type { RimSeg } from './data';
+import { PATCH_TINT_OPACITY, PatchLabelProjector, PatchLabels, PatchLines, patchAnchors, usePatchTexture, type PatchLayerData } from './PatchLayer';
 
 const KM = TERRAIN_KM;
 export const SHADOW_MAP = 2048; // per pane; 4096² on two canvases was part of the WebGL context pressure
@@ -65,27 +66,25 @@ function SyncedControls({ id }: { id: string }): JSX.Element {
 // Scene pieces
 // ------------------------------------------------------------------------------------------------
 
-function tileToScene(tile: LoadedTile, c: number, r: number, exag: number, lift: number): [number, number, number] {
-  const n = tile.filled.size;
-  const W = n * tile.filled.res * KM;
-  return [(c / (n - 1) - 0.5) * W, terrainHeightAt(tile, c, r, exag) + lift, (r / (n - 1) - 0.5) * W];
-}
-
 function TerrainMesh({
   tile,
   exag,
   map,
   emissiveMap,
   shadows,
+  patchMap,
 }: {
   tile: LoadedTile;
   exag: number;
   map: THREE.Texture | null;
   emissiveMap: THREE.Texture | null;
   shadows: boolean;
+  /** 25-patch tint drawn over the lit terrain on the same geometry (no second heightfield). */
+  patchMap: THREE.Texture | null;
 }): JSX.Element {
   const geom = useTerrainGeometry(tile, exag);
   return (
+    <>
     <mesh geometry={geom} castShadow={shadows} receiveShadow={shadows}>
       {/* Keyed on whether maps are present (that changes the shader), not on which texture: a new material per
           shadow mask released and recompiled the program on every sun step. Swapping textures needs no recompile. */}
@@ -100,6 +99,27 @@ function TerrainMesh({
         emissiveIntensity={emissiveMap ? 0.4 : 0}
       />
     </mesh>
+    {patchMap && (
+      <mesh geometry={geom} renderOrder={1}>
+        {/* Multiply tint: result = terrain × mix(1, patch colour, opacity), so cast shadows stay black. */}
+        <meshBasicMaterial
+          map={patchMap}
+          transparent
+          opacity={PATCH_TINT_OPACITY}
+          premultipliedAlpha
+          blending={THREE.CustomBlending}
+          blendEquation={THREE.AddEquation}
+          blendSrc={THREE.DstColorFactor}
+          blendDst={THREE.OneMinusSrcAlphaFactor}
+          depthWrite={false}
+          polygonOffset
+          polygonOffsetFactor={-2}
+          polygonOffsetUnits={-2}
+          toneMapped={false}
+        />
+      </mesh>
+    )}
+    </>
   );
 }
 
@@ -304,12 +324,18 @@ export interface PaneProps {
   readout: ReactNode;
   /** Small note at the bottom right. */
   note?: ReactNode;
+  /** "Show the 25 patches": values on the scale shared by both panes, or null when off. */
+  patches?: PatchLayerData | null;
 }
 
 export function Pane(p: PaneProps): JSX.Element {
   const { tile } = p;
   const shadows = p.realtime;
   const tagEls = useRef<Map<string, HTMLSpanElement>>(new Map());
+  const patchEls = useRef<(HTMLSpanElement | null)[]>([]);
+  const patches = p.patches ?? null;
+  const patchMap = usePatchTexture(patches);
+  const anchors = useMemo((): [number, number, number][] => (tile && patches ? patchAnchors(tile, p.exag) : []), [tile, patches, p.exag]);
   const baseY = tile ? baseHeight(tile, p.exag) : 0;
   const tags = useMemo((): Tag3D[] => {
     if (!tile) return [];
@@ -340,7 +366,9 @@ export function Pane(p: PaneProps): JSX.Element {
           {/* Light raised for the exaggeration (true shadow lengths); marker on the TRUE angle; same azimuth. */}
           <Sun el={sceneSunEl(p.el, p.exag)} az={p.az} shadows={shadows} extent={p.extentKm} />
           <SunMarker el={p.el} az={p.az} extent={p.extentKm} baseY={baseY} />
-          <TerrainMesh tile={tile} exag={p.exag} map={p.realtime ? null : p.shadeMap} emissiveMap={p.cellMap} shadows={shadows} />
+          <TerrainMesh tile={tile} exag={p.exag} map={p.realtime ? null : p.shadeMap} emissiveMap={p.cellMap} shadows={shadows} patchMap={patchMap} />
+          {patches && <PatchLines tile={tile} exag={p.exag} />}
+          {patches && <PatchLabelProjector anchors={anchors} els={patchEls} />}
           {p.rim && <RimOverlay tile={tile} exag={p.exag} segs={p.rim} />}
           {p.path &&
             p.path.slice(1).map((pt: [number, number], i: number) => (
@@ -350,6 +378,7 @@ export function Pane(p: PaneProps): JSX.Element {
           <SyncedControls id={p.id} />
         </SafeCanvas>
       )}
+      {tile && !p.error && patches && <PatchLabels data={patches} els={patchEls} />}
       {tile && !p.error && (
         <div className="t3-tags" aria-hidden="true">
           {tags.map((t: Tag3D) => (

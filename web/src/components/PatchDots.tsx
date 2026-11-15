@@ -1,5 +1,5 @@
 // Patchiness strip: the 25 block values (3 km patches of the 15 km square) on the Moon and on Earth,
-// on one shared axis, with each whole-square value marked and the Moon's middle 50% (IQR) shaded.
+// on one shared axis, with each whole-square value marked and the Moon's typical patches (middle half, IQR) shaded.
 // Data: matches.json lights[].moon_blocks / earth_blocks (pipeline/match/patchiness.py).
 import { useMemo, type JSX } from 'react';
 import type { HazardId } from '../types/contract';
@@ -201,7 +201,7 @@ export function PatchDots({
         <span className="patchdots__label">{label}</span>
         <span className="patchdots__key">
           <span className="patchdots__key-whole" /> whole square
-          <span className="patchdots__key-band" /> Moon middle 50%
+          <span className="patchdots__key-band" /> Moon’s typical patches
           {view.verdict && <strong className="patchdots__verdict">{VERDICT_TEXT[view.verdict]}</strong>}
         </span>
       </figcaption>

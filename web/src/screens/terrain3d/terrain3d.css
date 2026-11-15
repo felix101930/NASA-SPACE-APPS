@@ -1107,3 +1107,47 @@
 .t3-section > .patchdots {
   margin-top: 16px;
 }
+
+/* ---------- 25 patches overlay (PatchLayer.tsx) ---------- */
+
+.t3-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.t3-patch-labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.t3-patch-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(10, 11, 14, 0.72);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.3;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.t3-patch-key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  font-size: var(--fs-label);
+  color: var(--text-2);
+}
+
+.t3-patch-key strong {
+  color: var(--text);
+  font-weight: 600;
+}

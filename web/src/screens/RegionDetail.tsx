@@ -6,10 +6,12 @@ import { Fit, FitGlyph, HazardGlyph, VerdictGlyph, type VerdictKind } from '../c
 import { SampleChip, ScreenHead } from '../components/ScreenHead';
 import { InfoTip } from '../components/InfoTip';
 import { headlineLight, PatchFor } from '../components/PatchFor';
+import { PatchPair } from '../components/PatchPair';
+import { agreementLine, nasademAgreement } from './terrain3d/Evidence';
 import { Select, type SelectOption } from '../components/Select';
 import { regionOptions } from '../lib/regionOptions';
-import { Term, Why } from '../components/Term';
-import { fmtDeg, fmtNum, fmtPct, fmtSpread, fmtStat } from '../lib/units';
+import { Term, Why, WhyBody } from '../components/Term';
+import { fmtDeg, fmtNum, fmtPct, fmtSpread } from '../lib/units';
 import { parseBootstrap } from '../lib/validationExtras';
 import '../styles/clarity-moon.css';
 import { localSolarTime } from '../lib/solar';
@@ -22,19 +24,49 @@ const DAY_FMT = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: '2-dig
 
 const HAZARD_NOUN: Record<HazardId, string> = { shadow: 'shadow', rim: 'rim-jump', texture: 'texture' };
 
-/** Signed Earth − Moon difference in the metric's own unit: shares as percentage points, others as-is. */
-function realGap(diff: number, unit: string): string {
+/** What each share measures, for plain gap wording ("2% more of the ground in shadow"). */
+const SHARE_NOUN: Record<string, string> = {
+  shadow_frac_el1: 'of the ground in shadow',
+  shadow_frac_el3: 'of the ground in shadow',
+  shadow_frac_el5: 'of the ground in shadow',
+  shadow_frac_timeweighted: 'of the ground in shadow',
+  empty_cell_frac_el3: 'of 1 km cells featureless',
+  frac_track_over_500m: 'of the track crossing 500 m jumps',
+};
+
+/** Earth − Moon in plain words and the metric's own unit; shares as "% of the ground", never "points". */
+function plainGap(metric: string, diff: number, unit: string): string {
   if (!Number.isFinite(diff)) return '—';
-  const sign = diff > 0 ? '+' : diff < 0 ? '−' : '±';
+  const more = diff > 0;
   const a = Math.abs(diff);
   if (unit === '%') {
     const v = a * 100;
-    return `${sign}${v < 1 ? v.toFixed(1) : Math.round(v)} pts`;
+    const n = v < 1 ? v.toFixed(1) : String(Math.round(v));
+    if (Number(n) === 0) return 'same';
+    return `${n}% ${more ? 'more' : 'less'} ${SHARE_NOUN[metric] ?? ''}`.trim();
   }
-  if (unit === 'm') return `${sign}${Math.round(a)} m`;
-  if (unit === '°') return `${sign}${a.toFixed(1)}°`;
-  if (unit === '/km²') return `${sign}${a.toFixed(1)} /km²`;
-  return `${sign}${a < 10 ? a.toFixed(2) : a.toFixed(1)}`;
+  if (unit === 'm') return Math.round(a) === 0 ? 'same' : `${Math.round(a)} m ${more ? 'bigger' : 'smaller'} jumps`;
+  if (unit === '°') return a < 0.05 ? 'same' : `${a.toFixed(1)}° ${more ? 'steeper' : 'gentler'}`;
+  if (unit === '/km²') return a < 0.05 ? 'same' : `${a.toFixed(1)} ${more ? 'more' : 'fewer'} keypoints per km²`;
+  return `${more ? '+' : '−'}${a < 10 ? a.toFixed(2) : a.toFixed(1)}`;
+}
+
+/** Exact signed difference for the tooltip: shares in percentage points to two decimals. */
+function exactGap(diff: number, unit: string): string {
+  if (!Number.isFinite(diff)) return '—';
+  const sign = diff > 0 ? '+' : diff < 0 ? '−' : '±';
+  const a = Math.abs(diff);
+  if (unit === '%') return `${sign}${(a * 100).toFixed(2)} percentage points`;
+  return `${sign}${a.toFixed(2)}${unit === '°' ? '°' : ` ${unit}`}`;
+}
+
+/** "Moon's typical patches": the middle half of its 25 patches (moon_block_iqr), else the pipeline's band. */
+function typicalBand(l: Match['lights'][number]): [number, number] {
+  const b: unknown = field(l, 'moon_block_iqr');
+  if (Array.isArray(b) && b.length === 2 && b.every((x: unknown): boolean => typeof x === 'number' && Number.isFinite(x))) {
+    return [Number(b[0]), Number(b[1])];
+  }
+  return l.moon_iqr;
 }
 
 function hhmmUTC(d: Date): string {
@@ -64,21 +96,6 @@ function strField(o: unknown, k: string): string | null {
   const v = field(o, k);
   return typeof v === 'string' && v ? v : null;
 }
-
-/** Pearson r per metric, Copernicus vs NASADEM, from method.json nasadem_check.per_metric. */
-function nasademAgreement(core: CoreData): Record<string, number> {
-  const out: Record<string, number> = {};
-  const per = field(field(core.method?.file, 'nasadem_check'), 'per_metric');
-  if (!isObj(per)) return out;
-  Object.entries(per as Loose).forEach(([k, v]: [string, unknown]): void => {
-    const r = numField(v, 'r');
-    if (r !== null) out[k] = r;
-  });
-  return out;
-}
-
-/** Below this r the two elevation datasets disagree enough to flag the measure as less certain. */
-const WEAK_R = 0.8;
 
 /** Sun this low is bent noticeably by the atmosphere, so timing is uncertain. */
 const REFRACTION_EL_DEG = 1;
@@ -194,6 +211,7 @@ function SiteCard({
   agreement,
   screened,
   regions,
+  regionName,
   active,
   onToggle,
   onCompare,
@@ -203,13 +221,13 @@ function SiteCard({
   agreement: Record<string, number>;
   screened: number | null;
   regions: { id: string; name: string }[];
+  regionName: string;
   active: boolean;
   onToggle: () => void;
   onCompare: () => void;
 }): JSX.Element {
   const place = placeName(site);
-  const nasadem: unknown = field(site, 'nasadem');
-  const nasMetrics: unknown = field(nasadem, 'metrics');
+  const agree = agreementLine(agreement);
   const rehearsal: unknown = field(match, 'rehearsal');
   const targetEl = numField(rehearsal, 'target_sun_el');
   const tolEl = numField(rehearsal, 'el_tolerance');
@@ -266,23 +284,25 @@ function SiteCard({
             <div className="list-lede">
               <span className="why-row">
                 Gap = this site minus the Moon region. Hover a gap for its <Term id="typicalSpread">× figure</Term>
-                <Why id="iqr" />
+                <InfoTip label="Why count differences in the Moon region’s typical spread?" title="Why count differences in the Moon region’s typical spread?">
+                  <WhyBody id="iqr" />
+                  {agree && (
+                    <p>
+                      <strong>Second dataset:</strong> {agree}
+                    </p>
+                  )}
+                </InfoTip>
               </span>
             </div>
+          <PatchPair key={`${match.region_id}:${match.hazard}:${match.site_id}`} match={match} moonName={regionName} earthName={place.label} />
           <section>
             <h4 className="section-label">Metric by metric</h4>
             <table className="data-table">
               <thead>
                 <tr>
                   <th>Metric</th>
-                  <th className="r">Moon (middle 50%)</th>
+                  <th className="r">Moon’s typical patches</th>
                   <th className="r">This site</th>
-                  <th className="r">
-                    <span className="th-tip">
-                      NASADEM check
-                      <Why id="nasadem" align="end" />
-                    </span>
-                  </th>
                   <th className="r">Gap</th>
                   <th>Fit</th>
                 </tr>
@@ -290,26 +310,20 @@ function SiteCard({
               <tbody>
                 {match.lights.map((l) => {
                   const mi = metricInfo(l.metric);
-                  const nv = field(nasMetrics, l.metric);
-                  const r = agreement[l.metric];
-                  const weak = typeof r === 'number' && r < WEAK_R;
+                  const band = typicalBand(l);
                   const gap = numField(l, 'gap_in_iqr');
                   return (
                     <tr key={l.metric}>
                       <td title={mi.help}>{mi.label}</td>
-                      <td className="r">
-                        {mi.fmt(l.moon)}{' '}
-                        <span className="faint">
-                          ({mi.fmt(l.moon_iqr[0])}–{mi.fmt(l.moon_iqr[1])})
-                        </span>
+                      <td className="r" title={`Middle half of the Moon’s 25 patches: ${mi.fmt(band[0])}–${mi.fmt(band[1])} · whole square ${mi.fmt(l.moon)}`}>
+                        {mi.fmt(band[0])}–{mi.fmt(band[1])}
                       </td>
                       <td className="r">{mi.fmt(l.earth)}</td>
-                      <td className="r metric-nasadem" data-weak={weak} title={weak ? 'Least certain measure: the two elevation datasets agree only moderately.' : undefined}>
-                        {typeof nv === 'number' ? mi.fmt(nv) : '—'}
-                        {typeof r === 'number' && <span className="pm">r {fmtStat(r)}{weak ? ' · least certain' : ''}</span>}
-                      </td>
-                      <td className="r" title={`${l.gap_text}${gap !== null ? ` · ${fmtSpread(gap, 1)} (× = how far off, compared with how much the Moon region varies within itself; under 0.5 = close)` : ''}`}>
-                        {realGap(l.earth - l.moon, mi.unit)}
+                      <td
+                        className="r"
+                        title={`Exactly ${exactGap(l.earth - l.moon, mi.unit)}${gap !== null ? ` · ${fmtSpread(gap, 1)} (× = how far off, compared with how much the Moon region varies within itself; under 0.5 = close)` : ''}`}
+                      >
+                        {plainGap(l.metric, l.earth - l.moon, mi.unit)}
                       </td>
                       <td>
                         <Fit fit={l.light} />
@@ -392,7 +406,7 @@ export function RegionDetail(): JSX.Element {
       }),
     [list, core, activeId],
   );
-  const agreement = useMemo((): Record<string, number> => nasademAgreement(core), [core]);
+  const agreement = useMemo((): Record<string, number> => nasademAgreement(core.method?.file), [core]);
   const screened = numField(field(core.method?.file, 'screen'), 'n_screened');
   const boot = parseBootstrap(core.summary?.validation);
   const onSelect = useCallback((id: string): void => setSite(id), [setSite]);
@@ -478,6 +492,7 @@ export function RegionDetail(): JSX.Element {
                 agreement={agreement}
                 screened={screened}
                 regions={core.regions}
+                regionName={region.name}
                 active={m.site_id === activeId}
                 onToggle={(): void => setSite(m.site_id)}
                 onCompare={(): void => {

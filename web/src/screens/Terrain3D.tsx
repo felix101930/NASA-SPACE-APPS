@@ -38,6 +38,10 @@ import {
 } from './terrain3d/data';
 import { EvidenceTable, nasademAgreement, NotesBoxes, WindowsList } from './terrain3d/Evidence';
 import { Pane } from './terrain3d/Scene';
+import type { PatchLayerData } from './terrain3d/PatchLayer';
+import { headlineLight } from '../components/PatchFor';
+import { PatchLegend } from '../components/PatchGrid';
+import { patchPair, type PatchPair } from '../lib/patchScale';
 import { useSunSweep, type SunSweep, type SweepMode } from '../lib/useSunSweep';
 import './terrain3d/terrain3d.css';
 
@@ -313,10 +317,11 @@ export default function Terrain3D(): JSX.Element {
   const mode = useApp((s) => s.shadowMode);
   const setMode = useApp((s) => s.setShadowMode);
   const walk = useApp((s) => s.walk);
-  const [sweepMode, setSweepMode] = useState<SweepMode>('marks');
+  const [sweepMode, setSweepMode] = useState<SweepMode>('smooth');
   const sweep = useSunSweep({ marks: SWEEP_MARKS, mode: sweepMode, getAz: readSunAz, setAz: applySunAz, holdMs: 1200, glideMs: 450 });
   const sweeping = sweep.state.phase !== 'idle';
   const [lift, setLift] = useState<boolean>(false);
+  const [showPatches, setShowPatches] = useState<boolean>(false);
   const [activeWindow, setActiveWindow] = useState<{ key: string; el: number; az: number } | null>(null);
   const [datesOpen, setDatesOpen] = useState<boolean>(false);
 
@@ -353,6 +358,19 @@ export default function Terrain3D(): JSX.Element {
   const current: SiteChoice | null = inChoices ?? extra ?? choices[0] ?? null;
   const site = current?.site ?? null;
   const match = current?.match ?? null;
+
+  // "Show the 25 patches": the hazard's headline measure on one colour scale shared by both panes.
+  const pair = useMemo((): PatchPair | null => (match ? patchPair(headlineLight(match)) : null), [match]);
+  const moonPatches = useMemo(
+    (): PatchLayerData | null =>
+      showPatches && pair ? { values: pair.moon, unit: pair.unit, scaleMin: pair.scaleMin, scaleMax: pair.scaleMax, hazard } : null,
+    [showPatches, pair, hazard],
+  );
+  const earthPatches = useMemo(
+    (): PatchLayerData | null =>
+      showPatches && pair ? { values: pair.earth, unit: pair.unit, scaleMin: pair.scaleMin, scaleMax: pair.scaleMax, hazard } : null,
+    [showPatches, pair, hazard],
+  );
 
   const moon = useTile(region?.tile ?? null, core.regionsOrigin);
   const earth = useTile(site?.tile ?? null, core.sitesOrigin);
@@ -732,16 +750,6 @@ export default function Terrain3D(): JSX.Element {
               <div className="seg" role="group" aria-labelledby="t3-sweep-label">
                 <button
                   type="button"
-                  aria-pressed={sweepMode === 'marks'}
-                  onClick={(): void => {
-                    sweep.stop();
-                    setSweepMode('marks');
-                  }}
-                >
-                  8 directions
-                </button>
-                <button
-                  type="button"
                   aria-pressed={sweepMode === 'smooth'}
                   title="One continuous turn; the dark figures refresh up to 4 times a second. With reduced motion this steps instead."
                   onClick={(): void => {
@@ -750,6 +758,17 @@ export default function Terrain3D(): JSX.Element {
                   }}
                 >
                   Smooth
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={sweepMode === 'marks'}
+                  title="Steps the sun once round 8 compass directions, pausing at each"
+                  onClick={(): void => {
+                    sweep.stop();
+                    setSweepMode('marks');
+                  }}
+                >
+                  Step through 8 directions
                 </button>
               </div>
             </div>
@@ -778,6 +797,7 @@ export default function Terrain3D(): JSX.Element {
           path={moonPath}
           readout={moonReadout}
           note={!realtime && moonMask.note ? `Shadows: ${moonMask.note}` : null}
+          patches={moonPatches}
         />
         <Pane
           id="earth"
@@ -800,6 +820,7 @@ export default function Terrain3D(): JSX.Element {
           path={earthPath}
           readout={earthReadout}
           note={earthNote ?? (!realtime && earthMask.note ? `Shadows: ${earthMask.note}` : null)}
+          patches={earthPatches}
         />
       </div>
 
@@ -807,11 +828,25 @@ export default function Terrain3D(): JSX.Element {
         <div className="t3-caption-lines">
           <div className="why-row t3-caption-row">{caption}</div>
           {walk && walk.regionId === region.id && <p className="t3-caption-dark">White line = your drawn walk.</p>}
+          {showPatches && pair && (
+            <div className="t3-patch-key">
+              <span>
+                <strong>25 patches of 3 km</strong> · {pair.label}, same scale on both:
+              </span>
+              <PatchLegend scaleMin={pair.scaleMin} scaleMax={pair.scaleMax} unit={pair.unit} hazard={hazard} />
+            </div>
+          )}
         </div>
-        <label className="check t3-lift">
-          <input type="checkbox" checked={lift} onChange={(e): void => setLift(e.target.checked)} />
-          See into shadows
-        </label>
+        <div className="t3-toggles">
+          <label className="check t3-lift" title={pair ? undefined : 'No patch values for this site'}>
+            <input type="checkbox" checked={showPatches && pair !== null} disabled={!pair} onChange={(e): void => setShowPatches(e.target.checked)} />
+            Show the 25 patches
+          </label>
+          <label className="check t3-lift">
+            <input type="checkbox" checked={lift} onChange={(e): void => setLift(e.target.checked)} />
+            See into shadows
+          </label>
+        </div>
       </div>
       {activeW && (
         <div className="t3-window-note why-row">

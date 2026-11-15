@@ -1,0 +1,204 @@
+/* 25 patches (components/PatchGrid.tsx): a 5 × 5 grid of 3 km patches on one shared, single-hue ramp.
+   Colour is data only; the ring (dark edge + light inner line) reads on both ends of the ramp. */
+
+.pgrid {
+  --pg-cell: 18px;
+  --pg-gap: 2px;
+  margin: 0;
+  display: inline-grid;
+  gap: 6px;
+  min-width: 0;
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+}
+
+.pgrid--md {
+  --pg-cell: 44px;
+}
+
+.pgrid__label {
+  max-width: calc(var(--pg-cell) * 5 + var(--pg-gap) * 4);
+  color: var(--text);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pgrid--sm .pgrid__label {
+  font-size: var(--fs-caption);
+}
+
+.pgrid__cells {
+  display: grid;
+  grid-template-columns: repeat(5, var(--pg-cell));
+  grid-auto-rows: var(--pg-cell);
+  gap: var(--pg-gap);
+  width: max-content;
+  border-radius: 4px;
+}
+
+.pgrid__cells:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.pgrid__cell {
+  display: grid;
+  place-items: center;
+  border-radius: 2px;
+  background: var(--surface-2);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  cursor: default;
+}
+
+.pgrid__cell[data-empty] {
+  background: repeating-linear-gradient(45deg, var(--surface-2) 0 3px, var(--surface-1) 3px 6px);
+}
+
+.pgrid__cell[data-out] {
+  box-shadow:
+    inset 0 0 0 1.5px var(--bg),
+    inset 0 0 0 3px var(--text);
+}
+
+.pgrid--sm .pgrid__cell[data-out] {
+  box-shadow:
+    inset 0 0 0 1px var(--bg),
+    inset 0 0 0 2px var(--text);
+}
+
+.pgrid__cell[data-active] {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+  position: relative;
+  z-index: 1;
+}
+
+.pgrid__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 16px;
+  line-height: 16px;
+  color: var(--text-3);
+}
+
+.pgrid__read {
+  color: var(--text);
+  font-family: var(--mono);
+}
+
+/* ---------- Legend: one shared scale ---------- */
+
+.pgrid-legend {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  font-size: var(--fs-caption);
+  color: var(--text-3);
+}
+
+.pgrid-legend__end {
+  font-family: var(--mono);
+  color: var(--text-2);
+}
+
+.pgrid-legend__ramp {
+  width: 96px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.pgrid-legend__ring {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.pgrid-legend__swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--surface-3);
+  box-shadow:
+    inset 0 0 0 1px var(--bg),
+    inset 0 0 0 2px var(--text);
+}
+
+/* ---------- Earth matches: Moon and Earth side by side ---------- */
+
+.pgpair {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 4px;
+}
+
+.pgpair__cap {
+  max-width: 68ch;
+  font-size: var(--fs-label);
+  color: var(--text-2);
+}
+
+.pgpair__measures {
+  justify-self: start;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.pgpair__measures button {
+  min-height: 32px;
+  padding: 4px 12px;
+  font-size: var(--fs-caption);
+}
+
+.pgpair__grids {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  align-items: start;
+}
+
+.pgrid-legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+
+.pgpair__measure {
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+}
+
+.pgpair__result {
+  font-size: var(--fs-label);
+  color: var(--text-2);
+}
+
+.pgpair__result strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.pgpair__place {
+  color: var(--text);
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .pgrid--md {
+    --pg-cell: 34px;
+  }
+  .pgrid--md .pgrid__cell {
+    font-size: 10px;
+  }
+}

@@ -13,6 +13,13 @@ export function terrainHeightAt(tile: LoadedTile, col: number, row: number, exag
   return Number.isFinite(v) ? v : 0;
 }
 
+/** Scene position of tile pixel (col, row), lifted `lift` scene units above the exaggerated surface. */
+export function tileToScene(tile: LoadedTile, c: number, r: number, exag: number, lift: number): [number, number, number] {
+  const n = tile.filled.size;
+  const W = n * tile.filled.res * KM;
+  return [(c / (n - 1) - 0.5) * W, terrainHeightAt(tile, c, r, exag) + lift, (r / (n - 1) - 0.5) * W];
+}
+
 /** Grid mesh over the tile (x east, z south, y up), heights centred on the tile median. */
 export function useTerrainGeometry(tile: LoadedTile, exag: number): THREE.BufferGeometry {
   const geom = useMemo((): THREE.BufferGeometry => {
