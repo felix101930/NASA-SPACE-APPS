@@ -1,4 +1,6 @@
-# Protected-areas audit of the Earth analog spots
+# Protected-areas audit of the Earth analog spots (earlier site list)
+
+> **Note: this audit covers an earlier site list, not the sites the website shows.** It was made from an earlier pipeline run (`results/job2_test_sites.csv`: 15 spots such as Galápagos, Northern Hoggar and Aksai Chin). The website's current 57 analog sites (from `web/public/data/matches.json`) are different, so the counts below (for example "14 of 27 picks") do not describe them. For the current sites, the protected-area check is `pipeline/match/analog_tags.py` → `web/public/data/analog_tags.json`, shown on the Summary page (15 of 57 with their centre inside a protected area). This file is kept for its access notes (permits, restricted zones, gaps in protected-area data) and its method.
 
 Date: 2026-11-15. Covers the 27 top-3 picks in `results/job2_test_sites.csv` (15 unique spots; the Job 4 base list is the same). Per-spot table: `results/protected_areas_audit.csv`.
 
