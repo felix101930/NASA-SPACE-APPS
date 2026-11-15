@@ -166,6 +166,6 @@ Full citations and licences are listed in each output file's `meta.sources` and 
 ## Honest limits
 - The 30 m terrain can't see boulders or small craters.
 - Shadows are matched by geometry only, but sky light fills Earth's shadows.
-- The Earth screen is a sample of about 5–6% of bare land, not every square metre.
+- The Earth screen is a sample: 12,013 squares (about 2.7 million km², about 15% of Earth's bare land), not every square metre.
 - No Earth place reproduces lunar gravity, vacuum or −200 °C nights.
 - See the "Where it fails" section of the app's summary for the full list.

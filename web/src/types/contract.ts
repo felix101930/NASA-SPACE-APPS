@@ -97,6 +97,8 @@ export interface EarthSite {
   category: string;
   known_analog: boolean;
   role: 'candidate' | 'heldout_positive' | 'decoy' | string;
+  /** How the site entered the set: 'global_screen' | 'documented' | 'validation' (pipeline extra). */
+  selected_by?: string;
   bare_frac: number;
   worldcover_note: string;
   rock: { lith: string; anorthosite: boolean; source: string };

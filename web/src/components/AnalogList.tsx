@@ -2,6 +2,7 @@ import { useEffect, useState, type JSX } from 'react';
 import { HAZARDS } from '../content';
 import { HazardGlyph } from './Glyphs';
 import { InfoTip } from './InfoTip';
+import { SearchScope } from './SearchScope';
 import { loadOptionalJson } from '../data/loader';
 import { matchesFor, useApp, type CoreData } from '../store';
 import { HAZARD_IDS, isMeta, isObj, type EarthSite, type HazardId, type Meta } from '../types/contract';
@@ -154,6 +155,7 @@ export function AnalogList({ core, onMeta }: { core: CoreData; onMeta?: (m: Meta
   return (
     <section className="sum-section" aria-labelledby="analogs-h">
       <h2 id="analogs-h">Earth analogs we found</h2>
+      <SearchScope core={core} />
       {nv && (
         <div className="an-lead">
           <span>

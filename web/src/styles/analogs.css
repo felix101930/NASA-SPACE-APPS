@@ -1,3 +1,68 @@
+/* Search scope: two tables side by side on wide screens */
+.an-scope {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 16px 32px;
+  margin: 12px 0 20px;
+}
+
+.an-scope-block h3 {
+  margin: 0 0 8px;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.an-kv {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-label);
+  border-top: 1px solid var(--line);
+}
+
+.an-kv th,
+.an-kv td {
+  padding: 8px 12px 8px 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.an-kv tbody th {
+  font-weight: 400;
+  color: var(--text-2);
+}
+
+.an-kv td {
+  color: var(--text);
+}
+
+.an-kv thead th {
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.an-kv tfoot th {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.an-n {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.an-groups td:last-child {
+  color: var(--text-2);
+}
+
+@media (max-width: 960px) {
+  .an-scope {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* Summary: list of Earth analog sites with protected-area and new/known tags. Tokens from styles.css only;
    no gold (gold is sunlight). */
 
