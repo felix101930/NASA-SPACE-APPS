@@ -99,6 +99,21 @@ export async function loadOptionalJson<T>(path: string, guard: (v: unknown) => v
   }
 }
 
+/**
+ * Raw bytes of a binary from exactly one origin, or null when it is missing, an HTML fallback page (Vite answers
+ * unknown paths with index.html) or not exactly `byteLength` long (null = any length).
+ */
+export async function loadBytesFrom(path: string, byteLength: number | null, origin: Origin): Promise<ArrayBuffer | null> {
+  const res = await fetchOk(assetUrl(path, origin));
+  if (!res) return null;
+  try {
+    const buf = await res.arrayBuffer();
+    return byteLength === null || buf.byteLength === byteLength ? buf : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Loads a raw little-endian Float32 binary of an exact element count. */
 export async function loadFloat32(path: string, count: number, prefer: Origin = 'data'): Promise<Loaded<Float32Array>> {
   for (const origin of orderFor(prefer)) {

@@ -423,10 +423,19 @@ export default function Terrain3D(): JSX.Element {
   const earthMask = useMaskTexture(earth.tile, mode, el, az, NO_MASKS, core.sitesOrigin);
   const moonRim = useMemo((): RimSeg[] | null => (hazard === 'rim' ? moonRimSegs(ann, RIM_COUNT) : null), [hazard, ann]);
   const earthRim = useEarthRimSegs(earth.tile, hazard === 'rim', RIM_COUNT);
+  // Annotation cells are in the Moon tile's pixel grid (Moon tiles are always full resolution).
   const tileSize = region?.tile.size ?? 500;
-  const cellPx = ann?.texture ? ann.texture.cell_m / (ann.tile.res_m || 30) : 1000 / 30;
+  const cellPx = ann?.texture ? ann.texture.cell_m / (ann.tile.res_m || region?.tile.res_m || 30) : 1000 / (region?.tile.res_m ?? 30);
   const moonCells = useCellTexture(hazard === 'texture', ann?.texture?.texture_empty_cells ?? null, tileSize, cellPx, TEXTURE_TINT);
-  const earthCells = useCellTexture(hazard === 'texture', null, site?.tile.size ?? 500, 1000 / (site?.tile.res_m ?? 30), TEXTURE_TINT);
+  // Earth: the grid actually loaded (a deploy may serve the 60 m lite copy), not the site's JSON ref.
+  const earthGridRef = earthTileHere?.ref ?? site?.tile ?? null;
+  const earthCells = useCellTexture(
+    hazard === 'texture',
+    null,
+    earthGridRef?.size ?? 500,
+    1000 / (earthGridRef?.res_m ?? 30),
+    TEXTURE_TINT,
+  );
 
   const moonPath = useMemo((): [number, number][] | null => {
     if (!walk || !region || walk.regionId !== region.id) return null;
@@ -435,10 +444,11 @@ export default function Terrain3D(): JSX.Element {
   }, [walk, region]);
   const earthPath = useMemo((): [number, number][] | null => {
     const it = walk?.bestItem;
-    if (!it || !site || it.site_id !== site.id) return null;
-    const ref = site.tile;
+    if (!it || !site || it.site_id !== site.id || !earthTileHere) return null;
+    // Pixel coords in the loaded grid (full 30 m or lite 60 m), which is what the mesh is built from.
+    const ref = earthTileHere.ref;
     return [mapToPixel(it.x0, it.y0, ref.origin_x, ref.origin_y, ref.res_m), mapToPixel(it.x1, it.y1, ref.origin_x, ref.origin_y, ref.res_m)];
-  }, [walk, site]);
+  }, [walk, site, earthTileHere]);
 
   // On load and whenever the match changes, light both panes with the best date (once; later picks are the user's).
   useEffect((): void => {
@@ -953,7 +963,10 @@ export default function Terrain3D(): JSX.Element {
             but the shadows still fall where they would on the real ground.
           </p>
           <p className="t3-fine">
-            Both views use a 30 m grid. The dark percentages are worked out in your browser from true heights in 90 m steps, for the one sun
+            {earthTileHere?.lite
+              ? `The Moon view uses a 30 m grid; this online copy draws the Earth view from a ${Math.round(earthTileHere.ref.res_m)} m copy of the 30 m data (the full tiles are too big to host). `
+              : 'Both views use a 30 m grid. '}
+            The dark percentages are worked out in your browser from true heights in 90 m steps, for the one sun
             direction shown. Pink squares are 1 km squares with no camera
             landmark at a 3° sun from at least half of 8 sun directions. Orange lines come from a scan of every point in 16 directions, with
             picks at least 1.5 km apart.

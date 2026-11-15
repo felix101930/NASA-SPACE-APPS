@@ -34,7 +34,7 @@ npm install
 npm run dev          # opens on http://localhost:5173
 ```
 
-> **Note:** the 30 m Earth terrain tiles (`web/public/data/earth/*.bin`, about 270 MB) are not committed yet. Without them the Earth side of the 3D views shows an error panel. Every other screen works. To generate the tiles, run the pipeline below (`python -m pipeline.earth all`).
+> **Note:** the full 30 m Earth terrain tiles (`web/public/data/earth/*.bin`, about 370 MB) are not committed. The repo carries a lite copy instead (`web/public/data/earth_lite/`, 60 m, about 17 MB), so every 3D view works out of the box. If the full tiles are present (after running the pipeline below), the website uses them automatically.
 
 **Other scripts:**
 
@@ -44,6 +44,27 @@ npm run dev          # opens on http://localhost:5173
 | `npm run preview` | Serves the build locally |
 | `npm run typecheck` | Runs the TypeScript checks only |
 | `npm run mock` | Regenerates sample data in `web/public/mock/`. Use it only for UI work without real data. |
+
+---
+
+## Deploy on Vercel
+The website is a static Vite build, so it deploys to Vercel (the free Hobby plan is enough) with no server code.
+
+1. Fork the repository on GitHub, or push your copy.
+2. In Vercel, choose **Add New → Project** and import the repository.
+3. Set **Root Directory** to `web`. The framework preset is Vite. Build command: `npm run build`. Output directory: `dist`.
+4. Deploy. `web/vercel.json` sends every page path (for example `/summary`) to `index.html`, so links and reloads work.
+
+**Full tiles locally, lite tiles in the repo.** The 30 m Earth tiles are about 370 MB and git-ignored, which is too big for a Hobby deploy (about 100 MB of static files). The repo carries `web/public/data/earth_lite/`: every Earth site the site can show, averaged to 60 m (250 × 250 pixels for the same 15 km), heights stored to 0.25 m and losslessly packed. That is about 17 MB, and the whole deploy is about 72 MB. The website first tries the full tile. If the full tile is missing, it loads the lite copy, and the 3D page says so in "How this is drawn". Moon, Alberta and Calgary tiles are committed at full resolution.
+
+**Regenerate the lite tiles** after a pipeline run that changes the Earth sites. Run this from the repo root:
+
+```bash
+python -m pipeline.publish_lite          # only rewrites tiles whose full tile changed
+python -m pipeline.publish_lite --force  # rewrite all of them
+```
+
+The command prints the total size and fails if it goes over 90 MB. In that case, pass a smaller `--size` that divides 500 (for example `--size 125` for 120 m).
 
 ---
 
@@ -93,6 +114,7 @@ Every step is cached and idempotent: re-running it skips work that's already don
 | 5 | `python -m pipeline.alberta all` | Screens all of Alberta and builds the Moon walks in Calgary | ~20 min |
 | 6 | `python -m pipeline.walkval` | Runs the walk matcher's hidden-copy validation | ~3 min |
 | 7 | `python -m pipeline.match all` | Picks the final top 3 per region × danger, finds rehearsal windows, and writes the ranking and the validation summary | ~5 min |
+| 8 | `python -m pipeline.publish_lite` | Writes the committed 60 m lite copies of the Earth tiles the site can show (`web/public/data/earth_lite/`) | seconds |
 
 Each step's sub-steps are listed by `--help`, for example `python -m pipeline.earth --help` (pool, screen, adaptive, documented, refine, rank, stage2, nasadem, transects, report).
 

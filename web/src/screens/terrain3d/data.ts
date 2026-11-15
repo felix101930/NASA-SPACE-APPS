@@ -208,19 +208,43 @@ export function useEarthRimSegs(tile: LoadedTile | null, enabled: boolean, count
 // Shadow share: same method on both worlds, true heights, computed in the browser
 // ------------------------------------------------------------------------------------------------
 
-const READOUT_STEP = 3; // 30 m tiles -> 90 m samples for the readout
+const READOUT_RES_M = 90; // readout grid: 90 m steps on both worlds (3 × 3 blocks of a 30 m tile)
 
-function downsample(g: Grid, f: number): Grid {
-  const n = Math.floor(g.size / f);
+/**
+ * Area-weighted resample to `resM` cells (each output cell = the overlap-weighted mean of the input pixels it
+ * covers). For an integer factor (30 m -> 90 m) this is exactly the plain block mean; it also takes a 60 m lite Earth
+ * tile to the same 90 m grid as the 30 m Moon tile, so the two dark percentages stay like for like.
+ */
+function resampleTo(g: Grid, resM: number): Grid {
+  const f = resM / g.res;
+  if (f <= 1) return g;
+  const n = Math.floor(g.size / f + 1e-9);
+  // Per output index: the input pixels it overlaps and the overlap weights (same for rows and columns).
+  const spans: { i: number; w: number }[][] = [];
+  for (let o = 0; o < n; o++) {
+    const a = o * f;
+    const b = a + f;
+    const span: { i: number; w: number }[] = [];
+    for (let i = Math.floor(a); i < Math.min(g.size, Math.ceil(b - 1e-9)); i++) {
+      const w = Math.min(b, i + 1) - Math.max(a, i);
+      if (w > 1e-9) span.push({ i, w });
+    }
+    spans.push(span);
+  }
   const out = new Float32Array(n * n);
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
       let sum = 0;
-      for (let i = 0; i < f; i++) for (let j = 0; j < f; j++) sum += g.data[(r * f + i) * g.size + (c * f + j)];
-      out[r * n + c] = sum / (f * f);
+      let wsum = 0;
+      for (const ri of spans[r]) for (const ci of spans[c]) {
+        const w = ri.w * ci.w;
+        sum += g.data[ri.i * g.size + ci.i] * w;
+        wsum += w;
+      }
+      out[r * n + c] = sum / wsum;
     }
   }
-  return { data: out, size: n, res: g.res * f };
+  return { data: out, size: n, res: resM };
 }
 
 export interface ShadowShare {
@@ -293,7 +317,7 @@ const readoutGrids = new WeakMap<LoadedTile, Grid>();
 function readoutGrid(tile: LoadedTile): Grid {
   let g = readoutGrids.get(tile);
   if (!g) {
-    g = downsample(tile.filled, READOUT_STEP);
+    g = resampleTo(tile.filled, READOUT_RES_M);
     readoutGrids.set(tile, g);
   }
   return g;
