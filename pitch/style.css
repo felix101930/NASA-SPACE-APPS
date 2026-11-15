@@ -49,10 +49,11 @@ html.lenis,html.lenis body{height:auto}
 .pin .pin-t span{font-size:11px;color:#ffb3a6}
 
 /* Artemis IV inset */
-#launch{position:fixed;right:5vw;top:9vh;width:min(34vw,520px);z-index:7;opacity:0;pointer-events:none}
-#sls{display:block;width:100%;aspect-ratio:3/4;border:1px solid rgba(242,239,233,.28);border-radius:6px;background:#000}
-#launch-t{white-space:nowrap;font-weight:800;font-size:clamp(40px,5.4vw,88px);letter-spacing:-.04em;line-height:1;margin-top:2vh;color:var(--ink)}
-#launch-src{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--dim);margin-top:1.2vh;text-transform:uppercase}
+#launch{position:fixed;inset:0;z-index:7;opacity:0;pointer-events:none;background:#000}
+#sls{position:absolute;inset:0;width:100%;height:100%;display:block}
+#launch::after{content:'';position:absolute;left:0;right:0;bottom:0;height:52vh;background:linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,.2) 55%,transparent)}
+#launch-t{position:absolute;left:6vw;bottom:15vh;z-index:1;white-space:nowrap;font-weight:800;font-size:clamp(56px,10vw,170px);letter-spacing:-.05em;line-height:.9;color:var(--ink);text-shadow:0 2px 28px rgba(0,0,0,.55)}
+#launch-src{position:absolute;left:6vw;bottom:11vh;z-index:1;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--dim);text-transform:uppercase}
 
 #flash{position:fixed;inset:0;z-index:5;opacity:0;pointer-events:none;background:radial-gradient(ellipse at 50% 60%,#fff 0%,#eaf2ff 45%,#9cc1ff 100%)}
 
@@ -101,8 +102,8 @@ html.lenis,html.lenis body{height:auto}
   .cap{left:16px;right:16px;max-width:none;bottom:16vh}
   #gauge{right:16px;width:200px;top:10vh}
   #hud{display:none}
-  #launch{right:16px;left:auto;width:44vw;top:8vh}
   .pin .pin-t{left:auto;right:-20px;top:64px;text-align:right}
-  #launch-t{font-size:32px}
+  #launch-t{left:16px;font-size:58px}
+  #launch-src{left:16px;right:16px;white-space:normal}
   .pin .pin-t strong{font-size:24px}
 }

@@ -7,14 +7,12 @@ const SPOT = { r: 188, c: 312, yaw: 0.52 };          // flat ridge looking north
 
 export function buildGround(raw, satTex, astroSrc, walkify) {
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(new THREE.Color(0xb9c6d3), 0.00009);
+  scene.fog = new THREE.FogExp2(new THREE.Color(0xaabdd0), 0.00006);
   const sky = new THREE.Mesh(new THREE.SphereGeometry(40000, 32, 16), new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false, depthTest: false, fog: false,
     vertexShader: 'varying vec3 d; void main(){ d = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
-    fragmentShader: `varying vec3 d; void main(){ float h = max(d.y,0.); vec3 c = mix(vec3(.80,.85,.90), vec3(.30,.52,.80), pow(h,.45)); gl_FragColor = vec4(c,1.);
-      #include <tonemapping_fragment>
-      #include <colorspace_fragment>
-    }`,
+    // sky colours written as-is (no tone mapping), as in the approved option B
+    fragmentShader: `varying vec3 d; void main(){ float h = max(d.y,0.); vec3 c = mix(vec3(.722,.804,.878), vec3(.141,.373,.702), pow(h,.45)); gl_FragColor = vec4(c,1.); }`,
   }));
   sky.renderOrder = -10; sky.frustumCulled = false; scene.add(sky);
 
@@ -56,7 +54,7 @@ float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); return mix(mix(h
   const sun = new THREE.DirectionalLight(0xfff1dc, 3.2); scene.add(sun, sun.target);
   scene.add(new THREE.HemisphereLight(0xaac4e6, 0x6b5a44, 1.0));
   sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
-  Object.assign(sun.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, near: 1, far: 200 }); sun.shadow.bias = -0.0004;
+  Object.assign(sun.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14, near: 1, far: 200 }); sun.shadow.bias = -0.0004;
 
   const fwd = new THREE.Vector3(Math.sin(SPOT.yaw), 0, -Math.cos(SPOT.yaw));
   const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
@@ -96,7 +94,7 @@ float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); return mix(mix(h
   function clamp(i) { return Math.min(499, Math.max(0, i)); }
 
   const cam = new THREE.PerspectiveCamera(38, 1, .1, 60000);
-  const se = 30 * Math.PI / 180, sa = 150 * Math.PI / 180;
+  const se = 13 * Math.PI / 180, sa = 230 * Math.PI / 180;   // low sun from the side: long shadows, depth in the grass
   const sunDir = new THREE.Vector3(Math.sin(sa) * Math.cos(se), Math.sin(se), -Math.cos(sa) * Math.cos(se));
 
   /** walked: metres along the walk; pull: 0 = close behind, 1 = pulled back and up (handoff). */
