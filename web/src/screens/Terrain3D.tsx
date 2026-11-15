@@ -344,7 +344,9 @@ export default function Terrain3D(): JSX.Element {
   const sweep = useSunSweep({ marks: SWEEP_MARKS, mode: sweepMode, getAz: readSunAz, setAz: applySunAz, holdMs: 1200, glideMs: 450 });
   const sweeping = sweep.state.phase !== 'idle';
   const [lift, setLift] = useState<boolean>(false);
+  // "Show the 25 patches": on whenever the Texture tab is selected, the way big-drop zones follow the Rim jump tab.
   const [showPatches, setShowPatches] = useState<boolean>(false);
+  useEffect((): void => setShowPatches(hazard === 'texture'), [hazard]);
   // "Show big-drop zones": on whenever the Rim jump tab is selected; one colour max (the larger P99) for both panes.
   const [showDrops, setShowDrops] = useState<boolean>(false);
   useEffect((): void => setShowDrops(hazard === 'rim'), [hazard]);

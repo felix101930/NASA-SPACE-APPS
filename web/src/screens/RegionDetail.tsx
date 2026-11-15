@@ -278,7 +278,7 @@ function SiteCard({
       {active && (
         <div className="site-card-body">
           {match.patchiness_summary?.text && <p className="patch-line">{match.patchiness_summary.text}</p>}
-          <details className="verdict-details" open>
+          <details className="verdict-details">
             <summary>Metric by metric and in words</summary>
             <div className="list-lede">
               <span className="why-row">
