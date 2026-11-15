@@ -33,8 +33,9 @@ const HOT = 3; // Mons Mouton Plateau: Athena's point lies inside this box
 
 /* ---------------------------------------------------------------- beats */
 const BEATS = [
-  ['open', 1.4], ['descent', 1.6], ['photo', 2.4], ['athena', 1.0], ['lowsun', 1.6], ['money', 1.4],
-  ['people', 2.8], ['regions', 1.7], ['slope', 1.5], ['turn', 1.2], ['earth', 2.8], ['handoff', 1.1], ['close', 1.3],
+  ['open', 1.4], ['descent', 1.6], ['photo', 2.4], ['athena', 1.0], ['lowsun', 1.6], ['money', 1.4], ['tally', 1.3],
+  ['people', 3.6], ['regions', 1.7], ['slope', 0.01], ['turn', 1.2], ['earth', 2.8], ['handoff', 1.1],
+  ['pipe', 1.4], ['outro', 3.4], ['close', 1.3],
 ];
 const B = {}; let acc = 0;
 for (const [n, l] of BEATS) { B[n] = { s: acc, l, e: acc + l }; acc += l; }
@@ -42,19 +43,22 @@ const TOTAL = acc;
 const at = (n, f) => B[n].s + B[n].l * f;
 
 const CAPS = [
+  { beat: 'open', a: .18, b: .92, cls: 'center kinetic', html: 'TEAM KINETIC' },
   { beat: 'descent', a: .45, b: .97, html: 'March 2025.<br>The Moon’s south pole.' },
   { beat: 'photo', a: .30, b: .54, cls: 'center', html: 'Recognize this?' },
   { beat: 'photo', a: .60, b: .99, html: 'Those are its <em>feet.</em>', src: 'Lander on its side · Mons Mouton · 6 March 2025' },
   { beat: 'athena', a: .06, b: .96, html: 'Athena. NASA-funded.<br>Landed on its side.', src: 'NASA CLPS delivery · Intuitive Machines IM-2' },
   { beat: 'lowsun', a: .04, b: .42, html: 'Low sun.<br>Long shadows.' },
   { beat: 'lowsun', a: .50, b: .98, cls: 'top', html: 'Craters didn’t look like<br>its reference maps.', src: 'Intuitive Machines post-mission review, May 2025' },
-  { beat: 'people', a: .14, b: .46, html: 'Next landing has<br><em>people</em> on board.', src: 'Artemis IV · targeted early 2028 · ~$4.1B per launch (NASA OIG, 2021)' },
+  { beat: 'people', a: .1, b: .36, html: 'Next landing has<br><em>people</em> on board.', src: 'Artemis IV · targeted early 2028 · ~$4.1B per launch (NASA OIG, 2021)' },
   { beat: 'regions', a: .40, b: .98, html: 'Nine candidate regions.<br>Athena fell in <em>one.</em>', src: 'NASA, Oct 2024 · Athena’s LROC position lies inside Mons Mouton Plateau' },
-  { beat: 'slope', a: .30, b: .98, cls: 'ink', html: 'Slopes up to 20°.<br>Landers need under <em>8°.</em>', src: 'NASA OIG, Human Landing System audit, March 2026' },
   { beat: 'turn', a: .06, b: .97, html: 'You can’t rehearse<br>on the Moon.' },
   { beat: 'earth', a: .74, b: .995, html: 'So we found<br>where <em>you can.</em>', src: 'Kohler Coulee · NASA HLS satellite image, 9 Oct 2025 · Copernicus GLO-30 terrain' },
   { beat: 'handoff', a: .10, b: .98, cls: 'center', html: 'Let us show you.' },
-  { beat: 'close', a: .40, b: 1.01, cls: 'center low', html: 'Rehearse here.<br>Land there.' },
+  { beat: 'outro', a: .05, b: .31, html: 'Next time,<br>we land safely.' },
+  { beat: 'outro', a: .40, b: .62, html: 'Gotcha.<br>This is <em>Alberta.</em>', src: 'Same hills, same camera, real colours · NRCan HRDEM lidar + Sentinel-2, 9 Oct 2025' },
+  { beat: 'outro', a: .70, b: .985, html: 'Kohler Coulee.<br>100 km south of Calgary.', src: 'Best Alberta match to the shadows at Mons Mouton Plateau · the world’s best is in Chile' },
+  { beat: 'close', a: .18, b: 1.01, html: 'Rehearse here.<br>Land there.' },
 ];
 
 /* ---------------------------------------------------------------- helpers */
@@ -190,19 +194,52 @@ uniform float shadowOn; uniform float split; uniform vec3 refDir; uniform float 
 uniform vec3 sunCol; uniform vec3 astro; uniform float astroOn; uniform float plate; uniform vec4 tileRect; uniform float hideTile;
 uniform float alpha; uniform vec3 camPos; uniform float haze; uniform float reveal;
 uniform float sweep; uniform float edgeDark;
+uniform float detail; uniform vec2 dO; uniform vec2 fpP0; uniform vec2 fpDir; uniform float fpLen;
 uniform vec4 boxes[9]; uniform float boxOp[9]; uniform float hotFill; uniform float boxesOn;
 varying vec2 vUv; varying vec3 vW;
 #include <common>
 #include <logdepthbuf_pars_fragment>
 float H(vec2 uv){ return mix(texture2D(hA,uv).r, texture2D(hB,uv).r + offB, morph); }
+float hsh(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x*p.y); }
+float vn(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.-2.*f);
+  return mix(mix(hsh(i), hsh(i+vec2(1.,0.)), u.x), mix(hsh(i+vec2(0.,1.)), hsh(i+vec2(1.,1.)), u.x), u.y); }
+float fbm(vec2 p){ float a = .5, s = 0.; for (int i = 0; i < 4; i++){ s += a*vn(p); p = p*2.03 + 17.1; a *= .5; } return s; }
+// bowl-shaped craters with raised rims, one candidate per cell
+float crat(vec2 p){
+  vec2 i = floor(p), f = fract(p); float h = 0.;
+  for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++){
+    vec2 g = vec2(float(x), float(y));
+    if (hsh(i+g+11.3) > .38) continue;
+    vec2 c = g + vec2(hsh(i+g), hsh(i+g+7.7));
+    float r = .07 + .38*pow(hsh(i+g+3.1), 2.2); float d = length(c - f) / r;
+    h += d < 1. ? (d*d - 1.)*r : .35*r*(1. - smoothstep(1., 1.5, d));
+  }
+  return h;
+}
+// metre-scale relief the 30 m data cannot show: regolith ripples, small craters, clods
+float micro(vec2 m){ return fbm(m*.3)*.5 + fbm(m*2.2)*.06 + crat(m*.045)*1.8 + crat(m*.21 + 3.7)*.3; }
 void main(){
   #include <logdepthbuf_fragment>
   if (hideTile > .5 && vW.x > tileRect.x && vW.x < tileRect.z && vW.z > tileRect.y && vW.z < tileRect.w) discard;
   float e = texel;
   float hl=H(vUv-vec2(e,0.)), hr=H(vUv+vec2(e,0.)), hd=H(vUv-vec2(0.,e)), hu=H(vUv+vec2(0.,e));
   float gx=(hr-hl)/(2.*e*sizeKm), gv=(hu-hd)/(2.*e*sizeKm);
-  vec3 n = normalize(vec3(-gx*ex, 1., gv*ex));
   float slopeDeg = degrees(atan(length(vec2(gx,gv))));
+  vec3 n = vec3(-gx*ex, 1., gv*ex);
+  float tone = 1.;
+  float dpx = detail * (1. - smoothstep(.03, .45, length(vW - camPos)));
+  if (dpx > .01) {
+    vec2 m = (vW.xz - dO) * 1000.;
+    float k = .12;
+    float dx = (micro(m + vec2(k,0.)) - micro(m - vec2(k,0.))) / (2.*k);
+    float dz = (micro(m + vec2(0.,k)) - micro(m - vec2(0.,k))) / (2.*k);
+    n.xz -= vec2(dx, dz) * dpx;
+    tone = mix(1., .9 + .16*fbm(m*.05) + .1*fbm(m*1.7), dpx);
+  }
+  // brightness variation at 25 m to 1 km scale (fresh ejecta, darker patches), fades with distance so it never shimmers
+  float pxw = fwidth(vW.x) + fwidth(vW.z);
+  if (plate < .5) tone *= mix(1., .84 + .3*fbm(vW.xz*1.3 + 3.), .6) * mix(1., .86 + .28*fbm(vW.xz*22. + 9.), .7*(1. - smoothstep(.004, .02, pxw)));
+  n = normalize(n);
   float lam = max(dot(n, sunDir), 0.);
   // cast shadow: march toward the sun over the true-scale heightfield
   float sh = 1.;
@@ -228,10 +265,18 @@ void main(){
     float w = .00028 * (1. - .5*clamp(along/L,0.,1.));
     float inS = step(0., along) * (1.-smoothstep(L*.85, L, along)) * (1.-smoothstep(w*.6, w, length(perp)));
     sh *= 1. - .92*inS;
+    // boot prints behind the walk
+    vec2 fr = vW.xz - fpP0; vec2 fq = vec2(-fpDir.y, fpDir.x);
+    float al = dot(fr, fpDir), la = dot(fr, fq);
+    if (al > 0. && al < fpLen - .0005) {
+      float kk = floor(al / .00042); float side = mod(kk, 2.) * 2. - 1.;
+      vec2 fp = vec2((al - (kk + .5)*.00042) / .00015, (la - side*.00012) / .00006);
+      tone *= 1. - .35*(1. - smoothstep(.7, 1., length(fp)));
+    }
   }
   vec3 albMoon = vec3(.50,.49,.47);
   vec3 albEarth = mix(vec3(.74,.58,.38), vec3(.52,.50,.30), smoothstep(6.,18.,slopeDeg));
-  vec3 alb = mix(albMoon, albEarth, morph);
+  vec3 alb = mix(albMoon, albEarth, morph) * tone;
   vec3 col = alb * (lam * sh * sunCol + mix(vec3(.018,.020,.026), vec3(.20,.24,.30), morph));
   if (slopeMode > 0.) {
     // readable relief, red hatching only where the ground is steeper than 8 degrees
@@ -291,6 +336,7 @@ function terrainMaterial(texA, texB, sizeKm, n, isPlate) {
       astroOn: { value: 0 }, plate: { value: isPlate ? 1 : 0 }, tileRect: { value: new THREE.Vector4() }, hideTile: { value: 0 },
       alpha: { value: 1 }, camPos: { value: new THREE.Vector3() }, haze: { value: 0 }, reveal: { value: 400 },
       sweep: { value: 1e9 }, edgeDark: { value: 0 },
+      detail: { value: 0 }, dO: { value: new THREE.Vector2() }, fpP0: { value: new THREE.Vector2() }, fpDir: { value: new THREE.Vector2(1, 0) }, fpLen: { value: 0 },
       boxes: { value: REGIONS.map(([, x0, x1, y0, y1]) => new THREE.Vector4(x0 / 1000, -y1 / 1000, x1 / 1000, -y0 / 1000)) },
       boxOp: { value: REGIONS.map(() => 0) }, hotFill: { value: 0 }, boxesOn: { value: 0 },
     },
@@ -563,14 +609,12 @@ function keyframes(S) {
     { u: B.lowsun.e, t: () => S.MM, d: n3(.86, .15, .49), r: 15 },
     { u: B.money.e, t: () => S.MM, d: n3(.9, .13, .42), r: 13.5 },
     { u: B.people.s + .45, t: A, d: n3(.45, .10, 1), r: 0.0075, o: .0022 },
-    { u: at('people', .44), t: A, d: n3(.55, .12, 1), r: 0.016, o: .004 },
-    { u: at('people', .6), t: A, d: n3(.55, .12, 1), r: 0.016, o: .004, ly: 38 },   // look up: the next crew comes from up there
-    { u: at('people', .86), t: A, d: n3(.58, .13, 1), r: 0.02, o: .005, ly: 40 },
+    { u: at('people', .34), t: A, d: n3(.55, .12, 1), r: 0.016, o: .004 },
+    { u: at('people', .46), t: A, d: n3(.55, .12, 1), r: 0.016, o: .004, ly: 38 },   // look up: the next crew comes from up there
+    { u: at('people', .93), t: A, d: n3(.58, .13, 1), r: 0.02, o: .005, ly: 40 },
     { u: B.people.e, t: A, d: n3(.62, .16, 1), r: 0.055, o: .012 },
     { u: B.regions.s + .9, t: () => S.RC, d: n3(0, 1, .32), r: 600 },
     { u: B.regions.e, t: () => S.RC, d: n3(.05, 1, .36), r: 560 },
-    { u: B.slope.s + .8, t: () => S.MM, d: n3(.45, .62, .78), r: 21 },
-    { u: B.slope.e, t: () => S.MM, d: n3(.6, .55, .7), r: 19 },
     { u: B.turn.s + .6, t: A, d: n3(-.32, .12, 1), r: 0.009 },
     { u: B.turn.e, t: A, d: n3(-.4, .14, 1), r: 0.02 },
     { u: TOTAL, t: A, d: n3(-.4, .14, 1), r: 0.02 },   // after this the Earth ground scene takes over
@@ -600,7 +644,7 @@ function sunAt(u) {
   const k = [
     [0, 4, 72], [B.open.e - .3, 6, 100], [B.descent.s, 8, 120], [B.descent.e, 5, 128], [B.athena.e, 4, 132], [B.lowsun.s + .5, 1.4, 136],
     [B.money.e, 1.4, 136], [B.people.s, 4.5, 250], [B.people.e, 4.5, 250], [B.regions.s + .6, 1.6, 140],
-    [B.regions.e, 1.6, 140], [B.slope.s + .5, 16, 205], [B.slope.e, 16, 215], [B.turn.s + .3, 4.5, 250],
+    [B.regions.e, 1.6, 140], [B.turn.s + .3, 4.5, 250],
     [TOTAL, 4.5, 250],
   ];
   let i = 0; while (i < k.length - 2 && u > k[i + 1][0]) i++;
@@ -616,11 +660,14 @@ setH();
 const uNow = () => (lenis.limit > 0 ? lenis.scroll / lenis.limit : 0) * TOTAL;
 
 const anchors = [0, ...CAPS.map(c => B[c.beat].s + B[c.beat].l * (c.a + Math.min(.4, (c.b - c.a) * .55))), B.open.e - .05,
-  at('money', .55), at('people', .8), at('earth', .3), at('earth', .55)].sort((a, b) => a - b);
+  at('money', .55), at('open', .55), at('descent', .22), at('people', .56), at('people', .72), at('people', .9),
+  at('earth', .12), at('earth', .3), at('earth', .55), at('tally', .62), at('pipe', .5)].sort((a, b) => a - b);
 const goto = dir => {
   const u = uNow(); const list = dir > 0 ? anchors.filter(a => a > u + 0.03) : anchors.filter(a => a < u - 0.03).reverse();
   if (!list.length) return;
-  lenis.scrollTo((list[0] / TOTAL) * lenis.limit, { duration: 2.4, easing: t => 1 - Math.pow(1 - t, 3) });
+  // presenter mode: a steady speed (about 2.6 s per beat unit), never a rapid jump
+  const dist = Math.abs(list[0] - u);
+  lenis.scrollTo((list[0] / TOTAL) * lenis.limit, { duration: clamp(dist * 2.6, 1.4, 6), easing: t => .5 - .5 * Math.cos(Math.PI * t) });
 };
 window.__go = u => lenis.scrollTo((u / TOTAL) * lenis.limit, { immediate: true });
 window.__B = B;
@@ -637,6 +684,15 @@ const photo = $('photo'), photoInner = $('photo-inner'), rings = [...document.qu
 const money = $('money'), moneyNum = $('money-num'), moneyLine = $('money-line'), moneySrc = $('money-src');
 const pin = $('athena-pin'), flash = $('flash'), launchEl = $('launch');
 const gauge = $('gauge'), gNeedle = $('g-needle'), gVal = $('g-val'), gOk = $('g-ok'), gBad = $('g-bad');
+const tally = $('tally'), pipe = $('pipe'), outro = $('outro'), oReal = $('o-real'), oPull = $('o-pull');
+const PULL = Array.from({ length: 24 }, (_, i) => `assets/img/outro/pull_${String(i).padStart(2, '0')}.jpg`);
+PULL.forEach(src => { const im = new Image(); im.src = src; });
+let pullIdx = -1;
+fetch('assets/data/pipeline_frame.json').then(r => r.json()).then(P => {
+  const col = (k, n, t, cls = '') => `<div class="${cls}"><h3><span>${n}</span>${t}</h3><ul>${(P[k] || []).map(x => `<li>${x}</li>`).join('')}</ul></div>`;
+  $('pipe-in').innerHTML = col('how', '01', 'How it works') + col('tested', '02', 'How we tested it') + col('new', '03', 'What’s new')
+    + col('gaps', '04', 'Gaps', 'gap') + col('next', '05', 'Next') + `<div id="pipe-src">${P.sources || ''}</div>`;
+}).catch(() => {});
 const hud2 = $('hud-l2'), hud3 = $('hud-l3'), railFill = $('rail-fill'), hint = $('hint'), handoff = $('handoff'), credits = $('credits');
 
 function arc(a0, a1) { // degrees 0..25 mapped to 180..0 on the gauge
@@ -734,6 +790,9 @@ function update(time) {
     U.slopeMode.value = sstep(.1, .22, local(u, 'slope')) * (1 - sstep(.9, 1, local(u, 'slope'))) * (inBeat(u, 'slope') ? 1 : 0);
     U.sweep.value = lerp(TILE_C[0] - 7.6, TILE_C[0] + 7.7, sstep(.2, .6, local(u, 'slope')));
   }
+  const TU0 = S.tileMat.uniforms;
+  TU0.detail.value = 1 - sstep(.04, .6, c.r); TU0.dO.value.set(S.A.x, S.A.z);
+  TU0.fpP0.value.set(S.A.x, S.A.z); TU0.fpDir.value.copy(S.WALK_DIR); TU0.fpLen.value = walked;
   S.plateMat.uniforms.alpha.value = 1;
   S.plateMat.uniforms.reveal.value = lerp(0, 400, sstep(B.open.e - .55, B.descent.s + .6, u));
   S.plateMat.uniforms.hideTile.value = tileOn ? 1 : 0;
@@ -745,7 +804,8 @@ function update(time) {
   S.plateMat.uniforms.boxOp.value = REGIONS.map((_, i) => sstep(.14 + i * .03, .2 + i * .03, rg));
   S.plateMat.uniforms.hotFill.value = sstep(.5, .62, rg) * (.75 + .25 * Math.sin(time * .006));
   // darken the scene under overlays
-  const dimMoney = inBeat(u, 'money') ? 1 - .72 * sstep(0, .15, local(u, 'money')) * (1 - sstep(.92, 1, local(u, 'money'))) : 1;
+  const mtL = clamp((u - B.money.s) / (B.tally.e - B.money.s));   // money + lander tally share one dimmed stretch
+  const dimMoney = u >= B.money.s && u <= B.tally.e ? 1 - .72 * sstep(0, .08, mtL) * (1 - sstep(.95, 1, mtL)) : 1;
   const dimHand = 1;
   S.tileMat.uniforms.bright.value = S.plateMat.uniforms.bright.value = dimMoney * dimHand;
 
@@ -784,7 +844,7 @@ function update(time) {
     const ring = sstep(.62, .78, ph);
     rings.forEach((r, i) => r.style.strokeDashoffset = 280 * (1 - clamp(ring * 1.3 - i * .3)));
     photoInner.style.filter = '';
-  } else if (inBeat(u, 'close')) {
+  } else if (false) {   // old close (zoom to Earth in the photo) replaced by the Kohler outro
     pOpac = sstep(0, .2, cl);
     const z = ease(sstep(.15, .95, cl));
     const s = Math.exp(lerp(0, Math.log(4.5), z));
@@ -814,9 +874,9 @@ function update(time) {
 
   /* Artemis IV launch inset */
   const pl = local(u, 'people');
-  const lOp = inBeat(u, 'people') ? sstep(.56, .64, pl) * (1 - sstep(.9, .96, pl)) : 0;
+  const lOp = inBeat(u, 'people') ? sstep(.42, .48, pl) * (1 - sstep(.94, .975, pl)) : 0;
   launchEl.style.opacity = lOp;
-  if (lOp > 0) S.launch.render(sstep(.6, .92, pl));
+  if (lOp > 0) S.launch.render(clamp((pl - .48) / .44));
 
   /* white-out between the Earth zoom and the ground */
   flash.style.opacity = inBeat(u, 'earth') ? sstep(.5, .615, ea) * (1 - sstep(.625, .74, ea)) : 0;
@@ -824,7 +884,7 @@ function update(time) {
   /* gauge */
   const sl = local(u, 'slope');
   const gOpac = inBeat(u, 'slope') ? sstep(.15, .3, sl) * (1 - sstep(.92, 1, sl)) : 0;
-  gauge.style.opacity = gOpac;
+  gauge.style.opacity = 0;   // slope view cut from the clicked version
   if (gOpac > 0) {
     const deg = 20 * ease(sstep(.3, .7, sl));
     const th = Math.PI * (1 - deg / 25);
@@ -838,6 +898,28 @@ function update(time) {
   for (const L of S.labels) {
     const op = labOn ? sstep(.18 + L.i * .03, .26 + L.i * .03, rg) * (1 - sstep(.93, 1, rg)) * (L.i === HOT ? 1 : 1 - .6 * sstep(.56, .66, rg)) : 0;
     L.el.style.opacity = op > 0 && project(L.p, L.el) ? op : 0;
+  }
+
+  /* lander tally */
+  const ta = local(u, 'tally');
+  tally.style.opacity = inBeat(u, 'tally') ? sstep(0, .12, ta) * (1 - sstep(.9, 1, ta)) : 0;
+  tally.querySelectorAll('.lander').forEach((el, i) => el.classList.toggle('on', ta > .14 + i * .03));
+  tally.querySelector('.t-line').style.opacity = sstep(.55, .65, ta);
+
+  /* pipeline frame */
+  const pi = local(u, 'pipe');
+  pipe.style.opacity = inBeat(u, 'pipe') ? sstep(0, .1, pi) * (1 - sstep(.92, 1, pi)) : 0;
+
+  /* outro: Kohler Coulee as the Moon, then real colours, then pull back to the map */
+  const ou = local(u, 'outro');
+  const oOp = u >= B.outro.s ? sstep(0, .05, ou) : 0;
+  outro.style.opacity = oOp;
+  if (oOp > 0) {
+    const pullT = u >= B.close.s ? 1 : sstep(.64, 1, ou);
+    oReal.style.opacity = sstep(.32, .42, ou);
+    const k = Math.round(pullT * 23);
+    if (k !== pullIdx) { pullIdx = k; oPull.src = PULL[k]; }
+    oPull.style.opacity = pullT > 0 ? 1 : 0;
   }
 
   /* captions */
@@ -866,9 +948,10 @@ function update(time) {
   const zoomed = inBeat(u, 'earth') && ea > .3 && !onGround;
   hud3.textContent = onGround ? 'Earth · on foot' : zoomed ? `Lens ${fov.toFixed(1)}° · Earth` : `Range ${alt >= 1 ? alt.toFixed(alt > 100 ? 0 : 1) + ' km' : (alt * 1000).toFixed(alt < .1 ? 1 : 0) + ' m'}`;
   $('hud-l1').textContent = onGround ? 'NASA HLS · Copernicus GLO-30 · Earth' : 'LOLA 20 m · PGDA · Moon';
-  if (onGround) hud2.textContent = 'Sun el 30.0° · az 150°';
+  if (onGround) hud2.textContent = 'Sun el 13.0° · az 230°';
   railFill.style.height = `${(u / TOTAL) * 100}%`;
   hint.style.opacity = u < .15 ? 1 : 0;
+  $('hud').style.opacity = u >= B.pipe.s ? 0 : 1;   // the readout would give away the Kohler reveal
 
   if (onGround) {
     // Earth ground: astronaut keeps walking; camera pulls back and the scene dims under "Let us show you"

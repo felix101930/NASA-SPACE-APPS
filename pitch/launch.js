@@ -80,7 +80,12 @@ export function buildLaunch(canvas, buf, moonModel) {
   };
   let w = 0, h = 0;
   function render(p) {
-    if (canvas.clientWidth !== w || canvas.clientHeight !== h) { w = canvas.clientWidth; h = canvas.clientHeight; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+    if (canvas.clientWidth !== w || canvas.clientHeight !== h) {
+      w = canvas.clientWidth; h = canvas.clientHeight; R.setSize(w, h, false); cam.aspect = w / h;
+      // full screen on a wide display: keep the rocket in the right half, clear of the title
+      if (w / h > 1.2) cam.setViewOffset(w, h, -w * .2, 0, w, h); else cam.clearViewOffset();
+      cam.updateProjectionMatrix();
+    }
     const P = path(p), a = pitch(p);
     // the whole stack follows the path; released stages are re-parented in world terms each frame
     rocket.position.set(0, 0, 0); rocket.rotation.set(0, 0, 0);
