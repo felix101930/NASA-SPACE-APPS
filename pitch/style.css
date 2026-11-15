@@ -56,6 +56,7 @@ html.lenis,html.lenis body{height:auto}
 #launch-src{position:absolute;left:6vw;bottom:11vh;z-index:1;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--dim);text-transform:uppercase}
 
 #flash{position:fixed;inset:0;z-index:5;opacity:0;pointer-events:none;background:radial-gradient(ellipse at 50% 60%,#fff 0%,#eaf2ff 45%,#9cc1ff 100%)}
+#dip{position:fixed;inset:0;z-index:5;opacity:0;pointer-events:none;background:#000}
 
 /* gauge */
 #gauge{position:fixed;right:5vw;top:14vh;width:300px;z-index:5;opacity:0;pointer-events:none}

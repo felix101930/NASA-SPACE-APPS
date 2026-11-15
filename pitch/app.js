@@ -34,8 +34,8 @@ const HOT = 3; // Mons Mouton Plateau: Athena's point lies inside this box
 /* ---------------------------------------------------------------- beats */
 const BEATS = [
   ['open', 1.4], ['descent', 1.6], ['photo', 2.4], ['athena', 1.0], ['lowsun', 1.6], ['money', 1.4], ['tally', 1.3],
-  ['people', 3.6], ['regions', 1.7], ['slope', 0.01], ['turn', 1.2], ['earth', 2.8], ['handoff', 1.1],
-  ['pipe', 1.4], ['outro', 3.4], ['close', 1.3],
+  ['people', 3.6], ['regions', 1.7], ['slope', 0.01], ['turn', 1.0], ['earth', 2.2], ['handoff', 1.1],
+  ['outro', 3.4], ['close', 1.3],
 ];
 const B = {}; let acc = 0;
 for (const [n, l] of BEATS) { B[n] = { s: acc, l, e: acc + l }; acc += l; }
@@ -636,16 +636,16 @@ function keyframes(S) {
     { u: B.athena.e, t: () => S.MM, d: n3(.82, .17, .55), r: 18 },
     { u: B.lowsun.e, t: () => S.MM, d: n3(.86, .15, .49), r: 15 },
     { u: B.money.e, t: () => S.MM, d: n3(.9, .13, .42), r: 13.5 },
-    { u: B.people.s + .45, t: A, d: n3(.45, .10, 1), r: 0.0075, o: .0022 },
+    { u: B.people.s + .45, t: A, d: n3(.45, .10, 1), r: 0.016, o: .004 },
     { u: at('people', .34), t: A, d: n3(.55, .12, 1), r: 0.016, o: .004 },
     { u: at('people', .46), t: A, d: n3(.55, .12, 1), r: 0.016, o: .004, ly: 38 },   // look up: the next crew comes from up there
-    { u: at('people', .93), t: A, d: n3(.58, .13, 1), r: 0.02, o: .005, ly: 40 },
-    { u: B.people.e, t: A, d: n3(.62, .16, 1), r: 0.055, o: .012 },
-    { u: B.regions.s + .9, t: () => S.RC, d: n3(0, 1, .32), r: 600 },
+    { u: at('people', .93), t: A, d: n3(.58, .13, 1), r: 0.016, o: .004, ly: 40 },   // same distance: the camera only pans up
+    { u: at('regions', .35), t: () => S.RC, d: n3(0, 1, .32), r: 600 },   // one slow rise from the launch to the region overview
     { u: B.regions.e, t: () => S.RC, d: n3(.05, 1, .36), r: 560 },
-    { u: B.turn.s + .6, t: A, d: n3(-.32, .12, 1), r: 0.009 },
-    { u: B.turn.e, t: A, d: n3(-.4, .14, 1), r: 0.02 },
-    { u: TOTAL, t: A, d: n3(-.4, .14, 1), r: 0.02 },   // after this the Earth ground scene takes over
+    // hard cut to the astronaut, hidden under the dip to black: no zoom, sun swing or tile swap on screen
+    { u: B.turn.s, t: A, d: n3(-.32, .12, 1), r: 0.009 },
+    { u: B.turn.e, t: A, d: n3(-.4, .14, 1), r: 0.009 },   // hold on the astronaut: no pull-back before the Earth
+    { u: TOTAL, t: A, d: n3(-.4, .14, 1), r: 0.009 },   // after this the Earth ground scene takes over
   ];
 }
 function camAt(u, K) {
@@ -671,8 +671,8 @@ function sunAt(u) {
   // returns elevation (deg), azimuth (deg from north, clockwise)
   const k = [
     [0, 4, 72], [B.open.e - .3, 6, 100], [B.descent.s, 8, 120], [B.descent.e, 5, 128], [B.athena.e, 4, 132], [B.lowsun.s + .5, 1.4, 136],
-    [B.money.e, 1.4, 136], [B.people.s, 4.5, 250], [B.people.e, 4.5, 250], [B.regions.s + .6, 1.6, 140],
-    [B.regions.e, 1.6, 140], [B.turn.s + .3, 4.5, 250],
+    [B.money.e, 1.4, 136], [B.people.s, 4.5, 250], [B.people.e, 4.5, 250], [B.regions.s + .9, 1.6, 140],
+    [B.regions.e, 1.6, 140], [B.turn.s, 4.5, 250],
     [TOTAL, 4.5, 250],
   ];
   let i = 0; while (i < k.length - 2 && u > k[i + 1][0]) i++;
@@ -687,15 +687,15 @@ const setH = () => { scrollEl.style.height = `${TOTAL * 100 + 100}vh`; };
 setH();
 const uNow = () => (lenis.limit > 0 ? lenis.scroll / lenis.limit : 0) * TOTAL;
 
-const anchors = [0, ...CAPS.map(c => B[c.beat].s + B[c.beat].l * (c.a + Math.min(.4, (c.b - c.a) * .55))), B.open.e - .05,
-  at('money', .55), at('open', .55), at('descent', .22), at('people', .56), at('people', .72), at('people', .9),
-  at('earth', .12), at('earth', .3), at('earth', .55), at('tally', .62), at('pipe', .5)].sort((a, b) => a - b);
+// one click per caption, plus money, tally, and a stop on the Artemis IV launch (no caption of their own)
+const anchors = [0, ...CAPS.map(c => B[c.beat].s + B[c.beat].l * (c.a + Math.min(.4, (c.b - c.a) * .55))),
+  at('money', .55), at('tally', .62), at('people', .7)].sort((a, b) => a - b);
 const goto = dir => {
   const u = uNow(); const list = dir > 0 ? anchors.filter(a => a > u + 0.03) : anchors.filter(a => a < u - 0.03).reverse();
   if (!list.length) return;
-  // presenter mode: a steady speed (about 2.6 s per beat unit), never a rapid jump
+  // presenter mode: one steady speed (about 3.2 s per beat unit), never under 3 s, never a rapid jump
   const dist = Math.abs(list[0] - u);
-  lenis.scrollTo((list[0] / TOTAL) * lenis.limit, { duration: clamp(dist * 2.6, 1.4, 6), easing: t => .5 - .5 * Math.cos(Math.PI * t) });
+  lenis.scrollTo((list[0] / TOTAL) * lenis.limit, { duration: clamp(dist * 3.2, 3, 8), easing: t => .5 - .5 * Math.cos(Math.PI * t) });
 };
 window.__go = u => lenis.scrollTo((u / TOTAL) * lenis.limit, { immediate: true });
 window.__B = B;
@@ -710,19 +710,14 @@ addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; cam
 const $ = id => document.getElementById(id);
 const photo = $('photo'), photoInner = $('photo-inner'), rings = [...document.querySelectorAll('.ring')];
 const money = $('money'), moneyNum = $('money-num'), moneyLine = $('money-line'), moneySrc = $('money-src');
-const pin = $('athena-pin'), flash = $('flash'), launchEl = $('launch');
+const pin = $('athena-pin'), flash = $('flash'), dip = $('dip'), launchEl = $('launch');
 const gauge = $('gauge'), gNeedle = $('g-needle'), gVal = $('g-val'), gOk = $('g-ok'), gBad = $('g-bad');
-const tally = $('tally'), pipe = $('pipe'), outro = $('outro'), oReal = $('o-real'), oPull = $('o-pull');
+const tally = $('tally'), outro = $('outro'), oReal = $('o-real'), oPull = $('o-pull');
 const PULL = Array.from({ length: 24 }, (_, i) => `assets/img/outro/pull_${String(i).padStart(2, '0')}.jpg`);
 // keep the frames alive so swapping src only ever goes to a frame that has loaded (decoding all 24 up front was
 // tried and stalled the main thread for up to 3 s when the decodes resolved together mid-pitch)
 const PULL_IMG = PULL.map(src => { const im = new Image(); im.src = src; return im; });
 let pullIdx = -1;
-fetch('assets/data/pipeline_frame.json').then(r => r.json()).then(P => {
-  const col = (k, n, t, cls = '') => `<div class="${cls}"><h3><span>${n}</span>${t}</h3><ul>${(P[k] || []).map(x => `<li>${x}</li>`).join('')}</ul></div>`;
-  $('pipe-in').innerHTML = col('how', '01', 'How it works') + col('tested', '02', 'How we tested it') + col('new', '03', 'What’s new')
-    + col('gaps', '04', 'Gaps', 'gap') + col('next', '05', 'Next') + `<div id="pipe-src">${P.sources || ''}</div>`;
-}).catch(() => {});
 const hud2 = $('hud-l2'), hud3 = $('hud-l3'), railFill = $('rail-fill'), hint = $('hint'), handoff = $('handoff'), credits = $('credits');
 
 function arc(a0, a1) { // degrees 0..25 mapped to 180..0 on the gauge
@@ -765,7 +760,7 @@ function update(time) {
   const onGround = S.ground && u >= at('earth', .62);
 
   /* astronaut walk clock: runs while he is on screen, restarts when he is off */
-  const showA = (u > B.people.s - .1 && u < B.regions.s + .5) || (u > B.slope.e - .2 && !onGround);
+  const showA = (u > B.people.s - .1 && u < at('people', .95)) || (u > B.slope.e - .2 && !onGround);
   const dt = Math.min(.05, Math.max(0, (time - S.walkLast) / 1000)); S.walkLast = time;
   S.walkT = (showA || onGround) ? S.walkT + dt : 0;
   if (onGround !== S.wasGround) { S.walkT = 0; S.wasGround = onGround; }
@@ -831,8 +826,9 @@ function update(time) {
   /* region boxes draw one by one, then Athena's box fills */
   const rg = local(u, 'regions');
   S.plateMat.uniforms.boxesOn.value = inBeat(u, 'regions') ? 1 - sstep(.95, 1, rg) : 0;
-  S.plateMat.uniforms.boxOp.value = REGIONS.map((_, i) => sstep(.14 + i * .03, .2 + i * .03, rg));
-  S.plateMat.uniforms.hotFill.value = sstep(.5, .62, rg) * (.75 + .25 * Math.sin(time * .006));
+  // boxes start once the camera has finished rising (regions .35); boxes, fill and pin are all done before the click stop (.72)
+  S.plateMat.uniforms.boxOp.value = REGIONS.map((_, i) => sstep(.36 + i * .025, .42 + i * .025, rg));
+  S.plateMat.uniforms.hotFill.value = sstep(.6, .68, rg) * (.75 + .25 * Math.sin(time * .006));
   // darken the scene under overlays
   const mtL = clamp((u - B.money.s) / (B.tally.e - B.money.s));   // money + lander tally share one dimmed stretch
   const dimMoney = u >= B.money.s && u <= B.tally.e ? 1 - .72 * sstep(0, .08, mtL) * (1 - sstep(.95, 1, mtL)) : 1;
@@ -898,7 +894,7 @@ function update(time) {
   }
 
   /* Athena crosshair inside its region box */
-  let pinOp = inBeat(u, 'regions') ? sstep(.56, .66, rg) * (1 - sstep(.95, 1, rg)) : 0;
+  let pinOp = inBeat(u, 'regions') ? sstep(.62, .7, rg) * (1 - sstep(.86, .92, rg)) : 0;
   if (pinOp > 0) pinOp *= project(new THREE.Vector3(ATH[0], S.heightPlate(ATH[0], ATH[1]) + .3, ATH[1]), pin) ? 1 : 0;
   pin.style.opacity = pinOp;
 
@@ -907,6 +903,9 @@ function update(time) {
   const lOp = inBeat(u, 'people') ? sstep(.42, .48, pl) * (1 - sstep(.94, .975, pl)) : 0;
   launchEl.style.opacity = lOp;
   if (lOp > 0) S.launch.render(clamp((pl - .48) / .44));
+
+  /* dip to black from the region overview to the astronaut (the camera cuts while it is dark) */
+  dip.style.opacity = sstep(at('regions', .86), B.regions.e, u) * (1 - sstep(B.turn.s, B.turn.s + .22, u));
 
   /* white-out between the Earth zoom and the ground */
   flash.style.opacity = inBeat(u, 'earth') ? sstep(.5, .615, ea) * (1 - sstep(.625, .74, ea)) : 0;
@@ -926,7 +925,8 @@ function update(time) {
   /* region labels */
   const labOn = inBeat(u, 'regions');
   for (const L of S.labels) {
-    const op = labOn ? sstep(.18 + L.i * .03, .26 + L.i * .03, rg) * (1 - sstep(.93, 1, rg)) * (L.i === HOT ? 1 : 1 - .6 * sstep(.56, .66, rg)) : 0;
+    // labels draw with their boxes, the others dim as Athena's box fills, all gone before the dip
+    const op = labOn ? sstep(.36 + L.i * .025, .42 + L.i * .025, rg) * (1 - sstep(.86, .92, rg)) * (L.i === HOT ? 1 : 1 - .6 * sstep(.6, .68, rg)) : 0;
     L.el.style.opacity = op > 0 && project(L.p, L.el) ? op : 0;
   }
 
@@ -936,9 +936,6 @@ function update(time) {
   tally.querySelectorAll('.lander').forEach((el, i) => el.classList.toggle('on', ta > .14 + i * .03));
   tally.querySelector('.t-line').style.opacity = sstep(.55, .65, ta);
 
-  /* pipeline frame */
-  const pi = local(u, 'pipe');
-  pipe.style.opacity = inBeat(u, 'pipe') ? sstep(0, .1, pi) * (1 - sstep(.92, 1, pi)) : 0;
 
   /* outro: Kohler Coulee as the Moon, then real colours, then pull back to the map */
   const ou = local(u, 'outro');
@@ -982,7 +979,7 @@ function update(time) {
   if (onGround) hud2.textContent = 'Sun el 13.0° · az 230°';
   railFill.style.height = `${(u / TOTAL) * 100}%`;
   hint.style.opacity = u < .15 ? 1 : 0;
-  $('hud').style.opacity = u >= B.pipe.s ? 0 : 1;   // the readout would give away the Kohler reveal
+  $('hud').style.opacity = u >= B.outro.s ? 0 : 1;   // the readout would give away the Kohler reveal
 
   if (onGround) {
     // Earth ground: astronaut keeps walking; camera pulls back and the scene dims under "Let us show you"
