@@ -10,12 +10,15 @@ import { Fit, HazardGlyph } from '../components/Glyphs';
 import { Loading } from '../components/Loading';
 import { ScreenHead } from '../components/ScreenHead';
 import { HAZARD_IDS, type HazardId, type Meta } from '../types/contract';
+import { Select, type SelectOption } from '../components/Select';
+import { regionOptions } from '../lib/regionOptions';
+import { useApp } from '../store';
 import { CreditsPanel } from '../components/Credits';
 import { InfoTip } from '../components/InfoTip';
 import { buildCredits, type Credit, type CreditArea } from '../lib/credits';
 import '../styles/calgary.css';
 import { CalgaryMap, type MapPin } from './alberta/CalgaryMap';
-import { CalgaryPlanner, ctuidOfOption } from './alberta/CalgaryPlanner';
+import { CalgaryPlanner, ctuidOfOption, kindWord, offLine, type RegionRoute } from './alberta/CalgaryPlanner';
 import { EquityCompare, equityResult, type EquityResult } from './alberta/EquityCompare';
 import { RouteThumb, useTwinGeom } from './alberta/MoonTwin';
 import {
@@ -632,49 +635,69 @@ function BusStopIcon(): JSX.Element {
   );
 }
 
-function StepThumb({ data, world }: { data: CalgaryData; world: 'moon' | 'calgary' }): JSX.Element | null {
-  const ex = useMemo(() => exampleRoute(data), [data]);
-  if (!ex) return null;
-  return <StepThumbInner preset={ex.preset} walk={ex.walk} walks={data.walks.items} world={world} />;
-}
-
-function StepThumbInner({
-  preset,
-  walk,
-  walks,
-  world,
-}: {
-  preset: CalgaryPreset;
-  walk: CalgaryWalk;
-  walks: CalgaryWalk[];
-  world: 'moon' | 'calgary';
-}): JSX.Element | null {
-  const g = useTwinGeom(preset, walk, walks);
+function StepThumb({ route, walks, world }: { route: RegionRoute; walks: CalgaryWalk[]; world: 'moon' | 'calgary' }): JSX.Element {
+  const g = useTwinGeom(route.preset, route.walk, walks);
   return (
-    <span className="cg-step-thumb">
+    <span className="cg-step-thumb" data-dim={world === 'calgary' && !route.ok ? true : undefined}>
       <RouteThumb g={g} world={world} px={64} />
     </span>
   );
 }
 
-function CalgaryIntro({ data, result }: { data: CalgaryData; result: EquityResult | null }): JSX.Element {
-  const ex = useMemo(() => exampleRoute(data), [data]);
-  const exPlace = ex ? (ex.walk.park?.split(';')[0].trim() ?? (ex.walk.tract?.communities ? titleCase(ex.walk.tract.communities.split(',')[0]) : '')) : '';
+/** The Moon route of a region and kind, with its closest Calgary path (the recommended match, else the nearest). */
+function routeFor(data: CalgaryData, region: string, kind: CalgaryPreset['kind']): RegionRoute | null {
+  const preset = data.presets.presets.find((p: CalgaryPreset): boolean => p.region === region && p.kind === kind);
+  const m = preset?.match.recommended ?? preset?.match.top[0] ?? null;
+  const walk = m ? data.walks.items.find((w: CalgaryWalk): boolean => w.id === m.id) : undefined;
+  if (!preset || !m || !walk) return null;
+  return { preset, walk, dtw: m.dtw_deg, ok: m.dtw_deg < CALGARY_MATCH_DEG };
+}
+
+interface IntroProps {
+  data: CalgaryData;
+  result: EquityResult | null;
+  route: RegionRoute | null;
+  region: string;
+  kind: CalgaryPreset['kind'];
+  options: SelectOption<string>[];
+  onRegion: (v: string) => void;
+  onKind: (k: CalgaryPreset['kind']) => void;
+}
+
+function CalgaryIntro({ data, result, route, region, kind, options, onRegion, onKind }: IntroProps): JSX.Element {
+  const w = route?.walk;
+  const place = w ? (w.park?.split(';')[0].trim() ?? (w.tract?.communities ? titleCase(w.tract.communities.split(',')[0]) : '')) : '';
+  const off = route ? offLine(route) : null;
   return (
     <section className="cg-intro" aria-label="How it works and the result">
       <ol className="cg-steps">
         <li className="cg-step">
-          <StepThumb data={data} world="moon" />
+          {route && <StepThumb route={route} walks={data.walks.items} world="moon" />}
           <span className="cg-step-text">
             <strong>Moon route</strong>
-            {ex && <span className="cg-step-sub">{ex.preset.region_name}</span>}
+            <Select
+              className="cg-region"
+              triggerClassName="cg-region-trigger"
+              label="Moon region"
+              hideLabel
+              value={region}
+              options={options}
+              onChange={onRegion}
+            />
+            <span className="seg seg-sm cg-kind" role="group" aria-label="Route steepness">
+              {(['gentle', 'steeper'] as const).map((k: CalgaryPreset['kind']): JSX.Element => (
+                <button key={k} type="button" aria-pressed={kind === k} onClick={(): void => onKind(k)}>
+                  {kindWord(k)}
+                </button>
+              ))}
+            </span>
           </span>
         </li>
         <li className="cg-step">
-          <StepThumb data={data} world="calgary" />
+          {route && <StepThumb route={route} walks={data.walks.items} world="calgary" />}
           <span className="cg-step-text">
             <strong>Calgary path, same slopes</strong>
-            {exPlace && <span className="cg-step-sub">{exPlace}</span>}
+            {off ? <span className="cg-step-sub cg-off" title={off}>{off}</span> : place && <span className="cg-step-sub">{place}</span>}
           </span>
         </li>
         <li className="cg-step">
@@ -984,6 +1007,19 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
   const [needFilter, setNeedFilter] = useState<NeedFilter>('All');
   const [unreachedOnly, setUnreachedOnly] = useState<boolean>(false);
   const mapColRef = useRef<HTMLDivElement | null>(null);
+  // Step 1: the Moon region and steepness. Until the user touches them the neighbourhood plan drives the map and route card.
+  const core = useApp((st) => st.core);
+  const [region, setRegion] = useState<string>(() => exampleRoute(data)?.preset.region ?? data.presets.presets[0]?.region ?? '');
+  const [kind, setKind] = useState<CalgaryPreset['kind']>('gentle');
+  const [regionActive, setRegionActive] = useState<boolean>(false);
+  const regionOpts = useMemo((): SelectOption<string>[] => {
+    const have = new Set(data.presets.presets.map((p: CalgaryPreset): string => p.region));
+    const list = (core?.regions ?? []).filter((r): boolean => have.has(r.id));
+    if (list.length) return regionOptions(list, core?.summary?.ranking);
+    const seen = new Map<string, string>(data.presets.presets.map((p: CalgaryPreset): [string, string] => [p.region, p.region_name]));
+    return Array.from(seen, ([value, label]): SelectOption<string> => ({ value, label }));
+  }, [core, data.presets.presets]);
+  const regionRoute = useMemo((): RegionRoute | null => routeFor(data, region, kind), [data, region, kind]);
 
   const indexById = useMemo((): Map<string, number> => new Map(items.map((w: CalgaryWalk, k: number): [string, number] => [w.id, k])), [items]);
   const preferred = useMemo((): Map<string, PreferredNearest> => {
@@ -998,6 +1034,8 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
   const reached = useMemo((): Set<string> | null => (ix ? new Set(ix.suitableByTract.keys()) : null), [ix]);
   const plan = useMemo((): PlanOption[] => (ix && ctuid ? planFor(ix, items, ctuid, preferred.get(ctuid)) : []), [ix, ctuid, items, preferred]);
   const planWalk = plan[optIdx] ? items[plan[optIdx].walkIndex] : null;
+  const activeRegion: RegionRoute | null = regionActive ? regionRoute : null;
+  const mapWalk = activeRegion ? activeRegion.walk : planWalk;
   const compare = useMemo((): { withNeed: EventPick[]; withoutNeed: EventPick[] } | null => {
     if (!ix) return null;
     const pct = needPercentiles(data.overlays);
@@ -1021,6 +1059,7 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
 
   const openTract = useCallback(
     (id: string, opts: { fit: boolean; walkIndex?: number; value?: string }): void => {
+      setRegionActive(false);
       setCtuid(id);
       setSelectValue(opts.value ?? firstOptionValue(ix, data, id));
       let at = 0;
@@ -1054,18 +1093,36 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
     }
   };
 
-  const activePin = planWalk ? (equity?.top_events.find((e: EquityEvent): boolean => e.route_id === planWalk.id)?.rank ?? null) : null;
+  const activePin = mapWalk ? (equity?.top_events.find((e: EquityEvent): boolean => e.route_id === mapWalk.id)?.rank ?? null) : null;
 
   return (
     <>
-      <CalgaryIntro data={data} result={result} />
+      <CalgaryIntro
+        data={data}
+        result={result}
+        route={regionRoute}
+        region={region}
+        kind={kind}
+        options={regionOpts}
+        onRegion={(v: string): void => {
+          setRegion(v);
+          setRegionActive(true);
+          setFitKey((k: number): number => k + 1);
+        }}
+        onKind={(k: CalgaryPreset['kind']): void => {
+          setKind(k);
+          setRegionActive(true);
+          setFitKey((k2: number): number => k2 + 1);
+        }}
+      />
       <div className="ab-layout cg-layout" role="tabpanel">
       <div className="cg-map-col" ref={mapColRef}>
         <CalgaryMap
           overlays={data.overlays}
           walks={items}
-          walk={planWalk}
-          selectedTract={ctuid}
+          walk={mapWalk}
+          dim={activeRegion ? !activeRegion.ok : false}
+          selectedTract={activeRegion ? null : ctuid}
           pins={pins}
           activePin={activePin}
           onPin={onPin}
@@ -1091,7 +1148,7 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
               Suggested event
             </span>
           )}
-          {planWalk && (
+          {mapWalk && (
             <span className="legend-item">
               <span className="mt-key-start" aria-hidden="true" />
               <span className="cg-route-key" aria-hidden="true" />
@@ -1123,6 +1180,7 @@ function CalgaryPanel({ data }: { data: CalgaryData }): JSX.Element {
           }}
           onShow={zoomToRoute}
           routeInView={routeInView}
+          region={activeRegion}
         />
         <NumbersView
           data={data}

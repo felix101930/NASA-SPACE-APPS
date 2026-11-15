@@ -85,16 +85,39 @@ export interface CalgaryPlannerProps {
   onShow: () => void;
   /** The route is already fully on the map at a useful zoom: the zoom button is not needed. */
   routeInView: boolean;
+  /** A region chosen in step 1: its Moon route and the Calgary path that matches it. Replaces the neighbourhood plan while set. */
+  region: RegionRoute | null;
+}
+
+/** A Moon region's preset and its best Calgary path (closest, even when outside the 1.0° match threshold). */
+export interface RegionRoute {
+  preset: CalgaryPreset;
+  walk: CalgaryWalk;
+  dtw: number;
+  /** Within the match threshold. */
+  ok: boolean;
+}
+
+export function kindWord(k: CalgaryPreset['kind']): string {
+  return k === 'steeper' ? 'Steeper' : 'Gentle';
+}
+
+/** The honest line for a route with no good Calgary stand-in; null when the match is good. */
+export function offLine(r: RegionRoute): string | null {
+  if (r.ok) return null;
+  const d = r.dtw.toFixed(1);
+  return r.preset.kind === 'steeper' ? `No Calgary path is this steep — closest is ${d}° off` : `No close Calgary match — closest is ${d}° off`;
 }
 
 export function CalgaryPlanner(p: CalgaryPlannerProps): JSX.Element {
   const reached = useMemo((): Set<string> | null => (p.index ? new Set(p.index.suitableByTract.keys()) : null), [p.index]);
   const options = useMemo((): SelectOption<string>[] => neighbourhoodOptions(p.overlays, reached), [p.overlays, reached]);
   const tract = p.ctuid ? (p.index?.tracts.get(p.ctuid) ?? null) : null;
-  const opt = p.plan[p.optionIdx] ?? null;
-  const walk = opt ? p.walks[opt.walkIndex] : null;
-  const preset = opt && p.index ? (p.presets[p.index.bestPreset[opt.walkIndex]] ?? null) : null;
-  const dtw = opt && p.index ? p.index.bestDtw[opt.walkIndex] : null;
+  const reg = p.region;
+  const opt = reg ? null : (p.plan[p.optionIdx] ?? null);
+  const walk = reg ? reg.walk : opt ? p.walks[opt.walkIndex] : null;
+  const preset = reg ? reg.preset : opt && p.index ? (p.presets[p.index.bestPreset[opt.walkIndex]] ?? null) : null;
+  const dtw = reg ? reg.dtw : opt && p.index ? p.index.bestDtw[opt.walkIndex] : null;
   const earth = useMemo(
     (): number[] | null => (walk ? Array.from(p.rows.subarray(walk.row * p.pts, (walk.row + 1) * p.pts)) : null),
     [walk, p.rows, p.pts],
@@ -120,30 +143,41 @@ export function CalgaryPlanner(p: CalgaryPlannerProps): JSX.Element {
         </InfoTip>
       </div>
       <Select className="field" labelClassName="field-label" label="Neighbourhood" value={p.selectValue} options={options} onChange={p.onSelect} />
-      {!p.ctuid && <p className="caption cg-plan-hint">Type to search, or tap a pin or a neighbourhood on the map.</p>}
-      {p.ctuid && !p.index && (
+      {!p.ctuid && !reg && <p className="caption cg-plan-hint">Type to search, or tap a pin or a neighbourhood on the map.</p>}
+      {p.ctuid && !p.index && !reg && (
         <p className="caption" role="status">
           Matching 2,762 routes to the Moon…
         </p>
       )}
-      {p.ctuid && p.index && (
+      {((p.ctuid && p.index) || reg) && (
         <div className="cg-plan-card" aria-live="polite">
           <div className="cg-plan-head">
-            <h4 className="cg-plan-name">{tract?.label ?? p.ctuid}</h4>
-            <div className="chip-row">
-              <NeedChip category={tract?.category ?? null} />
-              {isReached !== null && (
-                <span className="chip cg-reach" data-reached={isReached}>
-                  {isReached ? 'Has a Moon walk near a bus stop' : 'No Moon walk near a bus stop yet'}
-                </span>
-              )}
-            </div>
+            {reg ? (
+              <>
+                <h4 className="cg-plan-name">
+                  {reg.preset.region_name} · {kindWord(reg.preset.kind)} route
+                </h4>
+                {offLine(reg) && <p className="cg-off">{offLine(reg)}</p>}
+              </>
+            ) : (
+              <>
+                <h4 className="cg-plan-name">{tract?.label ?? p.ctuid}</h4>
+                <div className="chip-row">
+                  <NeedChip category={tract?.category ?? null} />
+                  {isReached !== null && (
+                    <span className="chip cg-reach" data-reached={isReached}>
+                      {isReached ? 'Has a Moon walk near a bus stop' : 'No Moon walk near a bus stop yet'}
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
-          {walk && opt && preset && dtw !== null ? (
-            <div className="cg-plan-route">
+          {walk && preset && dtw !== null && (reg || opt) ? (
+            <div className="cg-plan-route" data-dim={reg ? !reg.ok : undefined}>
               <p className="cg-plan-where">
-                {opt.inTract ? 'Moon walk here' : `Nearest Moon walk · ${(opt.distFromTractM / 1000).toFixed(1)} km away`}
+                {reg ? (reg.ok ? 'Best Calgary match' : 'Closest Calgary path') : opt?.inTract ? 'Moon walk here' : `Nearest Moon walk · ${((opt?.distFromTractM ?? 0) / 1000).toFixed(1)} km away`}
               </p>
               <p className="cg-plan-park">{place}</p>
               <dl className="cg-facts">
@@ -189,7 +223,7 @@ export function CalgaryPlanner(p: CalgaryPlannerProps): JSX.Element {
                 >
                   {p.routeInView ? 'Route in view on the map' : 'Zoom to this route'}
                 </button>
-                {p.plan.length > 1 && (
+                {!reg && p.plan.length > 1 && (
                   <button type="button" className="btn" onClick={p.onNext}>
                     Next route <span className="muted">· {p.optionIdx + 1} of {p.plan.length}</span>
                   </button>

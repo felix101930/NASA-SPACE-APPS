@@ -1266,3 +1266,44 @@
     font-size: var(--fs-body);
   }
 }
+
+/* ---------------------------------------------------------------- step 1 region choice */
+
+.cg-region {
+  margin-top: 2px;
+}
+
+.cg-region-trigger {
+  padding: 4px 10px;
+  font-size: var(--fs-caption);
+  min-height: 0;
+}
+
+.cg-kind {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.cg-off {
+  color: var(--sun);
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.cg-plan-head .cg-off {
+  margin: 4px 0 0;
+  font-size: var(--fs-label);
+}
+
+.cg-step-thumb[data-dim],
+.cg-plan-route[data-dim='true'] .mt-svg-yyc {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.cg-step-text .cg-region,
+.cg-step-text .cg-region-trigger {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}

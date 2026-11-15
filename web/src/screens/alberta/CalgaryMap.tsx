@@ -40,6 +40,8 @@ export interface CalgaryMapProps {
   fitKey: number;
   /** Each change zooms to the highlighted route alone, then pulses it and its start once. */
   zoomKey: number;
+  /** Draw the highlighted route greyed (a closest path that is not a good match). */
+  dim?: boolean;
   /** True while the map box is on screen and the whole route is in the map view at zoom 12 or closer. */
   onRouteInView?: (inView: boolean) => void;
 }
@@ -158,6 +160,7 @@ export function CalgaryMap(props: CalgaryMapProps): JSX.Element {
     reached,
     fitKey,
     zoomKey,
+    dim = false,
     onRouteInView,
   } = props;
   const mapRef = useRef<MlMap | null>(null);
@@ -393,6 +396,13 @@ export function CalgaryMap(props: CalgaryMapProps): JSX.Element {
     }
     evaluate();
   }, [walk, activePin, ready, evaluate]);
+
+  // Greyed route when it is only the closest path, not a match.
+  useEffect((): void => {
+    const map = mapRef.current;
+    if (!map || !ready || !map.getLayer('sel')) return;
+    map.setPaintProperty('sel', 'line-color', dim ? '#8b8780' : '#f3b54a');
+  }, [dim, ready]);
 
   // Fit on request: route + selected tract, else the whole city.
   useEffect((): void => {
