@@ -299,7 +299,7 @@ def gap_text(metric: str, earth: float, moon: float) -> str:
         pts = round(100 * abs(d))
         where = {"shadow_frac_el1": "at 1° sun", "shadow_frac_el3": "at 3° sun", "shadow_frac_el5": "at 5° sun",
                  "shadow_frac_timeweighted": "over a low-sun day"}[metric]
-        return f"same shadow {where}" if pts == 0 else f"{pts} pts {'more' if more else 'less'} shadow {where}"
+        return f"same shadow {where}" if pts == 0 else f"{pts}% {'more' if more else 'less'} of the ground in shadow {where}"
     if metric in ("jump1km_p95_m", "jump1km_p99_m"):
         x = round(abs(d))
         tail = "worst 5%" if metric.endswith("p95_m") else "worst 1%"
@@ -307,12 +307,12 @@ def gap_text(metric: str, earth: float, moon: float) -> str:
     if metric == "frac_track_over_500m":
         if earth == 0 and moon == 0:
             return "no 500 m jumps on either"
-        return f"{100 * abs(d):.1f} pts {'more' if more else 'less'} track crossing 500 m jumps"
+        return f"{100 * abs(d):.1f}% {'more' if more else 'less'} of the 1 km stretches drop over 500 m"
     if metric == "fast_per_km2_el3":
         return f"{abs(d):.1f} {'more' if more else 'fewer'} camera landmarks per km²"
     if metric == "empty_cell_frac_el3":
         pts = round(100 * abs(d))
-        return "same share of featureless 1 km cells" if pts == 0 else f"{pts} pts {'more' if more else 'fewer'} featureless 1 km cells"
+        return "same share of featureless 1 km cells" if pts == 0 else f"{pts}% {'more' if more else 'fewer'} of the 1 km squares featureless"
     if metric == "slope_p50_deg":
         x = round(abs(d))
         return "same typical slope" if x == 0 else f"slopes {x}° {'steeper' if more else 'gentler'}"

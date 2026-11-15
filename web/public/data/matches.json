@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated_utc": "2026-11-15T00:20:52Z",
+  "generated_utc": "2026-11-15T00:21:18Z",
   "pipeline_version": "match-0.1.0",
   "sources": [
    {
@@ -212,7 +212,7 @@
       0.5254
      ],
      "earth": 0.65792,
-     "gap_text": "13 pts more shadow at 1° sun",
+     "gap_text": "13% more of the ground in shadow at 1° sun",
      "light": "red",
      "gap_in_iqr": 6.69,
      "in_distance": true,
@@ -288,7 +288,7 @@
       0.48674
      ],
      "earth": 0.52162,
-     "gap_text": "4 pts more shadow at 3° sun",
+     "gap_text": "4% more of the ground in shadow at 3° sun",
      "light": "red",
      "gap_in_iqr": 2.01,
      "in_distance": true,
@@ -364,7 +364,7 @@
       0.45933
      ],
      "earth": 0.40968,
-     "gap_text": "3 pts less shadow at 5° sun",
+     "gap_text": "3% less of the ground in shadow at 5° sun",
      "light": "amber",
      "gap_in_iqr": 0.74,
      "in_distance": true,
@@ -440,7 +440,7 @@
       0.76994
      ],
      "earth": 0.44332,
-     "gap_text": "7 pts less shadow over a low-sun day",
+     "gap_text": "7% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.15,
      "in_distance": true,
@@ -511,8 +511,8 @@
     "Ground brightness sits at a similar place in its world's range as the Moon region's"
    ],
    "mismatches_text": [
-    "Shadow at 1° sun: 66% here vs 52% on the Moon (13 pts more shadow at 1° sun)",
-    "Shadow at 3° sun: 52% here vs 48% on the Moon (4 pts more shadow at 3° sun)",
+    "Shadow at 1° sun: 66% here vs 52% on the Moon (13% more of the ground in shadow at 1° sun)",
+    "Shadow at 3° sun: 52% here vs 48% on the Moon (4% more of the ground in shadow at 3° sun)",
     "Rock is sedimentary rocks (Macrostrat), not the anorthosite of the lunar highlands: colour, brightness and grain differ",
     "Slopes are more one-directional than on the Moon (aspect anisotropy)"
    ],
@@ -659,7 +659,7 @@
       0.5254
      ],
      "earth": 0.66493,
-     "gap_text": "14 pts more shadow at 1° sun",
+     "gap_text": "14% more of the ground in shadow at 1° sun",
      "light": "red",
      "gap_in_iqr": 7.04,
      "in_distance": true,
@@ -735,7 +735,7 @@
       0.48674
      ],
      "earth": 0.53921,
-     "gap_text": "6 pts more shadow at 3° sun",
+     "gap_text": "6% more of the ground in shadow at 3° sun",
      "light": "red",
      "gap_in_iqr": 2.87,
      "in_distance": true,
@@ -887,7 +887,7 @@
       0.76994
      ],
      "earth": 0.5108,
-     "gap_text": "1 pts less shadow over a low-sun day",
+     "gap_text": "1% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.01,
      "in_distance": true,
@@ -959,8 +959,8 @@
     "Slopes face a mix of directions to a similar degree as on the Moon (aspect anisotropy)"
    ],
    "mismatches_text": [
-    "Shadow at 1° sun: 66% here vs 52% on the Moon (14 pts more shadow at 1° sun)",
-    "Shadow at 3° sun: 54% here vs 48% on the Moon (6 pts more shadow at 3° sun)",
+    "Shadow at 1° sun: 66% here vs 52% on the Moon (14% more of the ground in shadow at 1° sun)",
+    "Shadow at 3° sun: 54% here vs 48% on the Moon (6% more of the ground in shadow at 3° sun)",
     "Low vegetation present (73% shrub/grass: 0% shrub, 73% grass); grass and shrubs soften texture and shadows",
     "Rock is andesite and related volcanic (Macrostrat), not the anorthosite of the lunar highlands: colour, brightness and grain differ"
    ],
@@ -1107,7 +1107,7 @@
       0.5254
      ],
      "earth": 0.69662,
-     "gap_text": "17 pts more shadow at 1° sun",
+     "gap_text": "17% more of the ground in shadow at 1° sun",
      "light": "red",
      "gap_in_iqr": 8.63,
      "in_distance": true,
@@ -1183,7 +1183,7 @@
       0.48674
      ],
      "earth": 0.53739,
-     "gap_text": "6 pts more shadow at 3° sun",
+     "gap_text": "6% more of the ground in shadow at 3° sun",
      "light": "red",
      "gap_in_iqr": 2.78,
      "in_distance": true,
@@ -1259,7 +1259,7 @@
       0.45933
      ],
      "earth": 0.44389,
-     "gap_text": "1 pts more shadow at 5° sun",
+     "gap_text": "1% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.15,
      "in_distance": true,
@@ -1335,7 +1335,7 @@
       0.76994
      ],
      "earth": 0.56926,
-     "gap_text": "5 pts more shadow over a low-sun day",
+     "gap_text": "5% more of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.11,
      "in_distance": true,
@@ -1408,8 +1408,8 @@
     "Slopes face a mix of directions to a similar degree as on the Moon (aspect anisotropy)"
    ],
    "mismatches_text": [
-    "Shadow at 1° sun: 70% here vs 52% on the Moon (17 pts more shadow at 1° sun)",
-    "Shadow at 3° sun: 54% here vs 48% on the Moon (6 pts more shadow at 3° sun)",
+    "Shadow at 1° sun: 70% here vs 52% on the Moon (17% more of the ground in shadow at 1° sun)",
+    "Shadow at 3° sun: 54% here vs 48% on the Moon (6% more of the ground in shadow at 3° sun)",
     "Rock is granite (Macrostrat), not the anorthosite of the lunar highlands: colour, brightness and grain differ"
    ],
    "cannot_test": [
@@ -1705,7 +1705,7 @@
       0.0
      ],
      "earth": 0.00273,
-     "gap_text": "0.1 pts more track crossing 500 m jumps",
+     "gap_text": "0.1% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.28,
      "in_distance": true,
@@ -2149,7 +2149,7 @@
       0.0
      ],
      "earth": 0.00366,
-     "gap_text": "0.2 pts more track crossing 500 m jumps",
+     "gap_text": "0.2% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.46,
      "in_distance": true,
@@ -2592,7 +2592,7 @@
       0.0
      ],
      "earth": 0.00122,
-     "gap_text": "0.0 pts less track crossing 500 m jumps",
+     "gap_text": "0.0% less of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.02,
      "in_distance": true,
@@ -3527,7 +3527,7 @@
       0.43056
      ],
      "earth": 0.39278,
-     "gap_text": "1 pts fewer featureless 1 km cells",
+     "gap_text": "1% fewer of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.09,
      "in_distance": true,
@@ -3744,7 +3744,7 @@
       0.71291
      ],
      "earth": 0.68908,
-     "gap_text": "2 pts more shadow at 1° sun",
+     "gap_text": "2% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.2,
      "in_distance": true,
@@ -3820,7 +3820,7 @@
       0.56848
      ],
      "earth": 0.54689,
-     "gap_text": "1 pts more shadow at 3° sun",
+     "gap_text": "1% more of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.16,
      "in_distance": true,
@@ -3896,7 +3896,7 @@
       0.48758
      ],
      "earth": 0.40515,
-     "gap_text": "1 pts more shadow at 5° sun",
+     "gap_text": "1% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.1,
      "in_distance": true,
@@ -3972,7 +3972,7 @@
       0.73387
      ],
      "earth": 0.54164,
-     "gap_text": "12 pts less shadow over a low-sun day",
+     "gap_text": "12% less of the ground in shadow over a low-sun day",
      "light": "amber",
      "gap_in_iqr": 0.67,
      "in_distance": true,
@@ -4191,7 +4191,7 @@
       0.71291
      ],
      "earth": 0.75041,
-     "gap_text": "8 pts more shadow at 1° sun",
+     "gap_text": "8% more of the ground in shadow at 1° sun",
      "light": "amber",
      "gap_in_iqr": 0.88,
      "in_distance": true,
@@ -4419,7 +4419,7 @@
       0.73387
      ],
      "earth": 0.53295,
-     "gap_text": "13 pts less shadow over a low-sun day",
+     "gap_text": "13% less of the ground in shadow over a low-sun day",
      "light": "amber",
      "gap_in_iqr": 0.71,
      "in_distance": true,
@@ -4637,7 +4637,7 @@
       0.71291
      ],
      "earth": 0.69967,
-     "gap_text": "3 pts more shadow at 1° sun",
+     "gap_text": "3% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.32,
      "in_distance": true,
@@ -4713,7 +4713,7 @@
       0.56848
      ],
      "earth": 0.55318,
-     "gap_text": "2 pts more shadow at 3° sun",
+     "gap_text": "2% more of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.25,
      "in_distance": true,
@@ -4789,7 +4789,7 @@
       0.48758
      ],
      "earth": 0.43137,
-     "gap_text": "4 pts more shadow at 5° sun",
+     "gap_text": "4% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.3,
      "in_distance": true,
@@ -4865,7 +4865,7 @@
       0.73387
      ],
      "earth": 0.536,
-     "gap_text": "13 pts less shadow over a low-sun day",
+     "gap_text": "13% less of the ground in shadow over a low-sun day",
      "light": "amber",
      "gap_in_iqr": 0.7,
      "in_distance": true,
@@ -6443,7 +6443,7 @@
       0.51389
      ],
      "earth": 0.37222,
-     "gap_text": "4 pts fewer featureless 1 km cells",
+     "gap_text": "4% fewer of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.23,
      "in_distance": true,
@@ -6733,7 +6733,7 @@
       0.51389
      ],
      "earth": 0.34167,
-     "gap_text": "7 pts fewer featureless 1 km cells",
+     "gap_text": "7% fewer of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.41,
      "in_distance": true,
@@ -7241,7 +7241,7 @@
       0.57535
      ],
      "earth": 0.69662,
-     "gap_text": "14 pts more shadow at 1° sun",
+     "gap_text": "14% more of the ground in shadow at 1° sun",
      "light": "red",
      "gap_in_iqr": 3.29,
      "in_distance": true,
@@ -7317,7 +7317,7 @@
       0.53603
      ],
      "earth": 0.53739,
-     "gap_text": "4 pts more shadow at 3° sun",
+     "gap_text": "4% more of the ground in shadow at 3° sun",
      "light": "amber",
      "gap_in_iqr": 0.58,
      "in_distance": true,
@@ -7469,7 +7469,7 @@
       0.90721
      ],
      "earth": 0.56926,
-     "gap_text": "2 pts more shadow over a low-sun day",
+     "gap_text": "2% more of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.02,
      "in_distance": true,
@@ -7542,7 +7542,7 @@
     "Slopes face a mix of directions to a similar degree as on the Moon (aspect anisotropy)"
    ],
    "mismatches_text": [
-    "Shadow at 1° sun: 70% here vs 56% on the Moon (14 pts more shadow at 1° sun)",
+    "Shadow at 1° sun: 70% here vs 56% on the Moon (14% more of the ground in shadow at 1° sun)",
     "Rock is granite (Macrostrat), not the anorthosite of the lunar highlands: colour, brightness and grain differ"
    ],
    "cannot_test": [
@@ -7688,7 +7688,7 @@
       0.57535
      ],
      "earth": 0.66493,
-     "gap_text": "11 pts more shadow at 1° sun",
+     "gap_text": "11% more of the ground in shadow at 1° sun",
      "light": "red",
      "gap_in_iqr": 2.54,
      "in_distance": true,
@@ -7764,7 +7764,7 @@
       0.53603
      ],
      "earth": 0.53921,
-     "gap_text": "4 pts more shadow at 3° sun",
+     "gap_text": "4% more of the ground in shadow at 3° sun",
      "light": "amber",
      "gap_in_iqr": 0.61,
      "in_distance": true,
@@ -7840,7 +7840,7 @@
       0.49932
      ],
      "earth": 0.43332,
-     "gap_text": "1 pts less shadow at 5° sun",
+     "gap_text": "1% less of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.16,
      "in_distance": true,
@@ -7916,7 +7916,7 @@
       0.90721
      ],
      "earth": 0.5108,
-     "gap_text": "4 pts less shadow over a low-sun day",
+     "gap_text": "4% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.05,
      "in_distance": true,
@@ -7987,7 +7987,7 @@
     "Slopes face a mix of directions to a similar degree as on the Moon (aspect anisotropy)"
    ],
    "mismatches_text": [
-    "Shadow at 1° sun: 66% here vs 56% on the Moon (11 pts more shadow at 1° sun)",
+    "Shadow at 1° sun: 66% here vs 56% on the Moon (11% more of the ground in shadow at 1° sun)",
     "Low vegetation present (73% shrub/grass: 0% shrub, 73% grass); grass and shrubs soften texture and shadows",
     "Rock is andesite and related volcanic (Macrostrat), not the anorthosite of the lunar highlands: colour, brightness and grain differ",
     "Ground is relatively brighter for Earth than this region is for the Moon"
@@ -8135,7 +8135,7 @@
       0.57535
      ],
      "earth": 0.65792,
-     "gap_text": "10 pts more shadow at 1° sun",
+     "gap_text": "10% more of the ground in shadow at 1° sun",
      "light": "red",
      "gap_in_iqr": 2.38,
      "in_distance": true,
@@ -8211,7 +8211,7 @@
       0.53603
      ],
      "earth": 0.52162,
-     "gap_text": "2 pts more shadow at 3° sun",
+     "gap_text": "2% more of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.33,
      "in_distance": true,
@@ -8287,7 +8287,7 @@
       0.49932
      ],
      "earth": 0.40968,
-     "gap_text": "4 pts less shadow at 5° sun",
+     "gap_text": "4% less of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.45,
      "in_distance": true,
@@ -8363,7 +8363,7 @@
       0.90721
      ],
      "earth": 0.44332,
-     "gap_text": "11 pts less shadow over a low-sun day",
+     "gap_text": "11% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.14,
      "in_distance": true,
@@ -8435,7 +8435,7 @@
     "Mostly open ground (bare 95%, water 5% (ESA WorldCover 2021, 15 km core))"
    ],
    "mismatches_text": [
-    "Shadow at 1° sun: 66% here vs 56% on the Moon (10 pts more shadow at 1° sun)",
+    "Shadow at 1° sun: 66% here vs 56% on the Moon (10% more of the ground in shadow at 1° sun)",
     "Rock is sedimentary rocks (Macrostrat), not the anorthosite of the lunar highlands: colour, brightness and grain differ",
     "Ground is relatively brighter for Earth than this region is for the Moon",
     "Slopes are more one-directional than on the Moon (aspect anisotropy)"
@@ -8733,7 +8733,7 @@
       0.0
      ],
      "earth": 0.01013,
-     "gap_text": "0.1 pts more track crossing 500 m jumps",
+     "gap_text": "0.1% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.24,
      "in_distance": true,
@@ -9177,7 +9177,7 @@
       0.0
      ],
      "earth": 0.01331,
-     "gap_text": "0.4 pts more track crossing 500 m jumps",
+     "gap_text": "0.4% more of the 1 km stretches drop over 500 m",
      "light": "amber",
      "gap_in_iqr": 0.87,
      "in_distance": true,
@@ -9620,7 +9620,7 @@
       0.0
      ],
      "earth": 0.00894,
-     "gap_text": "0.0 pts less track crossing 500 m jumps",
+     "gap_text": "0.0% less of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.0,
      "in_distance": true,
@@ -9986,7 +9986,7 @@
       0.5
      ],
      "earth": 0.45222,
-     "gap_text": "2 pts more featureless 1 km cells",
+     "gap_text": "2% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.17,
      "in_distance": true,
@@ -10276,7 +10276,7 @@
       0.5
      ],
      "earth": 0.42222,
-     "gap_text": "1 pts fewer featureless 1 km cells",
+     "gap_text": "1% fewer of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.05,
      "in_distance": true,
@@ -10566,7 +10566,7 @@
       0.5
      ],
      "earth": 0.43444,
-     "gap_text": "1 pts more featureless 1 km cells",
+     "gap_text": "1% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.04,
      "in_distance": true,
@@ -10860,7 +10860,7 @@
       0.63267
      ],
      "earth": 0.52037,
-     "gap_text": "5 pts less shadow at 3° sun",
+     "gap_text": "5% less of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.27,
      "in_distance": true,
@@ -11012,7 +11012,7 @@
       0.60234
      ],
      "earth": 0.51529,
-     "gap_text": "7 pts more shadow over a low-sun day",
+     "gap_text": "7% more of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.22,
      "in_distance": true,
@@ -11232,7 +11232,7 @@
       0.83402
      ],
      "earth": 0.80265,
-     "gap_text": "3 pts more shadow at 1° sun",
+     "gap_text": "3% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.26,
      "in_distance": true,
@@ -11384,7 +11384,7 @@
       0.39675
      ],
      "earth": 0.3869,
-     "gap_text": "3 pts more shadow at 5° sun",
+     "gap_text": "3% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.31,
      "in_distance": true,
@@ -11460,7 +11460,7 @@
       0.60234
      ],
      "earth": 0.53391,
-     "gap_text": "8 pts more shadow over a low-sun day",
+     "gap_text": "8% more of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.28,
      "in_distance": true,
@@ -11680,7 +11680,7 @@
       0.83402
      ],
      "earth": 0.80884,
-     "gap_text": "4 pts more shadow at 1° sun",
+     "gap_text": "4% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.31,
      "in_distance": true,
@@ -11832,7 +11832,7 @@
       0.39675
      ],
      "earth": 0.37323,
-     "gap_text": "2 pts more shadow at 5° sun",
+     "gap_text": "2% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.18,
      "in_distance": true,
@@ -11908,7 +11908,7 @@
       0.60234
      ],
      "earth": 0.57347,
-     "gap_text": "12 pts more shadow over a low-sun day",
+     "gap_text": "12% more of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.41,
      "in_distance": true,
@@ -13510,7 +13510,7 @@
       0.43056
      ],
      "earth": 0.36556,
-     "gap_text": "4 pts more featureless 1 km cells",
+     "gap_text": "4% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.18,
      "in_distance": true,
@@ -13800,7 +13800,7 @@
       0.43056
      ],
      "earth": 0.35389,
-     "gap_text": "3 pts more featureless 1 km cells",
+     "gap_text": "3% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.13,
      "in_distance": true,
@@ -14090,7 +14090,7 @@
       0.43056
      ],
      "earth": 0.30722,
-     "gap_text": "2 pts fewer featureless 1 km cells",
+     "gap_text": "2% fewer of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.1,
      "in_distance": true,
@@ -14307,7 +14307,7 @@
       0.73277
      ],
      "earth": 0.71235,
-     "gap_text": "5 pts more shadow at 1° sun",
+     "gap_text": "5% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.31,
      "in_distance": true,
@@ -14383,7 +14383,7 @@
       0.61929
      ],
      "earth": 0.54812,
-     "gap_text": "2 pts less shadow at 3° sun",
+     "gap_text": "2% less of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.14,
      "in_distance": true,
@@ -14459,7 +14459,7 @@
       0.49838
      ],
      "earth": 0.43675,
-     "gap_text": "2 pts less shadow at 5° sun",
+     "gap_text": "2% less of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.18,
      "in_distance": true,
@@ -14535,7 +14535,7 @@
       0.94797
      ],
      "earth": 0.567,
-     "gap_text": "10 pts less shadow over a low-sun day",
+     "gap_text": "10% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.18,
      "in_distance": true,
@@ -14755,7 +14755,7 @@
       0.73277
      ],
      "earth": 0.72554,
-     "gap_text": "6 pts more shadow at 1° sun",
+     "gap_text": "6% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.4,
      "in_distance": true,
@@ -14831,7 +14831,7 @@
       0.61929
      ],
      "earth": 0.60697,
-     "gap_text": "4 pts more shadow at 3° sun",
+     "gap_text": "4% more of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.34,
      "in_distance": true,
@@ -14907,7 +14907,7 @@
       0.49838
      ],
      "earth": 0.46112,
-     "gap_text": "1 pts more shadow at 5° sun",
+     "gap_text": "1% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.06,
      "in_distance": true,
@@ -14983,7 +14983,7 @@
       0.94797
      ],
      "earth": 0.58488,
-     "gap_text": "9 pts less shadow over a low-sun day",
+     "gap_text": "9% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.15,
      "in_distance": true,
@@ -15179,7 +15179,7 @@
       0.73277
      ],
      "earth": 0.69967,
-     "gap_text": "3 pts more shadow at 1° sun",
+     "gap_text": "3% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.23,
      "in_distance": true,
@@ -15255,7 +15255,7 @@
       0.61929
      ],
      "earth": 0.55318,
-     "gap_text": "1 pts less shadow at 3° sun",
+     "gap_text": "1% less of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.1,
      "in_distance": true,
@@ -15331,7 +15331,7 @@
       0.49838
      ],
      "earth": 0.43137,
-     "gap_text": "2 pts less shadow at 5° sun",
+     "gap_text": "2% less of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.24,
      "in_distance": true,
@@ -15407,7 +15407,7 @@
       0.94797
      ],
      "earth": 0.536,
-     "gap_text": "13 pts less shadow over a low-sun day",
+     "gap_text": "13% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.24,
      "in_distance": true,
@@ -15777,7 +15777,7 @@
       0.0
      ],
      "earth": 0.00122,
-     "gap_text": "0.1 pts more track crossing 500 m jumps",
+     "gap_text": "0.1% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.24,
      "in_distance": true,
@@ -16210,7 +16210,7 @@
       0.0
      ],
      "earth": 6e-05,
-     "gap_text": "0.0 pts more track crossing 500 m jumps",
+     "gap_text": "0.0% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.01,
      "in_distance": true,
@@ -16653,7 +16653,7 @@
       0.0
      ],
      "earth": 0.00016,
-     "gap_text": "0.0 pts more track crossing 500 m jumps",
+     "gap_text": "0.0% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.03,
      "in_distance": true,
@@ -17020,7 +17020,7 @@
       0.51389
      ],
      "earth": 0.45167,
-     "gap_text": "3 pts more featureless 1 km cells",
+     "gap_text": "3% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.19,
      "in_distance": true,
@@ -17310,7 +17310,7 @@
       0.51389
      ],
      "earth": 0.46833,
-     "gap_text": "5 pts more featureless 1 km cells",
+     "gap_text": "5% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.29,
      "in_distance": true,
@@ -17600,7 +17600,7 @@
       0.51389
      ],
      "earth": 0.43444,
-     "gap_text": "1 pts more featureless 1 km cells",
+     "gap_text": "1% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.08,
      "in_distance": true,
@@ -17818,7 +17818,7 @@
       0.68823
      ],
      "earth": 0.65364,
-     "gap_text": "1 pts more shadow at 1° sun",
+     "gap_text": "1% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.09,
      "in_distance": true,
@@ -17894,7 +17894,7 @@
       0.59361
      ],
      "earth": 0.58475,
-     "gap_text": "3 pts more shadow at 3° sun",
+     "gap_text": "3% more of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.25,
      "in_distance": true,
@@ -17970,7 +17970,7 @@
       0.52989
      ],
      "earth": 0.51803,
-     "gap_text": "4 pts more shadow at 5° sun",
+     "gap_text": "4% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.39,
      "in_distance": true,
@@ -18046,7 +18046,7 @@
       0.83193
      ],
      "earth": 0.59646,
-     "gap_text": "10 pts less shadow over a low-sun day",
+     "gap_text": "10% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.35,
      "in_distance": true,
@@ -18243,7 +18243,7 @@
       0.68823
      ],
      "earth": 0.69662,
-     "gap_text": "5 pts more shadow at 1° sun",
+     "gap_text": "5% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.47,
      "in_distance": true,
@@ -18319,7 +18319,7 @@
       0.59361
      ],
      "earth": 0.53739,
-     "gap_text": "2 pts less shadow at 3° sun",
+     "gap_text": "2% less of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.21,
      "in_distance": true,
@@ -18395,7 +18395,7 @@
       0.52989
      ],
      "earth": 0.44389,
-     "gap_text": "3 pts less shadow at 5° sun",
+     "gap_text": "3% less of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.28,
      "in_distance": true,
@@ -18471,7 +18471,7 @@
       0.83193
      ],
      "earth": 0.56926,
-     "gap_text": "12 pts less shadow over a low-sun day",
+     "gap_text": "12% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.45,
      "in_distance": true,
@@ -18691,7 +18691,7 @@
       0.68823
      ],
      "earth": 0.71423,
-     "gap_text": "7 pts more shadow at 1° sun",
+     "gap_text": "7% more of the ground in shadow at 1° sun",
      "light": "amber",
      "gap_in_iqr": 0.63,
      "in_distance": true,
@@ -18767,7 +18767,7 @@
       0.59361
      ],
      "earth": 0.56876,
-     "gap_text": "1 pts more shadow at 3° sun",
+     "gap_text": "1% more of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.09,
      "in_distance": true,
@@ -18843,7 +18843,7 @@
       0.52989
      ],
      "earth": 0.50255,
-     "gap_text": "3 pts more shadow at 5° sun",
+     "gap_text": "3% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.25,
      "in_distance": true,
@@ -18919,7 +18919,7 @@
       0.83193
      ],
      "earth": 0.57585,
-     "gap_text": "12 pts less shadow over a low-sun day",
+     "gap_text": "12% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.43,
      "in_distance": true,
@@ -19288,7 +19288,7 @@
       0.0
      ],
      "earth": 0.01331,
-     "gap_text": "0.0 pts less track crossing 500 m jumps",
+     "gap_text": "0.0% less of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.05,
      "in_distance": true,
@@ -19733,7 +19733,7 @@
       0.0
      ],
      "earth": 0.01572,
-     "gap_text": "0.2 pts more track crossing 500 m jumps",
+     "gap_text": "0.2% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.43,
      "in_distance": true,
@@ -20177,7 +20177,7 @@
       0.0
      ],
      "earth": 0.01595,
-     "gap_text": "0.2 pts more track crossing 500 m jumps",
+     "gap_text": "0.2% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.48,
      "in_distance": true,
@@ -20543,7 +20543,7 @@
       0.59722
      ],
      "earth": 0.51,
-     "gap_text": "4 pts more featureless 1 km cells",
+     "gap_text": "4% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.15,
      "in_distance": true,
@@ -20833,7 +20833,7 @@
       0.59722
      ],
      "earth": 0.49556,
-     "gap_text": "3 pts more featureless 1 km cells",
+     "gap_text": "3% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.1,
      "in_distance": true,
@@ -21318,7 +21318,7 @@
       0.91817
      ],
      "earth": 0.76182,
-     "gap_text": "1 pts less shadow at 1° sun",
+     "gap_text": "1% less of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.05,
      "in_distance": true,
@@ -21470,7 +21470,7 @@
       0.50273
      ],
      "earth": 0.49751,
-     "gap_text": "4 pts more shadow at 5° sun",
+     "gap_text": "4% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.35,
      "in_distance": true,
@@ -21546,7 +21546,7 @@
       0.59534
      ],
      "earth": 0.60461,
-     "gap_text": "13 pts more shadow over a low-sun day",
+     "gap_text": "13% more of the ground in shadow over a low-sun day",
      "light": "amber",
      "gap_in_iqr": 0.51,
      "in_distance": true,
@@ -21765,7 +21765,7 @@
       0.91817
      ],
      "earth": 0.81831,
-     "gap_text": "5 pts more shadow at 1° sun",
+     "gap_text": "5% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.2,
      "in_distance": true,
@@ -21841,7 +21841,7 @@
       0.64715
      ],
      "earth": 0.61899,
-     "gap_text": "2 pts more shadow at 3° sun",
+     "gap_text": "2% more of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.16,
      "in_distance": true,
@@ -21917,7 +21917,7 @@
       0.50273
      ],
      "earth": 0.47073,
-     "gap_text": "1 pts more shadow at 5° sun",
+     "gap_text": "1% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.1,
      "in_distance": true,
@@ -21993,7 +21993,7 @@
       0.59534
      ],
      "earth": 0.63621,
-     "gap_text": "16 pts more shadow over a low-sun day",
+     "gap_text": "16% more of the ground in shadow over a low-sun day",
      "light": "amber",
      "gap_in_iqr": 0.63,
      "in_distance": true,
@@ -22188,7 +22188,7 @@
       0.91817
      ],
      "earth": 0.80436,
-     "gap_text": "3 pts more shadow at 1° sun",
+     "gap_text": "3% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.14,
      "in_distance": true,
@@ -22264,7 +22264,7 @@
       0.64715
      ],
      "earth": 0.59311,
-     "gap_text": "1 pts less shadow at 3° sun",
+     "gap_text": "1% less of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.07,
      "in_distance": true,
@@ -22340,7 +22340,7 @@
       0.50273
      ],
      "earth": 0.46952,
-     "gap_text": "1 pts more shadow at 5° sun",
+     "gap_text": "1% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.09,
      "in_distance": true,
@@ -22416,7 +22416,7 @@
       0.59534
      ],
      "earth": 0.58679,
-     "gap_text": "11 pts more shadow over a low-sun day",
+     "gap_text": "11% more of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.44,
      "in_distance": true,
@@ -22786,7 +22786,7 @@
       0.0
      ],
      "earth": 6e-05,
-     "gap_text": "0.0 pts more track crossing 500 m jumps",
+     "gap_text": "0.0% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.01,
      "in_distance": true,
@@ -23229,7 +23229,7 @@
       0.0
      ],
      "earth": 0.00122,
-     "gap_text": "0.1 pts more track crossing 500 m jumps",
+     "gap_text": "0.1% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.24,
      "in_distance": true,
@@ -24319,7 +24319,7 @@
       0.54167
      ],
      "earth": 0.48889,
-     "gap_text": "2 pts more featureless 1 km cells",
+     "gap_text": "2% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.17,
      "in_distance": true,
@@ -24609,7 +24609,7 @@
       0.54167
      ],
      "earth": 0.48722,
-     "gap_text": "2 pts more featureless 1 km cells",
+     "gap_text": "2% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.16,
      "in_distance": true,
@@ -24826,7 +24826,7 @@
       0.67853
      ],
      "earth": 0.65792,
-     "gap_text": "5 pts more shadow at 1° sun",
+     "gap_text": "5% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.34,
      "in_distance": true,
@@ -24902,7 +24902,7 @@
       0.51743
      ],
      "earth": 0.52162,
-     "gap_text": "2 pts more shadow at 3° sun",
+     "gap_text": "2% more of the ground in shadow at 3° sun",
      "light": "amber",
      "gap_in_iqr": 0.52,
      "in_distance": true,
@@ -24978,7 +24978,7 @@
       0.44912
      ],
      "earth": 0.40968,
-     "gap_text": "2 pts less shadow at 5° sun",
+     "gap_text": "2% less of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.49,
      "in_distance": true,
@@ -25054,7 +25054,7 @@
       0.46374
      ],
      "earth": 0.44332,
-     "gap_text": "4 pts more shadow over a low-sun day",
+     "gap_text": "4% more of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.26,
      "in_distance": true,
@@ -25273,7 +25273,7 @@
       0.67853
      ],
      "earth": 0.7279,
-     "gap_text": "12 pts more shadow at 1° sun",
+     "gap_text": "12% more of the ground in shadow at 1° sun",
      "light": "amber",
      "gap_in_iqr": 0.86,
      "in_distance": true,
@@ -25425,7 +25425,7 @@
       0.44912
      ],
      "earth": 0.41878,
-     "gap_text": "1 pts less shadow at 5° sun",
+     "gap_text": "1% less of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.28,
      "in_distance": true,
@@ -25501,7 +25501,7 @@
       0.46374
      ],
      "earth": 0.6096,
-     "gap_text": "21 pts more shadow over a low-sun day",
+     "gap_text": "21% more of the ground in shadow over a low-sun day",
      "light": "red",
      "gap_in_iqr": 1.27,
      "in_distance": true,
@@ -25571,7 +25571,7 @@
     "Surface model is trustworthy here: little tree cover or buildings (DSM-safe)"
    ],
    "mismatches_text": [
-    "Shadow over a low-sun day: 61% here vs 40% on the Moon (21 pts more shadow over a low-sun day)",
+    "Shadow over a low-sun day: 61% here vs 40% on the Moon (21% more of the ground in shadow over a low-sun day)",
     "Low vegetation present (44% shrub/grass: 38% shrub, 6% grass); grass and shrubs soften texture and shadows",
     "Rock is lambs/weeks/wah wah summit formations, orr formation, and notch peak formation (Macrostrat), not the anorthosite of the lunar highlands: colour, brightness and grain differ",
     "Ground is relatively darker for Earth than this region is for the Moon",
@@ -25684,7 +25684,7 @@
       0.67853
      ],
      "earth": 0.67307,
-     "gap_text": "6 pts more shadow at 1° sun",
+     "gap_text": "6% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.46,
      "in_distance": true,
@@ -25760,7 +25760,7 @@
       0.51743
      ],
      "earth": 0.56768,
-     "gap_text": "7 pts more shadow at 3° sun",
+     "gap_text": "7% more of the ground in shadow at 3° sun",
      "light": "red",
      "gap_in_iqr": 1.58,
      "in_distance": true,
@@ -25836,7 +25836,7 @@
       0.44912
      ],
      "earth": 0.45247,
-     "gap_text": "2 pts more shadow at 5° sun",
+     "gap_text": "2% more of the ground in shadow at 5° sun",
      "light": "amber",
      "gap_in_iqr": 0.53,
      "in_distance": true,
@@ -25912,7 +25912,7 @@
       0.46374
      ],
      "earth": 0.54655,
-     "gap_text": "15 pts more shadow over a low-sun day",
+     "gap_text": "15% more of the ground in shadow over a low-sun day",
      "light": "amber",
      "gap_in_iqr": 0.88,
      "in_distance": true,
@@ -25983,7 +25983,7 @@
     "Slopes face a mix of directions to a similar degree as on the Moon (aspect anisotropy)"
    ],
    "mismatches_text": [
-    "Shadow at 3° sun: 57% here vs 50% on the Moon (7 pts more shadow at 3° sun)",
+    "Shadow at 3° sun: 57% here vs 50% on the Moon (7% more of the ground in shadow at 3° sun)",
     "Low vegetation present (21% shrub/grass: 0% shrub, 21% grass); grass and shrubs soften texture and shadows",
     "Rock is sedimentary rocks (Macrostrat), not the anorthosite of the lunar highlands: colour, brightness and grain differ"
    ],
@@ -26244,7 +26244,7 @@
       0.0
      ],
      "earth": 8e-05,
-     "gap_text": "0.0 pts more track crossing 500 m jumps",
+     "gap_text": "0.0% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.02,
      "in_distance": true,
@@ -26688,7 +26688,7 @@
       0.0
      ],
      "earth": 0.00017,
-     "gap_text": "0.0 pts more track crossing 500 m jumps",
+     "gap_text": "0.0% more of the 1 km stretches drop over 500 m",
      "light": "green",
      "gap_in_iqr": 0.03,
      "in_distance": true,
@@ -27499,7 +27499,7 @@
       0.45833
      ],
      "earth": 0.38722,
-     "gap_text": "2 pts fewer featureless 1 km cells",
+     "gap_text": "2% fewer of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.23,
      "in_distance": true,
@@ -27789,7 +27789,7 @@
       0.45833
      ],
      "earth": 0.41722,
-     "gap_text": "1 pts more featureless 1 km cells",
+     "gap_text": "1% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.2,
      "in_distance": true,
@@ -28078,7 +28078,7 @@
       0.45833
      ],
      "earth": 0.45167,
-     "gap_text": "5 pts more featureless 1 km cells",
+     "gap_text": "5% more of the 1 km squares featureless",
      "light": "amber",
      "gap_in_iqr": 0.7,
      "in_distance": true,
@@ -28294,7 +28294,7 @@
       0.789
      ],
      "earth": 0.71395,
-     "gap_text": "2 pts more shadow at 1° sun",
+     "gap_text": "2% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.11,
      "in_distance": true,
@@ -28370,7 +28370,7 @@
       0.578
      ],
      "earth": 0.51247,
-     "gap_text": "1 pts more shadow at 3° sun",
+     "gap_text": "1% more of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.09,
      "in_distance": true,
@@ -28446,7 +28446,7 @@
       0.40056
      ],
      "earth": 0.33395,
-     "gap_text": "1 pts more shadow at 5° sun",
+     "gap_text": "1% more of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.05,
      "in_distance": true,
@@ -28522,7 +28522,7 @@
       0.71319
      ],
      "earth": 0.53189,
-     "gap_text": "3 pts less shadow over a low-sun day",
+     "gap_text": "3% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.1,
      "in_distance": true,
@@ -28696,7 +28696,7 @@
       0.789
      ],
      "earth": 0.797,
-     "gap_text": "11 pts more shadow at 1° sun",
+     "gap_text": "11% more of the ground in shadow at 1° sun",
      "light": "green",
      "gap_in_iqr": 0.5,
      "in_distance": true,
@@ -28848,7 +28848,7 @@
       0.40056
      ],
      "earth": 0.31037,
-     "gap_text": "1 pts less shadow at 5° sun",
+     "gap_text": "1% less of the ground in shadow at 5° sun",
      "light": "green",
      "gap_in_iqr": 0.09,
      "in_distance": true,
@@ -29173,7 +29173,7 @@
       0.578
      ],
      "earth": 0.48288,
-     "gap_text": "1 pts less shadow at 3° sun",
+     "gap_text": "1% less of the ground in shadow at 3° sun",
      "light": "green",
      "gap_in_iqr": 0.09,
      "in_distance": true,
@@ -29325,7 +29325,7 @@
       0.71319
      ],
      "earth": 0.46578,
-     "gap_text": "9 pts less shadow over a low-sun day",
+     "gap_text": "9% less of the ground in shadow over a low-sun day",
      "light": "green",
      "gap_in_iqr": 0.34,
      "in_distance": true,
@@ -30951,7 +30951,7 @@
       0.36111
      ],
      "earth": 0.31389,
-     "gap_text": "3 pts more featureless 1 km cells",
+     "gap_text": "3% more of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.16,
      "in_distance": true,
@@ -31241,7 +31241,7 @@
       0.36111
      ],
      "earth": 0.26389,
-     "gap_text": "2 pts fewer featureless 1 km cells",
+     "gap_text": "2% fewer of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.12,
      "in_distance": true,
@@ -31532,7 +31532,7 @@
       0.36111
      ],
      "earth": 0.25611,
-     "gap_text": "3 pts fewer featureless 1 km cells",
+     "gap_text": "3% fewer of the 1 km squares featureless",
      "light": "green",
      "gap_in_iqr": 0.16,
      "in_distance": true,
