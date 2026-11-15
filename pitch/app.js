@@ -33,8 +33,9 @@ const HOT = 3; // Mons Mouton Plateau: Athena's point lies inside this box
 
 /* ---------------------------------------------------------------- beats */
 const BEATS = [
-  ['open', 1.4], ['descent', 1.6], ['photo', 2.4], ['athena', 1.0], ['lowsun', 1.6], ['money', 1.4],
-  ['people', 3.6], ['regions', 1.7], ['slope', 1.5], ['turn', 1.2], ['earth', 2.8], ['handoff', 1.1], ['close', 1.3],
+  ['open', 1.4], ['descent', 1.6], ['photo', 2.4], ['athena', 1.0], ['lowsun', 1.6], ['money', 1.4], ['tally', 1.3],
+  ['people', 3.6], ['regions', 1.7], ['slope', 0.01], ['turn', 1.2], ['earth', 2.8], ['handoff', 1.1],
+  ['pipe', 1.4], ['outro', 3.4], ['close', 1.3],
 ];
 const B = {}; let acc = 0;
 for (const [n, l] of BEATS) { B[n] = { s: acc, l, e: acc + l }; acc += l; }
@@ -42,6 +43,7 @@ const TOTAL = acc;
 const at = (n, f) => B[n].s + B[n].l * f;
 
 const CAPS = [
+  { beat: 'open', a: .18, b: .92, cls: 'center kinetic', html: 'TEAM KINETIC' },
   { beat: 'descent', a: .45, b: .97, html: 'March 2025.<br>The Moon’s south pole.' },
   { beat: 'photo', a: .30, b: .54, cls: 'center', html: 'Recognize this?' },
   { beat: 'photo', a: .60, b: .99, html: 'Those are its <em>feet.</em>', src: 'Lander on its side · Mons Mouton · 6 March 2025' },
@@ -50,11 +52,13 @@ const CAPS = [
   { beat: 'lowsun', a: .50, b: .98, cls: 'top', html: 'Craters didn’t look like<br>its reference maps.', src: 'Intuitive Machines post-mission review, May 2025' },
   { beat: 'people', a: .1, b: .36, html: 'Next landing has<br><em>people</em> on board.', src: 'Artemis IV · targeted early 2028 · ~$4.1B per launch (NASA OIG, 2021)' },
   { beat: 'regions', a: .40, b: .98, html: 'Nine candidate regions.<br>Athena fell in <em>one.</em>', src: 'NASA, Oct 2024 · Athena’s LROC position lies inside Mons Mouton Plateau' },
-  { beat: 'slope', a: .30, b: .98, cls: 'ink', html: 'Slopes up to 20°.<br>Landers need under <em>8°.</em>', src: 'NASA OIG, Human Landing System audit, March 2026' },
   { beat: 'turn', a: .06, b: .97, html: 'You can’t rehearse<br>on the Moon.' },
   { beat: 'earth', a: .74, b: .995, html: 'So we found<br>where <em>you can.</em>', src: 'Kohler Coulee · NASA HLS satellite image, 9 Oct 2025 · Copernicus GLO-30 terrain' },
   { beat: 'handoff', a: .10, b: .98, cls: 'center', html: 'Let us show you.' },
-  { beat: 'close', a: .40, b: 1.01, cls: 'center low', html: 'Rehearse here.<br>Land there.' },
+  { beat: 'outro', a: .05, b: .31, html: 'Next time,<br>we land safely.' },
+  { beat: 'outro', a: .40, b: .62, html: 'Gotcha.<br>This is <em>Alberta.</em>', src: 'Same hills, same camera, real colours · NRCan HRDEM lidar + Sentinel-2, 9 Oct 2025' },
+  { beat: 'outro', a: .70, b: .985, html: 'Kohler Coulee.<br>100 km south of Calgary.', src: 'Best Alberta match to the shadows at Mons Mouton Plateau · the world’s best is in Chile' },
+  { beat: 'close', a: .18, b: 1.01, html: 'Rehearse here.<br>Land there.' },
 ];
 
 /* ---------------------------------------------------------------- helpers */
@@ -611,8 +615,6 @@ function keyframes(S) {
     { u: B.people.e, t: A, d: n3(.62, .16, 1), r: 0.055, o: .012 },
     { u: B.regions.s + .9, t: () => S.RC, d: n3(0, 1, .32), r: 600 },
     { u: B.regions.e, t: () => S.RC, d: n3(.05, 1, .36), r: 560 },
-    { u: B.slope.s + .8, t: () => S.MM, d: n3(.45, .62, .78), r: 21 },
-    { u: B.slope.e, t: () => S.MM, d: n3(.6, .55, .7), r: 19 },
     { u: B.turn.s + .6, t: A, d: n3(-.32, .12, 1), r: 0.009 },
     { u: B.turn.e, t: A, d: n3(-.4, .14, 1), r: 0.02 },
     { u: TOTAL, t: A, d: n3(-.4, .14, 1), r: 0.02 },   // after this the Earth ground scene takes over
@@ -642,7 +644,7 @@ function sunAt(u) {
   const k = [
     [0, 4, 72], [B.open.e - .3, 6, 100], [B.descent.s, 8, 120], [B.descent.e, 5, 128], [B.athena.e, 4, 132], [B.lowsun.s + .5, 1.4, 136],
     [B.money.e, 1.4, 136], [B.people.s, 4.5, 250], [B.people.e, 4.5, 250], [B.regions.s + .6, 1.6, 140],
-    [B.regions.e, 1.6, 140], [B.slope.s + .5, 16, 205], [B.slope.e, 16, 215], [B.turn.s + .3, 4.5, 250],
+    [B.regions.e, 1.6, 140], [B.turn.s + .3, 4.5, 250],
     [TOTAL, 4.5, 250],
   ];
   let i = 0; while (i < k.length - 2 && u > k[i + 1][0]) i++;
@@ -659,7 +661,7 @@ const uNow = () => (lenis.limit > 0 ? lenis.scroll / lenis.limit : 0) * TOTAL;
 
 const anchors = [0, ...CAPS.map(c => B[c.beat].s + B[c.beat].l * (c.a + Math.min(.4, (c.b - c.a) * .55))), B.open.e - .05,
   at('money', .55), at('open', .55), at('descent', .22), at('people', .56), at('people', .72), at('people', .9),
-  at('earth', .12), at('earth', .3), at('earth', .55)].sort((a, b) => a - b);
+  at('earth', .12), at('earth', .3), at('earth', .55), at('tally', .62), at('pipe', .5)].sort((a, b) => a - b);
 const goto = dir => {
   const u = uNow(); const list = dir > 0 ? anchors.filter(a => a > u + 0.03) : anchors.filter(a => a < u - 0.03).reverse();
   if (!list.length) return;
@@ -682,6 +684,15 @@ const photo = $('photo'), photoInner = $('photo-inner'), rings = [...document.qu
 const money = $('money'), moneyNum = $('money-num'), moneyLine = $('money-line'), moneySrc = $('money-src');
 const pin = $('athena-pin'), flash = $('flash'), launchEl = $('launch');
 const gauge = $('gauge'), gNeedle = $('g-needle'), gVal = $('g-val'), gOk = $('g-ok'), gBad = $('g-bad');
+const tally = $('tally'), pipe = $('pipe'), outro = $('outro'), oReal = $('o-real'), oPull = $('o-pull');
+const PULL = Array.from({ length: 24 }, (_, i) => `assets/img/outro/pull_${String(i).padStart(2, '0')}.jpg`);
+PULL.forEach(src => { const im = new Image(); im.src = src; });
+let pullIdx = -1;
+fetch('assets/data/pipeline_frame.json').then(r => r.json()).then(P => {
+  const col = (k, n, t, cls = '') => `<div class="${cls}"><h3><span>${n}</span>${t}</h3><ul>${(P[k] || []).map(x => `<li>${x}</li>`).join('')}</ul></div>`;
+  $('pipe-in').innerHTML = col('how', '01', 'How it works') + col('tested', '02', 'How we tested it') + col('new', '03', 'What’s new')
+    + col('gaps', '04', 'Gaps', 'gap') + col('next', '05', 'Next') + `<div id="pipe-src">${P.sources || ''}</div>`;
+}).catch(() => {});
 const hud2 = $('hud-l2'), hud3 = $('hud-l3'), railFill = $('rail-fill'), hint = $('hint'), handoff = $('handoff'), credits = $('credits');
 
 function arc(a0, a1) { // degrees 0..25 mapped to 180..0 on the gauge
@@ -793,7 +804,8 @@ function update(time) {
   S.plateMat.uniforms.boxOp.value = REGIONS.map((_, i) => sstep(.14 + i * .03, .2 + i * .03, rg));
   S.plateMat.uniforms.hotFill.value = sstep(.5, .62, rg) * (.75 + .25 * Math.sin(time * .006));
   // darken the scene under overlays
-  const dimMoney = inBeat(u, 'money') ? 1 - .72 * sstep(0, .15, local(u, 'money')) * (1 - sstep(.92, 1, local(u, 'money'))) : 1;
+  const mtL = clamp((u - B.money.s) / (B.tally.e - B.money.s));   // money + lander tally share one dimmed stretch
+  const dimMoney = u >= B.money.s && u <= B.tally.e ? 1 - .72 * sstep(0, .08, mtL) * (1 - sstep(.95, 1, mtL)) : 1;
   const dimHand = 1;
   S.tileMat.uniforms.bright.value = S.plateMat.uniforms.bright.value = dimMoney * dimHand;
 
@@ -832,7 +844,7 @@ function update(time) {
     const ring = sstep(.62, .78, ph);
     rings.forEach((r, i) => r.style.strokeDashoffset = 280 * (1 - clamp(ring * 1.3 - i * .3)));
     photoInner.style.filter = '';
-  } else if (inBeat(u, 'close')) {
+  } else if (false) {   // old close (zoom to Earth in the photo) replaced by the Kohler outro
     pOpac = sstep(0, .2, cl);
     const z = ease(sstep(.15, .95, cl));
     const s = Math.exp(lerp(0, Math.log(4.5), z));
@@ -872,7 +884,7 @@ function update(time) {
   /* gauge */
   const sl = local(u, 'slope');
   const gOpac = inBeat(u, 'slope') ? sstep(.15, .3, sl) * (1 - sstep(.92, 1, sl)) : 0;
-  gauge.style.opacity = gOpac;
+  gauge.style.opacity = 0;   // slope view cut from the clicked version
   if (gOpac > 0) {
     const deg = 20 * ease(sstep(.3, .7, sl));
     const th = Math.PI * (1 - deg / 25);
@@ -886,6 +898,28 @@ function update(time) {
   for (const L of S.labels) {
     const op = labOn ? sstep(.18 + L.i * .03, .26 + L.i * .03, rg) * (1 - sstep(.93, 1, rg)) * (L.i === HOT ? 1 : 1 - .6 * sstep(.56, .66, rg)) : 0;
     L.el.style.opacity = op > 0 && project(L.p, L.el) ? op : 0;
+  }
+
+  /* lander tally */
+  const ta = local(u, 'tally');
+  tally.style.opacity = inBeat(u, 'tally') ? sstep(0, .12, ta) * (1 - sstep(.9, 1, ta)) : 0;
+  tally.querySelectorAll('.lander').forEach((el, i) => el.classList.toggle('on', ta > .14 + i * .03));
+  tally.querySelector('.t-line').style.opacity = sstep(.55, .65, ta);
+
+  /* pipeline frame */
+  const pi = local(u, 'pipe');
+  pipe.style.opacity = inBeat(u, 'pipe') ? sstep(0, .1, pi) * (1 - sstep(.92, 1, pi)) : 0;
+
+  /* outro: Kohler Coulee as the Moon, then real colours, then pull back to the map */
+  const ou = local(u, 'outro');
+  const oOp = u >= B.outro.s ? sstep(0, .05, ou) : 0;
+  outro.style.opacity = oOp;
+  if (oOp > 0) {
+    const pullT = u >= B.close.s ? 1 : sstep(.64, 1, ou);
+    oReal.style.opacity = sstep(.32, .42, ou);
+    const k = Math.round(pullT * 23);
+    if (k !== pullIdx) { pullIdx = k; oPull.src = PULL[k]; }
+    oPull.style.opacity = pullT > 0 ? 1 : 0;
   }
 
   /* captions */
@@ -917,6 +951,7 @@ function update(time) {
   if (onGround) hud2.textContent = 'Sun el 13.0° · az 230°';
   railFill.style.height = `${(u / TOTAL) * 100}%`;
   hint.style.opacity = u < .15 ? 1 : 0;
+  $('hud').style.opacity = u >= B.pipe.s ? 0 : 1;   // the readout would give away the Kohler reveal
 
   if (onGround) {
     // Earth ground: astronaut keeps walking; camera pulls back and the scene dims under "Let us show you"

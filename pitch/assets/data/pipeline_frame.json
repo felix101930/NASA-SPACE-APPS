@@ -1,0 +1,27 @@
+{
+  "how": [
+    "Moon: NASA LOLA 20 m terrain for all 9 Artemis regions",
+    "Earth: 30 m terrain worldwide, bare ground only (no trees, crops)",
+    "Cast shadows at sun 1-5°, measure rims and texture, then match"
+  ],
+  "tested": [
+    "Our Moon shadows vs NASA's own light map: r = 0.98",
+    "Known analog beats a decoy 80% of the time (13 known, 9 decoys)",
+    "Weights moved ±20%: top-site lists still overlap 88%"
+  ],
+  "new": [
+    "33 of the 57 Earth sites we picked for the 9 Moon regions:",
+    "No prior analog study found in the catalogs and literature we checked"
+  ],
+  "gaps": [
+    "Shape and light only: not gravity, vacuum, dust or soil",
+    "A classifier can still tell our matches from the Moon",
+    "Small test set, and no site has been visited yet"
+  ],
+  "next": [
+    "Visit Kohler Coulee at low sun with cameras and a drone",
+    "Run Kohler through the same catalog novelty check",
+    "Run the same pipeline on Mars landing sites"
+  ],
+  "sources": "NASA LOLA (PGDA), NASADEM, MODIS, HLS (GIBS) + GLO-30, WorldCover"
+}
