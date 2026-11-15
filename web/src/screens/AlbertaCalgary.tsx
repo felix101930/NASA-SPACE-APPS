@@ -714,21 +714,43 @@ function CalgaryIntro({ data, result, route, region, kind, options, onRegion, on
   );
 }
 
+/** A row of n dots, the first `filled` solid: a quick picture of "k of n". */
+function DotRow({ filled, n }: { filled: number; n: number }): JSX.Element {
+  return (
+    <span className="cg-dots" aria-hidden="true">
+      {Array.from({ length: n }, (_: unknown, i: number): JSX.Element => (
+        <span key={i} className={i < filled ? 'cg-dot cg-dot-on' : 'cg-dot'} />
+      ))}
+    </span>
+  );
+}
+
 function ResultLine({ r }: { r: EquityResult }): JSX.Element {
-  const withPart = r.withIndex === r.n ? `all ${r.n}` : `${r.withIndex} of ${r.n}`;
-  const better = r.withIndex > r.withoutIndex;
+  const onlyPart = r.withoutIndex < r.n ? `only ${r.withoutIndex}` : `all ${r.withoutIndex}`;
+  const withPart = r.withIndex === r.n ? `all ${r.n}` : `${r.withIndex}`;
   return (
     <div className="cg-result-text">
-      With the City’s Equity Index, <strong>{withPart}</strong> suggested events go to neighbourhoods where amenities are hardest to reach.{' '}
-      {better ? (
-        <>
-          Without it, only <strong>{r.withoutIndex} of {r.n}</strong> would.
-        </>
-      ) : (
-        <>
-          Without it, <strong>{r.withoutIndex} of {r.n}</strong> would.
-        </>
-      )}{' '}
+      <p className="cg-result-lead">
+        If we pick the {r.n} best walk spots on bus access and slope alone, <strong>{onlyPart}</strong> are where amenities are hardest to reach.
+        Add the City’s Equity Index, and <strong>{withPart}</strong> are.
+      </p>
+      <dl className="cg-dotrows" aria-label={`Bus access and slope only: ${r.withoutIndex} of ${r.n}. With the City's Equity Index: ${r.withIndex} of ${r.n}.`}>
+        <div className="cg-dotrow">
+          <dt>Bus access + slope only</dt>
+          <dd>
+            <DotRow filled={r.withoutIndex} n={r.n} />
+            <span className="cg-dotcount">{r.withoutIndex} of {r.n}</span>
+          </dd>
+        </div>
+        <div className="cg-dotrow">
+          <dt>+ City’s Equity Index</dt>
+          <dd>
+            <DotRow filled={r.withIndex} n={r.n} />
+            <span className="cg-dotcount">{r.withIndex} of {r.n}</span>
+          </dd>
+        </div>
+      </dl>
+      <span className="cg-dotkey">● = event spot where amenities are hardest to reach</span>{' '}
       <InfoTip label="How this is counted" title="How this is counted" align="end">
         <div className="infotip-body">
           <p>

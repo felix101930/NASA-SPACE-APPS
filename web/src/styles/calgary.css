@@ -1307,3 +1307,16 @@
   min-width: 0;
   max-width: 100%;
 }
+
+/* "k of n" dot rows in the Equity Index result */
+.cg-result-lead { margin: 0 0 12px; }
+.cg-dotrows { display: grid; gap: 8px; margin: 0 0 8px; }
+.cg-dotrow { display: grid; grid-template-columns: minmax(180px, max-content) 1fr; align-items: center; gap: 16px; }
+.cg-dotrow dt { color: var(--text-2); font-size: 14px; }
+.cg-dotrow dd { margin: 0; display: flex; align-items: center; gap: 12px; }
+.cg-dots { display: inline-flex; gap: 8px; }
+.cg-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--text-3); box-sizing: border-box; }
+.cg-dot-on { background: var(--text); border-color: var(--text); }
+.cg-dotcount { font-variant-numeric: tabular-nums; font-size: 14px; color: var(--text-2); }
+.cg-dotkey { font-size: 12px; color: var(--text-3); }
+@media (max-width: 560px) { .cg-dotrow { grid-template-columns: 1fr; gap: 4px; } }
