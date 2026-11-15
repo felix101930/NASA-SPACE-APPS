@@ -16,7 +16,7 @@ const TILE_W = 15;                    // km, Mons Mouton tile
 const TILE_N = 500;
 const TILE_ORIGIN = [65520, 125520];  // Mons Mouton tile west / north edges (m), from regions.json
 const TILE_C = [(TILE_ORIGIN[0] + 7500) / 1000, -(TILE_ORIGIN[1] - 7500) / 1000];
-const DEMO_URL = new URLSearchParams(location.search).get('demo') || 'http://localhost:5174/';
+const DEMO_URL = new URLSearchParams(location.search).get('demo') || 'http://localhost:5173/';
 
 const TEX = 'assets/img/earth/';   // three-globe 2.31.0 example images (NASA Blue Marble), served locally
 const ATH = [77.108, -137.993];       // Athena, 84.7906 S 29.1957 E (LROC), in world km
