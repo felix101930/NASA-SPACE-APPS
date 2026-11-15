@@ -1,41 +1,56 @@
-# Resources
+# Datasets
 
-Source: https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/?tab=resources
+Every dataset we used is free and public. This list matches the **Data we used** table and the
+**Data credits and licences** panel on the website's Summary page.
 
-NASA does not endorse any non-U.S. Government entity and is not responsible for information contained on non-U.S. Government websites. For non-U.S. Government websites, participants must comply with any data use parameters of that specific website.
+> **Challenge eligibility:** we use NASA data from this challenge's Resources list:
+> **NASA LRO LOLA** (Lunar Reconnaissance Orbiter, via PGDA) for all Moon terrain, plus
+> **NASA Earthdata** products (MODIS, NASADEM, HLS through GIBS).
 
-## NASA DATA & RESOURCES
+## Moon
+| Data | From | What we used it for | Licence | Link |
+|---|---|---|---|---|
+| Moon south-pole terrain (LRO LOLA 20 m, PGDA product 90) | NASA | Heights for all 9 regions. Every danger (shadows, rim drops, camera texture, slope) is measured from it. | NASA data, public domain | [pgda.gsfc.nasa.gov/products/90](https://pgda.gsfc.nasa.gov/products/90) |
+| Artemis candidate regions map (Oct 28 2024) | NASA | The 9 regions NASA named. | NASA media, not copyrighted | [nasa.gov](https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/) |
+| Region outlines (USGS LGRS) | USGS | Exact outlines of the 9 regions. | USGS, public domain | [doi:10.5066/P1MEQ6UK](https://doi.org/10.5066/P1MEQ6UK) |
 
-### Earth
+## Earth
+| Data | From | What we used it for | Licence | Link |
+|---|---|---|---|---|
+| Earth terrain (Copernicus DEM GLO-30 and GLO-90) | ESA, DLR, Airbus | Heights for every Earth square, measured exactly like the Moon. | © DLR 2010–2014, © Airbus 2014–2018, provided under COPERNICUS by the EU and ESA | [registry.opendata.aws](https://registry.opendata.aws/copernicus-dem/) |
+| Land cover (ESA WorldCover 2021, 10 m) | ESA | Keeps only bare ground: trees, crops and buildings would fake the terrain. | CC-BY 4.0 | [esa-worldcover.org](https://esa-worldcover.org/) |
+| Ground brightness (MODIS MCD43C3) | NASA | How bright the ground is, compared with the Moon region. | NASA open data, no restrictions | [lpdaac.usgs.gov](https://lpdaac.usgs.gov/products/mcd43c3v061/) |
+| Rock type (Macrostrat) | University of Wisconsin | What each Earth site is made of. | CC-BY 4.0 | [macrostrat.org](https://macrostrat.org/) |
+| Satellite images (GIBS, HLS) | NASA | The pictures of each Earth site. | NASA open data, no restrictions | [GIBS docs](https://nasa-gibs.github.io/gibs-api-docs/) |
+| Protected areas (Protected Planet WDPA) | UNEP-WCMC, IUCN | Flags sites inside parks and reserves, where a rehearsal may need a permit. | WDPA terms, with attribution | [protectedplanet.net](https://www.protectedplanet.net/) |
+| Place names (GeoNames) | GeoNames | Names such as "154 km E of Taltal". | CC-BY 4.0 | [geonames.org](https://www.geonames.org/) |
+| Maps (OpenFreeMap, OpenMapTiles, Natural Earth) | OpenStreetMap contributors, Natural Earth | Map backgrounds. | ODbL (OSM), public domain (Natural Earth) | [openstreetmap.org/copyright](https://www.openstreetmap.org/copyright) |
 
-[NASA Earthdata Search](https://search.earthdata.nasa.gov/?utm_source=%27chatgpt.com%27): NASA's primary portal for discovering and accessing Earth science observations.
+## Checks
+| Data | From | What we used it for | Licence | Link |
+|---|---|---|---|---|
+| Moon sunlight map (LOLA illumination, PGDA product 69) | NASA | Checks our computed Moon shadows against NASA's own (r = 0.98). | NASA data, public domain | [pgda.gsfc.nasa.gov/products/69](https://pgda.gsfc.nasa.gov/products/69) |
+| Second Earth terrain (NASADEM) | NASA | Cross-checks the Copernicus heights. | NASA open data, no restrictions | [lpdaac.usgs.gov](https://lpdaac.usgs.gov/products/nasadem_hgtv001/) |
+| Known analog sites (USGS TADP and PAAD, NASA Planetary Analog Explorer, published studies) | USGS, NASA, research papers | Tests the method (real training sites must beat decoys) and tells new sites from known ones. | Public domain (USGS, NASA); papers cited in [METHOD.md](METHOD.md) | — |
+| Sun position (Astropy) | Astropy project | Finds the dates and times when the sun is at the right height. | BSD-3-Clause | [astropy.org](https://www.astropy.org/) |
 
-[NASA Worldview](https://worldview.earthdata.nasa.gov/index.html?utm_source=%27chatgpt.com%27): An easy-to-use interactive environment for visually exploring NASA satellite imagery and environmental observations.
+## Alberta & Calgary
+| Data | From | What we used it for | Licence | Link |
+|---|---|---|---|---|
+| Calgary terrain (HRDEM lidar, 1 m) | Natural Resources Canada | Heights along Calgary's pathways. | Open Government Licence – Canada | [open.canada.ca](https://open.canada.ca/data/en/dataset/957782bf-847c-4644-a757-e383c0057995) |
+| City of Calgary Open Data (pathways, parks, transit stops) | City of Calgary | The paths we match Moon walks to, and how close they are to a bus or train. | Open Government Licence – City of Calgary | [data.calgary.ca](https://data.calgary.ca/) |
+| Calgary Equity Index 2024 | City of Calgary | Which neighbourhoods need access to amenities most. | Open Government Licence – City of Calgary | [data.calgary.ca](https://data.calgary.ca/) |
+| Canadian protected areas (CPCAD) | Environment and Climate Change Canada | Park labels for Alberta sites. | Open Government Licence – Canada | [canada.ca](https://www.canada.ca/en/environment-climate-change/services/national-wildlife-areas/protected-conserved-areas-database.html) |
 
-### Moon and Mars
+## Pitch site
+| Data | From | What we used it for | Licence |
+|---|---|---|---|
+| Moon model (SVS 14959), Blue Marble globe | NASA | The Moon and Earth in the opening and globe scenes. | NASA media, not copyrighted |
+| LRO, astronaut and SLS models | NASA 3D Resources | The 3D models in the pitch. | NASA media, not copyrighted |
+| Kohler Coulee outro (HRDEM lidar 4 m, Sentinel-2 L2A, 9 Oct 2025) | NRCan, ESA Copernicus | The "This is Alberta" reveal and pull-back. | Open Government Licence – Canada; Copernicus free and open |
+| Earth ground image (HLS HLSS30 v2.0, 9 Oct 2025) | NASA | The ground under the astronaut. | NASA open data, no restrictions |
+| Athena on its side (March 2025) | Intuitive Machines | "Those are its feet." | Photo: Intuitive Machines |
 
-[NASA Planetary Data System (PDS)](https://pds.nasa.gov/?utm_source=%27chatgpt.com%27): NASA's long-term archive for planetary science data from NASA orbital, lander, and rover missions. It provides access to lunar and Martian mission observations spanning imagery, geoscience, atmospheres, plasma environments, cartography, and other measurements.
-
-[NASA Lunar Reconnaissance Orbiter (LRO)](https://pds-geosciences.wustl.edu/missions/lro/?utm_source=%27chatgpt.com%27): LRO provides extensive observations of the lunar surface through instruments including LROC, LOLA, Diviner, LEND, Mini-RF and others.
-
-[NASA LRO Diviner Lunar Data](https://pds-geosciences.wustl.edu/missions/lro/diviner.htm?utm_source=%27chatgpt.com%27): Diviner maps lunar surface temperatures and provides especially useful products for studying the lunar poles. Its polar and resource products could be compared with extreme cold, ice-bearing, or other terrestrial environments.
-
-## SPACE AGENCY PARTNER RESOURCES
-
-### CSA (Canadian Space Agency)
-
-[RADARSAT Constellation Mission (RCM) - Data](https://donnees-data.asc-csa.gc.ca/en/dataset/rcm): RCM is Canada's new generation of Earth observation satellites. The RCM includes a trio of Earth observation satellites, capable of scanning Earth day or night and in any weather conditions. The RCM is designed to provide effective solutions in three main areas: Maritime surveillance (ice, surface wind, oil pollution and ship monitoring); Disaster management (mitigation, warning, response and recovery); and Ecosystem monitoring (agriculture, wetlands, forestry and coastal change monitoring).
-
-[RADARSAT 1 - Data](https://donnees-data.asc-csa.gc.ca/en/dataset/radarsat1): Launched in November 1995, RADARSAT-1 provided Canada and the world with an operational radar satellite system capable of timely delivery of large amounts of data. Equipped with a powerful synthetic aperture radar (SAR) instrument, it acquired images of the Earth day or night, in all weather and through cloud cover, smoke and haze. All data products in the Canadian RADARSAT-1 archive have been released under an open license.
-
-[Synthetic Aperture Radar (SAR) Python Tutorial](https://github.com/asc-csa/Synthetic_Aperture_Radar_Tutorial): This tutorial demonstrates how to work with SAR imagery using Python and QGIS. It includes easy and practical steps for accessing and visualizing data.
-
-### ESA (European Space Agency)
-
-[Copernicus Data Space Ecosystem](https://dataspace.copernicus.eu/?utm_source=%27chatgpt.com%27): Provides free and open access to Sentinel Earth-observation data covering land, oceans, and atmosphere, with tools for visualization and processing.
-
-[ESA Open Science Catalog](https://opensciencedata.esa.int/?utm_source=%27chatgpt.com%27): A catalog of publicly available geoscience datasets, products, experiments, and workflows.
-
-### JAXA (Japan Aerospace Exploration Agency)
-
-[JAXA G-Portal](https://gportal.jaxa.jp/gpr/index/index?utm_source=%27chatgpt.com%27): Provides Earth-observation products from JAXA missions, searchable by variables such as precipitation, snow, vegetation, etc.
+Full citations are in each output file's `meta.sources` and in the website's **Data credits and licences** panel.
+The full list of resources the challenge offered is at
+[spaceappschallenge.org](https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/?tab=resources).
