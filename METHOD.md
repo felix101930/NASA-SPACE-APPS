@@ -1,5 +1,7 @@
 # Method (fixed before any result was computed)
 
+> **Earlier plan.** This was the plan for our first run (ASTER terrain, 10-model contest). The final app uses a different setup: see [docs/research-synthesis.md](docs/research-synthesis.md) and the [README](README.md). Two rules from this plan carried into the final pipeline: the 50 km novelty rule and the walk find-back test with a hidden copy.
+
 Written 2026-11-14, before any feature, score or ranking existed. Changes after this point are listed at the bottom with a reason.
 
 ## Data (organizer-listed sources only)
